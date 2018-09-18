@@ -22,7 +22,18 @@ done that, you can run `npm start` to compile your code.  JetLag uses webpack
 for compilation, so every time you make a change, the code will recompile.  
 To test your game, open a browser and navigate to http://localhost:8080.
 
-## Status
+To develop a game, we recommend that you start by reading the code in 
+src/game/Levels.ts, to understand how JetLag works.  Then edit the first level 
+of that file to start creating your game.
+
+To add images and sounds to JetLag, follow these steps:
+1. Copy the image or sound file into the assets folder
+2. Add the name of the file to the appropriate list in src/game/myconfig.ts
+
+That's it.  Once you follow those two steps, you can refer to the asset by its 
+filename in your code.
+
+## JetLag Status
 This is an initial port of JetLag.  It is under active development.  While many 
 parts of JetLag are effectively stable, we reserve the right to change any and
 all APIs and interfaces.
