@@ -13,6 +13,7 @@ import { TimedEvent } from "../misc/Timer";
 import { ProjectilePool } from "../misc/ProjectilePool";
 import { ParallaxLayer } from "../renderables/ParallaxLayer";
 import { Animation } from "../renderables/Animation";
+import { Svg } from "../misc/Svg";
 
 /**
  * WorldApi provides the functionality needed for putting things into the world
@@ -792,5 +793,21 @@ export class WorldApi {
      */
     public setBackgroundColor(color: number) {
         this.stageManager.getCurrStage().backgroundColor = color;
+    }
+
+    /**
+     * From an SVG file that consists only of paths, produce a bunch of 
+     * obstacles that correspond to the line segments of those paths.
+     * 
+     * @param filename The name of the SVG file to load
+     * @param xTranslate An amount to shift the SVG in the x dimension
+     * @param yTranslate An amount to shift the SVG in the y dimension
+     * @param xStretch A multiplier to stretch in the x dimension
+     * @param yStretch A multiplier to stretch in the y dimension
+     * @param callback Code to run on each obstacle once it is made
+     */
+    public drawSVG(filename: string, xTranslate: number, yTranslate: number, xStretch: number, yStretch: number, callback: (actor: WorldActor) => void) {
+        let s = new Svg();
+        s.processFile(filename, xTranslate, yTranslate, xStretch, yStretch, this, this.stageManager.config, callback);
     }
 }

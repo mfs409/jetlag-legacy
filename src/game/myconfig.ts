@@ -29,10 +29,10 @@ export class MyConfig extends JetLagConfig {
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
     this.debugMode = true;
-    this.forceAccelerometerOff = false;
+    this.forceAccelerometerOff = true;
 
     // Chooser configuration
-    this.numLevels = 90;
+    this.numLevels = 92;
     this.enableChooser = true;
     this.storageKey = "com.me.myjetlaggame.prefs";
 

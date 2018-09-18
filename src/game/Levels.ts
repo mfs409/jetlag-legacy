@@ -3308,6 +3308,100 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         trigger.setCollisionsEnabled(false);
     }
 
+    // JetLag has limited support for SVG. If you draw a picture in Inkscape or another SVG
+    // tool, and it only consists of lines, then you can import it into your game as a set of
+    // obstacles. Drawing a picture on top of the obstacle is probably a good idea, though we
+    // don't bother in this level
+    else if (index == 91) {
+        // We'll use tilt and jump to control the hero in this level
+        jl.world.setCameraBounds(340, 90);
+        //jl.world.resetGravity(0, 10);
+        //jl.world.enableTilt(10, 0);
+        jl.world.enableTilt(10, 10);
+
+
+
+        jl.world.setTiltAsVelocity(true);
+        // jl.world.drawBoundingBox(0, 0, 34, 9, "", 1, .3, 1);
+        let h = jl.world.makeHeroAsCircle(.25, 5.25, .75, .75, "greenball.png");
+        h.setPhysics(5, 0, 0.6);
+        h.setJumpImpulses(0, 20);
+        h.setTouchToJump();
+        h.setMoveByTilting();
+        jl.world.setCameraChase(h);
+        jl.world.makeDestinationAsCircle(33, 8, 1, 1, "mustardball.png");
+        jl.score.setVictoryDestination(1);
+
+        // draw an obstacle from SVG.  We are stretching it in the X and Y dimensions, and also
+        // moving it rightward and upward
+        jl.world.drawSVG("shape.svg", 5, 5, 3, 3, (actor: WorldActor) => {
+            // This code is run each time a line of the SVG is drawn.  When we draw a line,
+            // we'll give it some density and friction.  Remember that the line is
+            // actually a rotated obstacle.
+            actor.setPhysics(1, 0, .1);
+            actor.setImage("red.png");
+        });
+
+
+        // add zoom buttons. We are using blank images, which means that the buttons will be
+        // invisible... that's nice, because we can make the buttons big (covering the left and
+        // right halves of the screen).  When debug rendering is turned on, we'll be able to see
+        // an outline of the two rectangles. You could also use images (that you registered,
+        // of course), but if you did, you'd either need to make them small (maybe by drawing
+        // some pictures in addition to Tap controls), or make them semi-transparent.
+        jl.hud.addTapControl(0, 0, 8, 9, "", () => {
+            if (jl.world.getZoom() > 50)
+                jl.world.setZoom(jl.world.getZoom() - 10);
+            return true;
+        });
+        jl.hud.addTapControl(8, 0, 16, 9, "", () => {
+            if (jl.world.getZoom() < 200)
+                jl.world.setZoom(jl.world.getZoom() + 20);
+            return true;
+        });
+
+
+        welcomeMessage(jl, "Obstacles can be drawn from SVG files");
+        winMessage(jl, "Great Job");
+        loseMessage(jl, "Try Again");
+    }
+
+    // This is for working with sticky + passthrough
+    else if (index == 92) {
+        jl.world.resetGravity(0, 10);
+        welcomeMessage(jl, "Press screen borders to move,  the hero");
+        winMessage(jl, "Great Job");
+        loseMessage(jl, "Try Again");
+        jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
+        let h = jl.world.makeHeroAsCircle(.25, 5.25, .75, .75, "greenball.png");
+        h.disableRotation();
+        h.setJumpImpulses(0, 10);
+        h.setTouchToJump();
+        // give a little friction, to help the hero stick to platforms
+        h.setPhysics(2, 0, .5);
+
+        // create a destination
+        jl.world.makeDestinationAsCircle(14, 4, 2, 2, "mustardball.png");
+        jl.score.setVictoryDestination(1);
+
+        // This obstacle is sticky on top... Jump onto it and watch what
+        // happens
+        let o = jl.world.makeObstacleAsBox(2, 6, 2, .25, "red.png");
+        o.setRoute(new Route().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true);
+        o.setPhysics(100, 0, .1);
+        o.setSticky(true, false, false, false);
+        o.setOneSided(0);
+
+        // This obstacle is not sticky... it's not nearly as much fun
+        let o2 = jl.world.makeObstacleAsBox(11, 6, 2, .25, "red.png");
+        o2.setRoute(new Route().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true);
+        o2.setPhysics(100, 0, 1);
+
+        // draw some buttons for moving the hero
+        jl.hud.addToggleButton(0, 0, 1, 8, "", jl.hud.makeXMotionAction(h, -5), jl.hud.makeXMotionAction(h, 0));
+        jl.hud.addToggleButton(15, 0, 1, 8, "", jl.hud.makeXMotionAction(h, 5), jl.hud.makeXMotionAction(h, 0));
+    }
+
     // Put the level number in the top right corner of every level
     jl.hud.addText(15, .5, "arial", "#872436", 22, () => "Level " + index, 2);
 }
