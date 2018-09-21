@@ -10,16 +10,6 @@ import { Goodie } from "../renderables/Goodie"
 import { Enemy } from "../renderables/Enemy"
 
 /**
- * These are the ways you can complete a level: you can reach the destination, you can collect
- * enough stuff, or you can reach a certain number of enemies defeated.
- *
- * Technically, there's also 'survive for x seconds', but that doesn't need special support
- */
-export enum VictoryType {
-    DESTINATION, GOODIECOUNT, ENEMYCOUNT
-}
-
-/**
  * Stage is a fully interactive portion of the game.  It has several scenes, 
  * of which more than one may be active at a time.
  */
@@ -182,10 +172,6 @@ export class Stage {
     /**  Text to display when a Win Countdown completes */
     mWinCountText: string;
 
-    /** Describes how a level is won. */
-    mVictoryType: VictoryType;
-
-
     /** 
      * Hide the current overlay scene that is showing
      */
@@ -281,7 +267,6 @@ export class Stage {
         this.score.reset();
         this.mLoseCountDownText = "";
         this.mWinCountText = "";
-        this.mVictoryType = VictoryType.DESTINATION;
         this.stageManager.device.storage.clearLevelFacts();
     }
 
@@ -325,69 +310,40 @@ export class Stage {
     * @param goodie The goodie that was collected
     */
     onGoodieCollected(goodie: Goodie): void {
-        // Update goodie counts
-        for (let i = 0; i < 4; i++) {
-            this.score.mGoodiesCollected[i] += goodie.score[i];
-        }
-        // possibly win the level, but only if we win on goodie count and all
-        // four counts are high enough
-        if (this.mVictoryType != VictoryType.GOODIECOUNT) {
-            return;
-        }
-        let match: boolean = true;
-        for (let i = 0; i < 4; ++i) {
-            match = match && (this.score.mVictoryGoodieCount[i] <= this.score.mGoodiesCollected[i]);
-        }
-        if (match) {
+        if (this.score.onGoodieCollected(goodie))
             this.endLevel(true);
-        }
     }
 
     /**
-    * Indicate that a hero has reached a destination
-    */
+     * Indicate that a hero has reached a destination
+     */
     onDestinationArrive(): void {
-        // check if the level is complete
-        this.score.mDestinationArrivals++;
-        if ((this.mVictoryType == VictoryType.DESTINATION) && (this.score.mDestinationArrivals >= this.score.mVictoryHeroCount)) {
+        if (this.score.onDestinationArrive())
             this.endLevel(true);
-        }
     }
 
     /**
-    * Indicate that an enemy has been defeated
-    */
+     * Indicate that an enemy has been defeated
+     */
     onDefeatEnemy(): void {
-        // update the count of defeated enemies
-        this.score.mEnemiesDefeated++;
-        // if we win by defeating enemies, see if we've defeated enough of them:
-        let win: boolean = false;
-        if (this.mVictoryType == VictoryType.ENEMYCOUNT) {
-            // -1 means "defeat all enemies"
-            if (this.score.mVictoryEnemyCount == -1) {
-                win = this.score.mEnemiesDefeated == this.score.mEnemiesCreated;
-            } else {
-                win = this.score.mEnemiesDefeated >= this.score.mVictoryEnemyCount;
-            }
-        }
-        if (win) {
+        if (this.score.onEnemyDefeated()) {
             this.endLevel(true);
         }
     }
 
     /**
-     *  Returns number of enemies defeated
+     * Returns number of enemies defeated
      */
     getEnemiesDefeated(): number {
         return this.score.mEnemiesDefeated;
     }
 
     /**
-    * When a level ends, we run this code to shut it down, print a message, and
-    * then let the user resume play
-    *
-    * @param win true if the level was won, false otherwise
-    */
+     * When a level ends, we run this code to shut it down, print a message, and
+     * then let the user resume play
+     *
+     * @param win true if the level was won, false otherwise
+     */
     endLevel(win: boolean): void {
         if (win) {
             if (this.winSceneBuilder) {

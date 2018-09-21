@@ -1,5 +1,4 @@
 import { JetLagManager } from "../JetLagManager"
-import { VictoryType } from "../stage/Stage"
 
 /**
  * ScoreApi provides an interface for configuring everything related to the
@@ -89,7 +88,7 @@ export class ScoreApi {
      * @param howMany Number of heroes that must reach destinations
      */
     public setVictoryDestination(howMany: number): void {
-        this.manager.getCurrStage().mVictoryType = VictoryType.DESTINATION;
+        this.manager.getCurrStage().score.setWinDestination();
         this.manager.getCurrStage().score.mVictoryHeroCount = howMany;
     }
 
@@ -102,12 +101,7 @@ export class ScoreApi {
      * @param howMany The number of enemies that must be defeated to win the level
      */
     public setVictoryEnemyCount(howMany?: number): void {
-        this.manager.getCurrStage().mVictoryType = VictoryType.ENEMYCOUNT;
-        if (howMany) {
-            this.manager.getCurrStage().score.mVictoryEnemyCount = howMany;
-        } else {
-            this.manager.getCurrStage().score.mVictoryEnemyCount = -1;
-        }
+        this.manager.getCurrStage().score.setVictoryEnemyCount(howMany);
     }
 
     /**
@@ -118,12 +112,8 @@ export class ScoreApi {
      * @param v3 Number of type-3 goodies that must be collected to win the level
      * @param v4 Number of type-4 goodies that must be collected to win the level
      */
-    public setVictoryGoodies(v1: number, v2: number, v3: number, v4: number): void {
-        this.manager.getCurrStage().mVictoryType = VictoryType.GOODIECOUNT;
-        this.manager.getCurrStage().score.mVictoryGoodieCount[0] = v1;
-        this.manager.getCurrStage().score.mVictoryGoodieCount[1] = v2;
-        this.manager.getCurrStage().score.mVictoryGoodieCount[2] = v3;
-        this.manager.getCurrStage().score.mVictoryGoodieCount[3] = v4;
+    public setVictoryGoodies(v1: number, v2: number, v3: number, v4: number) {
+        this.manager.getCurrStage().score.setVictoryGoodies(v1, v2, v3, v4);
     }
 
     /**
