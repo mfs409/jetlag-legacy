@@ -6,9 +6,11 @@ import { JetLagApi } from "./api/JetLagApi"
 import { Stage } from "./stage/Stage"
 
 /**
- * Modes of the game, which help decide which stage to show.  We can be showing the main splash screens, the help screens, the level chooser screens, the store screens, or the playable level screens
+ * Modes of the game, which help decide which stage to show.  We can be showing
+ * the main splash screens, the help screens, the level chooser screens, the
+ * store screens, or the playable level screens
  */
-export enum MODES {
+enum MODES {
     SPLASH = 0, HELP = 1, CHOOSER = 2, STORE = 3, PLAY = 4, COUNT = 5
 }
 
