@@ -9,17 +9,18 @@ import { Obstacle } from "./Obstacle"
 import { Animation } from "./Animation"
 
 /**
- * The Hero is the focal point of a game. While it is technically possible to have many heroes, or
- * invisible heroes that exist just so that the player has to keep bad things from happening to the
- * hero, it is usually the case that a game has one hero who moves around on the screen, possibly
- * jumping and crawling.
+  * The Hero is the focal point of a game. While it is technically possible to
+  * have many heroes, or invisible heroes that exist just so that the player has
+  * to keep bad things from happening to the hero, it is usually the case that a
+  * game has one hero who moves around on the screen, possibly jumping and
+  * crawling.
  */
 export class Hero extends WorldActor {
     /**
-     * Strength of the hero. This determines how many collisions with enemies the
-     * hero can sustain before it is defeated. The default is 1, and the default
-     * enemy damage amount is 2, so that the default behavior is for the hero to
-     * be defeated on any collision with an enemy, with the enemy *not*
+     * Strength of the hero. This determines how many collisions with enemies
+     * the hero can sustain before it is defeated. The default is 1, and the
+     * default enemy damage amount is 2, so that the default behavior is for the
+     * hero to be defeated on any collision with an enemy, with the enemy *not*
      * disappearing
      */
     private mStrength = 1;
@@ -27,15 +28,20 @@ export class Hero extends WorldActor {
     /** Time until the hero's invincibility runs out */
     private invincibleRemaining: number = 0;
 
-    /** When the hero jumps, this specifies the amount of velocity to add to simulate a jump */
+    /** 
+     * When the hero jumps, this specifies the amount of velocity to add to
+     * simulate a jump 
+     */
     private jumpImpulses: { x: number, y: number } = null;
 
     /** Report the time until the hero's invincibility runs out */
-    getInvincibleRemaining() { return Math.max(0, this.invincibleRemaining / 1000); }
+    getInvincibleRemaining() {
+        return Math.max(0, this.invincibleRemaining / 1000);
+    }
 
     /** 
-     * Set the time until the hero's invincibility runs out.  If this is making a
-     * zero value positive, it makes the hero invincible. 
+     * Set the time until the hero's invincibility runs out.  If this is making
+     * a zero value positive, it makes the hero invincible. 
      */
     setInvincibleRemaining(amount: number) {
         this.invincibleRemaining = amount * 1000;
@@ -50,16 +56,19 @@ export class Hero extends WorldActor {
     * @param scene   The scene into which the Hero is being placed
     * @param width   The width of the hero
     * @param height  The height of the hero
-    * @param imgName The name of the file that has the default image for this hero
+    * @param imgName The name of the file that has the default image for this
+    *                hero
     */
-    constructor(manager: JetLagManager, scene: WorldScene, width: number, height: number, imgName: string) {
+    constructor(manager: JetLagManager, scene: WorldScene, width: number,
+        height: number, imgName: string) {
         super(manager, scene, imgName, width, height);
     }
 
     /**
      * Code to run when rendering the Hero.
-     * NB:  We can't just use the basic renderer, because we might need to adjust a one-off
-     * animation (invincibility or throw) first
+     *
+     * NB:  We can't just use the basic renderer, because we might need to
+     *      adjust a one-off animation (invincibility or throw) first
      */
     render(renderer: Renderer, camera: Camera, elapsedMillis: number): void {
         // determine when to turn off throw animations
@@ -71,7 +80,8 @@ export class Hero extends WorldActor {
             }
         }
 
-        // determine when to turn off invincibility and cease invincibility animation
+        // determine when to turn off invincibility and cease invincibility
+        // animation
         if (this.invincibleRemaining > 0) {
             this.invincibleRemaining -= elapsedMillis;
             if (this.invincibleRemaining <= 0) {
@@ -86,13 +96,12 @@ export class Hero extends WorldActor {
     /**
     * Code to run when a Hero collides with a WorldActor.
     *
-    * The Hero is the dominant participant in all collisions. Whenever the hero collides with
-    * something, we need to figure out what to do
+    * The Hero is the dominant participant in all collisions. Whenever the hero
+    * collides with something, we need to figure out what to do
     *
     * @param other   Other object involved in this collision
     * @param contact A description of the contact that caused this collision
     */
-    //@Override
     onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
         // NB: we currently ignore Projectile and Hero
         if (other instanceof Enemy) {
@@ -127,7 +136,8 @@ export class Hero extends WorldActor {
     * @param enemy The enemy with which this hero collided
     */
     private onCollideWithEnemy(enemy: Enemy): void {
-        // if the enemy always defeats the hero, no matter what, then defeat the hero
+        // if the enemy always defeats the hero, no matter what, then defeat the
+        // hero
         if (enemy.mAlwaysDoesDamage) {
             this.remove(false);
             this.stageManager.getCurrStage().defeatHero(enemy, this);
@@ -136,11 +146,6 @@ export class Hero extends WorldActor {
             }
             return;
         }
-        console.log(this.mInAir);
-        console.log(enemy.mDefeatByJump);
-        console.log(this.getYPosition());
-        console.log(this.mSize.y);
-        console.log(enemy.getYPosition());
         // handle hero invincibility
         if (this.invincibleRemaining > 0) {
             // if the enemy is immune to invincibility, do nothing
@@ -173,7 +178,8 @@ export class Hero extends WorldActor {
     }
 
     /**
-     * Update the hero's strength, and then run the strength change callback (if any)
+     * Update the hero's strength, and then run the strength change callback (if
+     * any)
      *
      * @param amount The amount to add (use a negative value to subtract)
      */
@@ -205,13 +211,15 @@ export class Hero extends WorldActor {
         if (this.mCurrentRotation != 0 && !sensor)
             this.increaseRotation(-this.mCurrentRotation);
 
-        // if there is code attached to the obstacle for modifying the hero's behavior, run it
+        // if there is code attached to the obstacle for modifying the hero's
+        // behavior, run it
         if (o.mHeroCollision != null)
             o.mHeroCollision(o, this, contact);
 
-        // If this is a wall, then mark us not in the air so we can do more jumps. Note that sensors
-        // should not enable jumps for the hero.
-        if ((this.mInAir || this.mAllowMultiJump) && !sensor && !o.mNoJumpReenable) {
+        // If this is a wall, then mark us not in the air so we can do more
+        // jumps. Note that sensors should not enable jumps for the hero.
+        if ((this.mInAir || this.mAllowMultiJump) && !sensor
+            && !o.mNoJumpReenable) {
             this.stopJump();
         }
     }
@@ -241,8 +249,8 @@ export class Hero extends WorldActor {
     /**
     * Change the hero's strength.
     *
-    * NB: calling this will not run any strength change callbacks... they only run in conjunction
-    *     with collisions with goodies or enemies.
+    * NB: calling this will not run any strength change callbacks... they only
+    *     run in conjunction with collisions with goodies or enemies.
     *
     * @param amount The new strength of the hero
     */
@@ -255,7 +263,8 @@ export class Hero extends WorldActor {
     }
 
     /**
-     * Specify the X and Y velocity to give to the hero whenever it is instructed to jump
+     * Specify the X and Y velocity to give to the hero whenever it is
+     * instructed to jump
      *
      * @param x Velocity in X direction
      * @param y Velocity in Y direction
@@ -264,7 +273,10 @@ export class Hero extends WorldActor {
         this.jumpImpulses = new PhysicsType2d.Vector2(x, -y);
     }
 
-    /** For tracking if the game should end immediately when this hero is defeated */
+    /** 
+     * For tracking if the game should end immediately when this hero is
+     * defeated 
+     */
     private mMustSurvive: boolean;
 
     /** Code to run when the hero's strength changes */
@@ -283,7 +295,11 @@ export class Hero extends WorldActor {
     /** how long until we stop showing the throw animation */
     private mThrowAnimationTimeRemaining: number;
 
-    /** Track if the hero is in the air, so that it can't jump when it isn't touching anything. This does not quite work as desired, but is good enough for LOL */
+    /** 
+     * Track if the hero is in the air, so that it can't jump when it isn't
+     * touching anything. This does not quite work as desired, but is good
+     * enough for LOL 
+     */
     private mInAir = false;
 
     /** Indicate that the hero can jump while in the air */
@@ -350,7 +366,8 @@ export class Hero extends WorldActor {
     }
 
     /**
-     * Put the hero in crawl mode. Note that we make the hero rotate when it is crawling
+     * Put the hero in crawl mode. Note that we make the hero rotate when it is
+     * crawling
      */
     crawlOn(rotate: number): void {
         if (this.mCrawling) {
@@ -388,7 +405,8 @@ export class Hero extends WorldActor {
     }
 
     /**
-     * Indicate that upon a touch, this hero should begin moving with a specific velocity
+     * Indicate that upon a touch, this hero should begin moving with a specific
+     * velocity
      *
      * @param x Velocity in X dimension
      * @param y Velocity in Y dimension
@@ -452,7 +470,6 @@ export class Hero extends WorldActor {
         // compute the length of the throw sequence, so that we can get our
         // timer right for restoring the default animation
         this.mThrowAnimateTotalLength = animation.getDuration() / 1000;
-        console.log("setting throw animation", this.mThrowAnimateTotalLength, this.mThrowAnimation)
     }
 
     /**
