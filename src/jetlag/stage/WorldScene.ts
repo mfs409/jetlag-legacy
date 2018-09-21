@@ -179,7 +179,6 @@ export class WorldScene extends Scene {
             *
             * @param contact A description of the contact event
             */
-            //@Override
             public EndContact(contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
             }
 
@@ -249,12 +248,11 @@ export class WorldScene extends Scene {
             }
 
             /**
-            * We ignore postsolve
-            *
-            * @param contact A description of the contact event
-            * @param impulse The impulse of the contact
-            */
-            //@Override
+             * We ignore postsolve
+             *
+             * @param contact A description of the contact event
+             * @param impulse The impulse of the contact
+             */
             public PostSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, impulse: PhysicsType2d.Dynamics.ContactImpulse): void {
             }
         })(this));
