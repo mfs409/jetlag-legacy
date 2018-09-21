@@ -10,6 +10,7 @@ import { Hero } from "./Hero"
  * hero's strength, and it can make the hero invincible
  */
 export class Goodie extends WorldActor {
+  /** A callback to run when the hero collects this goodie */
   onHeroCollect: (g: Goodie, h: Hero) => void = null;
 
   /**
@@ -18,36 +19,31 @@ export class Goodie extends WorldActor {
    * strength because this actually bumps the score, which in turn lets us have
    * "super goodies" that turn on callback obstacles.
    */
-  score: number[] = [];
+  score = [1, 0, 0, 0];
 
   /**
-  * Create a basic Goodie.  The goodie won't yet have any physics attached to it.
-  *
-  * @param game    The currently active game
-  * @param scene   The scene into which the destination is being placed
-  * @param width   width of this Goodie
-  * @param height  height of this Goodie
-  * @param imgName image to use for this Goodie
-  */
+   * Create a basic Goodie.  The goodie won't yet have any physics attached to it.
+   *
+   * @param game    The currently active game
+   * @param scene   The scene into which the destination is being placed
+   * @param width   width of this Goodie
+   * @param height  height of this Goodie
+   * @param imgName image to use for this Goodie
+   */
   constructor(manager: JetLagManager, scene: WorldScene, width: number, height: number, imgName: string) {
     super(manager, scene, imgName, width, height);
-    this.score[0] = 1;
-    this.score[1] = 0;
-    this.score[2] = 0;
-    this.score[3] = 0;
   }
 
   /**
-  * Code to run when a Goodie collides with a WorldActor.
-  * <p>
-  * NB: Goodies are at the end of the collision hierarchy, so we don't do anything when
-  * they are in a collision that hasn't already been handled by a higher-ranked WorldActor.
-  *
-  * @param other   Other object involved in this collision
-  * @param contact A description of the contact that caused this collision
-  */
-  onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
-  }
+   * Code to run when a Goodie collides with a WorldActor.
+   * <p>
+   * NB: Goodies are at the end of the collision hierarchy, so we don't do anything when
+   * they are in a collision that hasn't already been handled by a higher-ranked WorldActor.
+   *
+   * @param other   Other object involved in this collision
+   * @param contact A description of the contact that caused this collision
+   */
+  onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void { }
 
   /**
    * Set the score of this goodie.

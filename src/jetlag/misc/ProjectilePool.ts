@@ -10,10 +10,10 @@ import { JetLagManager } from "../JetLagManager"
 */
 export class ProjectilePool {
     /** A collection of all the available projectiles */
-    readonly mPool: Projectile[];
+    readonly pool: Projectile[];
 
     /** The number of projectiles in the pool */
-    private readonly mPoolSize: number;
+    private readonly poolSize: number;
 
     /** For limiting the number of projectiles that can be thrown */
     mProjectilesRemaining: number;
@@ -34,7 +34,7 @@ export class ProjectilePool {
     mRotateVectorThrow: boolean;
 
     /** Index of next available projectile in the pool */
-    private mNextIndex: number;
+    private nextIndex: number;
 
     /** Sound to play when projectiles are thrown */
     mThrowSound: Howl;
@@ -61,7 +61,7 @@ export class ProjectilePool {
     constructor(manager: JetLagManager, level: WorldScene, size: number, width: number, height: number,
         imgName: string, strength: number, zIndex: number, isCircle: boolean) {
         // set up the pool
-        this.mPool = [];
+        this.pool = [];
         // don't draw all projectiles in same place...
         for (let i = 0; i < size; ++i) {
             let p = new Projectile(manager, level, width, height, imgName, -100 - i * width, -100 - i * height, zIndex, isCircle);
@@ -69,10 +69,10 @@ export class ProjectilePool {
             p.mBody.SetBullet(true);
             p.mBody.SetActive(false);
             p.mDamage = strength;
-            this.mPool.push(p);
+            this.pool.push(p);
         }
-        this.mNextIndex = 0;
-        this.mPoolSize = size;
+        this.nextIndex = 0;
+        this.poolSize = size;
         // record vars that describe how the projectile behaves
         this.mThrowSound = null;
         this.mProjectileDisappearSound = null;
@@ -102,11 +102,11 @@ export class ProjectilePool {
             this.mProjectilesRemaining--;
 
         // is there an available projectile?
-        if (this.mPool[this.mNextIndex].getEnabled())
+        if (this.pool[this.nextIndex].getEnabled())
             return;
         // get the next projectile, reset sensor, set image
-        let b: Projectile = this.mPool[this.mNextIndex];
-        this.mNextIndex = (this.mNextIndex + 1) % this.mPoolSize;
+        let b: Projectile = this.pool[this.nextIndex];
+        this.nextIndex = (this.nextIndex + 1) % this.poolSize;
         b.setCollisionsEnabled(!this.mSensorProjectiles);
         b.mAnimator.resetCurrentAnimation();
 
@@ -152,11 +152,11 @@ export class ProjectilePool {
             this.mProjectilesRemaining--;
 
         // is there an available projectile?
-        if (this.mPool[this.mNextIndex].getEnabled())
+        if (this.pool[this.nextIndex].getEnabled())
             return;
         // get the next projectile, set sensor, set image
-        let b: Projectile = this.mPool[this.mNextIndex];
-        this.mNextIndex = (this.mNextIndex + 1) % this.mPoolSize;
+        let b: Projectile = this.pool[this.nextIndex];
+        this.nextIndex = (this.nextIndex + 1) % this.poolSize;
         b.setCollisionsEnabled(!this.mSensorProjectiles);
         b.mAnimator.resetCurrentAnimation();
 

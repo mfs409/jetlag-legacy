@@ -633,7 +633,7 @@ export class WorldApi {
      * @param distance Maximum distance from the hero that a projectile can travel
      */
     public setProjectileRange(distance: number): void {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.mPool)
+        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
             p.mRange = distance;
     }
 
@@ -642,7 +642,7 @@ export class WorldApi {
      * or less) immune to gravitational forces.
      */
     public setProjectileGravityOn(): void {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.mPool)
+        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
             p.mBody.SetGravityScale(1);
     }
 
@@ -687,7 +687,7 @@ export class WorldApi {
      * Indicate that when two projectiles collide, they should both remain on screen
      */
     public setCollisionOkForProjectiles(): void {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.mPool)
+        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
             p.mDisappearOnCollide = false;
     }
 
@@ -771,7 +771,7 @@ export class WorldApi {
      * @param animation The animation object to use for each projectile that is thrown
      */
     public setProjectileAnimation(animation: Animation) {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.mPool)
+        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
             p.setDefaultAnimation(animation.clone());
     }
 
@@ -781,7 +781,7 @@ export class WorldApi {
      * @param imgName The file to use when picking images
      */
     public setProjectileImageSource(imgName: string) {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.mPool)
+        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
             p.mAnimator.updateImage(this.stageManager, imgName);
         this.stageManager.getCurrStage().world.projectilePool.mRandomizeImages = true;
     }
