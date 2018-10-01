@@ -16,19 +16,19 @@ export class ProjectilePool {
     private readonly poolSize: number;
 
     /** For limiting the number of projectiles that can be thrown */
-    mProjectilesRemaining: number;
+    remaining: number;
 
     /** A dampening factor to apply to projectiles thrown via "directional" mechanism */
-    mDirectionalDamp: number;
+    directionalDamp: number;
 
     /** Indicates that projectiles should be sensors */
-    mSensorProjectiles: boolean;
+    sensor: boolean;
 
     /** Indicates that vector projectiles should have a fixed velocity */
-    mEnableFixedVectorVelocity: boolean;
+    enableFixedVectorVelocity: boolean;
 
     /** The magnitude of the velocity for vector projectiles thrown with a fixed velocity */
-    mFixedVectorVelocity: number;
+    fixedVectorVelocity: number;
 
     /** Indicate that projectiles should face in the direction they are initially thrown */
     mRotateVectorThrow: boolean;
@@ -76,8 +76,8 @@ export class ProjectilePool {
         // record vars that describe how the projectile behaves
         this.mThrowSound = null;
         this.mProjectileDisappearSound = null;
-        this.mProjectilesRemaining = -1;
-        this.mSensorProjectiles = true;
+        this.remaining = -1;
+        this.sensor = true;
     }
 
     /**
@@ -95,11 +95,11 @@ export class ProjectilePool {
     */
     throwFixed(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): void {
         // have we reached our limit?
-        if (this.mProjectilesRemaining == 0)
+        if (this.remaining == 0)
             return;
         // do we need to decrease our limit?
-        if (this.mProjectilesRemaining != -1)
-            this.mProjectilesRemaining--;
+        if (this.remaining != -1)
+            this.remaining--;
 
         // is there an available projectile?
         if (this.pool[this.nextIndex].getEnabled())
@@ -107,7 +107,7 @@ export class ProjectilePool {
         // get the next projectile, reset sensor, set image
         let b: Projectile = this.pool[this.nextIndex];
         this.nextIndex = (this.nextIndex + 1) % this.poolSize;
-        b.setCollisionsEnabled(!this.mSensorProjectiles);
+        b.setCollisionsEnabled(!this.sensor);
         b.mAnimator.resetCurrentAnimation();
 
         if (this.mRandomizeImages)
@@ -145,11 +145,11 @@ export class ProjectilePool {
     */
     throwAt(heroX: number, heroY: number, toX: number, toY: number, h: Hero, offsetX: number, offsetY: number): void {
         // have we reached our limit?
-        if (this.mProjectilesRemaining == 0)
+        if (this.remaining == 0)
             return;
         // do we need to decrease our limit?
-        if (this.mProjectilesRemaining != -1)
-            this.mProjectilesRemaining--;
+        if (this.remaining != -1)
+            this.remaining--;
 
         // is there an available projectile?
         if (this.pool[this.nextIndex].getEnabled())
@@ -157,7 +157,7 @@ export class ProjectilePool {
         // get the next projectile, set sensor, set image
         let b: Projectile = this.pool[this.nextIndex];
         this.nextIndex = (this.nextIndex + 1) % this.poolSize;
-        b.setCollisionsEnabled(!this.mSensorProjectiles);
+        b.setCollisionsEnabled(!this.sensor);
         b.mAnimator.resetCurrentAnimation();
 
         // calculate offset for starting position of projectile, put it on screen
@@ -167,7 +167,7 @@ export class ProjectilePool {
         b.mBody.SetTransform(b.mRangeFrom, 0);
 
         // give the projectile velocity
-        if (this.mEnableFixedVectorVelocity) {
+        if (this.enableFixedVectorVelocity) {
             // compute a unit vector
             let dX = toX - heroX - offsetX;
             let dY = toY - heroY - offsetY;
@@ -175,15 +175,15 @@ export class ProjectilePool {
             let tmpX = dX / hypotenuse;
             let tmpY = dY / hypotenuse;
             // multiply by fixed velocity
-            tmpX *= this.mFixedVectorVelocity;
-            tmpY *= this.mFixedVectorVelocity;
+            tmpX *= this.fixedVectorVelocity;
+            tmpY *= this.fixedVectorVelocity;
             b.updateVelocity(tmpX, tmpY);
         } else {
             let dX = toX - heroX - offsetX;
             let dY = toY - heroY - offsetY;
             // compute absolute vector, multiply by dampening factor
-            let tmpX = dX * this.mDirectionalDamp;
-            let tmpY = dY * this.mDirectionalDamp;
+            let tmpX = dX * this.directionalDamp;
+            let tmpY = dY * this.directionalDamp;
             b.updateVelocity(tmpX, tmpY);
         }
 

@@ -653,7 +653,7 @@ export class WorldApi {
     * @param factor The value to multiply against the projectile speed.
     */
     public setProjectileVectorDampeningFactor(factor: number): void {
-        this.stageManager.getCurrStage().world.projectilePool.mDirectionalDamp = factor;
+        this.stageManager.getCurrStage().world.projectilePool.directionalDamp = factor;
     }
 
     /**
@@ -661,7 +661,7 @@ export class WorldApi {
      * they collide with other actors
      */
     public enableCollisionsForProjectiles(): void {
-        this.stageManager.getCurrStage().world.projectilePool.mSensorProjectiles = false;
+        this.stageManager.getCurrStage().world.projectilePool.sensor = false;
     }
 
     /**
@@ -671,8 +671,8 @@ export class WorldApi {
      * @param velocity The magnitude of the velocity for projectiles
      */
     public setFixedVectorThrowVelocityForProjectiles(velocity: number): void {
-        this.stageManager.getCurrStage().world.projectilePool.mEnableFixedVectorVelocity = true;
-        this.stageManager.getCurrStage().world.projectilePool.mFixedVectorVelocity = velocity;
+        this.stageManager.getCurrStage().world.projectilePool.enableFixedVectorVelocity = true;
+        this.stageManager.getCurrStage().world.projectilePool.fixedVectorVelocity = velocity;
     }
 
     /**
@@ -698,7 +698,7 @@ export class WorldApi {
      * @param factor The value to multiply against the projectile speed.
      */
     public setProjectileMultiplier(factor: number) {
-        this.stageManager.getCurrStage().world.projectilePool.mDirectionalDamp = factor;
+        this.stageManager.getCurrStage().world.projectilePool.directionalDamp = factor;
     }
 
     /**
@@ -707,7 +707,7 @@ export class WorldApi {
      * @param number How many projectiles are available
      */
     public setNumberOfProjectiles(number: number): void {
-        this.stageManager.getCurrStage().world.projectilePool.mProjectilesRemaining = number;
+        this.stageManager.getCurrStage().world.projectilePool.remaining = number;
     }
 
     /**

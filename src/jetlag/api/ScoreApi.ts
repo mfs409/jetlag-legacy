@@ -282,7 +282,7 @@ export class ScoreApi {
      * Generate text indicating the number of remaining projectiles
      */
     public getRemainingProjectiles() {
-        return this.manager.getCurrStage().world.projectilePool.mProjectilesRemaining;
+        return this.manager.getCurrStage().world.projectilePool.remaining;
     }
 
     /**
