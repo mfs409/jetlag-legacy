@@ -3,9 +3,7 @@
  * can call a method that works even when the browser doesn't support vibration
  */
 export class Vibration {
-    /**
-     * Track whether the device supports vibration
-     */
+    /** Track whether the device supports vibration */
     isSupported: boolean = false;
 
     /**

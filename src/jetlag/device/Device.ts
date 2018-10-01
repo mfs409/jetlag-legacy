@@ -7,6 +7,7 @@ import { Speaker } from "./Speaker"
 import { Renderer } from "./Renderer"
 import { Process } from "./Process"
 import { JLStorage } from "./Storage"
+import { Console } from "./Console"
 import { JetLagConfig } from "../JetLagConfig"
 
 /**
@@ -33,6 +34,9 @@ export class Device {
     /** speaker is where we play sounds and background music */
     readonly speaker: Speaker;
 
+    /** console is for printing messages to the device console */
+    readonly console: Console;
+
     /** 
      * storage interfaces with the device's persistent storage, and also 
      * provides volatile storage for levels and sessions
@@ -49,6 +53,7 @@ export class Device {
      * @param domId The Id of the DOM element where the game exists
      */
     constructor(cfg: JetLagConfig, domId: string) {
+        this.console = new Console(cfg);
         this.speaker = new Speaker(cfg);
         this.touch = new TouchScreen(domId);
         this.keyboard = new Keyboard();

@@ -31,6 +31,7 @@ export class MyConfig extends JetLagConfig {
     this.canVibrate = true;
     this.debugMode = true;
     this.forceAccelerometerOff = true;
+    this.logLevel = 2;
 
     // Chooser configuration
     this.numLevels = 92;

@@ -22,6 +22,9 @@ export class JetLagConfig {
   /** Should the phone vibrate on certain events? */
   public canVibrate: boolean = null;
 
+  /** How verbose should we be with printing to the console (0-2, 0 == none) */
+  public logLevel: number = 2;
+
   /**
    * When this is true, the game will show an outline corresponding to the 
    * physics body behind each Actor in the game

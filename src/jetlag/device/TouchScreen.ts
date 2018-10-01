@@ -94,7 +94,6 @@ export class TouchScreen {
         hammer.on('swipe', (ev: HammerInput) => {
             this.receiver.swipe(ev.center.x - ev.deltaX, ev.center.y - ev.deltaY, ev.center.x, ev.center.y, ev.deltaTime);
         });
-
         hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
     }
 }
