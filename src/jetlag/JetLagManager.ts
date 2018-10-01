@@ -1,7 +1,7 @@
 import { JetLagConfig } from "./JetLagConfig"
 import { Device } from "./device/Device"
 import { TouchScreen } from "./device/TouchScreen"
-import { TouchReceiver } from "./device/TouchScreen"
+// import { TouchReceiver } from "./device/TouchScreen"
 import { JetLagApi } from "./api/JetLagApi"
 import { Stage } from "./stage/Stage"
 
@@ -27,7 +27,7 @@ export class JetLagManager {
     private currentMode: number;
 
     /** 
-     * The level within each mode (e.g., we are in PLAY scene 4, and will return
+     * The level within the mode (e.g., we are in PLAY scene 4, and will return
      * to CHOOSER 2) 
      */
     private readonly modeStates: number[] = [];
@@ -45,10 +45,11 @@ export class JetLagManager {
     private currStage: Stage;
 
     /**
-     * Create the JetLagManager.  Note that there are many steps to take before 
-     * we can get the JetLagManager fully up and running.  A constructed 
-     * JetLagManager can't function until the device's renderer is fully loaded.
-     * 
+     * Create the JetLagManager.  Note that there are many steps to take before
+     * we can get the JetLagManager fully up and running.  In particular, a
+     * constructed JetLagManager can't function until the device's renderer is
+     * fully loaded.
+     *
      * @param cfg The game config object
      * @param device The abstract device (with touch, sound, etc)
      */
@@ -63,44 +64,27 @@ export class JetLagManager {
     }
 
     /**
-     * Create an instance of TouchReceiver that the StageManager can use to
-     * receive gesture events from the TouchScreen and route them to the current
-     * stage.
-     * 
+     * Connect the methods of the stage to the things that Hammer.js needs in
+     * order for gestures to work.
+     *
      * @param touch The device's touch screen
      */
     private configureTouchReceiver(touch: TouchScreen) {
-        let that = this;
-        touch.setTouchReceiver(new (class _ implements TouchReceiver {
-            public tap(screenX: number, screenY: number): void {
-                that.currStage.tap(screenX, screenY);
-            }
-            public panStart(screenX: number, screenY: number): void {
-                that.currStage.panStart(screenX, screenY);
-            }
-            public panMove(screenX: number, screenY: number): void {
-                that.currStage.panMove(screenX, screenY);
-            }
-            public panStop(screenX: number, screenY: number): void {
-                that.currStage.panStop(screenX, screenY);
-            }
-            public touchDown(screenX: number, screenY: number): void {
-                that.currStage.touchDown(screenX, screenY);
-            }
-            public touchUp(screenX: number, screenY: number): void {
-                that.currStage.touchUp(screenX, screenY);
-            }
-            public swipe(x0: number, y0: number, x1: number, y1: number, time: number): void {
-                that.currStage.swipe(x0, y0, x1, y1, time);
-            }
-        })());
+        // NB: we want to configure once, but the current stage changes, so we
+        //     have to capture this, rather than this.currStage
+        let manager = this;
+        touch.setTouchReceiver({
+            tap(screenX: number, screenY: number): void { manager.currStage.tap(screenX, screenY); },
+            panStart(screenX: number, screenY: number): void { manager.currStage.panStart(screenX, screenY); },
+            panMove(screenX: number, screenY: number): void { manager.currStage.panMove(screenX, screenY); },
+            panStop(screenX: number, screenY: number): void { manager.currStage.panStop(screenX, screenY); },
+            touchDown(screenX: number, screenY: number): void { manager.currStage.touchDown(screenX, screenY); },
+            touchUp(screenX: number, screenY: number): void { manager.currStage.touchUp(screenX, screenY); },
+            swipe(x0: number, y0: number, x1: number, y1: number, time: number): void { manager.currStage.swipe(x0, y0, x1, y1, time); }
+        });
     }
 
-    /**
-     * Getter for the current stage
-     * 
-     * @returns The current stage
-     */
+    /** Getter for the current stage */
     getCurrStage() { return this.currStage; }
 
     /**
@@ -178,7 +162,8 @@ export class JetLagManager {
      * @param index The chooser screen to create
      */
     doChooser(index: number): void {
-        // if chooser disabled, then we either called this from splash, or from a game level
+        // if chooser disabled, then we either called this from splash, or from
+        // a game level
         if (!this.config.enableChooser) {
             if (this.currentMode == MODES.PLAY) {
                 this.doSplash(this.modeStates[MODES.SPLASH]);
@@ -203,7 +188,8 @@ export class JetLagManager {
     }
 
     /**
-     * Move forward to the next level, if there is one, and otherwise go back to the chooser.
+     * Move forward to the next level, if there is one, and otherwise go back to
+     * the chooser.
      */
     public advanceLevel(): void {
         // Make sure to stop the music!
@@ -215,12 +201,8 @@ export class JetLagManager {
         }
     }
 
-    /**
-     * Start a level over again.
-     */
-    public repeatLevel(): void {
-        this.doPlay(this.modeStates[MODES.PLAY]);
-    }
+    /** Start a level over again. */
+    public repeatLevel(): void { this.doPlay(this.modeStates[MODES.PLAY]); }
 
     /**
      * This code is called repeatedly to update the game state and re-draw the
