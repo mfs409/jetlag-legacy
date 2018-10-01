@@ -26,6 +26,7 @@ export class MyConfig extends JetLagConfig {
     // The size of the screen, and some game behavior configuration
     this.screenWidth = 1600;
     this.screenHeight = 900;
+    this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
     this.debugMode = true;

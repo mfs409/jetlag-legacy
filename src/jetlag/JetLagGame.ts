@@ -3,20 +3,20 @@ import { JetLagManager } from "./JetLagManager"
 import { JetLagConfig } from "./JetLagConfig";
 
 /**
- * LolGame is the top-level wrapper for all of the functionality of Lol-TS.
- * LolGame also provides the entry point through which a web page can connect
+ * JetLagGame is the top-level wrapper for all of the functionality of Lol-TS.
+ * JetLagGame also provides the entry point through which a web page can connect
  * game functionality to a div on the page.
- * 
- * From a MVC perspective, LolGame is both the top-level interface to the
- * view, and also the top-level interface to the controller.  In terms of
- * views, LolGame provides a RENDERER, a VIBRATE feature, and a SPEAKER.
- * In terms of controllers, LolGame provides TOUCHSCREEN, KEYBOARD, and
- * ACCELEROMETER.  Note that some of these features need not route through
- * LolGame explicitly, but doing so leads to a cleaner abstraction for the rest
- * of Lol-TS.
- * 
- * Another way of thinking about LolGame is that it provides an interface to an
- * abstract game device, and routes events between a StageManager and the
+ *
+ * From a MVC perspective, JetLagGame is both the top-level interface to the
+ * view, and also the top-level interface to the controller.  In terms of views,
+ * JetLagGame provides a RENDERER, a VIBRATE feature, and a SPEAKER. In terms of
+ * controllers, JetLagGame provides TOUCHSCREEN, KEYBOARD, and ACCELEROMETER.
+ * Note that some of these features need not route through JetLagGame
+ * explicitly, but doing so leads to a cleaner abstraction for the rest of
+ * Lol-TS.
+ *
+ * Another way of thinking about JetLagGame is that it provides an interface to
+ * an abstract game device, and routes events between a StageManager and the
  * abstract device.
  */
 export class JetLagGame {
@@ -34,8 +34,30 @@ export class JetLagGame {
                 console.log("  " + o);
             }
         }
+
+        if (cfg.adaptToScreenSize) {
+            // as we compute the new screen width, height, and pixel ratio, we
+            // need to be sure to preserve the original ratio given in the game.
+            // JetLag can't stretch differently in X than in Y, becaues there is
+            // only one pixel/meter ratio.
+            let targetRatio = cfg.screenWidth / cfg.screenHeight;
+            let screen = { x: window.innerWidth, y: window.innerHeight };
+            let old = { x: cfg.screenWidth, y: cfg.screenHeight };
+            if (screen.y * targetRatio < screen.x) {
+                // vertical is constraining
+                cfg.screenHeight = screen.y;
+                cfg.screenWidth = screen.y * targetRatio;
+            }
+            else {
+                cfg.screenWidth = screen.x;
+                cfg.screenHeight = screen.x / targetRatio;
+            }
+            cfg.pixelMeterRatio = cfg.pixelMeterRatio * cfg.screenWidth / old.x;
+        }
+
         let device = new Device(cfg, domId);
         let manager = new JetLagManager(cfg, device);
+
         // Things are a little bit convoluted here.  PIXI will load our assets
         // asynchronously, after which the manager can initialize the first scene
         // (it can't do that until the assets are loaded, because it wants to draw

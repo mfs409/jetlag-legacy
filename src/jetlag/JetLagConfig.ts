@@ -16,6 +16,9 @@ export class JetLagConfig {
   /** The default game height, in pixels */
   public screenHeight: number = -1;
 
+  /** Should we adapt the game size based on the size of the browser window? */
+  public adaptToScreenSize: boolean = false;
+
   /** Should the phone vibrate on certain events? */
   public canVibrate: boolean = null;
 
