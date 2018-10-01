@@ -44,6 +44,21 @@ export class Stage {
     /** The function for creating this level's pause scene */
     pauseSceneBuilder: (overlay: OverlayApi) => void = null;
 
+    /** Track all the scores */
+    score: Score = new Score();
+
+    /** Text to display when a Lose Countdown completes */
+    loseCountdownText: string;
+
+    /** Text to display when a Win Countdown completes */
+    winCountdownText: string;
+
+    /** The background layers */
+    background: ParallaxScene;
+
+    /** The foreground layers */
+    foreground: ParallaxScene;
+
     /**
      * Construct the LolManager, build the scenes, set up the state machine, and clear the scores.
      *
@@ -159,18 +174,9 @@ export class Stage {
         this.world = new WorldScene(this.stageManager);
         this.hud = new OverlayScene(this.stageManager);
         // Set up the parallax scenes
-        this.mBackground = new ParallaxScene(this.stageManager);
-        this.mForeground = new ParallaxScene(this.stageManager);
+        this.background = new ParallaxScene(this.stageManager);
+        this.foreground = new ParallaxScene(this.stageManager);
     }
-
-    /** Track all the scores */
-    score: Score = new Score();
-
-    /** Text to display when a Lose Countdown completes */
-    mLoseCountDownText: string;
-
-    /**  Text to display when a Win Countdown completes */
-    mWinCountText: string;
 
     /** 
      * Hide the current overlay scene that is showing
@@ -229,7 +235,7 @@ export class Stage {
         // handle accelerometer stuff... note that accelerometer is effectively disabled during a
         // popup... we could change that by moving this to the top, but that's probably not going to
         // produce logical behavior
-        this.world.handleTilt(this.stageManager.device.accel.getX(), this.stageManager.device.accel.getY());
+        this.world.handleTilt(this.stageManager.device.accel.get().x, this.stageManager.device.accel.get().y);
 
         // Advance the physics world by 1/45 of a second.
         //
@@ -238,12 +244,12 @@ export class Stage {
         this.world.world.Step(1 / 45, 8, 3);
 
         // Execute any one time events, then clear the list
-        for (let e of this.world.mOneTimeEvents)
+        for (let e of this.world.oneTimeEvents)
             e();
-        this.world.mOneTimeEvents.length = 0;
+        this.world.oneTimeEvents.length = 0;
 
         // handle repeat events
-        for (let e of this.world.mRepeatEvents)
+        for (let e of this.world.repeatEvents)
             e();
 
         // Determine the center of the camera's focus
@@ -251,11 +257,11 @@ export class Stage {
 
         // The world is now static for this time step... we can display it!
         // draw parallax backgrounds
-        this.mBackground.render(renderer, this.world.camera, elapsedTime);
+        this.background.render(renderer, this.world.camera, elapsedTime);
         // draw the world
         this.world.render(renderer, elapsedTime);
         // draw parallax foregrounds
-        this.mForeground.render(renderer, this.world.camera, elapsedTime);
+        this.foreground.render(renderer, this.world.camera, elapsedTime);
         // draw Controls
         this.hud.render(renderer, elapsedTime);
     }
@@ -265,8 +271,8 @@ export class Stage {
      */
     resetScores(): void {
         this.score.reset();
-        this.mLoseCountDownText = "";
-        this.mWinCountText = "";
+        this.loseCountdownText = "";
+        this.winCountdownText = "";
         this.stageManager.device.storage.clearLevelFacts();
     }
 
@@ -367,9 +373,4 @@ export class Stage {
         }
     }
 
-    /** The background layers */
-    mBackground: ParallaxScene;
-
-    /** The foreground layers */
-    mForeground: ParallaxScene;
 }

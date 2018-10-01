@@ -550,7 +550,7 @@ export class WorldApi {
      */
     public addHorizontalBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
         let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.stageManager);
-        this.stageManager.getCurrStage().mBackground.mLayers.push(pl);
+        this.stageManager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -569,7 +569,7 @@ export class WorldApi {
      */
     public addVerticalBackgroundLayer(x: number, y: number, width: number, height: number, ySpeed: number, imgName: string) {
         let pl = new ParallaxLayer(x, y, width, height, ySpeed, false, false, imgName, this.stageManager);
-        this.stageManager.getCurrStage().mBackground.mLayers.push(pl);
+        this.stageManager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -587,7 +587,7 @@ export class WorldApi {
      */
     public addHorizontalForegroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
         let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.stageManager);
-        this.stageManager.getCurrStage().mForeground.mLayers.push(pl);
+        this.stageManager.getCurrStage().foreground.layers.push(pl);
     }
 
     /**
@@ -605,7 +605,7 @@ export class WorldApi {
      */
     public addHorizontalAutoBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
         let pl = new ParallaxLayer(x, y, width, height, xSpeed / 1000, true, true, imgName, this.stageManager);
-        this.stageManager.getCurrStage().mBackground.mLayers.push(pl);
+        this.stageManager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -623,7 +623,7 @@ export class WorldApi {
      */
     public addVerticalAutoBackgroundLayer(x: number, y: number, width: number, height: number, ySpeed: number, imgName: string) {
         let pl = new ParallaxLayer(x, y, width, height, ySpeed / 1000, false, true, imgName, this.stageManager);
-        this.stageManager.getCurrStage().mBackground.mLayers.push(pl);
+        this.stageManager.getCurrStage().background.layers.push(pl);
     }
 
     /**

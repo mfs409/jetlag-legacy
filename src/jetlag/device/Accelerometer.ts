@@ -1,3 +1,5 @@
+import { XY } from "../misc/XY"
+
 /**
  * We are probably going to need a way to re-interpret the meaning of
  * accelerometer values depending on the orientation of the device (at least
@@ -20,11 +22,8 @@ export enum AccelerometerMode {
  * recent data.
  */
 export class Accelerometer {
-  /** The most recent value for the X dimension */
-  private xAccel = 0;
-
-  /** The most recent value for the Y dimension */
-  private yAccel = 0;
+  /** The most recent accelerometer reading */
+  private accel = new XY(0, 0);
 
   /** Is tilt supported on this device? */
   supported = false;
@@ -52,20 +51,13 @@ export class Accelerometer {
     }
     this.supported = true;
     w.addEventListener('devicemotion', (ev: DeviceMotionEvent) => {
-      this.xAccel = - ev.accelerationIncludingGravity.x;
-      this.yAccel = ev.accelerationIncludingGravity.y;
+      this.accel.x = - ev.accelerationIncludingGravity.x;
+      this.accel.y = ev.accelerationIncludingGravity.y;
     }, false);
   }
 
-  /**
-   * Getter for the most recent X acceleration value
-   */
-  getX() { return this.xAccel; }
-
-  /**
-   * Getter for the most recent Y acceleration value
-   */
-  getY() { return this.yAccel; }
+  /** Getter for the most recent acceleration value */
+  get() { return this.accel; }
 
   /**
    * Override to set the X acceleration manually
@@ -73,7 +65,7 @@ export class Accelerometer {
    * @param x The new X value
    */
   setX(x: number) {
-    this.xAccel = x;
+    this.accel.x = x;
   }
 
   /**
@@ -82,6 +74,6 @@ export class Accelerometer {
    * @param y The new Y value
    */
   setY(y: number) {
-    this.yAccel = y;
+    this.accel.y = y;
   }
 }

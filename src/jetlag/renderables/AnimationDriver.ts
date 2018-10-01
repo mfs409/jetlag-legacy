@@ -1,4 +1,4 @@
-import { JLSprite } from "../device/Renderer"
+import { JetLagSprite } from "../device/Renderer"
 import { JetLagManager } from "../JetLagManager"
 import { Animation } from "./Animation"
 
@@ -11,7 +11,7 @@ export class AnimationDriver {
     mCurrentAnimation: Animation;
 
     /** The images that comprise the current animation will be the elements of this array */
-    private mImages: JLSprite[];
+    private mImages: JetLagSprite[];
 
     /** The index to display from <code>mImages</code>, for the case where there is no active animation. This is useful for animateByGoodieCount. */
     private mImageIndex: number;

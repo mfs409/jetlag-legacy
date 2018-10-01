@@ -1,7 +1,8 @@
-import { Renderer, Camera } from "../device/Renderer"
-import { JLText } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
+import { JetLagText } from "../device/Renderer"
 import { JetLagManager } from "../JetLagManager"
 import { Renderable } from "./Renderable"
+import { Camera } from "../misc/Camera"
 
 /**
  * RenderableText provides a way to generate text and put it onto the screen.
@@ -14,7 +15,7 @@ export class RenderableText implements Renderable {
     private visible: boolean = true;
 
     /** The text object that we pass to the Renderer */
-    private mText: JLText;
+    private mText: JetLagText;
 
     /** X coordinate of the text */
     private readonly x: number;

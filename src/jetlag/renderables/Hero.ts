@@ -1,12 +1,13 @@
 import { WorldActor } from "./WorldActor"
 import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
-import { Renderer, Camera } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"
 import { Obstacle } from "./Obstacle"
 import { Animation } from "./Animation"
+import { Camera } from "../misc/Camera"
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to

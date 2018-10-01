@@ -404,7 +404,7 @@ export class OverlayApi {
         }
         // Put the control and events in the appropriate lists
         this.overlay.stageManager.getCurrStage().hud.addActor(c, 0);
-        this.overlay.stageManager.getCurrStage().world.mRepeatEvents.push(() => { if (active) whileDownAction(); });
+        this.overlay.stageManager.getCurrStage().world.repeatEvents.push(() => { if (active) whileDownAction(); });
         return c;
     }
 
@@ -527,7 +527,7 @@ export class OverlayApi {
         this.overlay.stageManager.getCurrStage().hud.addActor(c, 0);
 
         let mLastThrow = 0;
-        this.overlay.stageManager.getCurrStage().world.mRepeatEvents.push(() => {
+        this.overlay.stageManager.getCurrStage().world.repeatEvents.push(() => {
             if (isHolding) {
                 let now = new Date().getTime();
                 if (mLastThrow + milliDelay < now) {

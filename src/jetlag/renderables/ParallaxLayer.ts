@@ -1,4 +1,4 @@
-import { JLSprite } from "../device/Renderer"
+import { JetLagSprite } from "../device/Renderer"
 import { JetLagManager } from "../JetLagManager"
 
 /**
@@ -15,7 +15,7 @@ export class ParallaxLayer {
     isAuto: boolean;
 
     /** The images to display */
-    images: JLSprite[] = [];
+    images: JetLagSprite[] = [];
 
     /** X coord of last render */
     lastX: number;

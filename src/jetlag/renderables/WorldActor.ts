@@ -100,7 +100,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setChaseSpeed(speed: number, target: WorldActor, chaseInX: boolean, chaseInY: boolean) {
     this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
-    this.mScene.mRepeatEvents.push(() => {
+    this.mScene.repeatEvents.push(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -145,7 +145,7 @@ export abstract class WorldActor extends BaseActor {
   public setChaseFixedMagnitude(target: WorldActor, xMagnitude: number, yMagnitude: number, ignoreX: boolean, ignoreY: boolean): void {
     this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     let out_this = this;
-    this.mScene.mRepeatEvents.push(() => {
+    this.mScene.repeatEvents.push(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -289,7 +289,7 @@ export abstract class WorldActor extends BaseActor {
   public setHover(x: number, y: number) {
     let pmr = this.stageManager.config.pixelMeterRatio;
     this.mHover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
-    this.stageManager.getCurrStage().world.mRepeatEvents.push(() => {
+    this.stageManager.getCurrStage().world.repeatEvents.push(() => {
       if (this.mHover == null)
         return;
       this.mHover.Set(x * pmr, y * pmr);

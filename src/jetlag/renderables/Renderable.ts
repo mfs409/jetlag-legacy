@@ -1,4 +1,5 @@
-import { Renderer, Camera } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
+import { Camera } from "../misc/Camera"
 
 /**
  * Renderable encapsulates anything that can be drawn on the screen.  In LOL-TS,

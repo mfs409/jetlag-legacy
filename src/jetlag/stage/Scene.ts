@@ -4,7 +4,8 @@ import { Renderable } from "../renderables/Renderable"
 import { RenderableText } from "../renderables/RenderableText"
 import { Picture } from "../renderables/Picture"
 import { Timer } from "../misc/Timer"
-import { Renderer, Camera } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
+import { Camera } from "../misc/Camera"
 
 /**
  * PointToActorCallback is a QueryCallback for PhysicsType2d, which determines
@@ -23,9 +24,7 @@ class PointToActorCallback implements PhysicsType2d.Dynamics.IQueryCallback {
   /** The bounding box around the point that is being tested */
   private aabb = new PhysicsType2d.Collision.AxisAlignedBoundingBox();
 
-  /** 
-   * Destructor is a no-op for our use of the IQueryCallback interface
-   */
+  /**  Destructor is a no-op for our use of the IQueryCallback interface */
   Destructor(): void { }
 
   /**
@@ -105,10 +104,10 @@ export abstract class Scene {
   pointQuerier = new PointToActorCallback();
 
   /** Events that get processed on the next render, then discarded */
-  readonly mOneTimeEvents: (() => void)[] = [];
+  readonly oneTimeEvents: (() => void)[] = [];
 
   /** Events that get processed on every render */
-  readonly mRepeatEvents: (() => void)[] = [];
+  readonly repeatEvents: (() => void)[] = [];
 
   /** For tracking time... */
   readonly timer: Timer = new Timer();
@@ -279,8 +278,8 @@ export abstract class Scene {
    * Reset a scene by clearing all of its lists
    */
   reset(): void {
-    this.mOneTimeEvents.length = 0;
-    this.mRepeatEvents.length = 0;
+    this.oneTimeEvents.length = 0;
+    this.repeatEvents.length = 0;
     for (let a of this.renderables) {
       a.length = 0;
     }
@@ -334,7 +333,8 @@ export abstract class Scene {
    * @param fontSize  The size of the font
    * @param tp        A TextProducer that will generate the text to display
    * @param zIndex    The z index of the text
-   * @return A Renderable of the text, so it can be enabled/disabled by program code
+   * @return A Renderable of the text, so it can be enabled/disabled by program
+   *         code
    */
   public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): RenderableText {
     let t = new RenderableText(this.stageManager, fontName, fontSize, fontColor, centerX, centerY, true, producer);

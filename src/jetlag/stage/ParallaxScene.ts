@@ -1,6 +1,7 @@
 import { JetLagManager } from "../JetLagManager"
 import { ParallaxLayer } from "../renderables/ParallaxLayer"
-import { Renderer, Camera } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
+import { Camera } from "../misc/Camera"
 
 /**
  * ParallaxScenes present a set of images that seem to scroll relative to the 
@@ -13,10 +14,10 @@ import { Renderer, Camera } from "../device/Renderer"
  */
 export class ParallaxScene {
     /** The game-wide configuration object */
-    manager: JetLagManager;
+    private manager: JetLagManager;
 
     /** All the layers to show as part of this scene */
-    mLayers: ParallaxLayer[] = [];
+    layers: ParallaxLayer[] = [];
 
     /**
      * Create a ParallaxScene and configure its camera
@@ -35,7 +36,7 @@ export class ParallaxScene {
      * @param elapsed     The time since the last render
      */
     render(sb: Renderer, worldCamera: Camera, elapsed: number) {
-        for (let pl of this.mLayers) {
+        for (let pl of this.layers) {
             if (pl.isAuto) {
                 this.renderAuto(sb, pl, elapsed, worldCamera);
             } else {

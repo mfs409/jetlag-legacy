@@ -13,13 +13,14 @@ export class OverlayScene extends Scene {
     /**
      * Draw the OverlayScene
      *
-     * @param sb    The spritebatch to use when drawing
+     * @param sb            The spritebatch to use when drawing
      * @param elapsedMillis The time since the last render
      */
     render(renderer: Renderer, elapsedMillis: number) {
+        // advance timers and world
+        //
+        // TODO: should we be using elapsedMillis for the Step?
         this.timer.advance(elapsedMillis);
-
-        // Advance the physics world by 1/45 of a second (1/45 is the recommended rate)
         this.world.Step(1 / 45, 8, 3);
 
         // Draw everything

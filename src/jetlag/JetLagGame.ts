@@ -3,7 +3,7 @@ import { JetLagManager } from "./JetLagManager"
 import { JetLagConfig } from "./JetLagConfig";
 
 /**
- * JetLagGame is the top-level wrapper for all of the functionality of Lol-TS.
+ * JetLagGame is the top-level wrapper for all of the functionality of JetLag.
  * JetLagGame also provides the entry point through which a web page can connect
  * game functionality to a div on the page.
  *
@@ -13,10 +13,10 @@ import { JetLagConfig } from "./JetLagConfig";
  * controllers, JetLagGame provides TOUCHSCREEN, KEYBOARD, and ACCELEROMETER.
  * Note that some of these features need not route through JetLagGame
  * explicitly, but doing so leads to a cleaner abstraction for the rest of
- * Lol-TS.
+ * JetLag.
  *
  * Another way of thinking about JetLagGame is that it provides an interface to
- * an abstract game device, and routes events between a StageManager and the
+ * an abstract game device, and routes events between a JetLagManager and the
  * abstract device.
  */
 export class JetLagGame {

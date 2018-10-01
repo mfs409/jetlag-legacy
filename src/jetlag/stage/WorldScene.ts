@@ -6,11 +6,12 @@ import { Hero } from "../renderables/Hero"
 import { Enemy } from "../renderables/Enemy"
 import { Projectile } from "../renderables/Projectile"
 import { Renderer } from "../device/Renderer"
+import { XY } from "../misc/XY"
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
- * has all of the interesting types of actors that Jetlag supports, tilt, and
- * music.
+ * provides all of the interesting types of actors that JetLag supports, as well
+ * as support for tilt and music.
  */
 export class WorldScene extends Scene {
     /** All actors whose behavior should change due to tilt */
@@ -35,7 +36,7 @@ export class WorldScene extends Scene {
     private musicPlaying = false;
 
     /** A temp vector, to avoid allocation in the tilt code */
-    private tiltVec = new PhysicsType2d.Vector2(0, 0);
+    private tiltVec = new XY(0, 0);
 
     /** A pool of projectiles for use by the hero */
     projectilePool: ProjectilePool;
@@ -53,27 +54,27 @@ export class WorldScene extends Scene {
     }
 
     /**
-     * The main render loop calls this to determine what to do when there is a phone tilt
+     * The main render loop calls this to determine what to do when there is a
+     * phone tilt
      */
     public handleTilt(x: number, y: number) {
         if (this.tiltMax == null)
             return;
 
-        // these temps are for storing the accelerometer forces we measure
-        let xGravity = x;
-        let yGravity = y;
+        // store the accelerometer forces we measure
+        let gravity = { x: x, y: y };
 
         // Apply the gravity multiplier
-        xGravity *= this.tiltMultiplier;
-        yGravity *= this.tiltMultiplier;
+        gravity.x *= this.tiltMultiplier;
+        gravity.y *= this.tiltMultiplier;
 
         // ensure x is within the -GravityMax.x : GravityMax.x range
-        xGravity = (xGravity > this.tiltMax.x) ? this.tiltMax.x : xGravity;
-        xGravity = (xGravity < -this.tiltMax.x) ? -this.tiltMax.x : xGravity;
+        gravity.x = (gravity.x > this.tiltMax.x) ? this.tiltMax.x : gravity.x;
+        gravity.x = (gravity.x < -this.tiltMax.x) ? -this.tiltMax.x : gravity.x;
 
         // ensure y is within the -GravityMax.y : GravityMax.y range
-        yGravity = (yGravity > this.tiltMax.y) ? this.tiltMax.y : yGravity;
-        yGravity = (yGravity < -this.tiltMax.y) ? -this.tiltMax.y : yGravity;
+        gravity.y = (gravity.y > this.tiltMax.y) ? this.tiltMax.y : gravity.y;
+        gravity.y = (gravity.y < -this.tiltMax.y) ? -this.tiltMax.y : gravity.y;
 
         // If we're in 'velocity' mode, apply the accelerometer reading to each
         // actor as a fixed velocity
@@ -83,26 +84,26 @@ export class WorldScene extends Scene {
             if (this.tiltMax.x == 0) {
                 for (let gfo of this.tiltActors)
                     if (gfo.mBody.IsActive())
-                        gfo.updateVelocity(gfo.mBody.GetLinearVelocity().x, yGravity);
+                        gfo.updateVelocity(gfo.mBody.GetLinearVelocity().x, gravity.y);
             }
             // if Y is clipped to zero, set each actor's X velocity, leave Y
             // unchanged
             else if (this.tiltMax.y == 0) {
                 for (let gfo of this.tiltActors)
                     if (gfo.mBody.IsActive())
-                        gfo.updateVelocity(xGravity, gfo.mBody.GetLinearVelocity().y);
+                        gfo.updateVelocity(gravity.x, gfo.mBody.GetLinearVelocity().y);
             }
             // otherwise we set X and Y velocity
             else {
                 for (let gfo of this.tiltActors)
                     if (gfo.mBody.IsActive())
-                        gfo.updateVelocity(xGravity, yGravity);
+                        gfo.updateVelocity(gravity.x, gravity.y);
             }
         }
         // when not in velocity mode, apply the accelerometer reading to each
         // actor as a force
         else {
-            this.tiltVec.Set(xGravity, yGravity);
+            this.tiltVec.Set(gravity.x, gravity.y);
             for (let gfo of this.tiltActors) {
                 if (gfo.mBody.IsActive()) {
                     gfo.mBody.ApplyForceToCenter(this.tiltVec);
@@ -111,23 +112,21 @@ export class WorldScene extends Scene {
         }
     }
 
-    /**
-     * Configure physics for the current level
-     */
-    private configureCollisionHandlers(): void {
+    /** Configure physics for the current level */
+    private configureCollisionHandlers() {
         // set up the collision handlers
         this.world.SetContactListener(new (class myContactListener extends PhysicsType2d.Dynamics.ContactListener {
-            superThis: WorldScene;
-            constructor(superThis: WorldScene) {
+            scene: WorldScene;
+            constructor(scene: WorldScene) {
                 super();
-                this.superThis = superThis;
+                this.scene = scene;
             }
 
             /**
-            * When two bodies start to collide, we can use this to forward to our onCollide methods
-            *
-            * @param contact A description of the contact event
-            */
+             * When two bodies start to collide, we can use this to forward to our onCollide methods
+             *
+             * @param contact A description of the contact event
+             */
             public BeginContact(contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
                 // Get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData(); //any type
@@ -169,26 +168,26 @@ export class WorldScene extends Scene {
                 // NB: this is called from render, while world is updating.  We can't modify the
                 // world or its actors until the update finishes, so we have to schedule
                 // collision-based updates to run after the world update.
-                this.superThis.mOneTimeEvents.push(() => {
+                this.scene.oneTimeEvents.push(() => {
                     c0.onCollide(c1, contact);
                 });
             }
 
             /**
-            * We ignore endcontact
-            *
-            * @param contact A description of the contact event
-            */
+             * We ignore endcontact
+             *
+             * @param contact A description of the contact event
+             */
             public EndContact(contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
             }
 
             /**
-            * Presolve is a hook for disabling certain collisions. We use it
-            * for collision immunity, sticky obstacles, and one-way walls
-            *
-            * @param contact A description of the contact event
-            * @param oldManifold The manifold from the previous world step
-            */
+             * Presolve is a hook for disabling certain collisions. We use it
+             * for collision immunity, sticky obstacles, and one-way walls
+             *
+             * @param contact A description of the contact event
+             * @param oldManifold The manifold from the previous world step
+             */
             public PreSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, oldManifold: PhysicsType2d.Collision.Manifold): void {
                 // get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData();
@@ -213,18 +212,18 @@ export class WorldScene extends Scene {
                     let worldManiFold = contact.GetWorldManifold();
                     let numPoints = worldManiFold.points.length;
                     for (let i = 0; i < numPoints; i++) {
-                        let vector2 = other.mBody.GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
+                        let xy = other.mBody.GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
                         // disable based on the value of isOneSided and the vector between the actors
-                        if (oneSided.mIsOneSided == 0 && vector2.y < 0) {
+                        if (oneSided.mIsOneSided == 0 && xy.y < 0) {
                             contact.SetEnabled(false);
                         }
-                        else if (oneSided.mIsOneSided == 2 && vector2.y > 0) {
+                        else if (oneSided.mIsOneSided == 2 && xy.y > 0) {
                             contact.SetEnabled(false);
                         }
-                        else if (oneSided.mIsOneSided == 1 && vector2.x > 0) {
+                        else if (oneSided.mIsOneSided == 1 && xy.x > 0) {
                             contact.SetEnabled(false);
                         }
-                        else if (oneSided.mIsOneSided == 3 && vector2.x < 0) {
+                        else if (oneSided.mIsOneSided == 3 && xy.x < 0) {
                             contact.SetEnabled(false);
                         }
                     }
@@ -232,10 +231,10 @@ export class WorldScene extends Scene {
 
                 // handle sticky obstacles... only do something if at least one actor is a sticky actor
                 if (gfoA.mIsSticky[0] || gfoA.mIsSticky[1] || gfoA.mIsSticky[2] || gfoA.mIsSticky[3]) {
-                    this.superThis.handleSticky(gfoA, gfoB, contact);
+                    this.scene.handleSticky(gfoA, gfoB, contact);
                     return;
                 } else if (gfoB.mIsSticky[0] || gfoB.mIsSticky[1] || gfoB.mIsSticky[2] || gfoB.mIsSticky[3]) {
-                    this.superThis.handleSticky(gfoB, gfoA, contact);
+                    this.scene.handleSticky(gfoB, gfoA, contact);
                     return;
                 }
 
@@ -258,9 +257,7 @@ export class WorldScene extends Scene {
         })(this));
     }
 
-    /**
-     * If the level has music attached to it, this starts playing it
-     */
+    /** If the level has music attached to it, this starts playing it */
     playMusic(): void {
         if (!this.musicPlaying && this.music) {
             this.musicPlaying = true;
@@ -268,9 +265,7 @@ export class WorldScene extends Scene {
         }
     }
 
-    /**
-     * If the level has music attached to it, this pauses it
-     */
+    /** If the level has music attached to it, this pauses it */
     pauseMusic(): void {
         if (this.musicPlaying) {
             this.musicPlaying = false;
@@ -278,9 +273,7 @@ export class WorldScene extends Scene {
         }
     }
 
-    /**
-     * If the level has music attached to it, this stops it
-     */
+    /** If the level has music attached to it, this stops it */
     stopMusic(): void {
         if (this.musicPlaying) {
             this.musicPlaying = false;
@@ -309,9 +302,7 @@ export class WorldScene extends Scene {
         this.camera.setCenter(x, y);
     }
 
-    /**
-     * Draw the actors in this world
-     */
+    /** Draw the actors in this world */
     render(renderer: Renderer, elapsedMillis: number): boolean {
         this.timer.advance(elapsedMillis);
         for (let zA of this.renderables) {
@@ -346,9 +337,8 @@ export class WorldScene extends Scene {
             // work. Note that this function runs during the box2d step, so we need to make the
             // joint in a callback that runs later
             let v = contact.GetWorldManifold().points[0];
-
-            this.mOneTimeEvents.push(() => {
-                other.mBody.SetLinearVelocity(new PhysicsType2d.Vector2(0, 0));
+            this.oneTimeEvents.push(() => {
+                other.mBody.SetLinearVelocity(new XY(0, 0));
                 let d = new PhysicsType2d.Dynamics.Joints.DistanceJointDefinition();
                 d.Initialize(sticky.mBody, other.mBody, v, v);
                 d.collideConnected = true;

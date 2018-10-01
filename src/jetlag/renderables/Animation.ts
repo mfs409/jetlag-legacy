@@ -1,4 +1,4 @@
-import { JLSprite } from "../device/Renderer"
+import { JetLagSprite } from "../device/Renderer"
 import { Renderer } from "../device/Renderer"
 
 /**
@@ -11,7 +11,7 @@ import { Renderer } from "../device/Renderer"
  */
 export class Animation {
     /** A set of images that can be used as frames of an animation. */
-    mCells: JLSprite[];
+    mCells: JetLagSprite[];
 
     /** Should the animation repeat? */
     mLoop: boolean;

@@ -6,8 +6,9 @@ import { RouteDriver } from "../misc/Route"
 import { Route } from "../misc/Route"
 import { AnimationDriver } from "./AnimationDriver"
 import { Animation } from "./Animation"
-import { Renderer, Camera } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
 import { TimedEvent } from "../misc/Timer"
+import { Camera } from "../misc/Camera"
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
@@ -515,7 +516,7 @@ export class BaseActor implements Renderable {
      * Indicate that this actor's rotation should change in response to its direction of motion
      */
     public setRotationByDirection(): void {
-        this.mScene.mRepeatEvents.push(() => {
+        this.mScene.repeatEvents.push(() => {
             if (this.getEnabled()) {
                 let x = -this.mBody.GetLinearVelocity().x;
                 let y = -this.mBody.GetLinearVelocity().y;

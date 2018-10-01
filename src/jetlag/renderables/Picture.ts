@@ -1,7 +1,8 @@
 import { Renderable } from "./Renderable"
 import { JetLagManager } from "../JetLagManager"
-import { JLSprite } from "../device/Renderer"
-import { Renderer, Camera } from "../device/Renderer"
+import { JetLagSprite } from "../device/Renderer"
+import { Renderer } from "../device/Renderer"
+import { Camera } from "../misc/Camera"
 
 /**
  * Picture is a lightweight alternative to BaseActor and its descendents.  Its
@@ -25,7 +26,7 @@ export class Picture implements Renderable {
     /**
      * The sprite to display on screen when the Picture is visible
      */
-    sprite: JLSprite = null;
+    sprite: JetLagSprite = null;
 
     /**
      * Place an image at a fixed position in the world
