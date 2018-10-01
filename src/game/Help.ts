@@ -21,7 +21,7 @@ export function buildHelpScreen(index: number, jl: JetLagApi): void {
         jl.world.setBackgroundColor(0x19698E);
 
         // put some information on the screen
-        jl.world.addTextCentered(8, 1, "Arial", "#FFFFFF", 56, () => "The levels of this game demonstrate LOL features", 0);
+        jl.world.addTextCentered(8, 1, "Arial", "#FFFFFF", 56, () => "The levels of this game demonstrate JetLag features", 0);
 
         jl.world.makeObstacleAsBox(.5, 2, .75, .75, "greenball.png");
         jl.world.addText(1.5, 2.25, "Arial", "#000000", 24, () => "You control the hero", 0);
@@ -58,8 +58,8 @@ export function buildHelpScreen(index: number, jl: JetLagApi): void {
         jl.world.addTextCentered(8, 5, "Arial", "#FFFFFF", 32,
             () => "As you play through the levels of the sample game, be sure to read the code that accompanies\n" +
                 "each world.  The levels aren't meant to be \"hard\", or even really \"fun\".  They are meant to show\n" +
-                "you how to use the different features of LibLOL, and to show you how the same features can\n" +
-                "be used in many different ways, to achieve very different styles of game play.  LibLOL has been\n" +
+                "you how to use the different features of JetLag, and to show you how the same features can\n" +
+                "be used in many different ways, to achieve very different styles of game play.  JetLag has been\n" +
                 "used to make racing games, platformers, side-scrollers, puzzle games, and even re-creations\n" +
                 "of classic Atari games.  The possibilities are endless!\n\n" +
                 "If you're not sure where to start, consider making small changes to the levels, such as changing\n" +
