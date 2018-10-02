@@ -1,5 +1,5 @@
-import { JetLagSprite } from "../device/JetLagRenderer"
 import { JetLagManager } from "../JetLagManager"
+import { JetLagSprite } from "../misc/JetLagDevice";
 
 /**
  * This object holds the configuration information for a Parallax layer.
@@ -67,6 +67,6 @@ export class ParallaxLayer {
             num += Math.ceil(screenHeightMeters / this.height);
         }
         for (let i = 0; i < num; ++i)
-            this.images.push(manager.device.renderer.getSprite(imgName));
+            this.images.push(manager.device.getRenderer().getSprite(imgName));
     }
 }

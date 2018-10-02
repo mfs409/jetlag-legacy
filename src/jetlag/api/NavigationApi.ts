@@ -70,15 +70,15 @@ export class NavigationApi {
      */
     public toggleMute() {
         // volume is either 1 or 0
-        if (this.manager.device.storage.getPersistent("volume", "1") === "1") {
+        if (this.manager.device.getStorage().getPersistent("volume", "1") === "1") {
             // set volume to 0, set image to 'unmute'
-            this.manager.device.storage.setPersistent("volume", "0");
+            this.manager.device.getStorage().setPersistent("volume", "0");
         } else {
             // set volume to 1, set image to 'mute'
-            this.manager.device.storage.setPersistent("volume", "1");
+            this.manager.device.getStorage().setPersistent("volume", "1");
         }
         // update all music
-        this.manager.device.speaker.resetMusicVolume(parseInt(this.manager.device.storage.getPersistent("volume", "1")));
+        this.manager.device.getSpeaker().resetMusicVolume(parseInt(this.manager.device.getStorage().getPersistent("volume", "1")));
     }
 
     /**
@@ -86,7 +86,7 @@ export class NavigationApi {
      * corresponds to muted.
      */
     public getVolume() {
-        return this.manager.device.storage.getPersistent("volume", "1") === "1";
+        return this.manager.device.getStorage().getPersistent("volume", "1") === "1";
     }
 
     /**
@@ -151,13 +151,13 @@ export class NavigationApi {
      * @param soundName The name of the sound asset to play
      */
     public playSound(soundName: string) {
-        this.manager.device.speaker.getSound(soundName).play();
+        this.manager.device.getSpeaker().getSound(soundName).play();
     }
 
     /**
      * Generate text indicating the current FPS
      */
     public getFPS(): number {
-        return this.manager.device.renderer.getFPS();
+        return this.manager.device.getRenderer().getFPS();
     }
 }

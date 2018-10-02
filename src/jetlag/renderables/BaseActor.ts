@@ -6,11 +6,11 @@ import { RouteDriver } from "../misc/Route"
 import { Route } from "../misc/Route"
 import { AnimationDriver } from "./AnimationDriver"
 import { Animation } from "./Animation"
-import { JetLagRenderer } from "../device/JetLagRenderer"
+import { JetLagRenderer, JetLagSound } from "../misc/JetLagDevice"
 import { TimedEvent } from "../misc/Timer"
 import { Camera } from "../misc/Camera"
 import { XY } from "../misc/XY"
-import { JetLagConsole } from "../device/JetLagConsole"
+import { Logger } from "../misc/Logger"
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
@@ -86,7 +86,7 @@ export class BaseActor implements Renderable {
     route: RouteDriver = null;
 
     /** Sound to play when the actor disappears */
-    disappearSound: Howl;
+    disappearSound: JetLagSound;
 
     /** Code to run when this actor is tapped */
     tapHandler: (hudX: number, hudY: number) => boolean = null;
@@ -118,7 +118,7 @@ export class BaseActor implements Renderable {
      * @param height  The height of the actor's image and body, in meters
      */
     constructor(scene: Scene, imgName: string, width: number, height: number) {
-        this.mAnimator = new AnimationDriver(scene.stageManager.device.renderer, imgName);
+        this.mAnimator = new AnimationDriver(scene.stageManager.device.getRenderer(), imgName);
         this.mDisappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
         this.mDisappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
         this.scene = scene;
@@ -173,7 +173,7 @@ export class BaseActor implements Renderable {
             this.verts[i / 2] = new PhysicsType2d.Vector2(vertices[i], vertices[i + 1]);
         // print some debug info, since vertices are tricky
         for (let vert of this.verts)
-            JetLagConsole.info("vert at " + vert.x + "," + vert.y);
+            Logger.info("vert at " + vert.x + "," + vert.y);
         shape.Set(this.verts);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
@@ -455,7 +455,7 @@ export class BaseActor implements Renderable {
      * @param imgName The name of the new image file to use
      */
     public setImage(imgName: string) {
-        this.mAnimator.updateImage(this.scene.stageManager.device.renderer, imgName);
+        this.mAnimator.updateImage(this.scene.stageManager.device.getRenderer(), imgName);
     }
 
     /**
@@ -565,7 +565,7 @@ export class BaseActor implements Renderable {
      * @param soundName The name of the sound file to play
      */
     public setDisappearSound(soundName: string): void {
-        this.disappearSound = this.scene.stageManager.device.speaker.getSound(soundName);
+        this.disappearSound = this.scene.stageManager.device.getSpeaker().getSound(soundName);
     }
 
 

@@ -1,5 +1,4 @@
 import { JetLagApi } from "../jetlag/api/JetLagApi";
-import { KEYS } from "../jetlag/device/JetLagKeyboard";
 import { Route } from "../jetlag/misc/Route";
 import { Goodie } from "../jetlag/renderables/Goodie";
 import { Hero } from "../jetlag/renderables/Hero";
@@ -7,6 +6,7 @@ import { OverlayApi } from "../jetlag/api/OverlayApi";
 import { WorldActor } from "../jetlag/renderables/WorldActor";
 import { Enemy } from "../jetlag/renderables/Enemy";
 import { Obstacle } from "../jetlag/renderables/Obstacle";
+import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game
@@ -19,7 +19,7 @@ import { Obstacle } from "../jetlag/renderables/Obstacle";
 export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Chooser
-    jl.hud.setUpKeyAction(KEYS.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); jl.hud.setUpKeyAction(KEYS.ESCAPE, null); });
+    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, null); });
 
     // In this level, all we have is a hero (the green ball) who needs to make it to the destination (a mustard colored
     // ball). The game is configured to use tilt to control the world.  If you're running on a computer, arrow keys will

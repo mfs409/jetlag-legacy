@@ -4,9 +4,9 @@ import { Renderable } from "../renderables/Renderable"
 import { RenderableText } from "../renderables/RenderableText"
 import { Picture } from "../renderables/Picture"
 import { Timer } from "../misc/Timer"
-import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
 import { PointToActorCallback } from "../misc/PointToActorCallback"
+import { JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * Scene represents an interactive, dynamic, visible portion of a game.
@@ -236,7 +236,7 @@ export abstract class Scene {
     height: number, imgName: string, zIndex: number): Picture {
     // set up the image to display
     // NB: this will fail gracefully (no crash) for invalid file names
-    let r = new Picture(x, y, width, height, imgName, this.stageManager.device.renderer);
+    let r = new Picture(x, y, width, height, imgName, this.stageManager.device.getRenderer());
     this.addActor(r, zIndex);
     return r;
   }
@@ -254,7 +254,7 @@ export abstract class Scene {
    * @return A Renderable of the text, so it can be enabled/disabled by program code
    */
   public addText(x: number, y: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): RenderableText {
-    let t = new RenderableText(this.stageManager.device.renderer, fontName, fontSize, fontColor, x, y, false, producer);
+    let t = new RenderableText(this.stageManager.device.getRenderer(), fontName, fontSize, fontColor, x, y, false, producer);
     this.addActor(t, zIndex);
     return t;
   }
@@ -273,7 +273,7 @@ export abstract class Scene {
    *         code
    */
   public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): RenderableText {
-    let t = new RenderableText(this.stageManager.device.renderer, fontName, fontSize, fontColor, centerX, centerY, true, producer);
+    let t = new RenderableText(this.stageManager.device.getRenderer(), fontName, fontSize, fontColor, centerX, centerY, true, producer);
     this.addActor(t, zIndex);
     return t;
   }

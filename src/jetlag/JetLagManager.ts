@@ -1,15 +1,10 @@
 import { JetLagConfig } from "./JetLagConfig"
-import { Device } from "./device/Device"
-import { TouchReceiverHolder, TouchReceiver } from "./device/JetLagTouchScreen"
+import { JetLagDevice, JetLagTouchReceiverHolder, JetLagTouchReceiver } from "./misc/JetLagDevice"
 import { JetLagApi } from "./api/JetLagApi"
 import { Stage } from "./stage/Stage"
 
-/**
- * Modes of the game, which help decide which stage to show.  We can be showing
- * the main splash screens, the help screens, the level chooser screens, the
- * store screens, or the playable level screens
- */
-enum MODES {
+/** Types of stages in the game */
+enum STAGETYPES {
     SPLASH = 0, HELP = 1, CHOOSER = 2, STORE = 3, PLAY = 4, COUNT = 5
 }
 
@@ -21,24 +16,15 @@ enum MODES {
  * Stage, and provides the currently active Stage with access to the Device
  * outputs.
  */
-export class JetLagManager implements TouchReceiverHolder {
-    /** The current state (e.g., are we showing a STORE) */
-    private currentMode: number;
+export class JetLagManager implements JetLagTouchReceiverHolder {
+    /** The current type of stage that we are showing */
+    private currentStageType: number;
 
     /** 
-     * The level within the mode (e.g., we are in PLAY scene 4, and will return
-     * to CHOOSER 2) 
+     * The level within the current stage (e.g., we are in PLAY scene 4, and
+     * will return to CHOOSER 2) 
      */
     private readonly modeStates: number[] = [];
-
-    /**
-     * The game configuration object, which includes references to code for
-     * creating the stages of the game.
-     */
-    readonly config: JetLagConfig;
-
-    /** The abstract Device */
-    readonly device: Device;
 
     /** The currently active stage, if any */
     private currStage: Stage;
@@ -52,17 +38,16 @@ export class JetLagManager implements TouchReceiverHolder {
      * @param cfg The game config object
      * @param device The abstract device (with touch, sound, etc)
      */
-    constructor(cfg: JetLagConfig, device: Device) {
-        this.config = cfg;
+    constructor(public readonly config: JetLagConfig, public readonly device: JetLagDevice) {
         this.device = device;
         // Put each mode in state 1, since the first level is level 1
-        for (let i = 0; i < MODES.COUNT; ++i) {
+        for (let i = 0; i < STAGETYPES.COUNT; ++i) {
             this.modeStates.push(1);
         }
         // Register the manager with the device's gesture handler, so that all
         // gestures get routed through the manager to the stage.  See
         // TouchReceiverHolder for more information.
-        this.device.touch.setTouchReceiverHolder(this);
+        this.device.getTouchScreen().setTouchReceiverHolder(this);
     }
 
     /**
@@ -71,7 +56,7 @@ export class JetLagManager implements TouchReceiverHolder {
      * TouchReceiverHolder, not a TouchReceiver.  To satisfy the interface, we
      * need this method.  Note that the Stage is a TouchReceiver.
      */
-    getTouchReceiver(): TouchReceiver { return this.currStage; }
+    getTouchReceiver(): JetLagTouchReceiver { return this.currStage; }
 
     /** Getter for the current stage */
     getCurrStage() { return this.currStage; }
@@ -83,10 +68,10 @@ export class JetLagManager implements TouchReceiverHolder {
      */
     onAssetsLoaded() {
         // Be sure to refresh the mute state from the persistent storage
-        this.device.speaker.resetMusicVolume(parseInt(this.device.storage.getPersistent("volume", "1")));
+        this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
         this.currStage = new Stage(this);
-        this.doSplash(this.modeStates[MODES.SPLASH]);
-        this.device.renderer.startRenderLoop(this);
+        this.doSplash(this.modeStates[STAGETYPES.SPLASH]);
+        this.device.getRenderer().startRenderLoop(this);
     }
 
     /**
@@ -99,11 +84,11 @@ export class JetLagManager implements TouchReceiverHolder {
      * @param index The index of the splash screen to load
      */
     doSplash(index: number): void {
-        for (let i = 0; i < MODES.COUNT; ++i) {
+        for (let i = 0; i < STAGETYPES.COUNT; ++i) {
             this.modeStates[i] = 1;
         }
-        this.modeStates[MODES.SPLASH] = index;
-        this.currentMode = MODES.SPLASH;
+        this.modeStates[STAGETYPES.SPLASH] = index;
+        this.currentStageType = STAGETYPES.SPLASH;
         this.currStage.onScreenChange();
         this.config.splashBuilder(index, new JetLagApi(this));
     }
@@ -115,8 +100,8 @@ export class JetLagManager implements TouchReceiverHolder {
      * @param index The index of the level to load
      */
     doPlay(index: number): void {
-        this.modeStates[MODES.PLAY] = index;
-        this.currentMode = MODES.PLAY;
+        this.modeStates[STAGETYPES.PLAY] = index;
+        this.currentStageType = STAGETYPES.PLAY;
         this.currStage.onScreenChange();
         this.config.levelBuilder(index, new JetLagApi(this));
     }
@@ -127,8 +112,8 @@ export class JetLagManager implements TouchReceiverHolder {
      * @param index The index of the help level to load
      */
     doHelp(index: number): void {
-        this.modeStates[MODES.HELP] = index;
-        this.currentMode = MODES.HELP;
+        this.modeStates[STAGETYPES.HELP] = index;
+        this.currentStageType = STAGETYPES.HELP;
         this.currStage.onScreenChange();
         this.config.helpBuilder(index, new JetLagApi(this));
     }
@@ -139,8 +124,8 @@ export class JetLagManager implements TouchReceiverHolder {
      * @param index The index of the help level to load
      */
     doStore(index: number): void {
-        this.modeStates[MODES.STORE] = index;
-        this.currentMode = MODES.STORE;
+        this.modeStates[STAGETYPES.STORE] = index;
+        this.currentStageType = STAGETYPES.STORE;
         this.currStage.onScreenChange();
         this.config.storeBuilder(index, new JetLagApi(this));
     }
@@ -154,16 +139,16 @@ export class JetLagManager implements TouchReceiverHolder {
         // if chooser disabled, then we either called this from splash, or from
         // a game level
         if (!this.config.enableChooser) {
-            if (this.currentMode == MODES.PLAY) {
-                this.doSplash(this.modeStates[MODES.SPLASH]);
+            if (this.currentStageType == STAGETYPES.PLAY) {
+                this.doSplash(this.modeStates[STAGETYPES.SPLASH]);
             } else {
-                this.doPlay(this.modeStates[MODES.PLAY]);
+                this.doPlay(this.modeStates[STAGETYPES.PLAY]);
             }
             return;
         }
         // the chooser is not disabled
-        this.modeStates[MODES.CHOOSER] = index;
-        this.currentMode = MODES.CHOOSER;
+        this.modeStates[STAGETYPES.CHOOSER] = index;
+        this.currentStageType = STAGETYPES.CHOOSER;
         this.currStage.onScreenChange();
         this.config.chooserBuilder(index, new JetLagApi(this));
     }
@@ -173,7 +158,7 @@ export class JetLagManager implements TouchReceiverHolder {
      */
     public doQuit() {
         this.currStage.world.stopMusic();
-        this.device.process.exit();
+        this.device.getProcess().exit();
     }
 
     /**
@@ -182,16 +167,16 @@ export class JetLagManager implements TouchReceiverHolder {
      */
     public advanceLevel(): void {
         // Make sure to stop the music!
-        if (this.modeStates[MODES.PLAY] == this.config.numLevels) {
+        if (this.modeStates[STAGETYPES.PLAY] == this.config.numLevels) {
             this.doChooser(1);
         } else {
-            this.modeStates[MODES.PLAY]++;
-            this.doPlay(this.modeStates[MODES.PLAY]);
+            this.modeStates[STAGETYPES.PLAY]++;
+            this.doPlay(this.modeStates[STAGETYPES.PLAY]);
         }
     }
 
     /** Start a level over again. */
-    public repeatLevel(): void { this.doPlay(this.modeStates[MODES.PLAY]); }
+    public repeatLevel(): void { this.doPlay(this.modeStates[STAGETYPES.PLAY]); }
 
     /**
      * This code is called repeatedly to update the game state and re-draw the
@@ -201,8 +186,8 @@ export class JetLagManager implements TouchReceiverHolder {
      *               render
      */
     render(millis: number) {
-        this.device.renderer.initFrame();
-        this.currStage.render(this.device.renderer, millis);
-        this.device.renderer.showFrame();
+        this.device.getRenderer().initFrame();
+        this.currStage.render(this.device.getRenderer(), millis);
+        this.device.getRenderer().showFrame();
     }
 }

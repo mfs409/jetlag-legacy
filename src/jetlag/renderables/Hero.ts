@@ -1,13 +1,13 @@
 import { WorldActor } from "./WorldActor"
 import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
-import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"
 import { Obstacle } from "./Obstacle"
 import { Animation } from "./Animation"
 import { Camera } from "../misc/Camera"
+import { JetLagRenderer, JetLagSound } from "../misc/JetLagDevice";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -307,7 +307,7 @@ export class Hero extends WorldActor {
     private mAllowMultiJump: boolean;
 
     /** Sound to play when a jump occurs */
-    private mJumpSound: Howl;
+    private mJumpSound: JetLagSound;
 
     /** cells involved in animation for jumping */
     private mJumpAnimation: Animation;
@@ -458,7 +458,7 @@ export class Hero extends WorldActor {
      * @param soundName The name of the sound file to use
      */
     public setJumpSound(soundName: string): void {
-        this.mJumpSound = this.stageManager.device.speaker.getSound(soundName);
+        this.mJumpSound = this.stageManager.device.getSpeaker().getSound(soundName);
     }
 
     /**

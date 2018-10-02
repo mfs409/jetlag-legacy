@@ -1,5 +1,5 @@
-import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
+import { JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * Renderable encapsulates anything that can be drawn on the screen.  In JetLag,

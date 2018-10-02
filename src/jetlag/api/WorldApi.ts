@@ -7,13 +7,13 @@ import { Hero } from "../renderables/Hero"
 import { Goodie } from "../renderables/Goodie"
 import { Enemy } from "../renderables/Enemy"
 import { Destination } from "../renderables/Destination"
-import { KEYS } from "../device/JetLagKeyboard";
 import { WorldActor } from "../renderables/WorldActor";
 import { TimedEvent } from "../misc/Timer";
 import { ProjectilePool } from "../misc/ProjectilePool";
 import { ParallaxLayer } from "../renderables/ParallaxLayer";
 import { Animation } from "../renderables/Animation";
 import { Svg } from "../misc/Svg";
+import { JetLagKeys } from "../misc/JetLagDevice";
 
 /**
  * WorldApi provides the functionality needed for putting things into the world
@@ -56,7 +56,7 @@ export class WorldApi {
      *                  have been registered as Music, not as a Sound
      */
     public setMusic(musicName: string): void {
-        this.stageManager.getCurrStage().world.music = this.stageManager.device.speaker.getMusic(musicName);
+        this.stageManager.getCurrStage().world.music = this.stageManager.device.getSpeaker().getMusic(musicName);
     }
 
     /**
@@ -413,16 +413,16 @@ export class WorldApi {
     public enableTilt(xGravityMax: number, yGravityMax: number) {
         this.stageManager.getCurrStage().world.tiltMax.x = xGravityMax;
         this.stageManager.getCurrStage().world.tiltMax.y = yGravityMax;
-        if (!this.stageManager.device.accel.supported) {
-            this.hud.setUpKeyAction(KEYS.UP, () => { this.stageManager.device.accel.setY(0); });
-            this.hud.setUpKeyAction(KEYS.DOWN, () => { this.stageManager.device.accel.setY(0); });
-            this.hud.setUpKeyAction(KEYS.LEFT, () => { this.stageManager.device.accel.setX(0); });
-            this.hud.setUpKeyAction(KEYS.RIGHT, () => { this.stageManager.device.accel.setX(0); });
+        if (!this.stageManager.device.getAccelerometer().getSupported()) {
+            this.hud.setUpKeyAction(JetLagKeys.UP, () => { this.stageManager.device.getAccelerometer().setY(0); });
+            this.hud.setUpKeyAction(JetLagKeys.DOWN, () => { this.stageManager.device.getAccelerometer().setY(0); });
+            this.hud.setUpKeyAction(JetLagKeys.LEFT, () => { this.stageManager.device.getAccelerometer().setX(0); });
+            this.hud.setUpKeyAction(JetLagKeys.RIGHT, () => { this.stageManager.device.getAccelerometer().setX(0); });
 
-            this.hud.setDownKeyAction(KEYS.UP, () => { this.stageManager.device.accel.setY(-5); });
-            this.hud.setDownKeyAction(KEYS.DOWN, () => { this.stageManager.device.accel.setY(5); });
-            this.hud.setDownKeyAction(KEYS.LEFT, () => { this.stageManager.device.accel.setX(-5); });
-            this.hud.setDownKeyAction(KEYS.RIGHT, () => { this.stageManager.device.accel.setX(5); });
+            this.hud.setDownKeyAction(JetLagKeys.UP, () => { this.stageManager.device.getAccelerometer().setY(-5); });
+            this.hud.setDownKeyAction(JetLagKeys.DOWN, () => { this.stageManager.device.getAccelerometer().setY(5); });
+            this.hud.setDownKeyAction(JetLagKeys.LEFT, () => { this.stageManager.device.getAccelerometer().setX(-5); });
+            this.hud.setDownKeyAction(JetLagKeys.RIGHT, () => { this.stageManager.device.getAccelerometer().setX(5); });
         }
     }
 
@@ -716,7 +716,7 @@ export class WorldApi {
      * @param soundName Name of the sound file to play
      */
     public setThrowSound(soundName: string): void {
-        this.stageManager.getCurrStage().world.projectilePool.mThrowSound = this.stageManager.device.speaker.getSound(soundName);
+        this.stageManager.getCurrStage().world.projectilePool.mThrowSound = this.stageManager.device.getSpeaker().getSound(soundName);
     }
 
     /**
@@ -726,7 +726,7 @@ export class WorldApi {
      */
     public setProjectileDisappearSound(soundName: string): void {
         this.stageManager.getCurrStage().world.projectilePool.mProjectileDisappearSound =
-            this.stageManager.device.speaker.getSound(soundName);
+            this.stageManager.device.getSpeaker().getSound(soundName);
     }
 
     /**
@@ -747,7 +747,7 @@ export class WorldApi {
      * @return The animation
      */
     public makeComplexAnimation(repeat: boolean) {
-        return new Animation(repeat, this.stageManager.device.renderer);
+        return new Animation(repeat, this.stageManager.device.getRenderer());
     }
 
     /**
@@ -759,7 +759,7 @@ export class WorldApi {
      * @return The animation
      */
     public makeAnimation(timePerFrame: number, repeat: boolean, imgNames: string[]) {
-        let a = new Animation(repeat, this.stageManager.device.renderer);
+        let a = new Animation(repeat, this.stageManager.device.getRenderer());
         for (let i of imgNames)
             a.to(i, timePerFrame);
         return a;
@@ -782,7 +782,7 @@ export class WorldApi {
      */
     public setProjectileImageSource(imgName: string) {
         for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
-            p.mAnimator.updateImage(this.stageManager.device.renderer, imgName);
+            p.mAnimator.updateImage(this.stageManager.device.getRenderer(), imgName);
         this.stageManager.getCurrStage().world.projectilePool.mRandomizeImages = true;
     }
 

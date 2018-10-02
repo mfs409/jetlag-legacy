@@ -1,11 +1,11 @@
 import { OverlayScene } from "../stage/OverlayScene"
-import { KEYS } from "../device/JetLagKeyboard"
 import { WorldActor } from "../renderables/WorldActor"
 import { TimedEvent } from "../misc/Timer"
 import { Renderable } from "../renderables/Renderable"
 import { Hero } from "../renderables/Hero"
 import { Route } from "../misc/Route";
 import { BaseActor } from "../renderables/BaseActor";
+import { JetLagKeys } from "../misc/JetLagDevice";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
@@ -49,8 +49,8 @@ export class OverlayApi {
      * @param key The KEY to handle
      * @param action The action to perform when the key is released
      */
-    public setUpKeyAction(key: KEYS, action: () => void) {
-        this.overlay.stageManager.device.keyboard.setKeyUpHandler(key, action);
+    public setUpKeyAction(key: JetLagKeys, action: () => void) {
+        this.overlay.stageManager.device.getKeyboard().setKeyUpHandler(key, action);
     }
 
     /**
@@ -59,8 +59,8 @@ export class OverlayApi {
      * @param key The KEY to handle
      * @param action The action to perform when the key is released
      */
-    public setDownKeyAction(key: KEYS, action: () => void) {
-        this.overlay.stageManager.device.keyboard.setKeyDownHandler(key, action);
+    public setDownKeyAction(key: JetLagKeys, action: () => void) {
+        this.overlay.stageManager.device.getKeyboard().setKeyDownHandler(key, action);
     }
 
     /**

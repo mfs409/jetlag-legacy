@@ -1,5 +1,5 @@
 import { Scene } from "../stage/Scene"
-import { JetLagRenderer } from "../device/JetLagRenderer"
+import { JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * OverlayScene is any scene that sits on top of the world.  The most important 

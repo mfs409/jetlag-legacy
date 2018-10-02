@@ -1,6 +1,6 @@
 import { Renderable } from "./Renderable"
-import { JetLagSprite, JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
+import { JetLagSprite, JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * Picture is a lightweight alternative to BaseActor and its descendents.  Its
@@ -54,10 +54,9 @@ export class Picture implements Renderable {
             return;
         // update world position, because the renderer is free to scale and move
         // the sprite on every render...
-        this.sprite.sprite.position.x = this.dims.x;
-        this.sprite.sprite.position.y = this.dims.y;
-        this.sprite.sprite.height = this.dims.h;
-        this.sprite.sprite.width = this.dims.w;
+        this.sprite.setPosition(this.dims.x, this.dims.y);
+        this.sprite.setHeight(this.dims.h);
+        this.sprite.setWidth(this.dims.w);
         renderer.addPictureToFrame(this.sprite, camera);
     }
 }

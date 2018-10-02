@@ -3,12 +3,12 @@ import { WorldScene } from "./WorldScene"
 import { OverlayScene } from "./OverlayScene"
 import { OverlayApi } from "../api/OverlayApi"
 import { ParallaxScene } from "./ParallaxScene"
-import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Score } from "../misc/Score"
 import { Hero } from "../renderables/Hero"
 import { Goodie } from "../renderables/Goodie"
 import { Enemy } from "../renderables/Enemy"
-import { JetLagConsole } from "../device/JetLagConsole";
+import { Logger } from "../misc/Logger";
+import { JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * Stage is a fully interactive portion of the game.  It has several scenes, 
@@ -88,8 +88,8 @@ export class Stage {
         if (this.stageManager.config.debugMode) {
             let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
             let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
-            JetLagConsole.info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
-            JetLagConsole.info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
+            Logger.info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
+            Logger.info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
         }
         if (this.gestureHudFirst) {
             if (this.hud.tap(screenX, screenY))
@@ -236,7 +236,7 @@ export class Stage {
         // handle accelerometer stuff... note that accelerometer is effectively disabled during a
         // popup... we could change that by moving this to the top, but that's probably not going to
         // produce logical behavior
-        this.world.handleTilt(this.stageManager.device.accel.get().x, this.stageManager.device.accel.get().y);
+        this.world.handleTilt(this.stageManager.device.getAccelerometer().get().x, this.stageManager.device.getAccelerometer().get().y);
 
         // Advance the physics world by 1/45 of a second.
         //
@@ -274,7 +274,7 @@ export class Stage {
         this.score.reset();
         this.loseCountdownText = "";
         this.winCountdownText = "";
-        this.stageManager.device.storage.clearLevelFacts();
+        this.stageManager.device.getStorage().clearLevelFacts();
     }
 
     /**

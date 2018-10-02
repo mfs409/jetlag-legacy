@@ -1,7 +1,7 @@
 import { JetLagManager } from "../JetLagManager"
 import { ParallaxLayer } from "../renderables/ParallaxLayer"
-import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
+import { JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * ParallaxScenes present a set of images that seem to scroll relative to the 
@@ -136,10 +136,9 @@ export class ParallaxScene {
             let i = 0;
             let plx = pl.lastX;
             while (plx < x + camW) {
-                pl.images[i].sprite.position.x = plx;
-                pl.images[i].sprite.position.y = pl.lastY;
-                pl.images[i].sprite.height = pl.height;
-                pl.images[i].sprite.width = pl.width;
+                pl.images[i].setPosition(plx, pl.lastY);
+                pl.images[i].setHeight(pl.height);
+                pl.images[i].setWidth(pl.width);
                 sb.addPictureToFrame(pl.images[i], worldCamera);
                 plx += pl.width;
                 i++;
@@ -149,10 +148,9 @@ export class ParallaxScene {
             let i = 0;
             let ply = pl.lastY;
             while (ply < y + camH) {
-                pl.images[i].sprite.position.x = pl.lastX;
-                pl.images[i].sprite.position.y = ply;
-                pl.images[i].sprite.height = pl.height;
-                pl.images[i].sprite.width = pl.width;
+                pl.images[i].setPosition(pl.lastX, ply);
+                pl.images[i].setHeight(pl.height);
+                pl.images[i].setWidth( pl.width);
                 sb.addPictureToFrame(pl.images[i], worldCamera);
                 ply += pl.height;
                 i++;

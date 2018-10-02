@@ -2,6 +2,7 @@ import { WorldScene } from "../stage/WorldScene"
 import { Projectile } from "../renderables/Projectile"
 import { Hero } from "../renderables/Hero"
 import { JetLagManager } from "../JetLagManager"
+import { JetLagSound } from "./JetLagDevice";
 
 /**
 * ProjectilePool stores a set of projectiles.  We can get into lots of
@@ -37,10 +38,10 @@ export class ProjectilePool {
     private nextIndex: number;
 
     /** Sound to play when projectiles are thrown */
-    mThrowSound: Howl;
+    mThrowSound: JetLagSound;
 
     /** The sound to play when a projectile disappears */
-    mProjectileDisappearSound: Howl;
+    mProjectileDisappearSound: JetLagSound;
 
     /** For choosing random images for the projectiles */
     mRandomizeImages = false;

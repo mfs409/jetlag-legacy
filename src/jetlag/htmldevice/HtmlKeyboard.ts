@@ -1,14 +1,9 @@
-/**
- * The keys that we care about in the keyboard
- */
-export enum KEYS {
-    ESCAPE = 0, UP = 1, DOWN = 2, LEFT = 3, RIGHT = 4, SPACE = 5, COUNT = 6
-}
+import { JetLagKeys, JetLagKeyboard } from "../misc/JetLagDevice";
 
 /**
  * Keyboard abstracts the ways of responding to keyboard events
  */
-export class JetLagKeyboard {
+export class HtmlKeyboard implements JetLagKeyboard {
     /** handlers for when keys are pressed down */
     downHandlers: (() => void)[] = [];
 
@@ -16,10 +11,10 @@ export class JetLagKeyboard {
     upHandlers: (() => void)[] = [];
 
     /** Set a handler to respond to some keydown event */
-    public setKeyDownHandler(key: KEYS, handler: () => void) { this.downHandlers[key.valueOf() as number] = handler; }
+    public setKeyDownHandler(key: JetLagKeys, handler: () => void) { this.downHandlers[key.valueOf() as number] = handler; }
 
     /** Set a handler to respond to some keyup event */
-    public setKeyUpHandler(key: KEYS, handler: () => void) { this.upHandlers[key.valueOf() as number] = handler; }
+    public setKeyUpHandler(key: JetLagKeys, handler: () => void) { this.upHandlers[key.valueOf() as number] = handler; }
 
     /**
      * Convert a key code to KEYS enum
@@ -27,12 +22,12 @@ export class JetLagKeyboard {
     private toCode(code: number): number {
         let idx = -1;
         switch (code) {
-            case 27: idx = KEYS.ESCAPE; break;
-            case 38: idx = KEYS.UP; break;
-            case 40: idx = KEYS.DOWN; break;
-            case 37: idx = KEYS.LEFT; break;
-            case 39: idx = KEYS.RIGHT; break;
-            case 32: idx = KEYS.SPACE; break;
+            case 27: idx = JetLagKeys.ESCAPE; break;
+            case 38: idx = JetLagKeys.UP; break;
+            case 40: idx = JetLagKeys.DOWN; break;
+            case 37: idx = JetLagKeys.LEFT; break;
+            case 39: idx = JetLagKeys.RIGHT; break;
+            case 32: idx = JetLagKeys.SPACE; break;
             default: idx = -1; break;
         }
         return idx;
@@ -70,7 +65,7 @@ export class JetLagKeyboard {
      * Build the Keyboard handler object
      */
     constructor() {
-        for (let o = 0; o < KEYS.COUNT; ++o) {
+        for (let o = 0; o < JetLagKeys.COUNT; ++o) {
             this.upHandlers.push(null);
             this.downHandlers.push(null);
         }

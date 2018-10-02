@@ -1,4 +1,4 @@
-import { JetLagRenderer, JetLagSprite } from "../device/JetLagRenderer"
+import { JetLagRenderer, JetLagSprite } from "../misc/JetLagDevice";
 
 /**
  * Animation is a way of describing a set of images that can be used to do
@@ -23,7 +23,7 @@ export class Animation {
         let a = new Animation(this.loop, this.renderer);
         for (let i = 0; i < this.durations.length; ++i) {
             a.durations.push(this.durations[i]);
-            a.cells.push(this.renderer.getSprite(this.cells[i].imgName));
+            a.cells.push(this.renderer.getSprite(this.cells[i].getImgName()));
         }
         return a;
     }

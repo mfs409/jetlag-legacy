@@ -5,8 +5,9 @@ import { JetLagManager } from "../JetLagManager"
 import { Hero } from "../renderables/Hero"
 import { Enemy } from "../renderables/Enemy"
 import { Projectile } from "../renderables/Projectile"
-import { JetLagRenderer } from "../device/JetLagRenderer"
+import { JetLagRenderer } from "../misc/JetLagDevice"
 import { XY } from "../misc/XY"
+import { JetLagSound } from "../misc/JetLagDevice";
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
@@ -30,7 +31,7 @@ export class WorldScene extends Scene {
     cameraChaseActor: WorldActor = null;
 
     /** The music, if any */
-    music: Howl = null;
+    music: JetLagSound = null;
 
     /** Whether the music is playing or not */
     private musicPlaying = false;

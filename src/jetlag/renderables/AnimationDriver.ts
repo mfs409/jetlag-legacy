@@ -1,5 +1,5 @@
-import { JetLagSprite, JetLagRenderer } from "../device/JetLagRenderer"
 import { Animation } from "./Animation"
+import { JetLagSprite, JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * AnimationDriver is an internal class that actors can use to figure out which

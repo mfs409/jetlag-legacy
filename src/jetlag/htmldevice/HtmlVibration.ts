@@ -1,10 +1,11 @@
-import { JetLagConsole } from "./JetLagConsole";
+import { Logger } from "../misc/Logger";
+import { JetLagVibration } from "../misc/JetLagDevice";
 
 /**
  * Vibration provides a thin wrapper around the HTML5 vibration API, so that we
  * can call a method that works even when the browser doesn't support vibration
  */
-export class JetLagVibration {
+export class HtmlVibration implements JetLagVibration {
     /** Track whether the device supports vibration */
     isSupported: boolean = false;
 
@@ -29,7 +30,7 @@ export class JetLagVibration {
             navigator.vibrate(millis);
         }
         else {
-            JetLagConsole.info("Simulating " + millis + "ms of vibrate");
+            Logger.info("Simulating " + millis + "ms of vibrate");
         }
     }
 }

@@ -3,7 +3,11 @@ import { JetLagManager } from "../JetLagManager"
 import { BaseActor } from "../renderables/BaseActor"
 import { BodyStyle } from "../renderables/BaseActor"
 import { Camera } from "../misc/Camera"
-import { JetLagConsole } from "./JetLagConsole"
+import { Logger } from "../misc/Logger";
+import { JetLagRenderer, JetLagText, JetLagSprite } from "../misc/JetLagDevice"
+import { HtmlText } from "./HtmlText"
+import { HtmlSprite } from "./HtmlSprite"
+
 import * as PIXI from 'pixi.js';
 
 /**
@@ -21,7 +25,7 @@ import * as PIXI from 'pixi.js';
  * initFrame().  Then use the add* methods to add things to the frame.  Finally,
  * call showFrame() and the frame will be rendered.
  */
-export class JetLagRenderer {
+export class HtmlRenderer implements JetLagRenderer {
     /** The renderer object is responsible for drawing onto a canvas */
     private renderer: PIXI.Application;
 
@@ -128,12 +132,11 @@ export class JetLagRenderer {
         let r = actor.getRotation();
         // Configure the sprite (image) and put it on screen
         let sprite = actor.mAnimator.getCurrent();
-        sprite.sprite.anchor.set(.5, .5);
-        sprite.sprite.position.set(x + w / 2, y + h / 2);
-        sprite.sprite.width = w;
-        sprite.sprite.height = h;
-        sprite.sprite.rotation = r;
-        this.mainContainer.addChild(sprite.sprite);
+        sprite.setAnchoredPosition(.5, .5, x + w / 2, y + h / 2);
+        sprite.setWidth(w);
+        sprite.setHeight(h);
+        sprite.setRotation(r);
+        this.mainContainer.addChild((sprite as HtmlSprite).sprite);
         // Debug rendering is the hard part!
         if (this.debugContainer != null) {
             if (actor.bodyStyle === BodyStyle.RECTANGLE) {
@@ -187,7 +190,7 @@ export class JetLagRenderer {
                 this.debugContainer.addChild(poly);
             }
             else {
-                JetLagConsole.urgent("Unknown BodyStyle while attempting to render actor");
+                Logger.urgent("Unknown BodyStyle while attempting to render actor");
             }
         }
     }
@@ -200,22 +203,25 @@ export class JetLagRenderer {
      */
     public addPictureToFrame(sprite: JetLagSprite, camera: Camera) {
         // If the picture isn't on screen, skip it
-        if (!camera.inBounds(sprite.sprite.position.x, sprite.sprite.position.y, sprite.sprite.width, sprite.sprite.height))
+        if (!camera.inBounds(sprite.getXPosition(), sprite.getYPosition(), sprite.getWidth(), sprite.getHeight()))
             return;
-        sprite.sprite.position.x -= camera.getOffsetX();
-        sprite.sprite.position.y -= camera.getOffsetY();
+        let x = sprite.getXPosition();
+        let y = sprite.getYPosition();
+        x -= camera.getOffsetX();
+        y -= camera.getOffsetY();
         let scale = camera.getScale();
-        sprite.sprite.position.x *= scale;
-        sprite.sprite.position.y *= scale;
-        sprite.sprite.width *= scale;
-        sprite.sprite.height *= scale;
-        this.mainContainer.addChild(sprite.sprite);
+        x *= scale;
+        y *= scale;
+        sprite.setPosition(x, y);
+        sprite.setWidth(scale * sprite.getWidth());
+        sprite.setHeight(scale * sprite.getHeight());
+        this.mainContainer.addChild((sprite as HtmlSprite).sprite);
         // Debug rendering: draw a box around the image
         if (this.debugContainer != null) {
-            let rect = sprite.dbg;
+            let rect = (sprite as HtmlSprite).dbg;
             rect.clear();
             rect.lineStyle(1, 0xFF0000);
-            rect.drawRect(sprite.sprite.x + 1, sprite.sprite.y, sprite.sprite.width - 1, sprite.sprite.height - 1);
+            rect.drawRect(x + 1, y, sprite.getWidth() - 1, sprite.getHeight() - 1);
             this.debugContainer.addChild(rect);
         }
     }
@@ -228,19 +234,22 @@ export class JetLagRenderer {
      * @param center Should we center the text at its x/y coordinate?
      */
     public addTextToFrame(text: JetLagText, camera: Camera, center: boolean) {
-        text.text.position.x -= camera.getOffsetX();
-        text.text.position.y -= camera.getOffsetY();
+        let x = text.getXPosition();
+        let y = text.getYPosition();
+        x -= camera.getOffsetX();
+        y -= camera.getOffsetY();
         let scale = camera.getScale();
-        text.text.position.x *= scale;
-        text.text.position.y *= scale;
-        let bounds = text.text.getBounds();
+        x *= scale;
+        y *= scale;
+        let bounds = text.getBounds();
         if (center) {
-            let w = bounds.width;
-            let h = bounds.height;
-            text.text.position.x -= w / 2;
-            text.text.position.y -= h / 2;
+            let w = bounds.x;
+            let h = bounds.y;
+            x -= w / 2;
+            y -= h / 2;
         }
-        this.mainContainer.addChild(text.text);
+        text.setPosition(x, y);
+        this.mainContainer.addChild((text as HtmlText).text);
     }
 
     /**
@@ -249,44 +258,26 @@ export class JetLagRenderer {
      * 
      * @param imgName The name of the image to load
      */
-    public getSprite(imgName: string): JetLagSprite {
+    public getSprite(imgName: string) {
         if (!PIXI.loader.resources[imgName]) {
-            JetLagConsole.info("Unable to find graphics asset " + imgName);
-            return new JetLagSprite("", new PIXI.Sprite());
+            Logger.info("Unable to find graphics asset '" + imgName + "'");
+            return new HtmlSprite("", new PIXI.Sprite());
         }
-        return new JetLagSprite(imgName, new PIXI.Sprite(PIXI.loader.resources[imgName].texture));
+        return new HtmlSprite(imgName, new PIXI.Sprite(PIXI.loader.resources[imgName].texture));
     }
 
     /**
      * Return the current Frames-Per-Second of the renderer.  This is useful
      * when debugging
      */
-    public getFPS(): number {
-        return this.renderer.ticker.FPS;
-    }
+    public getFPS(): number { return this.renderer.ticker.FPS; }
 
     /**
      * Create some text
      */
     public makeText(txt: string, opts: any) {
-        return new JetLagText(new PIXI.Text(txt, opts));
+        return new HtmlText(new PIXI.Text(txt, opts));
     }
 }
 
-/**
- * JLSprite is a thin wrapper around PIXI.Sprite, so that we don't have accesses
- * to PIXI outside of this file.
- */
-export class JetLagSprite {
-    constructor(public imgName: string, public sprite: PIXI.Sprite) { }
 
-    /** For debug rendering */
-    dbg = new PIXI.Graphics();
-}
-
-/**
- * JLText is a thin wrapper around PIXI.Text
- */
-export class JetLagText {
-    constructor(public text: PIXI.Text) { }
-}

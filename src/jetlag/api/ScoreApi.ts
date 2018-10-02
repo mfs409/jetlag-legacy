@@ -21,7 +21,7 @@ export class ScoreApi {
      * @return The string value corresponding to the last value stored
      */
     public getGameFact(factName: string, defaultVal: string): string {
-        return this.manager.device.storage.getPersistent(factName, defaultVal);
+        return this.manager.device.getStorage().getPersistent(factName, defaultVal);
     }
 
     /**
@@ -33,7 +33,7 @@ export class ScoreApi {
      * @return The integer value corresponding to the last value stored
      */
     public getLevelFact(factName: string, defaultVal: string): string {
-        return this.manager.device.storage.getLevel(factName, defaultVal);
+        return this.manager.device.getStorage().getLevel(factName, defaultVal);
     }
 
     /**
@@ -45,7 +45,7 @@ export class ScoreApi {
      * @return The integer value corresponding to the last value stored
      */
     public getSessionFact(factName: string, defaultVal: string) {
-        return this.manager.device.storage.getSession(factName, defaultVal);
+        return this.manager.device.getStorage().getSession(factName, defaultVal);
     }
 
     /**
@@ -56,7 +56,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setLevelFact(factName: string, factValue: string) {
-        this.manager.device.storage.setLevel(factName, factValue);
+        this.manager.device.getStorage().setLevel(factName, factValue);
     }
 
     /**
@@ -67,7 +67,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setSessionFact(factName: string, factValue: string) {
-        this.manager.device.storage.setSession(factName, factValue);
+        this.manager.device.getStorage().setSession(factName, factValue);
     }
 
 
@@ -79,7 +79,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setGameFact(factName: string, factValue: string) {
-        this.manager.device.storage.setPersistent(factName, factValue);
+        this.manager.device.getStorage().setPersistent(factName, factValue);
     }
 
     /**

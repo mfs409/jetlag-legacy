@@ -2,6 +2,7 @@ import { WorldActor } from "./WorldActor"
 import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
 import { Hero } from "./Hero"
+import { JetLagSound } from "../misc/JetLagDevice";
 
 /**
  * Destinations are actors that the Hero should try to reach. When a Hero reaches a destination, the
@@ -15,7 +16,7 @@ export class Destination extends WorldActor {
     private holding: number;
 
     /** Sound to play when a hero arrives at this destination */
-    private arrivalSound: Howl;
+    private arrivalSound: JetLagSound;
 
     /** 
      * A custom, optional check to decide if the Destination is "ready" to
@@ -89,6 +90,6 @@ export class Destination extends WorldActor {
      * @param soundName The name of the sound file that should play
      */
     public setArrivalSound(soundName: string): void {
-        this.arrivalSound = this.stageManager.device.speaker.getSound(soundName);
+        this.arrivalSound = this.stageManager.device.getSpeaker().getSound(soundName);
     }
 }

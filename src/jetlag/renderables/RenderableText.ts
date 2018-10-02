@@ -1,7 +1,7 @@
-import { JetLagRenderer, JetLagText } from "../device/JetLagRenderer"
 import { Renderable } from "./Renderable"
 import { Camera } from "../misc/Camera"
 import { XY } from "../misc/XY"
+import { JetLagText, JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
  * RenderableText provides a way to generate text and put it onto the screen.
@@ -62,9 +62,8 @@ export class RenderableText implements Renderable {
         if (!this.visible)
             return;
         // Set the world position and the text, then let the renderer decide where to put it...
-        this.jlText.text.text = this.producer();
-        this.jlText.text.position.x = this.coord.x;
-        this.jlText.text.position.y = this.coord.y;
+        this.jlText.setText(this.producer());
+        this.jlText.setPosition(this.coord.x,this.coord.y);
         renderer.addTextToFrame(this.jlText, camera, this.center);
     }
 }

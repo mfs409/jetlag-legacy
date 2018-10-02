@@ -1,5 +1,5 @@
 import { BaseActor } from "../renderables/BaseActor"
-import { JetLagConsole } from "../device/JetLagConsole"
+import { Logger } from "./Logger";
 /**
  * Route specifies a set of points that an actor will move between at a fixed speed.
  */
@@ -59,7 +59,7 @@ export class RouteDriver {
     this.loop = loop;
     this.actor = actor;
     if (route.points.length < 2) {
-      JetLagConsole.urgent("Error: route must have at least two points");
+      Logger.urgent("Error: route must have at least two points");
       this.haltRoute();
     }
     else {

@@ -1,4 +1,5 @@
-import { JetLagConsole } from "./JetLagConsole"
+import { Logger } from "../misc/Logger";
+import { JetLagStorage } from "../misc/JetLagDevice";
 
 /**
  * JetLagStorage provides an interface to three key/value stores
@@ -12,7 +13,7 @@ import { JetLagConsole } from "./JetLagConsole"
  * Note: there are a few special-purpose key/value pairs in the Level storage.
  * See the 'KEYS' enum for more information
  */
-export class JetLagStorage {
+export class HtmlStorage implements JetLagStorage {
     /**
      * Store string/object pairs that get reset whenever we navigate away from
      * the page, but which persist across levels 
@@ -46,7 +47,7 @@ export class JetLagStorage {
         let res = this.levelFacts[key];
         if (res)
             return res;
-        JetLagConsole.info("Error: Unable to find a value for level fact " + key);
+        Logger.info("Error: Unable to find a value for level fact " + key);
         return defaultVal;
     }
 
@@ -71,7 +72,7 @@ export class JetLagStorage {
         let res = this.sessionFacts[key];
         if (res)
             return res;
-        JetLagConsole.info("Error: Unable to find a value for session fact " + key)
+        Logger.info("Error: Unable to find a value for session fact " + key)
         return defaultVal;
     }
 
@@ -96,7 +97,7 @@ export class JetLagStorage {
         let res = localStorage.getItem(key);
         if (res)
             return res;
-        JetLagConsole.info("Error: Unable to find a value for game fact " + key)
+        Logger.info("Error: Unable to find a value for game fact " + key)
         return defaultVal;
     }
 }

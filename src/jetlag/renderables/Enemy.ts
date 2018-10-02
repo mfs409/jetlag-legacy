@@ -165,7 +165,7 @@ export class Enemy extends WorldActor {
      */
     public setDisappearOnTouch() {
         this.setTapCallback(() => {
-            this.stageManager.device.vibe.vibrate(100);
+            this.stageManager.device.getVibration().vibrate(100);
             this.defeat(true, null);
             this.setTapCallback(null);
             return true;

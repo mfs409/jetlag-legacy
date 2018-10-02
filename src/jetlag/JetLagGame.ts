@@ -1,7 +1,8 @@
-import { Device } from "./device/Device"
 import { JetLagManager } from "./JetLagManager"
 import { JetLagConfig } from "./JetLagConfig";
-import { JetLagConsole } from "./device/JetLagConsole";
+import { Logger } from "./misc/Logger";
+import { HtmlDevice } from "./htmldevice/HtmlDevice"
+import { HtmlConsole } from "./htmldevice/HtmlConsole"
 
 /**
  * JetLagGame is the top-level wrapper for all of the functionality of JetLag.
@@ -32,12 +33,12 @@ export class JetLagGame {
         // singleton consistently, so we have to use it before checking the
         // configuration:
         let errs = cfg.check();
-        JetLagConsole.config(cfg);
+        Logger.config(new HtmlConsole(cfg));
         if (errs.length > 0) {
-            JetLagConsole.urgent("Warning: the following errors were found in your " +
+            Logger.urgent("Warning: the following errors were found in your " +
                 "configuration object.  Game behavior may not be as expected");
             for (let o of errs) {
-                JetLagConsole.urgent("  " + o);
+                Logger.urgent("  " + o);
             }
         }
 
@@ -61,7 +62,7 @@ export class JetLagGame {
             cfg.pixelMeterRatio = cfg.pixelMeterRatio * cfg.screenWidth / old.x;
         }
 
-        let device = new Device(cfg, domId);
+        let device = new HtmlDevice(cfg, domId);
         let manager = new JetLagManager(cfg, device);
 
         // Things are a little bit convoluted here.  PIXI will load our assets
@@ -69,6 +70,6 @@ export class JetLagGame {
         // (it can't do that until the assets are loaded, because it wants to draw
         // pictures into the scene).  Then, once the first scene is actually loaded,
         // the manager can ask the renderer to launch the render loop.
-        device.renderer.loadAssets(() => { manager.onAssetsLoaded() });
+        device.getRenderer().loadAssets(() => { manager.onAssetsLoaded() });
     }
 }
