@@ -49,10 +49,10 @@ export class Projectile extends WorldActor {
             this.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y);
         }
         this.setFastMoving(true);
-        this.mBody.SetGravityScale(0);
+        this.body.SetGravityScale(0);
         this.setCollisionsEnabled(false);
         this.disableRotation();
-        this.mScene.addActor(this, zIndex);
+        this.scene.addActor(this, zIndex);
         this.mDisappearOnCollide = true;
         this.mRangeFrom = new PhysicsType2d.Vector2(0, 0);
     }
@@ -82,7 +82,7 @@ export class Projectile extends WorldActor {
                 return;
         }
         // only disappear if other is not a sensor
-        let f = other.mBody.GetFixtures();
+        let f = other.body.GetFixtures();
         f.MoveNext();
         if (f.Current().IsSensor()) {
             // TODO: why reset?
@@ -97,14 +97,14 @@ export class Projectile extends WorldActor {
      * draw it if it is not.
      */
     public render(renderer: Renderer, camera: Camera, elapsedMillis: number): void {
-        if (!this.mBody.IsActive())
+        if (!this.body.IsActive())
             return;
         // eliminate the projectile quietly if it has traveled too far
-        let dx = Math.abs(this.mBody.GetPosition().x - this.mRangeFrom.x);
-        let dy = Math.abs(this.mBody.GetPosition().y - this.mRangeFrom.y);
+        let dx = Math.abs(this.body.GetPosition().x - this.mRangeFrom.x);
+        let dy = Math.abs(this.body.GetPosition().y - this.mRangeFrom.y);
         if (dx * dx + dy * dy > this.mRange * this.mRange) {
             this.remove(true);
-            this.mBody.SetActive(false);
+            this.body.SetActive(false);
             return;
         }
         super.render(renderer, camera, elapsedMillis);

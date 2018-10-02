@@ -83,20 +83,20 @@ export class WorldScene extends Scene {
             // unchanged
             if (this.tiltMax.x == 0) {
                 for (let gfo of this.tiltActors)
-                    if (gfo.mBody.IsActive())
-                        gfo.updateVelocity(gfo.mBody.GetLinearVelocity().x, gravity.y);
+                    if (gfo.body.IsActive())
+                        gfo.updateVelocity(gfo.body.GetLinearVelocity().x, gravity.y);
             }
             // if Y is clipped to zero, set each actor's X velocity, leave Y
             // unchanged
             else if (this.tiltMax.y == 0) {
                 for (let gfo of this.tiltActors)
-                    if (gfo.mBody.IsActive())
-                        gfo.updateVelocity(gravity.x, gfo.mBody.GetLinearVelocity().y);
+                    if (gfo.body.IsActive())
+                        gfo.updateVelocity(gravity.x, gfo.body.GetLinearVelocity().y);
             }
             // otherwise we set X and Y velocity
             else {
                 for (let gfo of this.tiltActors)
-                    if (gfo.mBody.IsActive())
+                    if (gfo.body.IsActive())
                         gfo.updateVelocity(gravity.x, gravity.y);
             }
         }
@@ -105,8 +105,8 @@ export class WorldScene extends Scene {
         else {
             this.tiltVec.Set(gravity.x, gravity.y);
             for (let gfo of this.tiltActors) {
-                if (gfo.mBody.IsActive()) {
-                    gfo.mBody.ApplyForceToCenter(this.tiltVec);
+                if (gfo.body.IsActive()) {
+                    gfo.body.ApplyForceToCenter(this.tiltVec);
                 }
             }
         }
@@ -212,7 +212,7 @@ export class WorldScene extends Scene {
                     let worldManiFold = contact.GetWorldManifold();
                     let numPoints = worldManiFold.points.length;
                     for (let i = 0; i < numPoints; i++) {
-                        let xy = other.mBody.GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
+                        let xy = other.body.GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
                         // disable based on the value of isOneSided and the vector between the actors
                         if (oneSided.mIsOneSided == 0 && xy.y < 0) {
                             contact.SetEnabled(false);
@@ -295,8 +295,8 @@ export class WorldScene extends Scene {
 
         // figure out the actor's position + the offset
         let a = this.cameraChaseActor;
-        let x = a.mBody.GetWorldCenter().x + a.mCameraOffset.x;
-        let y = a.mBody.GetWorldCenter().y + a.mCameraOffset.y;
+        let x = a.body.GetWorldCenter().x + a.mCameraOffset.x;
+        let y = a.body.GetWorldCenter().y + a.mCameraOffset.y;
 
         // request that the camera center on that point
         this.camera.setCenter(x, y);
@@ -329,22 +329,22 @@ export class WorldScene extends Scene {
             return;
         // handle sticky obstacles... only do something if we're hitting the
         // obstacle from the correct direction
-        if ((sticky.mIsSticky[0] && other.getYPosition() >= sticky.getYPosition() + sticky.mSize.y)
-            || (sticky.mIsSticky[1] && other.getXPosition() + other.mSize.x <= sticky.getXPosition())
-            || (sticky.mIsSticky[3] && other.getXPosition() >= sticky.getXPosition() + sticky.mSize.x)
-            || (sticky.mIsSticky[2] && other.getYPosition() + other.mSize.y <= sticky.getYPosition())) {
+        if ((sticky.mIsSticky[0] && other.getYPosition() >= sticky.getYPosition() + sticky.size.y)
+            || (sticky.mIsSticky[1] && other.getXPosition() + other.size.x <= sticky.getXPosition())
+            || (sticky.mIsSticky[3] && other.getXPosition() >= sticky.getXPosition() + sticky.size.x)
+            || (sticky.mIsSticky[2] && other.getYPosition() + other.size.y <= sticky.getYPosition())) {
             // create distance and weld joints... somehow, the combination is needed to get this to
             // work. Note that this function runs during the box2d step, so we need to make the
             // joint in a callback that runs later
             let v = contact.GetWorldManifold().points[0];
             this.oneTimeEvents.push(() => {
-                other.mBody.SetLinearVelocity(new XY(0, 0));
+                other.body.SetLinearVelocity(new XY(0, 0));
                 let d = new PhysicsType2d.Dynamics.Joints.DistanceJointDefinition();
-                d.Initialize(sticky.mBody, other.mBody, v, v);
+                d.Initialize(sticky.body, other.body, v, v);
                 d.collideConnected = true;
                 other.mDJoint = this.world.CreateJoint(d) as PhysicsType2d.Dynamics.Joints.DistanceJoint;
                 let w = new PhysicsType2d.Dynamics.Joints.WeldJointDefinition();
-                w.Initialize(sticky.mBody, other.mBody, v);
+                w.Initialize(sticky.body, other.body, v);
                 w.collideConnected = true;
                 other.mWJoint = this.world.CreateJoint(w) as PhysicsType2d.Dynamics.Joints.WeldJoint;
             });

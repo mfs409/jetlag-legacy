@@ -9,6 +9,7 @@ import { Animation } from "./Animation"
 import { Renderer } from "../device/Renderer"
 import { TimedEvent } from "../misc/Timer"
 import { Camera } from "../misc/Camera"
+import { XY } from "../misc/XY"
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
@@ -29,7 +30,7 @@ export class BaseActor implements Renderable {
      * Track if the object is currently allowed to be rendered.  When it is
      * false, we don't run any updates on the object
      */
-    private mEnabled: boolean = true;
+    private enabled: boolean = true;
 
     /**
      * Specify whether this Renderable object is enabled or disabled.  When it is disabled, it
@@ -38,7 +39,7 @@ export class BaseActor implements Renderable {
      * @param val The new state (true for enabled, false for disabled)
      */
     public setEnabled(val: boolean) {
-        this.mEnabled = val;
+        this.enabled = val;
     }
 
     /**
@@ -47,26 +48,26 @@ export class BaseActor implements Renderable {
      * @return The state of the renderable
      */
     public getEnabled() {
-        return this.mEnabled;
+        return this.enabled;
     }
 
     /** The level in which this Actor exists */
-    readonly mScene: Scene;
+    protected readonly scene: Scene;
 
     /** Physics body for this WorldActor */
-    mBody: PhysicsType2d.Dynamics.Body;
+    body: PhysicsType2d.Dynamics.Body;
 
     /** The type of body for this actor */
     bodyStyle: BodyStyle;
 
     /** The dimensions of the WorldActor... x is width, y is height */
-    mSize: { x: number, y: number };
+    size: { x: number, y: number };
 
     /** The vertices, if this is a polygon */
-    verts: PhysicsType2d.Vector2[];
+    verts: XY[];
 
     /** A temp vector to help us avoid allocation */
-    tmp = new PhysicsType2d.Vector2(0, 0);
+    tmp = new XY(0, 0);
 
     /** For debug rendering of the shape */
     dbg = new PIXI.Graphics();
@@ -75,16 +76,16 @@ export class BaseActor implements Renderable {
     dbg2 = new PIXI.Graphics();
 
     /** The z index of this actor. Valid range is [-2, 2] */
-    private mZIndex: number;
+    private zIndex: number;
 
     /** 
      * Does this WorldActor follow a route? If so, the Driver will be used to
      * advance the  actor along its route.
      */
-    mRoute: RouteDriver = null;
+    route: RouteDriver = null;
 
     /** Sound to play when the actor disappears */
-    mDisappearSound: Howl;
+    disappearSound: Howl;
 
     /** Code to run when this actor is tapped */
     tapHandler: (hudX: number, hudY: number) => boolean = null;
@@ -116,36 +117,36 @@ export class BaseActor implements Renderable {
      * @param height  The height of the actor's image and body, in meters
      */
     constructor(scene: Scene, imgName: string, width: number, height: number) {
-        this.mAnimator = new AnimationDriver(scene.stageManager, imgName);
+        this.mAnimator = new AnimationDriver(scene.stageManager.device.renderer, imgName);
         this.mDisappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
         this.mDisappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
-        this.mScene = scene;
-        this.mSize = new PhysicsType2d.Vector2(width, height);
-        this.mZIndex = 0;
+        this.scene = scene;
+        this.size = new PhysicsType2d.Vector2(width, height);
+        this.zIndex = 0;
     }
 
     /**
-    * Specify that this actor should have a rectangular physics shape
-    *
-    * @param type Is the actor's body static or dynamic?
-    * @param x    The X coordinate of the top left corner
-    * @param y    The Y coordinate of the top left corner
-    */
+     * Specify that this actor should have a rectangular physics shape
+     *
+     * @param type Is the actor's body static or dynamic?
+     * @param x    The X coordinate of the top left corner
+     * @param y    The Y coordinate of the top left corner
+     */
     setBoxPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number): void {
         let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
-        shape.SetAsBoxAtOrigin(this.mSize.x / 2, this.mSize.y / 2);
+        shape.SetAsBoxAtOrigin(this.size.x / 2, this.size.y / 2);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.mSize.x / 2;
-        boxBodyDef.position.y = y + this.mSize.y / 2;
-        this.mBody = this.mScene.world.CreateBody(boxBodyDef);
+        boxBodyDef.position.x = x + this.size.x / 2;
+        boxBodyDef.position.y = y + this.size.y / 2;
+        this.body = this.scene.world.CreateBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
         fd.shape = shape;
-        this.mBody.CreateFixtureFromDefinition(fd);
+        this.body.CreateFixtureFromDefinition(fd);
         this.setPhysics(0, 0, 0);
 
-        this.mBody.SetUserData(this);
+        this.body.SetUserData(this);
 
         // remember this is a box
         this.bodyStyle = BodyStyle.RECTANGLE;
@@ -175,17 +176,17 @@ export class BaseActor implements Renderable {
         shape.Set(this.verts);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.mSize.x / 2;
-        boxBodyDef.position.y = y + this.mSize.y / 2;
-        this.mBody = this.mScene.world.CreateBody(boxBodyDef);
+        boxBodyDef.position.x = x + this.size.x / 2;
+        boxBodyDef.position.y = y + this.size.y / 2;
+        this.body = this.scene.world.CreateBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
         fd.shape = shape;
-        this.mBody.CreateFixtureFromDefinition(fd);
+        this.body.CreateFixtureFromDefinition(fd);
         this.setPhysics(0, 0, 0);
 
         // link the body to the actor
-        this.mBody.SetUserData(this);
+        this.body.SetUserData(this);
 
         // remember this is a polygon
         this.bodyStyle = BodyStyle.POLYGON;
@@ -205,17 +206,17 @@ export class BaseActor implements Renderable {
 
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.mSize.x / 2;
-        boxBodyDef.position.y = y + this.mSize.y / 2;
-        this.mBody = this.mScene.world.CreateBody(boxBodyDef);
+        boxBodyDef.position.x = x + this.size.x / 2;
+        boxBodyDef.position.y = y + this.size.y / 2;
+        this.body = this.scene.world.CreateBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
         fd.shape = shape;
-        this.mBody.CreateFixtureFromDefinition(fd);
+        this.body.CreateFixtureFromDefinition(fd);
         this.setPhysics(0, 0, 0);
 
         // link the body to the actor
-        this.mBody.SetUserData(this);
+        this.body.SetUserData(this);
 
         // remember this is a circle
         this.bodyStyle = BodyStyle.CIRCLE;
@@ -233,11 +234,11 @@ export class BaseActor implements Renderable {
     updateVelocity(x: number, y: number) {
         // make sure it is not static... heroes are already Dynamic, let's just set everything else
         // that is static to kinematic... that's probably safest.
-        if (this.mBody.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
-            this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
+            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
         }
         this.breakJoints();
-        this.mBody.SetLinearVelocity(new PhysicsType2d.Vector2(x, y));
+        this.body.SetLinearVelocity(new PhysicsType2d.Vector2(x, y));
     }
 
     /**
@@ -254,17 +255,17 @@ export class BaseActor implements Renderable {
     render(renderer: Renderer, camera: Camera, elapsedMillis: number) {
         if (!this.getEnabled())
             return;
-        if (this.mRoute) this.mRoute.drive();
+        if (this.route) this.route.drive();
 
         // choose the default TextureRegion to show... this is how we animate
         this.mAnimator.advanceAnimation(elapsedMillis);
 
         // Flip the animation?
-        if (this.mDefaultReverseAnimation != null && this.mBody.GetLinearVelocity().x < 0) {
-            if (this.mAnimator.mCurrentAnimation != this.mDefaultReverseAnimation)
+        if (this.mDefaultReverseAnimation != null && this.body.GetLinearVelocity().x < 0) {
+            if (this.mAnimator.currentAnimation != this.mDefaultReverseAnimation)
                 this.mAnimator.setCurrentAnimation(this.mDefaultReverseAnimation);
-        } else if (this.mDefaultReverseAnimation != null && this.mBody.GetLinearVelocity().x > 0) {
-            if (this.mAnimator.mCurrentAnimation == this.mDefaultReverseAnimation)
+        } else if (this.mDefaultReverseAnimation != null && this.body.GetLinearVelocity().x > 0) {
+            if (this.mAnimator.currentAnimation == this.mDefaultReverseAnimation)
                 if (this.mDefaultAnimation != null)
                     this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
         }
@@ -280,7 +281,7 @@ export class BaseActor implements Renderable {
      */
     setCollisionsEnabled(state: boolean): void {
         // The default is for all fixtures of a actor have the same sensor state
-        let fixtures = this.mBody.GetFixtures();
+        let fixtures = this.body.GetFixtures();
         while (fixtures.MoveNext())
             fixtures.Current().SetSensor(!state);
         fixtures.Reset();
@@ -288,14 +289,14 @@ export class BaseActor implements Renderable {
 
 
     /**
-    * Adjust the default physics settings (density, elasticity, friction) for this actor
-    *
-    * @param density    New density of the actor
-    * @param elasticity New elasticity of the actor
-    * @param friction   New friction of the actor
-    */
-    setPhysics(density: number, elasticity: number, friction: number): void {
-        let fixtures = this.mBody.GetFixtures();
+     * Adjust the default physics settings (density, elasticity, friction) for this actor
+     *
+     * @param density    New density of the actor
+     * @param elasticity New elasticity of the actor
+     * @param friction   New friction of the actor
+     */
+    setPhysics(density: number, elasticity: number, friction: number) {
+        let fixtures = this.body.GetFixtures();
         while (fixtures.MoveNext()) {
             let f = fixtures.Current();
             f.SetDensity(density);
@@ -303,61 +304,53 @@ export class BaseActor implements Renderable {
             f.SetFriction(friction);
         }
         fixtures.Reset();
-        this.mBody.ResetMassData();
+        this.body.ResetMassData();
     }
 
     /**
-    * Returns the X coordinate of this actor
-    *
-    * @return x coordinate of top left corner, in pixels
-    */
-    public getXPosition(): number {
-        return this.mBody.GetPosition().x - this.mSize.x / 2;
+     * Returns the X coordinate of this actor
+     *
+     * @return x coordinate of top left corner, in pixels
+     */
+    public getXPosition() {
+        return this.body.GetPosition().x - this.size.x / 2;
     }
 
     /**
-    * Returns the Y coordinate of this actor
-    *
-    * @return y coordinate of top left corner, in pixels
-    */
-    public getYPosition(): number {
-        return this.mBody.GetPosition().y - this.mSize.y / 2;
-    }
+     * Returns the Y coordinate of this actor
+     *
+     * @return y coordinate of top left corner, in pixels
+     */
+    public getYPosition() { return this.body.GetPosition().y - this.size.y / 2; }
 
     /**
      * Returns the width of this actor
      *
      * @return the actor's width, in pixels
      */
-    public getWidth(): number {
-        return this.mSize.x;
-    }
+    public getWidth() { return this.size.x; }
 
     /**
      * Return the height of this actor
      *
      * @return the actor's height, in pixels
      */
-    public getHeight(): number {
-        return this.mSize.y;
-    }
+    public getHeight() { return this.size.y; }
 
     /**
      * Use this to find the current rotation of an actor
      *
      * @return The rotation, in radians
      */
-    public getRotation(): number {
-        return this.mBody.GetAngle();
-    }
+    public getRotation() { return this.body.GetAngle(); }
 
     /**
      * Call this on an actor to rotate it. Note that this works best on boxes.
      *
      * @param rotation amount to rotate the actor clockwise (in radians)
      */
-    public setRotation(rotation: number): void {
-        this.mBody.SetTransform(this.mBody.GetPosition(), rotation);
+    public setRotation(rotation: number) {
+        this.body.SetTransform(this.body.GetPosition(), rotation);
     }
 
     /**
@@ -366,9 +359,9 @@ export class BaseActor implements Renderable {
      * @param duration Time it takes to complete one rotation
      */
     public setRotationSpeed(duration: number): void {
-        if (this.mBody.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
-            this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
-        this.mBody.SetAngularVelocity(duration);
+        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
+            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        this.body.SetAngularVelocity(duration);
     }
 
     /**
@@ -379,20 +372,20 @@ export class BaseActor implements Renderable {
     public remove(quiet: boolean): void {
         // set it invisible immediately, so that future calls know to ignore this actor
         this.setEnabled(false);
-        this.mBody.SetActive(false);
+        this.body.SetActive(false);
 
         // play a sound when we remove this actor?
-        if (this.mDisappearSound && !quiet)
-            this.mDisappearSound.play();
+        if (this.disappearSound && !quiet)
+            this.disappearSound.play();
         // To do a disappear animation after we've removed the actor, we draw an actor, so that
         // we have a clean hook into the animation system, but we disable its physics
         if (this.mDisappearAnimation != null) {
             let x = this.getXPosition() + this.mDisappearAnimateOffset.x;
             let y = this.getYPosition() + this.mDisappearAnimateOffset.y;
-            let o = new BaseActor(this.mScene, "", this.mDisappearAnimateSize.x, this.mDisappearAnimateSize.y);
+            let o = new BaseActor(this.scene, "", this.mDisappearAnimateSize.x, this.mDisappearAnimateSize.y);
             o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-            this.mScene.addActor(o, 0);
-            o.mBody.SetActive(false);
+            this.scene.addActor(o, 0);
+            o.body.SetActive(false);
             o.setDefaultAnimation(this.mDisappearAnimation);
         }
     }
@@ -403,7 +396,7 @@ export class BaseActor implements Renderable {
     * @return Velocity in X dimension, in pixels per second
     */
     public getXVelocity(): number {
-        return this.mBody.GetLinearVelocity().x;
+        return this.body.GetLinearVelocity().x;
     }
 
     /**
@@ -412,7 +405,7 @@ export class BaseActor implements Renderable {
     * @return Velocity in Y dimension, in pixels per second
     */
     public getYVelocity(): number {
-        return this.mBody.GetLinearVelocity().y;
+        return this.body.GetLinearVelocity().y;
     }
 
     /**
@@ -423,8 +416,8 @@ export class BaseActor implements Renderable {
     */
     public setAbsoluteVelocity(x: number, y: number): void {
         // ensure this is a moveable actor
-        if (this.mBody.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
-            this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
+            this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
         // change its velocity
         this.updateVelocity(x, y);
         // Disable sensor, or else this actor will go right through walls
@@ -451,12 +444,12 @@ export class BaseActor implements Renderable {
      */
     public setRoute(route: Route, velocity: number, loop: boolean): void {
         // This must be a KinematicBody or a Dynamic Body!
-        if (this.mBody.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
-            this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
+            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
         }
 
         // Create a Driver to advance the actor's position according to the route
-        this.mRoute = new RouteDriver(route, velocity, loop, this);
+        this.route = new RouteDriver(route, velocity, loop, this);
     }
 
     /**
@@ -465,7 +458,7 @@ export class BaseActor implements Renderable {
      * @param imgName The name of the new image file to use
      */
     public setImage(imgName: string) {
-        this.mAnimator.updateImage(this.mScene.stageManager, imgName);
+        this.mAnimator.updateImage(this.scene.stageManager.device.renderer, imgName);
     }
 
     /**
@@ -475,8 +468,8 @@ export class BaseActor implements Renderable {
      * @param y The new Y position, in pixels
      */
     public setPosition(x: number, y: number): void {
-        this.tmp.Set(x + this.mSize.x / 2, y + this.mSize.y / 2);
-        this.mBody.SetTransform(this.tmp, this.mBody.GetAngle());
+        this.tmp.Set(x + this.size.x / 2, y + this.size.y / 2);
+        this.body.SetTransform(this.tmp, this.body.GetAngle());
     }
 
     /**
@@ -488,9 +481,9 @@ export class BaseActor implements Renderable {
         // Coerce index into legal range, then move it
         zIndex = (zIndex < -2) ? -2 : zIndex;
         zIndex = (zIndex > 2) ? 2 : zIndex;
-        this.mScene.removeActor(this, this.mZIndex);
-        this.mZIndex = zIndex;
-        this.mScene.addActor(this, this.mZIndex);
+        this.scene.removeActor(this, this.zIndex);
+        this.zIndex = zIndex;
+        this.scene.addActor(this, this.zIndex);
     }
 
     /**
@@ -501,10 +494,10 @@ export class BaseActor implements Renderable {
      */
     public addVelocity(x: number, y: number): void {
         // ensure this is a moveable actor
-        if (this.mBody.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
-            this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
+            this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
         // Add to the velocity of the actor
-        let v = this.mBody.GetLinearVelocity();
+        let v = this.body.GetLinearVelocity();
         v.x += x;
         v.y += y;
         this.updateVelocity(v.x, v.y);
@@ -516,12 +509,12 @@ export class BaseActor implements Renderable {
      * Indicate that this actor's rotation should change in response to its direction of motion
      */
     public setRotationByDirection(): void {
-        this.mScene.repeatEvents.push(() => {
+        this.scene.repeatEvents.push(() => {
             if (this.getEnabled()) {
-                let x = -this.mBody.GetLinearVelocity().x;
-                let y = -this.mBody.GetLinearVelocity().y;
+                let x = -this.body.GetLinearVelocity().x;
+                let y = -this.body.GetLinearVelocity().y;
                 let angle = Math.atan2(y, x) + Math.atan2(-1, 0);
-                this.mBody.SetTransform(this.mBody.GetPosition(), angle);
+                this.body.SetTransform(this.body.GetPosition(), angle);
             }
         });
     }
@@ -535,7 +528,7 @@ export class BaseActor implements Renderable {
      * means the actor will fall to the ground.
      */
     public setCanFall(): void {
-        this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+        this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     }
 
     /**
@@ -545,7 +538,7 @@ export class BaseActor implements Renderable {
      * @param quiet Should the item should disappear quietly, or play its disappear sound?
      */
     public setDisappearDelay(delay: number, quiet: boolean): void {
-        this.mScene.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(delay, false, () => this.remove(quiet)));
+        this.scene.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(delay, false, () => this.remove(quiet)));
     }
 
     /**
@@ -555,10 +548,10 @@ export class BaseActor implements Renderable {
      */
     public setAppearDelay(delay: number): void {
         this.setEnabled(false);
-        this.mBody.SetActive(false);
-        this.mScene.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(delay, false, () => {
+        this.body.SetActive(false);
+        this.scene.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(delay, false, () => {
             this.setEnabled(true);
-            this.mBody.SetActive(true);
+            this.body.SetActive(true);
         }));
     }
 
@@ -566,7 +559,7 @@ export class BaseActor implements Renderable {
      * Indicate that this actor should not rotate due to torque
      */
     public disableRotation(): void {
-        this.mBody.SetFixedRotation(true);
+        this.body.SetFixedRotation(true);
     }
 
     /**
@@ -575,7 +568,7 @@ export class BaseActor implements Renderable {
      * @param soundName The name of the sound file to play
      */
     public setDisappearSound(soundName: string): void {
-        this.mDisappearSound = this.mScene.stageManager.device.speaker.getSound(soundName);
+        this.disappearSound = this.scene.stageManager.device.speaker.getSound(soundName);
     }
 
 
@@ -636,8 +629,8 @@ export class BaseActor implements Renderable {
                 x = this.getXPosition();
                 y = this.getYPosition();
             }
-            let w = this.mSize.x - shrinkX / 20;
-            let h = this.mSize.y - shrinkY / 20;
+            let w = this.size.x - shrinkX / 20;
+            let h = this.size.y - shrinkY / 20;
             // if the area remains >0, resize it and schedule a timer to run again
             if ((w > 0.05) && (h > 0.05)) {
                 this.resize(x, y, w, h);
@@ -646,7 +639,7 @@ export class BaseActor implements Renderable {
                 done = true;
             }
         });
-        this.mScene.stageManager.getCurrStage().world.timer.addEvent(te);
+        this.scene.stageManager.getCurrStage().world.timer.addEvent(te);
     }
 
     /**
@@ -655,7 +648,7 @@ export class BaseActor implements Renderable {
      * @param amount The amount of damping to apply
      */
     public setDamping(amount: number): void {
-        this.mBody.SetLinearDamping(amount);
+        this.body.SetLinearDamping(amount);
     }
 
     /**
@@ -664,7 +657,7 @@ export class BaseActor implements Renderable {
      * @param amount The amount of damping to apply
      */
     public setAngularDamping(amount: number): void {
-        this.mBody.SetAngularDamping(amount);
+        this.body.SetAngularDamping(amount);
     }
 
     /** Animation support: this tracks the current state of the active animation (if any) */
@@ -692,7 +685,7 @@ export class BaseActor implements Renderable {
      * Indicate that this actor should be immune to the force of gravity
      */
     public setGravityDefy() {
-        this.mBody.SetGravityScale(0);
+        this.body.SetGravityScale(0);
     }
 
     /**
@@ -700,8 +693,8 @@ export class BaseActor implements Renderable {
      * to forces in the same way as Dynamic bodies.
      */
     public setKinematic() {
-        if (this.mBody.GetType() != PhysicsType2d.Dynamics.BodyType.KINEMATIC)
-            this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.KINEMATIC)
+            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
     }
 
     /**
@@ -709,30 +702,26 @@ export class BaseActor implements Renderable {
      *
      * @return The object that the programmer provided
      */
-    public getExtra(): any {
-        return this.extra;
-    }
+    public getExtra() { return this.extra; }
 
     /**
      * Set additional information for this actor
      *
      * @param text Object to attach to the actor
      */
-    public setExtra(x: any) {
-        this.extra = x;
-    }
+    public setExtra(x: any) { this.extra = x; }
 
     /**
-    * Change the size of an actor, and/or change its position
-    *
-    * @param x      The new X coordinate of its top left corner, in pixels
-    * @param y      The new Y coordinate of its top left corner, in pixels
-    * @param width  The new width of the actor, in pixels
-    * @param height The new height of the actor, in pixels
-    */
+     * Change the size of an actor, and/or change its position
+     *
+     * @param x      The new X coordinate of its top left corner, in pixels
+     * @param y      The new Y coordinate of its top left corner, in pixels
+     * @param width  The new width of the actor, in pixels
+     * @param height The new height of the actor, in pixels
+     */
     public resize(x: number, y: number, width: number, height: number): void {
         // read old body information
-        let oldBody = this.mBody;
+        let oldBody = this.body;
         // The default is for all fixtures of a actor have the same sensor state
         let fixtures = oldBody.GetFixtures();
         fixtures.MoveNext();
@@ -744,8 +733,8 @@ export class BaseActor implements Renderable {
             this.setBoxPhysics(oldBody.GetType(), x, y);
         } else if (this.bodyStyle === BodyStyle.POLYGON) {
             // we need to manually scale all the vertices
-            let xScale = height / this.mSize.y;
-            let yScale = width / this.mSize.x;
+            let xScale = height / this.size.y;
+            let yScale = width / this.size.x;
             let ps = oldFix.GetShape() as PhysicsType2d.Collision.Shapes.PolygonShape;
             let verts: number[] = [];
             for (let i = 0; i < ps.m_vertices.length; ++i) {
@@ -756,17 +745,17 @@ export class BaseActor implements Renderable {
             this.setPolygonPhysics(oldBody.GetType(), x, y, verts);
         }
         // set new height and width of the image
-        this.mSize.x = width;
-        this.mSize.y = height;
+        this.size.x = width;
+        this.size.y = height;
         // Update the user-visible physics values
         this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
         this.setFastMoving(oldBody.IsBullet());
         // clone forces
-        this.mBody.SetAngularVelocity(oldBody.GetAngularVelocity());
-        this.mBody.SetTransform(this.mBody.GetPosition(), oldBody.GetAngle());
-        this.mBody.SetGravityScale(oldBody.GetGravityScale());
-        this.mBody.SetLinearDamping(oldBody.GetLinearDamping());
-        this.mBody.SetLinearVelocity(oldBody.GetLinearVelocity());
+        this.body.SetAngularVelocity(oldBody.GetAngularVelocity());
+        this.body.SetTransform(this.body.GetPosition(), oldBody.GetAngle());
+        this.body.SetGravityScale(oldBody.GetGravityScale());
+        this.body.SetLinearDamping(oldBody.GetLinearDamping());
+        this.body.SetLinearVelocity(oldBody.GetLinearVelocity());
         // disable the old body
         oldBody.SetActive(false);
     }
@@ -778,6 +767,6 @@ export class BaseActor implements Renderable {
      * @param state True or false, depending on whether it is fast-moving or not
      */
     setFastMoving(state: boolean): void {
-        this.mBody.SetBullet(state);
+        this.body.SetBullet(state);
     }
 }

@@ -80,7 +80,7 @@ export class RouteDriver {
    */
   private startRoute(): void {
     // move to the starting point
-    this.actor.mBody.SetTransform(new PhysicsType2d.Vector2(this.route.points[0].x + this.actor.mSize.x / 2, this.route.points[0].y + this.actor.mSize.y / 2), 0);
+    this.actor.body.SetTransform(new PhysicsType2d.Vector2(this.route.points[0].x + this.actor.size.x / 2, this.route.points[0].y + this.actor.size.y / 2), 0);
     // set up our next goal, start moving toward it
     this.nextIndex = 1;
     this.mRouteVec.x = this.route.points[this.nextIndex].x - this.actor.getXPosition();
@@ -88,7 +88,7 @@ export class RouteDriver {
     // normalize and scale the vector, then apply the velocity
     this.mRouteVec.Normalize();
     this.mRouteVec = this.mRouteVec.Multiply(this.velocity);
-    this.actor.mBody.SetLinearVelocity(this.mRouteVec);
+    this.actor.body.SetLinearVelocity(this.mRouteVec);
   }
 
   /**
@@ -118,7 +118,7 @@ export class RouteDriver {
           this.startRoute();
         } else {
           this.done = true;
-          this.actor.mBody.SetLinearVelocity(new PhysicsType2d.Vector2(0, 0));
+          this.actor.body.SetLinearVelocity(new PhysicsType2d.Vector2(0, 0));
         }
       } else {
         // advance to next point
@@ -126,7 +126,7 @@ export class RouteDriver {
         this.mRouteVec.y = this.route.points[this.nextIndex].y - this.actor.getYPosition();
         this.mRouteVec.Normalize();
         this.mRouteVec = this.mRouteVec.Multiply(this.velocity);
-        this.actor.mBody.SetLinearVelocity(this.mRouteVec);
+        this.actor.body.SetLinearVelocity(this.mRouteVec);
       }
     }
     // NB: 'else keep going at current velocity'

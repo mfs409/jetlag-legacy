@@ -643,7 +643,7 @@ export class WorldApi {
      */
     public setProjectileGravityOn(): void {
         for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
-            p.mBody.SetGravityScale(1);
+            p.body.SetGravityScale(1);
     }
 
     /**
@@ -782,7 +782,7 @@ export class WorldApi {
      */
     public setProjectileImageSource(imgName: string) {
         for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
-            p.mAnimator.updateImage(this.stageManager, imgName);
+            p.mAnimator.updateImage(this.stageManager.device.renderer, imgName);
         this.stageManager.getCurrStage().world.projectilePool.mRandomizeImages = true;
     }
 

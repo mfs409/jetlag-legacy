@@ -2,59 +2,59 @@ import { JetLagSprite } from "../device/Renderer"
 import { Renderer } from "../device/Renderer"
 
 /**
- * Animation is a way of describing a set of images that can be used to do flip-book animation on
- * any actor.  Animations consist of the names of images, and the time that each should be shown.
- * 
- * There are two ways to make an animation. The more powerful uses to() to chain
- * together frame/duration pairs. The less powerful uses a constructor with more
- * parameters to define the entire animation in equal-duration pieces.
+ * Animation is a way of describing a set of images that can be used to do
+ * flip-book animation on any actor.  Animations consist of the names of images,
+ * and the time that each should be shown.
  */
 export class Animation {
     /** A set of images that can be used as frames of an animation. */
-    mCells: JetLagSprite[];
+    cells: JetLagSprite[];
 
     /** Should the animation repeat? */
-    mLoop: boolean;
+    loop: boolean;
 
-    /** This array holds the durations for which each of the images should be displayed */
-    mDurations: number[];
+    /** 
+     * This array holds the durations for which each of the images should be
+     * displayed 
+     */
+    durations: number[];
 
     /** The renderer, so we can look up sprites */
-    renderer: Renderer;
+    private renderer: Renderer;
 
     /** Make a clone of this animation */
     clone() {
-        let a = new Animation(this.mLoop, this.renderer);
-        for (let i = 0; i < this.mDurations.length; ++i) {
-            a.mDurations.push(this.mDurations[i]);
-            a.mCells.push(this.renderer.getSprite(this.mCells[i].imgName));
+        let a = new Animation(this.loop, this.renderer);
+        for (let i = 0; i < this.durations.length; ++i) {
+            a.durations.push(this.durations[i]);
+            a.cells.push(this.renderer.getSprite(this.cells[i].imgName));
         }
         return a;
     }
 
     /**
-     * Create the shell of a complex animation. The animation can hold up to sequenceCount steps,
-     * but none will be initialized yet. After constructing like this, a programmer should use the
-     * "to" method to initialize the steps.
+     * Create the shell of a flipbook-style animation.  Once the shell is
+     * created, use "to()" to add steps to the animation.
      *
-     * @param media         The Media object, with references to all images that comprise the game
-     * @param sequenceCount The number of frames in the animation
-     * @param repeat        Either true or false, depending on whether the animation should repeat
+     * @param repeat   Either true or false, depending on whether the animation
+     *                 should repeat
+     * @param renderer The renderer to use (needed to find sprites)
      */
     constructor(repeat: boolean, renderer: Renderer) {
-        this.mCells = [];
-        this.mDurations = [];
-        this.mLoop = repeat;
+        this.cells = [];
+        this.durations = [];
+        this.loop = repeat;
         this.renderer = renderer;
     }
 
     /**
      * Get the duration of the entire animation sequence
+     * 
      * @return The duration, in milliseconds
      */
     getDuration(): number {
         let result = 0;
-        for (let l of this.mDurations)
+        for (let l of this.durations)
             result += l;
         return result;
     }
@@ -67,8 +67,8 @@ export class Animation {
      * @return the Animation, so that we can chain calls to "to()"
      */
     public to(imgName: string, duration: number): Animation {
-        this.mCells.push(this.renderer.getSprite(imgName));
-        this.mDurations.push(duration);
+        this.cells.push(this.renderer.getSprite(imgName));
+        this.durations.push(duration);
         return this;
     }
 }

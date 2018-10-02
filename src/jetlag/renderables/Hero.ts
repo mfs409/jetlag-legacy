@@ -160,7 +160,7 @@ export class Hero extends WorldActor {
             enemy.defeat(true, this);
         }
         // // defeat by jumping only if the hero's bottom is above the enemy's head
-        else if (this.mInAir && enemy.mDefeatByJump && this.getYPosition() + this.mSize.y < enemy.getYPosition()) {
+        else if (this.mInAir && enemy.mDefeatByJump && this.getYPosition() + this.size.y < enemy.getYPosition()) {
             enemy.defeat(true, this);
         }
         // when we can't defeat it by losing strength, remove the hero
@@ -203,7 +203,7 @@ export class Hero extends WorldActor {
         // Did we collide with a sensor?
         let sensor = true;
         // The default is for all fixtures of a actor have the same sensor state
-        let fixtures = this.mBody.GetFixtures();
+        let fixtures = this.body.GetFixtures();
         if (fixtures.MoveNext()) {
             sensor = sensor && fixtures.Current().IsSensor();
         }
@@ -329,7 +329,7 @@ export class Hero extends WorldActor {
         if (this.mInAir) {
             return;
         }
-        let v = this.mBody.GetLinearVelocity();
+        let v = this.body.GetLinearVelocity();
         v.x = v.x + this.jumpImpulses.x;
         v.y = v.y + this.jumpImpulses.y;
         this.updateVelocity(v.x, v.y);
@@ -375,7 +375,7 @@ export class Hero extends WorldActor {
             return;
         }
         this.mCrawling = true;
-        this.mBody.SetTransform(this.mBody.GetPosition(), this.mBody.GetAngle() + rotate);
+        this.body.SetTransform(this.body.GetPosition(), this.body.GetAngle() + rotate);
         if (this.mCrawlAnimation != null)
             this.mAnimator.setCurrentAnimation(this.mCrawlAnimation);
     }
@@ -388,7 +388,7 @@ export class Hero extends WorldActor {
             return;
         }
         this.mCrawling = false;
-        this.mBody.SetTransform(this.mBody.GetPosition(), this.mBody.GetAngle() - rotate);
+        this.body.SetTransform(this.body.GetPosition(), this.body.GetAngle() - rotate);
         this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
     }
 
@@ -400,8 +400,8 @@ export class Hero extends WorldActor {
     increaseRotation(delta: number): void {
         if (this.mInAir) {
             this.mCurrentRotation += delta;
-            this.mBody.SetAngularVelocity(0);
-            this.mBody.SetTransform(this.mBody.GetPosition(), this.mCurrentRotation);
+            this.body.SetAngularVelocity(0);
+            this.body.SetTransform(this.body.GetPosition(), this.mCurrentRotation);
         }
     }
 
@@ -415,8 +415,8 @@ export class Hero extends WorldActor {
     public setTouchAndGo(x: number, y: number): void {
         this.tapHandler = (worldX: number, worldY: number): boolean => {
             // if it was hovering, its body type won't be Dynamic
-            if (this.mBody.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC)
-                this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+            if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC)
+                this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
             this.setAbsoluteVelocity(x, y);
             // turn off isTouchAndGo, so we can't double-touch
             this.tapHandler = null;

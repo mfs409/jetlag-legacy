@@ -61,15 +61,15 @@ export abstract class WorldActor extends BaseActor {
    */
   public setMoveByTilting(): void {
     // If we've already added this to the set of tiltable objects, don't do it again
-    if ((this.mScene as WorldScene).tiltActors.indexOf(this) >= 0) {
+    if ((this.scene as WorldScene).tiltActors.indexOf(this) >= 0) {
       console.log("duplicate call to setMoveByTilting()");
       return;
     }
     // make sure it is moveable, add it to the list of tilt actors
-    if (this.mBody.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC) {
-      this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+    if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC) {
+      this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     }
-    (this.mScene as WorldScene).tiltActors.push(this);
+    (this.scene as WorldScene).tiltActors.push(this);
     // turn off sensor behavior, so this collides with stuff...
     this.setCollisionsEnabled(true);
   }
@@ -84,9 +84,9 @@ export abstract class WorldActor extends BaseActor {
   public setDraggable(immuneToPhysics: boolean) {
     // If the current body is static, we must change it!
     if (immuneToPhysics)
-      this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+      this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
     else
-      this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+      this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     this.draggable = true;
   }
 
@@ -99,8 +99,8 @@ export abstract class WorldActor extends BaseActor {
    * @param chaseInY Should the actor change its y velocity?
    */
   public setChaseSpeed(speed: number, target: WorldActor, chaseInX: boolean, chaseInY: boolean) {
-    this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
-    this.mScene.repeatEvents.push(() => {
+    this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+    this.scene.repeatEvents.push(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -108,8 +108,8 @@ export abstract class WorldActor extends BaseActor {
       if (!this.getEnabled())
         return;
       // compute vector between actors, and normalize it
-      let x = target.mBody.GetPosition().x - this.mBody.GetPosition().x;
-      let y = target.mBody.GetPosition().y - this.mBody.GetPosition().y;
+      let x = target.body.GetPosition().x - this.body.GetPosition().x;
+      let y = target.body.GetPosition().y - this.body.GetPosition().y;
       let denom = Math.sqrt(x * x + y * y);
       x /= denom;
       y /= denom;
@@ -119,11 +119,11 @@ export abstract class WorldActor extends BaseActor {
       // remove changes for disabled directions, and boost the other
       // dimension a little bit
       if (!chaseInX) {
-        x = this.mBody.GetLinearVelocity().x;
+        x = this.body.GetLinearVelocity().x;
         y *= 2;
       }
       if (!chaseInY) {
-        y = this.mBody.GetLinearVelocity().y;
+        y = this.body.GetLinearVelocity().y;
         x *= 2;
       }
       // apply velocity
@@ -143,9 +143,9 @@ export abstract class WorldActor extends BaseActor {
    *                   existing Y velocity
    */
   public setChaseFixedMagnitude(target: WorldActor, xMagnitude: number, yMagnitude: number, ignoreX: boolean, ignoreY: boolean): void {
-    this.mBody.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+    this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     let out_this = this;
-    this.mScene.repeatEvents.push(() => {
+    this.scene.repeatEvents.push(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -175,7 +175,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setTouchToThrow(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
     this.setTapCallback((worldX: number, worldY: number) => {
-      (this.mScene as WorldScene).projectilePool.throwFixed(h, offsetX, offsetY, velocityX, velocityY);
+      (this.scene as WorldScene).projectilePool.throwFixed(h, offsetX, offsetY, velocityX, velocityY);
       return true;
     });
   }
@@ -295,7 +295,7 @@ export abstract class WorldActor extends BaseActor {
       this.mHover.Set(x * pmr, y * pmr);
       let a = this.stageManager.getCurrStage().world.camera.screenToMeters(this.mHover.x, this.mHover.y);
       this.mHover.Set(a.x, a.y);
-      this.mBody.SetTransform(this.mHover, this.mBody.GetAngle());
+      this.body.SetTransform(this.mHover, this.body.GetAngle());
     });
   }
 
@@ -326,15 +326,15 @@ export abstract class WorldActor extends BaseActor {
     this.setCanFall();
     // create joint, connect anchors
     this.mRevJointDef = new PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition();
-    this.mRevJointDef.bodyA = anchor.mBody;
-    this.mRevJointDef.bodyB = this.mBody;
+    this.mRevJointDef.bodyA = anchor.body;
+    this.mRevJointDef.bodyB = this.body;
     this.mRevJointDef.localAnchorA.Set(anchorX, anchorY);
     this.mRevJointDef.localAnchorB.Set(localAnchorX, localAnchorY);
     // rotator and anchor don't collide
     this.mRevJointDef.collideConnected = false;
     this.mRevJointDef.referenceAngle = 0;
     this.mRevJointDef.enableLimit = false;
-    this.mRevJoint = this.mScene.world.CreateJoint(this.mRevJointDef);
+    this.mRevJoint = this.scene.world.CreateJoint(this.mRevJointDef);
   }
 
   /**
@@ -345,11 +345,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.mScene.world.DestroyJoint(this.mRevJoint);
+    this.scene.world.DestroyJoint(this.mRevJoint);
     this.mRevJointDef.enableMotor = true;
     this.mRevJointDef.motorSpeed = motorSpeed;
     this.mRevJointDef.maxMotorTorque = motorTorque;
-    this.mRevJoint = this.mScene.world.CreateJoint(this.mRevJointDef);
+    this.mRevJoint = this.scene.world.CreateJoint(this.mRevJointDef);
   }
 
   /**
@@ -360,11 +360,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.mScene.world.DestroyJoint(this.mRevJoint);
+    this.scene.world.DestroyJoint(this.mRevJoint);
     this.mRevJointDef.upperAngle = upper;
     this.mRevJointDef.lowerAngle = lower;
     this.mRevJointDef.enableLimit = true;
-    this.mRevJoint = this.mScene.world.CreateJoint(this.mRevJointDef);
+    this.mRevJoint = this.scene.world.CreateJoint(this.mRevJointDef);
   }
 
   /**
@@ -381,13 +381,13 @@ export abstract class WorldActor extends BaseActor {
   public setWeldJoint(other: WorldActor, otherX: number, otherY: number, localX: number,
     localY: number, angle: number) {
     let w = new PhysicsType2d.Dynamics.Joints.WeldJointDefinition();
-    w.bodyA = this.mBody;
-    w.bodyB = other.mBody;
+    w.bodyA = this.body;
+    w.bodyB = other.body;
     w.localAnchorA.Set(localX, localY);
     w.localAnchorB.Set(otherX, otherY);
     w.referenceAngle = angle;
     w.collideConnected = false;
-    this.mScene.world.CreateJoint(w);
+    this.scene.world.CreateJoint(w);
   }
 
   /**
@@ -405,15 +405,15 @@ export abstract class WorldActor extends BaseActor {
 
     // set up a joint so the head can't move too far
     let mDistJointDef = new PhysicsType2d.Dynamics.Joints.DistanceJointDefinition();
-    mDistJointDef.bodyA = anchor.mBody;
-    mDistJointDef.bodyB = this.mBody;
+    mDistJointDef.bodyA = anchor.body;
+    mDistJointDef.bodyB = this.body;
     mDistJointDef.localAnchorA.Set(anchorX, anchorY);
     mDistJointDef.localAnchorB.Set(localAnchorX, localAnchorY);
     mDistJointDef.collideConnected = false;
     mDistJointDef.dampingRatio = 0.1;
     mDistJointDef.frequencyHz = 2;
 
-    this.mScene.world.CreateJoint(mDistJointDef);
+    this.scene.world.CreateJoint(mDistJointDef);
   }
 
   /**
@@ -422,9 +422,9 @@ export abstract class WorldActor extends BaseActor {
   breakJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.mDJoint != null) {
-      this.mScene.world.DestroyJoint(this.mDJoint);
+      this.scene.world.DestroyJoint(this.mDJoint);
       this.mDJoint = null;
-      this.mScene.world.DestroyJoint(this.mWJoint);
+      this.scene.world.DestroyJoint(this.mWJoint);
       this.mWJoint = null;
     }
   }

@@ -1,8 +1,7 @@
-import { Renderer } from "../device/Renderer"
-import { JetLagText } from "../device/Renderer"
-import { JetLagManager } from "../JetLagManager"
+import { Renderer, JetLagText } from "../device/Renderer"
 import { Renderable } from "./Renderable"
 import { Camera } from "../misc/Camera"
+import { XY } from "../misc/XY"
 
 /**
  * RenderableText provides a way to generate text and put it onto the screen.
@@ -14,20 +13,17 @@ export class RenderableText implements Renderable {
      */
     private visible: boolean = true;
 
-    /** The text object that we pass to the Renderer */
-    private mText: JetLagText;
+    /** The low-level text object that we pass to the Renderer */
+    private jlText: JetLagText;
 
-    /** X coordinate of the text */
-    private readonly x: number;
+    /** coordinate of the text */
+    private readonly coord = new XY(0, 0);
 
-    /** Y coordinate of the text */
-    private readonly y: number;
-
-    /** The thing that produces the text */
-    private readonly producer: () => string;
-
-    /** Should we center at (x,y) */
+    /** Should we center at coord (true) or is it top-left? */
     private readonly center: boolean;
+
+    /** The thing that produces the string of text to display */
+    private readonly producer: () => string;
 
     /** 
      * Build some text that can be rendered
@@ -41,12 +37,11 @@ export class RenderableText implements Renderable {
      * @param center True to center instead of placing at top right (x,y)
      * @param producer The thing that produces text
      */
-    constructor(manager: JetLagManager, fontFamily: string, fontSize: number, fontColor: string, x: number, y: number, center: boolean, producer: () => string) {
-        this.x = x;
-        this.y = y;
+    constructor(renderer: Renderer, fontFamily: string, fontSize: number, fontColor: string, x: number, y: number, center: boolean, producer: () => string) {
+        this.coord.Set(x, y);
         this.producer = producer;
         this.center = center;
-        this.mText = manager.device.renderer.makeText("", { fontFamily: fontFamily, fontSize: fontSize, fill: fontColor });
+        this.jlText = renderer.makeText("", { fontFamily: fontFamily, fontSize: fontSize, fill: fontColor });
     }
 
     /**
@@ -67,9 +62,9 @@ export class RenderableText implements Renderable {
         if (!this.visible)
             return;
         // Set the world position and the text, then let the renderer decide where to put it...
-        this.mText.text.text = this.producer();
-        this.mText.text.position.x = this.x;
-        this.mText.text.position.y = this.y;
-        renderer.addTextToFrame(this.mText, camera, this.center);
+        this.jlText.text.text = this.producer();
+        this.jlText.text.position.x = this.coord.x;
+        this.jlText.text.position.y = this.coord.y;
+        renderer.addTextToFrame(this.jlText, camera, this.center);
     }
 }

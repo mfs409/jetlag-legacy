@@ -435,7 +435,7 @@ export class OverlayApi {
      * @return The action
      */
     public makeYMotionAction(actor: WorldActor, yRate: number) {
-        return () => { actor.updateVelocity(actor.mBody.GetLinearVelocity().x, yRate); };
+        return () => { actor.updateVelocity(actor.body.GetLinearVelocity().x, yRate); };
     }
 
     /**
@@ -460,7 +460,7 @@ export class OverlayApi {
     * @return The action
     */
     public makeXMotionAction(actor: WorldActor, xRate: number) {
-        return () => { actor.updateVelocity(xRate, actor.mBody.GetLinearVelocity().y); };
+        return () => { actor.updateVelocity(xRate, actor.body.GetLinearVelocity().y); };
     }
 
     /**
@@ -476,7 +476,7 @@ export class OverlayApi {
      * @return The action
      */
     public makeXYDampenedMotionAction(actor: WorldActor, xRate: number, yRate: number, dampening: number) {
-        return () => { actor.updateVelocity(xRate, yRate); actor.mBody.SetLinearDamping(dampening); }
+        return () => { actor.updateVelocity(xRate, yRate); actor.body.SetLinearDamping(dampening); }
     }
 
     /**
@@ -532,8 +532,8 @@ export class OverlayApi {
                 let now = new Date().getTime();
                 if (mLastThrow + milliDelay < now) {
                     mLastThrow = now;
-                    this.overlay.stageManager.getCurrStage().world.projectilePool.throwAt(h.mBody.GetPosition().x,
-                        h.mBody.GetPosition().y, v.x, v.y, h, offsetX, offsetY);
+                    this.overlay.stageManager.getCurrStage().world.projectilePool.throwAt(h.body.GetPosition().x,
+                        h.body.GetPosition().y, v.x, v.y, h, offsetX, offsetY);
                 }
             }
         });
@@ -555,7 +555,7 @@ export class OverlayApi {
         return (hudX: number, hudY: number) => {
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
             let world = this.overlay.stageManager.getCurrStage().world.camera.screenToMeters(pixels.x, pixels.y);
-            this.overlay.stageManager.getCurrStage().world.projectilePool.throwAt(hero.mBody.GetPosition().x, hero.mBody.GetPosition().y, world.x, world.y, hero, offsetX, offsetY);
+            this.overlay.stageManager.getCurrStage().world.projectilePool.throwAt(hero.body.GetPosition().x, hero.body.GetPosition().y, world.x, world.y, hero, offsetX, offsetY);
             return true;
         };
     }

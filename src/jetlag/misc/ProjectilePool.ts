@@ -66,8 +66,8 @@ export class ProjectilePool {
         for (let i = 0; i < size; ++i) {
             let p = new Projectile(manager, level, width, height, imgName, -100 - i * width, -100 - i * height, zIndex, isCircle);
             p.setEnabled(false);
-            p.mBody.SetBullet(true);
-            p.mBody.SetActive(false);
+            p.body.SetBullet(true);
+            p.body.SetActive(false);
             p.mDamage = strength;
             this.pool.push(p);
         }
@@ -111,20 +111,20 @@ export class ProjectilePool {
         b.mAnimator.resetCurrentAnimation();
 
         if (this.mRandomizeImages)
-            b.mAnimator.updateIndex();
+            b.mAnimator.switchToRandomIndex();
 
         // calculate offset for starting position of projectile, put it on screen
         b.mRangeFrom.x = h.getXPosition() + offsetX;
         b.mRangeFrom.y = h.getYPosition() + offsetY;
-        b.mBody.SetActive(true);
-        b.mBody.SetTransform(b.mRangeFrom, 0);
+        b.body.SetActive(true);
+        b.body.SetTransform(b.mRangeFrom, 0);
 
         // give the projectile velocity, show it, and play sound
         b.updateVelocity(velocityX, velocityY);
         b.setEnabled(true);
         if (this.mThrowSound)
             this.mThrowSound.play();
-        b.mDisappearSound = this.mProjectileDisappearSound;
+        b.disappearSound = this.mProjectileDisappearSound;
         h.doThrowAnimation();
     }
 
@@ -163,8 +163,8 @@ export class ProjectilePool {
         // calculate offset for starting position of projectile, put it on screen
         b.mRangeFrom.x = heroX + offsetX;
         b.mRangeFrom.y = heroY + offsetY;
-        b.mBody.SetActive(true);
-        b.mBody.SetTransform(b.mRangeFrom, 0);
+        b.body.SetActive(true);
+        b.body.SetTransform(b.mRangeFrom, 0);
 
         // give the projectile velocity
         if (this.enableFixedVectorVelocity) {
@@ -190,14 +190,14 @@ export class ProjectilePool {
         // rotate the projectile
         if (this.mRotateVectorThrow) {
             let angle = Math.atan2(toY - heroY - offsetY, toX - heroX - offsetX) - Math.atan2(-1, 0);
-            b.mBody.SetTransform(b.mBody.GetPosition(), angle);
+            b.body.SetTransform(b.body.GetPosition(), angle);
         }
 
         // show the projectile, play sound, and animate the hero
         b.setEnabled(true);
         if (this.mThrowSound)
             this.mThrowSound.play();
-        b.mDisappearSound = this.mProjectileDisappearSound;
+        b.disappearSound = this.mProjectileDisappearSound;
         h.doThrowAnimation();
     }
 }
