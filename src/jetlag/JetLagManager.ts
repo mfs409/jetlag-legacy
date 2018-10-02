@@ -1,7 +1,6 @@
 import { JetLagConfig } from "./JetLagConfig"
 import { Device } from "./device/Device"
-import { TouchScreen } from "./device/TouchScreen"
-// import { TouchReceiver } from "./device/TouchScreen"
+import { TouchReceiverHolder, TouchReceiver } from "./device/TouchScreen"
 import { JetLagApi } from "./api/JetLagApi"
 import { Stage } from "./stage/Stage"
 
@@ -22,7 +21,7 @@ enum MODES {
  * Stage, and provides the currently active Stage with access to the Device
  * outputs.
  */
-export class JetLagManager {
+export class JetLagManager implements TouchReceiverHolder {
     /** The current state (e.g., are we showing a STORE) */
     private currentMode: number;
 
@@ -60,29 +59,19 @@ export class JetLagManager {
         for (let i = 0; i < MODES.COUNT; ++i) {
             this.modeStates.push(1);
         }
-        this.configureTouchReceiver(this.device.touch);
+        // Register the manager with the device's gesture handler, so that all
+        // gestures get routed through the manager to the stage.  See
+        // TouchReceiverHolder for more information.
+        this.device.touch.setTouchReceiverHolder(this);
     }
 
     /**
-     * Connect the methods of the stage to the things that Hammer.js needs in
-     * order for gestures to work.
-     *
-     * @param touch The device's touch screen
+     * JetLagManager can't handle gestures itself, but its stage can.  The stage
+     * changes over time (e.g., Play vs. Help), so JetLagManager has to be a
+     * TouchReceiverHolder, not a TouchReceiver.  To satisfy the interface, we
+     * need this method.  Note that the Stage is a TouchReceiver.
      */
-    private configureTouchReceiver(touch: TouchScreen) {
-        // NB: we want to configure once, but the current stage changes, so we
-        //     have to capture this, rather than this.currStage
-        let manager = this;
-        touch.setTouchReceiver({
-            tap(screenX: number, screenY: number): void { manager.currStage.tap(screenX, screenY); },
-            panStart(screenX: number, screenY: number): void { manager.currStage.panStart(screenX, screenY); },
-            panMove(screenX: number, screenY: number): void { manager.currStage.panMove(screenX, screenY); },
-            panStop(screenX: number, screenY: number): void { manager.currStage.panStop(screenX, screenY); },
-            touchDown(screenX: number, screenY: number): void { manager.currStage.touchDown(screenX, screenY); },
-            touchUp(screenX: number, screenY: number): void { manager.currStage.touchUp(screenX, screenY); },
-            swipe(x0: number, y0: number, x1: number, y1: number, time: number): void { manager.currStage.swipe(x0, y0, x1, y1, time); }
-        });
-    }
+    getTouchReceiver(): TouchReceiver { return this.currStage; }
 
     /** Getter for the current stage */
     getCurrStage() { return this.currStage; }
@@ -93,7 +82,7 @@ export class JetLagManager {
      * it, and kick off the renderer.
      */
     onAssetsLoaded() {
-        // Be sure to refresh the mute state
+        // Be sure to refresh the mute state from the persistent storage
         this.device.speaker.resetMusicVolume(parseInt(this.device.storage.getPersistent("volume", "1")));
         this.currStage = new Stage(this);
         this.doSplash(this.modeStates[MODES.SPLASH]);

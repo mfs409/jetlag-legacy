@@ -9,11 +9,11 @@ import { JetLagConfig } from "./JetLagConfig";
  *
  * From a MVC perspective, JetLagGame is both the top-level interface to the
  * view, and also the top-level interface to the controller.  In terms of views,
- * JetLagGame provides a RENDERER, a VIBRATE feature, and a SPEAKER. In terms of
- * controllers, JetLagGame provides TOUCHSCREEN, KEYBOARD, and ACCELEROMETER.
- * Note that some of these features need not route through JetLagGame
- * explicitly, but doing so leads to a cleaner abstraction for the rest of
- * JetLag.
+ * JetLagGame provides a RENDERER, a VIBRATE feature, an output debug CONSOLE,
+ * STORAGE, and a SPEAKER. In terms of controllers, JetLagGame provides
+ * TOUCHSCREEN, KEYBOARD, and ACCELEROMETER.  Note that some of these features
+ * need not route through JetLagGame explicitly, but doing so leads to a cleaner
+ * abstraction for the rest of JetLag.
  *
  * Another way of thinking about JetLagGame is that it provides an interface to
  * an abstract game device, and routes events between a JetLagManager and the
@@ -29,7 +29,8 @@ export class JetLagGame {
     public static runGame(domId: string, cfg: JetLagConfig): void {
         let errs = cfg.check();
         if (errs.length > 0) {
-            console.log("Warning: the following errors were found in your configuration object.  Game behavior may not be as expected");
+            console.log("Warning: the following errors were found in your " +
+                "configuration object.  Game behavior may not be as expected");
             for (let o of errs) {
                 console.log("  " + o);
             }
