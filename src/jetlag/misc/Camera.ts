@@ -1,4 +1,5 @@
 import { JetLagConfig } from "../JetLagConfig"
+import { JetLagConsole } from "../device/JetLagConsole"
 
 /**
  * The Camera is used to determine /how much/ of a world to render.  The Camera
@@ -169,8 +170,8 @@ export class Camera {
         let h = this.ratio * (this.max.y - this.min.y);
 
         if (w < this.screenDims.w)
-            console.log("Warning, the visible game area is less than the screen width");
+            JetLagConsole.urgent("Warning, the visible game area is less than the screen width");
         if (h < this.screenDims.h)
-            console.log("Warning, the visible game area is less than the screen height");
+            JetLagConsole.urgent("Warning, the visible game area is less than the screen height");
     }
 }

@@ -5,7 +5,7 @@ import { JetLagManager } from "../JetLagManager"
 import { Hero } from "../renderables/Hero"
 import { Enemy } from "../renderables/Enemy"
 import { Projectile } from "../renderables/Projectile"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { XY } from "../misc/XY"
 
 /**
@@ -303,7 +303,7 @@ export class WorldScene extends Scene {
     }
 
     /** Draw the actors in this world */
-    render(renderer: Renderer, elapsedMillis: number): boolean {
+    render(renderer: JetLagRenderer, elapsedMillis: number): boolean {
         this.timer.advance(elapsedMillis);
         for (let zA of this.renderables) {
             for (let r of zA) {

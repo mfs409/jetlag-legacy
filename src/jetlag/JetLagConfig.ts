@@ -93,6 +93,10 @@ export class JetLagConfig {
    */
   public check(): string[] {
     let errs: string[] = [];
+    if (this.logLevel < 0 || this.logLevel > 2) {
+      errs.push("Invalid loglevel in game config object");
+      this.logLevel = 2; // let's show a lot of errors in this case :)
+    }
     if (this.pixelMeterRatio === -1)
       errs.push("Invalid pixelMeterRatio in game config object");
     if (this.screenWidth <= 0)

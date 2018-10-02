@@ -1,4 +1,5 @@
 import { XY } from "../misc/XY"
+import { JetLagConsole } from "./JetLagConsole"
 
 /**
  * We are probably going to need a way to re-interpret the meaning of
@@ -21,7 +22,7 @@ export enum AccelerometerMode {
  * the event data, and then during render operations we can poll for the most
  * recent data.
  */
-export class Accelerometer {
+export class JetLagAccelerometer {
   /** The most recent accelerometer reading */
   private accel = new XY(0, 0);
 
@@ -42,11 +43,11 @@ export class Accelerometer {
     // There's a weird typescript complaint if we don't copy window...
     let w = window;
     if (!('DeviceMotionEvent' in window)) {
-      console.log("DeviceMotion API not available... unable to use tilt to control entities");
+      JetLagConsole.urgent("DeviceMotion API not available... unable to use tilt to control entities");
       return;
     }
     if (mode != AccelerometerMode.DEFAULT_LANDSCAPE) {
-      console.log("Unsupported device orientation mode");
+      JetLagConsole.urgent("Unsupported device orientation mode");
       return;
     }
     this.supported = true;

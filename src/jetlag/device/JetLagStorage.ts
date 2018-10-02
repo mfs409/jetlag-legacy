@@ -1,12 +1,18 @@
+import { JetLagConsole } from "./JetLagConsole"
+
 /**
- * JLStorage provides an interface to three key/value stores
- * - Persistent: Things saved here will remain here, even after the player leaves the page.  This uses the HTML5 persistent storage API
- * - Session: Things saved here will remain as the player moves among levels, but will be discarded when the player leaves the page.
- * - Level: Things saved here will remain only until the player moves to another level
- * 
- * Note: there are a few special-purpose key/value pairs in the Level storage.  See the 'KEYS' enum for more information
+ * JetLagStorage provides an interface to three key/value stores
+ * - Persistent: Things saved here will remain here, even after the player
+ *               leaves the page.  This uses the HTML5 persistent storage API
+ * - Session:    Things saved here will remain as the player moves among levels,
+ *               but will be discarded when the player leaves the page.
+ * - Level:      Things saved here will remain only until the player moves to
+ *               another level
+ *
+ * Note: there are a few special-purpose key/value pairs in the Level storage.
+ * See the 'KEYS' enum for more information
  */
-export class JLStorage {
+export class JetLagStorage {
     /**
      * Store string/object pairs that get reset whenever we navigate away from
      * the page, but which persist across levels 
@@ -16,9 +22,7 @@ export class JLStorage {
     /** Store string/object pairs that get reset whenever we change levels */
     private levelFacts: { [index: string]: any } = {};
 
-    /**
-     * Clear the level facts
-     */
+    /** Clear the level facts */
     public clearLevelFacts() { this.levelFacts = {}; }
 
     /**
@@ -42,7 +46,7 @@ export class JLStorage {
         let res = this.levelFacts[key];
         if (res)
             return res;
-        console.log("Error: Unable to find a value for level fact " + key)
+        JetLagConsole.info("Error: Unable to find a value for level fact " + key);
         return defaultVal;
     }
 
@@ -67,7 +71,7 @@ export class JLStorage {
         let res = this.sessionFacts[key];
         if (res)
             return res;
-        console.log("Error: Unable to find a value for session fact " + key)
+        JetLagConsole.info("Error: Unable to find a value for session fact " + key)
         return defaultVal;
     }
 
@@ -92,7 +96,7 @@ export class JLStorage {
         let res = localStorage.getItem(key);
         if (res)
             return res;
-        console.log("Error: Unable to find a value for game fact " + key)
+        JetLagConsole.info("Error: Unable to find a value for game fact " + key)
         return defaultVal;
     }
 }

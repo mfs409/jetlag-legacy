@@ -62,7 +62,6 @@ export abstract class WorldActor extends BaseActor {
   public setMoveByTilting(): void {
     // If we've already added this to the set of tiltable objects, don't do it again
     if ((this.scene as WorldScene).tiltActors.indexOf(this) >= 0) {
-      console.log("duplicate call to setMoveByTilting()");
       return;
     }
     // make sure it is moveable, add it to the list of tilt actors

@@ -1,6 +1,6 @@
 import { Howl, Howler } from 'howler';
 import { JetLagConfig } from "../JetLagConfig"
-
+import { JetLagConsole } from "./JetLagConsole"
 /**
  * Audio provides a store of sound and music objects that can be played at any
  * time.  The only difference between sounds and music is that music objects
@@ -8,7 +8,7 @@ import { JetLagConfig } from "../JetLagConfig"
  * 
  * NB: We've probably got too thin a wrapper around Howler.js, but it's fine for now.
  */
-export class Speaker {
+export class JetLagSpeaker {
     /** All of the sounds (non-looping audio) in the game, by name */
     private readonly sounds: { [index: string]: Howl } = {};
 
@@ -38,8 +38,7 @@ export class Speaker {
     getSound(soundName: string): Howl {
         let ret: Howl = this.sounds[soundName];
         if (!ret) {
-            // TODO: we shouldn't use console.log... ever...
-            console.log("ERROR", "Error retrieving sound '" + soundName + "'");
+            JetLagConsole.info("Error retrieving sound '" + soundName + "'");
         }
         return ret;
     }
@@ -53,14 +52,12 @@ export class Speaker {
     getMusic(musicName: string): Howl {
         let ret: Howl = this.music[musicName];
         if (!ret) {
-            console.log("ERROR", "Error retrieving music '" + musicName + "'");
+            JetLagConsole.info("Error retrieving music '" + musicName + "'");
         }
         return ret;
     }
 
-    /**
-     * On a volume change event, make sure all Music objects are updated
-     */
+    /** On a volume change event, make sure all Music objects are updated */
     public resetMusicVolume(volume: number) {
         Howler.volume(volume);
     }

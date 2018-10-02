@@ -35,7 +35,7 @@ export interface TouchReceiverHolder {
  * Based on how Lol-TS is designed, we can get by with a single subscriber for
  * each gesture event
  */
-export class TouchScreen {
+export class JetLagTouchScreen {
     // /** receiver handles all of the touch events */
     // private receiver: TouchReceiver = null;
 

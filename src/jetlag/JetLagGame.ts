@@ -1,6 +1,7 @@
 import { Device } from "./device/Device"
 import { JetLagManager } from "./JetLagManager"
 import { JetLagConfig } from "./JetLagConfig";
+import { JetLagConsole } from "./device/JetLagConsole";
 
 /**
  * JetLagGame is the top-level wrapper for all of the functionality of JetLag.
@@ -27,12 +28,16 @@ export class JetLagGame {
      * @param cfg The game configuration object
      */
     public static runGame(domId: string, cfg: JetLagConfig): void {
+        // This is a bit dangerous, but we want to use the JetLagConsole
+        // singleton consistently, so we have to use it before checking the
+        // configuration:
         let errs = cfg.check();
+        JetLagConsole.config(cfg);
         if (errs.length > 0) {
-            console.log("Warning: the following errors were found in your " +
+            JetLagConsole.urgent("Warning: the following errors were found in your " +
                 "configuration object.  Game behavior may not be as expected");
             for (let o of errs) {
-                console.log("  " + o);
+                JetLagConsole.urgent("  " + o);
             }
         }
 

@@ -4,7 +4,7 @@ import { Renderable } from "../renderables/Renderable"
 import { RenderableText } from "../renderables/RenderableText"
 import { Picture } from "../renderables/Picture"
 import { Timer } from "../misc/Timer"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
 import { PointToActorCallback } from "../misc/PointToActorCallback"
 
@@ -79,7 +79,6 @@ export abstract class Scene {
    */
   public actorAt(screenX: number, screenY: number): BaseActor {
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    console.log("world coords", worldCoords.x, worldCoords.y)
     this.pointQuerier.query(worldCoords.x, worldCoords.y, this.world);
     return this.pointQuerier.getFoundActor();
   }
@@ -284,5 +283,5 @@ export abstract class Scene {
    *
    * @return True if the scene was rendered, false if it was not
    */
-  abstract render(renderer: Renderer, elapsedTime: number): boolean;
+  abstract render(renderer: JetLagRenderer, elapsedTime: number): boolean;
 }

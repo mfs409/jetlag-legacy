@@ -1,6 +1,6 @@
 import { JetLagConfig } from "./JetLagConfig"
 import { Device } from "./device/Device"
-import { TouchReceiverHolder, TouchReceiver } from "./device/TouchScreen"
+import { TouchReceiverHolder, TouchReceiver } from "./device/JetLagTouchScreen"
 import { JetLagApi } from "./api/JetLagApi"
 import { Stage } from "./stage/Stage"
 

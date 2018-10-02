@@ -7,7 +7,7 @@ import { Hero } from "../renderables/Hero"
 import { Goodie } from "../renderables/Goodie"
 import { Enemy } from "../renderables/Enemy"
 import { Destination } from "../renderables/Destination"
-import { KEYS } from "../device/Keyboard";
+import { KEYS } from "../device/JetLagKeyboard";
 import { WorldActor } from "../renderables/WorldActor";
 import { TimedEvent } from "../misc/Timer";
 import { ProjectilePool } from "../misc/ProjectilePool";

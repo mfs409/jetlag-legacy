@@ -1,6 +1,6 @@
 import { JetLagManager } from "../JetLagManager"
 import { ParallaxLayer } from "../renderables/ParallaxLayer"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
 
 /**
@@ -35,7 +35,7 @@ export class ParallaxScene {
      * @param sb          The SpriteBatch to use while rendering
      * @param elapsed     The time since the last render
      */
-    render(sb: Renderer, worldCamera: Camera, elapsed: number) {
+    render(sb: JetLagRenderer, worldCamera: Camera, elapsed: number) {
         for (let pl of this.layers) {
             if (pl.isAuto) {
                 this.renderAuto(sb, pl, elapsed, worldCamera);
@@ -52,7 +52,7 @@ export class ParallaxScene {
      * @param pl      The layer to draw
      * @param elapsed The elapsed time since we last drew this layer
      */
-    private renderAuto(sb: Renderer, pl: ParallaxLayer, elapsed: number, worldCamera: Camera) {
+    private renderAuto(sb: JetLagRenderer, pl: ParallaxLayer, elapsed: number, worldCamera: Camera) {
         // Determine the position of a reference tile of the image
         if (pl.isHoriz) {
             pl.lastX += pl.scrollSpeed * elapsed;
@@ -66,7 +66,7 @@ export class ParallaxScene {
     /**
      * This is how we actually figure out where to draw the background
      */
-    private normalizeAndRender(pl: ParallaxLayer, sb: Renderer, worldCamera: Camera) {
+    private normalizeAndRender(pl: ParallaxLayer, sb: JetLagRenderer, worldCamera: Camera) {
         let x = worldCamera.getOffsetX(); // left of viewport
         let y = worldCamera.getOffsetY(); // top of viewport
         let camW = this.manager.config.screenWidth / this.manager.config.pixelMeterRatio;
@@ -103,7 +103,7 @@ export class ParallaxScene {
      * @param sb The SpriteBatch to use when drawing this layer
      * @param pl The layer to draw
      */
-    private renderRelative(sb: Renderer, worldCamera: Camera, pl: ParallaxLayer) {
+    private renderRelative(sb: JetLagRenderer, worldCamera: Camera, pl: ParallaxLayer) {
         // Determine the change in camera
         let x = worldCamera.getOffsetX(); // left of viewport
         let y = worldCamera.getOffsetY(); // top of viewport
@@ -127,7 +127,7 @@ export class ParallaxScene {
      * @param x  the X coordinate of a reference tile of the layer
      * @param y  the Y coordinate of a reference tile of the layer
      */
-    private renderVisibleTiles(sb: Renderer, pl: ParallaxLayer, worldCamera: Camera) {
+    private renderVisibleTiles(sb: JetLagRenderer, pl: ParallaxLayer, worldCamera: Camera) {
         let x = worldCamera.getOffsetX(); // left of viewport
         let y = worldCamera.getOffsetY(); // top of viewport
         let camW = this.manager.config.screenWidth / this.manager.config.pixelMeterRatio;

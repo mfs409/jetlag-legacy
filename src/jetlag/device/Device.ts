@@ -1,13 +1,12 @@
-import { TouchScreen } from "./TouchScreen"
-import { Accelerometer } from "./Accelerometer"
-import { AccelerometerMode } from "./Accelerometer"
-import { Keyboard } from "./Keyboard"
-import { Vibration } from "./Vibration"
-import { Speaker } from "./Speaker"
-import { Renderer } from "./Renderer"
-import { Process } from "./Process"
-import { JLStorage } from "./Storage"
-import { Console } from "./Console"
+import { JetLagTouchScreen } from "./JetLagTouchScreen"
+import { JetLagAccelerometer } from "./JetLagAccelerometer"
+import { AccelerometerMode } from "./JetLagAccelerometer"
+import { JetLagKeyboard } from "./JetLagKeyboard"
+import { JetLagVibration } from "./JetLagVibration"
+import { JetLagSpeaker } from "./JetLagSpeaker"
+import { JetLagRenderer } from "./JetLagRenderer"
+import { JetLagProcess } from "./JetLagProcess"
+import { JetLagStorage } from "./JetLagStorage"
 import { JetLagConfig } from "../JetLagConfig"
 
 /**
@@ -17,34 +16,31 @@ import { JetLagConfig } from "../JetLagConfig"
  */
 export class Device {
     /** touch controller, providing gesture inputs */
-    readonly touch: TouchScreen;
+    readonly touch: JetLagTouchScreen;
 
     /** keyboard controller, providing key event inputs */
-    readonly keyboard: Keyboard;
+    readonly keyboard: JetLagKeyboard;
 
     /** accel provides access to the the device's accelerometer */
-    readonly accel: Accelerometer;
+    readonly accel: JetLagAccelerometer;
 
     /** video is where we draw the images we want the player to see */
-    readonly renderer: Renderer;
+    readonly renderer: JetLagRenderer;
 
     /** vibe provides device-specific vibration features */
-    readonly vibe: Vibration;
+    readonly vibe: JetLagVibration;
 
     /** speaker is where we play sounds and background music */
-    readonly speaker: Speaker;
-
-    /** console is for printing messages to the device console */
-    readonly console: Console;
+    readonly speaker: JetLagSpeaker;
 
     /** 
      * storage interfaces with the device's persistent storage, and also 
      * provides volatile storage for levels and sessions
      */
-    readonly storage: JLStorage = new JLStorage();
+    readonly storage: JetLagStorage;
 
     /** The abstraction of an OS Process */
-    readonly process: Process;
+    readonly process: JetLagProcess;
 
     /**
      * Create a device context to abstract away browser features
@@ -53,13 +49,13 @@ export class Device {
      * @param domId The Id of the DOM element where the game exists
      */
     constructor(cfg: JetLagConfig, domId: string) {
-        this.console = new Console(cfg);
-        this.speaker = new Speaker(cfg);
-        this.touch = new TouchScreen(domId);
-        this.keyboard = new Keyboard();
-        this.accel = new Accelerometer(AccelerometerMode.DEFAULT_LANDSCAPE, cfg.forceAccelerometerOff);
-        this.vibe = new Vibration();
-        this.process = new Process();
-        this.renderer = new Renderer(cfg, domId);
+        this.storage = new JetLagStorage();
+        this.speaker = new JetLagSpeaker(cfg);
+        this.touch = new JetLagTouchScreen(domId);
+        this.keyboard = new JetLagKeyboard();
+        this.accel = new JetLagAccelerometer(AccelerometerMode.DEFAULT_LANDSCAPE, cfg.forceAccelerometerOff);
+        this.vibe = new JetLagVibration();
+        this.process = new JetLagProcess();
+        this.renderer = new JetLagRenderer(cfg, domId);
     }
 }

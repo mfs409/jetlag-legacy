@@ -1,5 +1,4 @@
-import { JetLagSprite } from "../device/Renderer"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer, JetLagSprite } from "../device/JetLagRenderer"
 
 /**
  * Animation is a way of describing a set of images that can be used to do
@@ -19,9 +18,6 @@ export class Animation {
      */
     durations: number[];
 
-    /** The renderer, so we can look up sprites */
-    private renderer: Renderer;
-
     /** Make a clone of this animation */
     clone() {
         let a = new Animation(this.loop, this.renderer);
@@ -40,11 +36,10 @@ export class Animation {
      *                 should repeat
      * @param renderer The renderer to use (needed to find sprites)
      */
-    constructor(repeat: boolean, renderer: Renderer) {
+    constructor(repeat: boolean, public renderer: JetLagRenderer) {
         this.cells = [];
         this.durations = [];
         this.loop = repeat;
-        this.renderer = renderer;
     }
 
     /**

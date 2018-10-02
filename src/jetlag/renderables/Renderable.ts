@@ -1,4 +1,4 @@
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
 
 /**
@@ -14,5 +14,5 @@ export interface Renderable {
    * rendering, do it here, too.  If the object should be culled (not rendered
    * because it isn't in view), that should be decided here too.
    */
-  render(renderer: Renderer, camera: Camera, elapsedMillis: number): void;
+  render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number): void;
 }

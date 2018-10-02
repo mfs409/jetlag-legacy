@@ -112,7 +112,6 @@ export class Obstacle extends WorldActor {
         this.setCollisionsEnabled(false);
         // register a callback to change the hero's speed
         this.mHeroCollision = (self: Obstacle, h: Hero, c: PhysicsType2d.Dynamics.Contacts.Contact) => {
-            console.log("hit it");
             // boost the speed
             let v: PhysicsType2d.Vector2 = h.body.GetLinearVelocity();
             v.x += boostAmountX;

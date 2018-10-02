@@ -1,4 +1,4 @@
-import { Renderer, JetLagText } from "../device/Renderer"
+import { JetLagRenderer, JetLagText } from "../device/JetLagRenderer"
 import { Renderable } from "./Renderable"
 import { Camera } from "../misc/Camera"
 import { XY } from "../misc/XY"
@@ -37,7 +37,7 @@ export class RenderableText implements Renderable {
      * @param center True to center instead of placing at top right (x,y)
      * @param producer The thing that produces text
      */
-    constructor(renderer: Renderer, fontFamily: string, fontSize: number, fontColor: string, x: number, y: number, center: boolean, producer: () => string) {
+    constructor(renderer: JetLagRenderer, fontFamily: string, fontSize: number, fontColor: string, x: number, y: number, center: boolean, producer: () => string) {
         this.coord.Set(x, y);
         this.producer = producer;
         this.center = center;
@@ -58,7 +58,7 @@ export class RenderableText implements Renderable {
      * @param camera The camera that defines the bounds for the Scene where this
      *               image should be drawn
      */
-    public render(renderer: Renderer, camera: Camera): void {
+    public render(renderer: JetLagRenderer, camera: Camera): void {
         if (!this.visible)
             return;
         // Set the world position and the text, then let the renderer decide where to put it...

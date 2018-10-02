@@ -1,6 +1,5 @@
-import { JetLagSprite } from "../device/Renderer"
+import { JetLagSprite, JetLagRenderer } from "../device/JetLagRenderer"
 import { Animation } from "./Animation"
-import { Renderer } from "../device/Renderer"
 
 /**
  * AnimationDriver is an internal class that actors can use to figure out which
@@ -35,7 +34,7 @@ export class AnimationDriver {
      * @param renderer The renderer, so we can get one of its images by name
      * @param imgName  The name of the image file to use
      */
-    constructor(renderer: Renderer, imgName: string) {
+    constructor(renderer: JetLagRenderer, imgName: string) {
         this.updateImage(renderer, imgName);
     }
 
@@ -62,7 +61,7 @@ export class AnimationDriver {
      * @param media   The media object, with all of the game's loaded images
      * @param imgName The name of the image file to use
      */
-    updateImage(renderer: Renderer, imgName: string) {
+    updateImage(renderer: JetLagRenderer, imgName: string) {
         if (this.images == null)
             this.images = [null];
         this.images[0] = renderer.getSprite(imgName);

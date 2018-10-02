@@ -1,7 +1,7 @@
 import { WorldActor } from "./WorldActor"
 import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"
@@ -71,7 +71,7 @@ export class Hero extends WorldActor {
      * NB:  We can't just use the basic renderer, because we might need to
      *      adjust a one-off animation (invincibility or throw) first
      */
-    render(renderer: Renderer, camera: Camera, elapsedMillis: number): void {
+    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number): void {
         // determine when to turn off throw animations
         if (this.mThrowAnimationTimeRemaining > 0) {
             this.mThrowAnimationTimeRemaining -= elapsedMillis;

@@ -1,5 +1,5 @@
 import { Scene } from "../stage/Scene"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 
 /**
  * OverlayScene is any scene that sits on top of the world.  The most important 
@@ -16,7 +16,7 @@ export class OverlayScene extends Scene {
      * @param sb            The spritebatch to use when drawing
      * @param elapsedMillis The time since the last render
      */
-    render(renderer: Renderer, elapsedMillis: number) {
+    render(renderer: JetLagRenderer, elapsedMillis: number) {
         // advance timers and world
         //
         // TODO: should we be using elapsedMillis for the Step?

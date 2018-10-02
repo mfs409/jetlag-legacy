@@ -8,7 +8,7 @@ export enum KEYS {
 /**
  * Keyboard abstracts the ways of responding to keyboard events
  */
-export class Keyboard {
+export class JetLagKeyboard {
     /** handlers for when keys are pressed down */
     downHandlers: (() => void)[] = [];
 

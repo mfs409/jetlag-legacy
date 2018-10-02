@@ -1,7 +1,7 @@
 import { WorldActor } from "./WorldActor"
 import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Obstacle } from "./Obstacle"
 import { Camera } from "../misc/Camera"
 
@@ -67,7 +67,6 @@ export class Projectile extends WorldActor {
      * @param contact A description of the contact that caused this collision
      */
     onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
-        console.log("collision");
         // if this is an obstacle, check if it is a projectile callback, and if so, do the callback
         if (other instanceof Obstacle) {
             let o: Obstacle = other as Obstacle;
@@ -96,7 +95,7 @@ export class Projectile extends WorldActor {
      * When drawing a projectile, we first check if it is too far from its starting point. We only
      * draw it if it is not.
      */
-    public render(renderer: Renderer, camera: Camera, elapsedMillis: number): void {
+    public render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number): void {
         if (!this.body.IsActive())
             return;
         // eliminate the projectile quietly if it has traveled too far

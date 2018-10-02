@@ -6,10 +6,11 @@ import { RouteDriver } from "../misc/Route"
 import { Route } from "../misc/Route"
 import { AnimationDriver } from "./AnimationDriver"
 import { Animation } from "./Animation"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { TimedEvent } from "../misc/Timer"
 import { Camera } from "../misc/Camera"
 import { XY } from "../misc/XY"
+import { JetLagConsole } from "../device/JetLagConsole"
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
@@ -172,7 +173,7 @@ export class BaseActor implements Renderable {
             this.verts[i / 2] = new PhysicsType2d.Vector2(vertices[i], vertices[i + 1]);
         // print some debug info, since vertices are tricky
         for (let vert of this.verts)
-            console.log("vert", "at " + vert.x + "," + vert.y);
+            JetLagConsole.info("vert at " + vert.x + "," + vert.y);
         shape.Set(this.verts);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
@@ -252,7 +253,7 @@ export class BaseActor implements Renderable {
      * Every time the world advances by a timestep, we call this code to update the actor route and
      * animation, and then draw the actor
      */
-    render(renderer: Renderer, camera: Camera, elapsedMillis: number) {
+    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
         if (!this.getEnabled())
             return;
         if (this.route) this.route.drive();
@@ -365,10 +366,10 @@ export class BaseActor implements Renderable {
     }
 
     /**
-    * Make an actor disappear
-    *
-    * @param quiet True if the disappear sound should not be played
-    */
+     * Make an actor disappear
+     *
+     * @param quiet True if the disappear sound should not be played
+     */
     public remove(quiet: boolean): void {
         // set it invisible immediately, so that future calls know to ignore this actor
         this.setEnabled(false);
@@ -391,29 +392,25 @@ export class BaseActor implements Renderable {
     }
 
     /**
-    * Returns the X velocity of of this actor
-    *
-    * @return Velocity in X dimension, in pixels per second
-    */
-    public getXVelocity(): number {
-        return this.body.GetLinearVelocity().x;
-    }
+     * Returns the X velocity of of this actor
+     *
+     * @return Velocity in X dimension, in pixels per second
+     */
+    public getXVelocity() { return this.body.GetLinearVelocity().x; }
 
     /**
-    * Returns the Y velocity of of this actor
-    *
-    * @return Velocity in Y dimension, in pixels per second
-    */
-    public getYVelocity(): number {
-        return this.body.GetLinearVelocity().y;
-    }
+     * Returns the Y velocity of of this actor
+     *
+     * @return Velocity in Y dimension, in pixels per second
+     */
+    public getYVelocity() { return this.body.GetLinearVelocity().y; }
 
     /**
-    * Set the absolute velocity of this actor
-    *
-    * @param x Velocity in X dimension
-    * @param y Velocity in Y dimension
-    */
+     * Set the absolute velocity of this actor
+     *
+     * @param x Velocity in X dimension
+     * @param y Velocity in Y dimension
+     */
     public setAbsoluteVelocity(x: number, y: number): void {
         // ensure this is a moveable actor
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)

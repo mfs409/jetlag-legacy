@@ -3,11 +3,12 @@ import { WorldScene } from "./WorldScene"
 import { OverlayScene } from "./OverlayScene"
 import { OverlayApi } from "../api/OverlayApi"
 import { ParallaxScene } from "./ParallaxScene"
-import { Renderer } from "../device/Renderer"
+import { JetLagRenderer } from "../device/JetLagRenderer"
 import { Score } from "../misc/Score"
 import { Hero } from "../renderables/Hero"
 import { Goodie } from "../renderables/Goodie"
 import { Enemy } from "../renderables/Enemy"
+import { JetLagConsole } from "../device/JetLagConsole";
 
 /**
  * Stage is a fully interactive portion of the game.  It has several scenes, 
@@ -87,8 +88,8 @@ export class Stage {
         if (this.stageManager.config.debugMode) {
             let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
             let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
-            console.log("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
-            console.log("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
+            JetLagConsole.info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
+            JetLagConsole.info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
         }
         if (this.gestureHudFirst) {
             if (this.hud.tap(screenX, screenY))
@@ -190,7 +191,7 @@ export class Stage {
      * 
      * @param elapsedTime The milliseconds since the previous render
      */
-    render(renderer: Renderer, elapsedTime: number) {
+    render(renderer: JetLagRenderer, elapsedTime: number) {
         // Handle pauses due to pre, pause, or post scenes.  Note that these handle their own screen
         // touches, and that win and lose scenes should come first.
         if (this.welcomeSceneBuilder) {

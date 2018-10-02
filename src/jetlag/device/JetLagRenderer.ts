@@ -3,6 +3,7 @@ import { JetLagManager } from "../JetLagManager"
 import { BaseActor } from "../renderables/BaseActor"
 import { BodyStyle } from "../renderables/BaseActor"
 import { Camera } from "../misc/Camera"
+import { JetLagConsole } from "./JetLagConsole"
 import * as PIXI from 'pixi.js';
 
 /**
@@ -20,7 +21,7 @@ import * as PIXI from 'pixi.js';
  * initFrame().  Then use the add* methods to add things to the frame.  Finally,
  * call showFrame() and the frame will be rendered.
  */
-export class Renderer {
+export class JetLagRenderer {
     /** The renderer object is responsible for drawing onto a canvas */
     private renderer: PIXI.Application;
 
@@ -186,7 +187,7 @@ export class Renderer {
                 this.debugContainer.addChild(poly);
             }
             else {
-                console.log("Unknown BodyStyle");
+                JetLagConsole.urgent("Unknown BodyStyle while attempting to render actor");
             }
         }
     }
@@ -250,7 +251,7 @@ export class Renderer {
      */
     public getSprite(imgName: string): JetLagSprite {
         if (!PIXI.loader.resources[imgName]) {
-            console.log("Unable to find graphics asset " + imgName);
+            JetLagConsole.info("Unable to find graphics asset " + imgName);
             return new JetLagSprite("", new PIXI.Sprite());
         }
         return new JetLagSprite(imgName, new PIXI.Sprite(PIXI.loader.resources[imgName].texture));

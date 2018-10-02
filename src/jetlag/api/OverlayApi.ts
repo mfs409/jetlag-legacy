@@ -1,5 +1,5 @@
 import { OverlayScene } from "../stage/OverlayScene"
-import { KEYS } from "../device/Keyboard"
+import { KEYS } from "../device/JetLagKeyboard"
 import { WorldActor } from "../renderables/WorldActor"
 import { TimedEvent } from "../misc/Timer"
 import { Renderable } from "../renderables/Renderable"
@@ -265,7 +265,6 @@ export class OverlayApi {
             let dy = this.activeActor.getYPosition() - (meters.y - this.activeActor.getHeight() / 2);
             let hy = Math.sqrt(dx * dx + dy * dy) / velocity;
             let v = new PhysicsType2d.Vector2(dx / hy, dy / hy);
-            console.log(v.x, v.y);
             this.activeActor.setRotationSpeed(0);
             this.activeActor.setAbsoluteVelocity(-v.x, -v.y);
             if (clear)

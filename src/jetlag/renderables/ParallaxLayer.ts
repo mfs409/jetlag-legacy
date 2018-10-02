@@ -1,4 +1,4 @@
-import { JetLagSprite } from "../device/Renderer"
+import { JetLagSprite } from "../device/JetLagRenderer"
 import { JetLagManager } from "../JetLagManager"
 
 /**

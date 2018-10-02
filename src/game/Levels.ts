@@ -1,5 +1,5 @@
 import { JetLagApi } from "../jetlag/api/JetLagApi";
-import { KEYS } from "../jetlag/device/Keyboard";
+import { KEYS } from "../jetlag/device/JetLagKeyboard";
 import { Route } from "../jetlag/misc/Route";
 import { Goodie } from "../jetlag/renderables/Goodie";
 import { Hero } from "../jetlag/renderables/Hero";

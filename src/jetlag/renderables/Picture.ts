@@ -1,5 +1,5 @@
 import { Renderable } from "./Renderable"
-import { JetLagSprite, Renderer } from "../device/Renderer"
+import { JetLagSprite, JetLagRenderer } from "../device/JetLagRenderer"
 import { Camera } from "../misc/Camera"
 
 /**
@@ -30,7 +30,7 @@ export class Picture implements Renderable {
      * @param h The height of the image, in meters
      * @param imgName The name of the image to display
      */
-    constructor(x: number, y: number, w: number, h: number, imgName: string, renderer: Renderer) {
+    constructor(x: number, y: number, w: number, h: number, imgName: string, renderer: JetLagRenderer) {
         this.dims = { x: x, y: y, w: w, h: h };
         this.sprite = renderer.getSprite(imgName);
     }
@@ -49,7 +49,7 @@ export class Picture implements Renderable {
      * @param camera The camera that defines the bounds for the Scene where this
      *               image should be drawn
      */
-    public render(renderer: Renderer, camera: Camera): void {
+    public render(renderer: JetLagRenderer, camera: Camera): void {
         if (!this.visible || this.sprite === null)
             return;
         // update world position, because the renderer is free to scale and move
