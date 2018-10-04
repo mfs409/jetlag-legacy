@@ -1,4 +1,5 @@
 import { JetLagApi } from "../jetlag/api/JetLagApi";
+import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
 
 /**
  * buildHelpScreen draws the help screens.  Technically, a help screen can be
@@ -13,6 +14,9 @@ import { JetLagApi } from "../jetlag/api/JetLagApi";
  * @param level The level to configure
  */
 export function buildHelpScreen(index: number, jl: JetLagApi): void {
+    // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Splash
+    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, null); });
+
     // Our first scene describes the color coding that we use for the different entities in the game
     if (index == 1) {
         // By default, we have a level that is 1600x900 pixels (16x9 meters), with no default gravitational forces

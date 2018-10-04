@@ -1,4 +1,5 @@
 import { JetLagApi } from "../jetlag/api/JetLagApi"
+import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
 
 /**
  * buildChooserScreen draws the level chooser screens. Our chooser code is 
@@ -15,6 +16,9 @@ import { JetLagApi } from "../jetlag/api/JetLagApi"
 export function buildChooserScreen(index: number, jl: JetLagApi): void {
     // By default, we have a level that is 1600x900 pixels (16x9 meters), with no default
     // gravitational forces
+
+    // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Splash
+    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, null); });
 
     // screen 1: show levels 1 --> 24
     //
