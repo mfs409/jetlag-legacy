@@ -23,12 +23,13 @@ import { HtmlConsole } from "./htmldevice/HtmlConsole"
  */
 export class JetLagGame {
     /**
-     * Launch a game, as defined by its Config, and render it in appropriate DIV
-     * 
+     * Given a valid config object and the name of a DIV tag, run the game as an
+     * HTML5 game inside of that div
+     *
      * @param domId The name of the DIV into which the game should be placed
      * @param cfg The game configuration object
      */
-    public static runGame(domId: string, cfg: JetLagConfig): void {
+    public static runGameAsHtml(domId: string, cfg: JetLagConfig): void {
         // This is a bit dangerous, but we want to use the JetLagConsole
         // singleton consistently, so we have to use it before checking the
         // configuration:
@@ -44,7 +45,7 @@ export class JetLagGame {
 
         if (cfg.adaptToScreenSize) {
             // as we compute the new screen width, height, and pixel ratio, we
-            // need to be sure to preserve the original ratio given in the game.
+            // need to be sure to remember the original ratio given in the game.
             // JetLag can't stretch differently in X than in Y, becaues there is
             // only one pixel/meter ratio.
             let targetRatio = cfg.screenWidth / cfg.screenHeight;
