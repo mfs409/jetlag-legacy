@@ -26,13 +26,10 @@ export abstract class Scene {
   readonly world: PhysicsType2d.Dynamics.World;
 
   /** Anything in the world that can be rendered, in 5 planes [-2, -1, 0, 1, 2] */
-  readonly renderables: Array<Array<Renderable>>;
+  readonly renderables: Renderable[][];
 
   // The camera will make sure important actors are on screen
   readonly camera: Camera;
-
-  /** When there is a touch of an actor in the physics world, this is how we find it */
-  hitActor: BaseActor
 
   /** For querying the point that was toucned */
   pointQuerier = new PointToActorCallback();

@@ -4,7 +4,10 @@ import { OverlayApi } from "./OverlayApi"
 import { JetLagManager } from "../JetLagManager"
 import { NavigationApi } from "./NavigationApi"
 import { JetLagConfig } from "../JetLagConfig";
-import { JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagDevice, JetLagKeys } from "../misc/JetLagDevice";
+import { Stage } from "../stage/Stage";
+import { OverlayScene } from "../stage/OverlayScene";
+import { Score } from "../misc/Score";
 
 /**
  * JetLagApi provides a broad, public, declarative interface to the core
@@ -42,11 +45,69 @@ export class JetLagApi {
     readonly nav: NavigationApi;
 
     /** Construct the JetLag API from a manager object */
-    constructor(manager: JetLagManager, config: JetLagConfig, device: JetLagDevice) {
-        this.world = new WorldApi(manager, device, config);
-        this.hud = new OverlayApi(manager.getCurrStage().hud, device, manager);
-        this.score = new ScoreApi(manager, device);
-        this.nav = new NavigationApi(manager, device);
-        this.world.setHud(this.hud);
+    constructor(manager: JetLagManager, config: JetLagConfig, private device: JetLagDevice, stage: Stage, hud: OverlayScene, score: Score) {
+        this.world = new WorldApi(device, config, stage, score);
+        this.hud = new OverlayApi(hud, device, stage);
+        this.score = new ScoreApi(device, stage, score);
+        this.nav = new NavigationApi(manager, stage);
     }
+
+    /** Generate text indicating the current FPS */
+    public getFPS(): number {
+        return this.device.getRenderer().getFPS();
+    }
+
+    /**
+     * Play the sound indicated by the given sound name
+     * 
+     * @param soundName The name of the sound asset to play
+     */
+    public playSound(soundName: string) {
+        this.device.getSpeaker().getSound(soundName).play();
+    }
+
+    /**
+     * Use this to manage the state of Mute
+     */
+    public toggleMute() {
+        // volume is either 1 or 0
+        if (this.device.getStorage().getPersistent("volume", "1") === "1") {
+            // set volume to 0, set image to 'unmute'
+            this.device.getStorage().setPersistent("volume", "0");
+        } else {
+            // set volume to 1, set image to 'mute'
+            this.device.getStorage().setPersistent("volume", "1");
+        }
+        // update all music
+        this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
+    }
+
+    /**
+     * Use this to determine if the game is muted or not. True corresponds to not muted, false
+     * corresponds to muted.
+     */
+    public getVolume() {
+        return this.device.getStorage().getPersistent("volume", "1") === "1";
+    }
+
+    /**
+     * Set a behavior to happen when a key is released
+     * 
+     * @param key The KEY to handle
+     * @param action The action to perform when the key is released
+     */
+    public setUpKeyAction(key: JetLagKeys, action: () => void) {
+        this.device.getKeyboard().setKeyUpHandler(key, action);
+    }
+
+    /**
+     * Set a behavior to happen when a key is pressed
+     * 
+     * @param key The KEY to handle
+     * @param action The action to perform when the key is released
+     */
+    public setDownKeyAction(key: JetLagKeys, action: () => void) {
+        this.device.getKeyboard().setKeyDownHandler(key, action);
+    }
+
 }

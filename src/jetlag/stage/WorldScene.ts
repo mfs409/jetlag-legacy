@@ -6,7 +6,6 @@ import { Enemy } from "../renderables/Enemy"
 import { Projectile } from "../renderables/Projectile"
 import { JetLagRenderer, JetLagDevice } from "../misc/JetLagDevice"
 import { XY } from "../misc/XY"
-import { JetLagSound } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
 
 /**
@@ -29,12 +28,6 @@ export class WorldScene extends Scene {
 
     /** This is the WorldActor that the camera chases, if any */
     cameraChaseActor: WorldActor = null;
-
-    /** The music, if any */
-    music: JetLagSound = null;
-
-    /** Whether the music is playing or not */
-    private musicPlaying = false;
 
     /** A temp vector, to avoid allocation in the tilt code */
     private tiltVec = new XY(0, 0);
@@ -256,30 +249,6 @@ export class WorldScene extends Scene {
             public PostSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, impulse: PhysicsType2d.Dynamics.ContactImpulse): void {
             }
         })(this));
-    }
-
-    /** If the level has music attached to it, this starts playing it */
-    playMusic(): void {
-        if (!this.musicPlaying && this.music) {
-            this.musicPlaying = true;
-            this.music.play();
-        }
-    }
-
-    /** If the level has music attached to it, this pauses it */
-    pauseMusic(): void {
-        if (this.musicPlaying) {
-            this.musicPlaying = false;
-            this.music.stop();
-        }
-    }
-
-    /** If the level has music attached to it, this stops it */
-    stopMusic(): void {
-        if (this.musicPlaying) {
-            this.musicPlaying = false;
-            this.music.stop();
-        }
     }
 
     /**

@@ -1,5 +1,4 @@
 import { WorldActor } from "./WorldActor"
-import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
@@ -9,6 +8,8 @@ import { Animation } from "./Animation"
 import { Camera } from "../misc/Camera"
 import { JetLagRenderer, JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
+import { Stage } from "../stage/Stage";
+import { Score } from "../misc/Score";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -107,7 +108,7 @@ export class Hero extends WorldActor {
     * @param imgName The name of the file that has the default image for this
     *                hero
     */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private manager: JetLagManager, width: number,
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private stage: Stage, private score: Score, width: number,
         height: number, imgName: string) {
         super(scene, device, config, imgName, width, height);
     }
@@ -172,7 +173,7 @@ export class Hero extends WorldActor {
         if (!this.getEnabled() || !destination.getEnabled())
             return;
         if (destination.receive(this)) {
-            this.manager.getCurrStage().onDestinationArrive();
+            this.score.onDestinationArrive();
             // hide the hero quietly, since the destination might make a sound
             this.remove(true);
         }
@@ -188,9 +189,9 @@ export class Hero extends WorldActor {
         // hero
         if (enemy.alwaysDoesDamage) {
             this.remove(false);
-            this.manager.getCurrStage().defeatHero(enemy, this);
+            this.score.onDefeatHero(enemy, this);
             if (this.mustSurvive) {
-                this.manager.getCurrStage().endLevel(false);
+                this.stage.endLevel(false);
             }
             return;
         }
@@ -213,9 +214,9 @@ export class Hero extends WorldActor {
         // when we can't defeat it by losing strength, remove the hero
         else if (enemy.damage >= this.strength) {
             this.remove(false);
-            this.manager.getCurrStage().defeatHero(enemy, this);
+            this.score.onDefeatHero(enemy, this);
             if (this.mustSurvive) {
-                this.manager.getCurrStage().endLevel(false);
+                this.stage.endLevel(false);
             }
         }
         // when we can defeat it by losing strength
@@ -282,7 +283,7 @@ export class Hero extends WorldActor {
         g.remove(false);
         if (g.onHeroCollect)
             g.onHeroCollect(g, this);
-        this.manager.getCurrStage().onGoodieCollected(g);
+        this.score.onGoodieCollected(g);
     }
 
     /**

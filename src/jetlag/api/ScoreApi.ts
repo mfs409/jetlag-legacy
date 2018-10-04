@@ -1,5 +1,6 @@
-import { JetLagManager } from "../JetLagManager"
 import { JetLagDevice } from "../misc/JetLagDevice";
+import { Stage } from "../stage/Stage";
+import { Score } from "../misc/Score";
 
 /**
  * ScoreApi provides an interface for configuring everything related to the
@@ -11,7 +12,7 @@ export class ScoreApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private manager: JetLagManager, private device: JetLagDevice) { }
+    constructor(private device: JetLagDevice, private stage: Stage, private score: Score) { }
 
     /**
      * Look up a fact that was stored for the current game session. If no such fact exists,
@@ -89,8 +90,8 @@ export class ScoreApi {
      * @param howMany Number of heroes that must reach destinations
      */
     public setVictoryDestination(howMany: number): void {
-        this.manager.getCurrStage().score.setWinDestination();
-        this.manager.getCurrStage().score.victoryHeroCount = howMany;
+        this.score.setWinDestination();
+        this.score.victoryHeroCount = howMany;
     }
 
     /**
@@ -102,7 +103,7 @@ export class ScoreApi {
      * @param howMany The number of enemies that must be defeated to win the level
      */
     public setVictoryEnemyCount(howMany?: number): void {
-        this.manager.getCurrStage().score.setVictoryEnemyCount(howMany);
+        this.score.setVictoryEnemyCount(howMany);
     }
 
     /**
@@ -114,63 +115,63 @@ export class ScoreApi {
      * @param v4 Number of type-4 goodies that must be collected to win the level
      */
     public setVictoryGoodies(v1: number, v2: number, v3: number, v4: number) {
-        this.manager.getCurrStage().score.setVictoryGoodies(v1, v2, v3, v4);
+        this.score.setVictoryGoodies(v1, v2, v3, v4);
     }
 
     /**
      * Return the number of type-1 goodies that have been collected in the current level
      */
     public getGoodies1(): number {
-        return this.manager.getCurrStage().score.goodiesCollected[0];
+        return this.score.goodiesCollected[0];
     }
 
     /**
      * Return the number of type-2 goodies that have been collected in the current level
      */
     public getGoodies2(): number {
-        return this.manager.getCurrStage().score.goodiesCollected[1];
+        return this.score.goodiesCollected[1];
     }
 
     /**
      * Return the number of type-3 goodies that have been collected in the current level
      */
     public getGoodies3(): number {
-        return this.manager.getCurrStage().score.goodiesCollected[2];
+        return this.score.goodiesCollected[2];
     }
 
     /**
      * Return the number of type-4 goodies that have been collected in the current level
      */
     public getGoodies4(): number {
-        return this.manager.getCurrStage().score.goodiesCollected[3];
+        return this.score.goodiesCollected[3];
     }
 
     /**
      * Manually increment the number of goodies of type 1 that have been collected.
      */
     public incrementGoodies1() {
-        this.manager.getCurrStage().score.goodiesCollected[0]++;
+        this.score.goodiesCollected[0]++;
     }
 
     /**
      * Manually increment the number of goodies of type 2 that have been collected.
      */
     public incrementGoodies2() {
-        this.manager.getCurrStage().score.goodiesCollected[1]++;
+        this.score.goodiesCollected[1]++;
     }
 
     /**
      * Manually increment the number of goodies of type 3 that have been collected.
      */
     public incrementGoodies3() {
-        this.manager.getCurrStage().score.goodiesCollected[2]++;
+        this.score.goodiesCollected[2]++;
     }
 
     /**
      * Manually increment the number of goodies of type 4 that have been collected.
      */
     public incrementGoodies4() {
-        this.manager.getCurrStage().score.goodiesCollected[3]++;
+        this.score.goodiesCollected[3]++;
     }
 
     /**
@@ -179,7 +180,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies1(value: number) {
-        this.manager.getCurrStage().score.goodiesCollected[0] = value;
+        this.score.goodiesCollected[0] = value;
     }
 
     /**
@@ -188,7 +189,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies2(value: number) {
-        this.manager.getCurrStage().score.goodiesCollected[1] = value;
+        this.score.goodiesCollected[1] = value;
     }
 
     /**
@@ -197,7 +198,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies3(value: number) {
-        this.manager.getCurrStage().score.goodiesCollected[2] = value;
+        this.score.goodiesCollected[2] = value;
     }
 
     /**
@@ -206,14 +207,14 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies4(value: number) {
-        this.manager.getCurrStage().score.goodiesCollected[3] = value;
+        this.score.goodiesCollected[3] = value;
     }
 
     /**
      * Return the remaining time until the level is lost
      */
     public getLoseCountdown(): number {
-        return this.manager.getCurrStage().score.loseCountDownRemaining;
+        return this.score.loseCountDownRemaining;
     }
 
     /**
@@ -222,14 +223,14 @@ export class ScoreApi {
      * @param delta The amount of time to add before the timer expires
      */
     public updateTimerExpiration(delta: number): void {
-        this.manager.getCurrStage().score.loseCountDownRemaining += delta;
+        this.score.loseCountDownRemaining += delta;
     }
 
     /**
      * Return the remaining time until the level is won
      */
     public getWinCountdown(): number {
-        return this.manager.getCurrStage().score.winCountRemaining;
+        return this.score.winCountRemaining;
     }
 
     /**
@@ -239,7 +240,7 @@ export class ScoreApi {
      */
     public setLoseCountdown(timeout: number) {
         // Once the Lose CountDown is not -100, it will start counting down
-        this.manager.getCurrStage().score.loseCountDownRemaining = timeout;
+        this.score.loseCountDownRemaining = timeout;
     }
 
     /**
@@ -249,7 +250,7 @@ export class ScoreApi {
      */
     public setWinCountdown(timeout: number) {
         // Once the Win CountDown is not -100, it will start counting down
-        this.manager.getCurrStage().score.winCountRemaining = timeout;
+        this.score.winCountRemaining = timeout;
     }
 
     /**
@@ -259,7 +260,7 @@ export class ScoreApi {
      * @param newVal The new value of the stopwatch
      */
     public setStopwatch(newVal: number) {
-        this.manager.getCurrStage().score.stopWatchProgress = newVal;
+        this.score.stopWatchProgress = newVal;
     }
 
     /**
@@ -267,23 +268,23 @@ export class ScoreApi {
      */
     public getStopwatch(): number {
         // Inactive stopwatch should return 0
-        if (this.manager.getCurrStage().score.stopWatchProgress == -100)
+        if (this.score.stopWatchProgress == -100)
             return 0;
-        return this.manager.getCurrStage().score.stopWatchProgress;
+        return this.score.stopWatchProgress;
     }
 
     /**
      * Return the total number of enemies that have been defeated so far
      */
     public getEnemiesDefeated(): number {
-        return this.manager.getCurrStage().getEnemiesDefeated();
+        return this.score.getEnemiesDefeated();
     }
 
     /**
      * Generate text indicating the number of remaining projectiles
      */
     public getRemainingProjectiles() {
-        return this.manager.getCurrStage().world.projectilePool.remaining;
+        return this.stage.world.projectilePool.remaining;
     }
 
     /**
@@ -292,7 +293,7 @@ export class ScoreApi {
      * This is useful in callbacks, where we might want to immediately end the game
      */
     public winLevel() {
-        this.manager.getCurrStage().endLevel(true);
+        this.stage.endLevel(true);
     }
 
     /**
@@ -301,6 +302,6 @@ export class ScoreApi {
      * This is useful in callbacks, where we might want to immediately end the game
      */
     public loseLevel() {
-        this.manager.getCurrStage().endLevel(false);
+        this.stage.endLevel(false);
     }
 }

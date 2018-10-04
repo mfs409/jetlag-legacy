@@ -1,4 +1,7 @@
 import { Goodie } from "../renderables/Goodie";
+import { Stage } from "../stage/Stage";
+import { Enemy } from "../renderables/Enemy";
+import { Hero } from "../renderables/Hero";
 
 /**
  * These are the ways you can complete a level: you can reach the destination,
@@ -34,6 +37,13 @@ export class Score {
   /** Describes how a level is won. */
   private victoryType: VictoryType;
 
+  /** Text to display when a Lose Countdown completes */
+  loseCountdownText: string;
+
+  /** Text to display when a Win Countdown completes */
+  winCountdownText: string;
+
+
   /** 
    * In levels that have a lose-on-timer feature, we store the timer here, so 
    * that we can extend the time left to complete a game 
@@ -63,10 +73,14 @@ export class Score {
   /** The number of enemies that must be defeated, if we're in ENEMYCOUNT mode. -1 means "all" */
   private victoryEnemyCount: number;
 
+  constructor(private stage: Stage) { }
+
   /**
    * Reset all the scores at the beginning of a new level
    */
   reset() {
+    this.loseCountdownText = "";
+    this.winCountdownText = "";
     this.victoryGoodieCount = [0, 0, 0, 0];
     this.heroesCreated = 0;
     this.goodiesCollected = [0, 0, 0, 0];
@@ -88,7 +102,9 @@ export class Score {
   onDestinationArrive() {
     // check if the level is complete
     this.destinationArrivals++;
-    return ((this.victoryType == VictoryType.DESTINATION) && (this.destinationArrivals >= this.victoryHeroCount));
+    if ((this.victoryType == VictoryType.DESTINATION) && (this.destinationArrivals >= this.victoryHeroCount)) {
+      this.stage.endLevel(true);
+    }
   }
 
   /**
@@ -96,7 +112,7 @@ export class Score {
    *
    * @param goodie The goodie that was collected
    */
-  onGoodieCollected(goodie: Goodie): boolean {
+  onGoodieCollected(goodie: Goodie) {
     // Update goodie counts
     for (let i = 0; i < 4; i++) {
       this.goodiesCollected[i] += goodie.score[i];
@@ -104,19 +120,35 @@ export class Score {
     // possibly win the level, but only if we win on goodie count and all
     // four counts are high enough
     if (this.victoryType != VictoryType.GOODIECOUNT) {
-      return false;
+      return;
     }
     let match: boolean = true;
     for (let i = 0; i < 4; ++i) {
       match = match && (this.victoryGoodieCount[i] <= this.goodiesCollected[i]);
     }
-    return match;
+    if (match) {
+      this.stage.endLevel(true);
+    }
+  }
+
+  /**
+   * Indicate that a hero has been defeated
+   *
+   * @param enemy The enemy who defeated the hero
+   */
+  onDefeatHero(enemy: Enemy, hero: Hero): void {
+    this.heroesDefeated++;
+    if (this.heroesDefeated == this.heroesCreated) {
+      if (enemy.onDefeatHero)
+        enemy.onDefeatHero(enemy, hero);
+      this.stage.endLevel(false);
+    }
   }
 
   /**
    * Record that an enemy was defeated, and possibly end the level in victory
    */
-  onEnemyDefeated(): boolean {
+  onEnemyDefeated() {
     // update the count of defeated enemies
     this.enemiesDefeated++;
     // if we win by defeating enemies, see if we've defeated enough of them:
@@ -129,7 +161,16 @@ export class Score {
         win = this.enemiesDefeated >= this.victoryEnemyCount;
       }
     }
-    return win;
+    if (win) {
+      this.stage.endLevel(true);
+    }
+  }
+
+  /**
+   * Returns number of enemies defeated
+   */
+  getEnemiesDefeated(): number {
+    return this.enemiesDefeated;
   }
 
   /**

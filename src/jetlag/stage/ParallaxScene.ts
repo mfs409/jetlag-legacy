@@ -14,7 +14,7 @@ import { JetLagConfig } from "../JetLagConfig";
  */
 export class ParallaxScene {
     /** All the layers to show as part of this scene */
-    layers: ParallaxLayer[] = [];
+    private layers: ParallaxLayer[] = [];
 
     /**
      * Create a ParallaxScene and configure its camera
@@ -22,6 +22,8 @@ export class ParallaxScene {
      * @param config The game-wide configuration object
      */
     constructor(private config: JetLagConfig) { }
+
+    public addLayer(layer: ParallaxLayer) { this.layers.push(layer); }
 
     /**
      * Render all of the layers of this parallax scene

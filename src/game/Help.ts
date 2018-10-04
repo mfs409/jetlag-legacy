@@ -15,7 +15,7 @@ import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
  */
 export function buildHelpScreen(index: number, jl: JetLagApi): void {
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Splash
-    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); });
+    jl.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); });
 
     // Our first scene describes the color coding that we use for the different entities in the game
     if (index == 1) {

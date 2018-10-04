@@ -44,13 +44,13 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     // Draw an obstacle that we can use as a mute button
     let o = jl.world.makeObstacleAsBox(15, 8, .75, .75, "audio_off.png");
     // If the game is not muted, switch the obstacle's image
-    if (jl.nav.getVolume())
+    if (jl.getVolume())
         o.setImage("audio_on.png");
     // when the obstacle is touched, run the 'go()' function to change the mute
     // state and update the obstacle's picture
     o.setTapCallback(() => {
-        jl.nav.toggleMute();
-        if (jl.nav.getVolume())
+        jl.toggleMute();
+        if (jl.getVolume())
             o.setImage("audio_on.png");
         else
             o.setImage("audio_off.png");

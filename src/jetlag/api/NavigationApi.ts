@@ -1,6 +1,6 @@
 import { JetLagManager } from "../JetLagManager"
 import { OverlayApi } from "./OverlayApi"
-import { JetLagDevice } from "../misc/JetLagDevice";
+import { Stage } from "../stage/Stage";
 
 /**
  * NavigationApi is the "kitchen sink".  It has everything for moving between
@@ -14,7 +14,7 @@ export class NavigationApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private manager: JetLagManager, private device: JetLagDevice) { }
+    constructor(private manager: JetLagManager, private stage: Stage) { }
 
     /**
      * load the level-chooser screen. Note that when the chooser is disabled, we
@@ -31,22 +31,16 @@ export class NavigationApi {
      *
      * @param which The index of the help level to load
      */
-    public doHelp(whichHelp: number) {
-        this.manager.doHelp(whichHelp);
-    }
+    public doHelp(whichHelp: number) { this.manager.doHelp(whichHelp); }
 
-    /**
-     * quit the game
-     */
-    public doQuit() {
-        this.manager.doQuit();
-    }
+    /** quit the game */
+    public doQuit() { this.manager.doQuit(); }
 
     /**
      * Cause Jetlag to advance to the next level
      */
     nextLevel() {
-        this.manager.getCurrStage().clearOverlayScene();
+        this.stage.clearOverlayScene();
         this.manager.advanceLevel();
     }
 
@@ -54,7 +48,7 @@ export class NavigationApi {
      * Cause Jetlag to repeat the current level
      */
     repeatLevel() {
-        this.manager.getCurrStage().clearOverlayScene();
+        this.stage.clearOverlayScene();
         this.manager.repeatLevel();
     }
 
@@ -62,49 +56,19 @@ export class NavigationApi {
      * Explicitly dismiss any overlay scene.  Only use this when a PreScene or
      * PauseScene is showing.
      */
-    dismissOverlayScene() {
-        this.manager.getCurrStage().clearOverlayScene();
-    }
-
-    /**
-     * Use this to manage the state of Mute
-     */
-    public toggleMute() {
-        // volume is either 1 or 0
-        if (this.device.getStorage().getPersistent("volume", "1") === "1") {
-            // set volume to 0, set image to 'unmute'
-            this.device.getStorage().setPersistent("volume", "0");
-        } else {
-            // set volume to 1, set image to 'mute'
-            this.device.getStorage().setPersistent("volume", "1");
-        }
-        // update all music
-        this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
-    }
-
-    /**
-     * Use this to determine if the game is muted or not. True corresponds to not muted, false
-     * corresponds to muted.
-     */
-    public getVolume() {
-        return this.device.getStorage().getPersistent("volume", "1") === "1";
-    }
+    dismissOverlayScene() { this.stage.clearOverlayScene(); }
 
     /**
      * load a playable level.
      *
      * @param which The index of the level to load
      */
-    public doLevel(which: number) {
-        this.manager.doPlay(which);
-    }
+    public doLevel(which: number) { this.manager.doPlay(which); }
 
     /**
      * load the splash screen
      */
-    public doSplash(index: number) {
-        this.manager.doSplash(index);
-    }
+    public doSplash(index: number) { this.manager.doSplash(index); }
 
     /**
      * Provide code that can be used to create a "welcome" screen any time that
@@ -113,7 +77,7 @@ export class NavigationApi {
      * @param builder The code to run to create the initial welcome screen
      */
     public setWelcomeSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.manager.getCurrStage().welcomeSceneBuilder = builder;
+        this.stage.welcomeSceneBuilder = builder;
     }
 
     /**
@@ -123,7 +87,7 @@ export class NavigationApi {
      * @param builder The code to run to create the win scene
      */
     public setWinSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.manager.getCurrStage().winSceneBuilder = builder;
+        this.stage.winSceneBuilder = builder;
     }
 
     /**
@@ -133,7 +97,7 @@ export class NavigationApi {
      * @param builder The code to run to create the lose scene
      */
     public setLoseSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.manager.getCurrStage().loseSceneBuilder = builder;
+        this.stage.loseSceneBuilder = builder;
     }
 
     /**
@@ -143,20 +107,6 @@ export class NavigationApi {
      * @param builder The code to run to create the pause scene
      */
     public setPauseSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.manager.getCurrStage().pauseSceneBuilder = builder;
-    }
-
-    /**
-     * Play the sound indicated by the given sound name
-     * 
-     * @param soundName The name of the sound asset to play
-     */
-    public playSound(soundName: string) {
-        this.device.getSpeaker().getSound(soundName).play();
-    }
-
-    /** Generate text indicating the current FPS */
-    public getFPS(): number {
-        return this.device.getRenderer().getFPS();
+        this.stage.pauseSceneBuilder = builder;
     }
 }

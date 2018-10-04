@@ -4,11 +4,8 @@ import { OverlayScene } from "./OverlayScene"
 import { OverlayApi } from "../api/OverlayApi"
 import { ParallaxScene } from "./ParallaxScene"
 import { Score } from "../misc/Score"
-import { Hero } from "../renderables/Hero"
-import { Goodie } from "../renderables/Goodie"
-import { Enemy } from "../renderables/Enemy"
 import { Logger } from "../misc/Logger";
-import { JetLagRenderer, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagRenderer, JetLagDevice, JetLagSound } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
 
 /**
@@ -44,13 +41,7 @@ export class Stage {
     pauseSceneBuilder: (overlay: OverlayApi) => void = null;
 
     /** Track all the scores */
-    score: Score = new Score();
-
-    /** Text to display when a Lose Countdown completes */
-    loseCountdownText: string;
-
-    /** Text to display when a Win Countdown completes */
-    winCountdownText: string;
+    private score: Score;
 
     /** The background layers */
     background: ParallaxScene;
@@ -58,17 +49,21 @@ export class Stage {
     /** The foreground layers */
     foreground: ParallaxScene;
 
+    /** The music, if any */
+    music: JetLagSound = null;
+
+    /** Whether the music is playing or not */
+    private musicPlaying = false;
+
     /**
      * Construct the stage, build the scenes, set up the state machine, and
      * clear the scores.
      *
      * @param manager The JetLagManager that navigates among stages
      */
-    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) {
-        // build scenes and facts
-        this.createScenes();
-        this.resetScores();
-    }
+    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) { }
+
+    setScore(score: Score) { this.score = score; }
 
     /**
      * Handle a TAP event
@@ -147,9 +142,7 @@ export class Stage {
         this.hud.touchDown(screenX, screenY);
     }
 
-    /** 
-     * Handle when a touch ends (is released)
-     */
+    /** Handle when a touch ends (is released) */
     touchUp(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.touchUp(screenX, screenY);
@@ -158,28 +151,12 @@ export class Stage {
         this.hud.touchUp(screenX, screenY);
     }
 
-    /** 
-     * Handle swipe events
-     */
+    /** Handle swipe events */
     swipe(screenX0: number, screenY0: number, screenX1: number, screenY1: number, time: number) {
         this.hud.swipe(screenX0, screenY0, screenX1, screenY1, time);
     }
 
-    /**
-     * Create all scenes for a playable level.
-     */
-    private createScenes(): void {
-        // Create the main scene and hud
-        this.world = new WorldScene(this.config, this.device);
-        this.hud = new OverlayScene(this.config, this.device);
-        // Set up the parallax scenes
-        this.background = new ParallaxScene(this.config);
-        this.foreground = new ParallaxScene(this.config);
-    }
-
-    /** 
-     * Hide the current overlay scene that is showing
-     */
+    /** Hide the current overlay scene that is showing */
     clearOverlayScene() {
         this.overlay = null;
     }
@@ -194,12 +171,12 @@ export class Stage {
         // touches, and that win and lose scenes should come first.
         if (this.welcomeSceneBuilder) {
             this.overlay = new OverlayScene(this.config, this.device);
-            this.welcomeSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
+            this.welcomeSceneBuilder(new OverlayApi(this.overlay, this.device, this));
             this.welcomeSceneBuilder = null;
         }
         if (this.pauseSceneBuilder) {
             this.overlay = new OverlayScene(this.config, this.device);
-            this.pauseSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
+            this.pauseSceneBuilder(new OverlayApi(this.overlay, this.device, this));
             this.pauseSceneBuilder = null;
         }
         if (this.overlay) {
@@ -210,7 +187,7 @@ export class Stage {
         renderer.setFrameColor(this.backgroundColor);
 
         // Make sure the music is playing... Note that we start music before the PreScene shows
-        this.world.playMusic();
+        this.playMusic();
 
         // Update the win/lose timers
         // Check the countdown timers
@@ -266,22 +243,15 @@ export class Stage {
     }
 
     /**
-     * Reset all scores.  This should be called at the beginning of every level.
-     */
-    resetScores(): void {
-        this.score.reset();
-        this.loseCountdownText = "";
-        this.winCountdownText = "";
-        this.device.getStorage().clearLevelFacts();
-    }
-
-    /**
      * Before we call programmer code to load a new scene, we call this to
      * ensure that everything is in a clean state.
      */
     onScreenChange(): void {
-        this.world.stopMusic();
-        this.resetScores();
+        this.stopMusic();
+        this.music = null;
+
+        this.score.reset();
+        this.device.getStorage().clearLevelFacts();
 
         // Reset default values
         this.gestureHudFirst = true;
@@ -291,56 +261,12 @@ export class Stage {
         this.loseSceneBuilder = null;
         this.pauseSceneBuilder = null;
 
-        this.world.pauseMusic();
-        this.createScenes();
-    }
-
-    /**
-     * Indicate that a hero has been defeated
-     *
-     * @param enemy The enemy who defeated the hero
-     */
-    defeatHero(enemy: Enemy, hero: Hero): void {
-        this.score.heroesDefeated++;
-        if (this.score.heroesDefeated == this.score.heroesCreated) {
-            if (enemy.onDefeatHero)
-                enemy.onDefeatHero(enemy, hero);
-            this.endLevel(false);
-        }
-    }
-
-    /**
-    * Indicate that a goodie has been collected
-    *
-    * @param goodie The goodie that was collected
-    */
-    onGoodieCollected(goodie: Goodie): void {
-        if (this.score.onGoodieCollected(goodie))
-            this.endLevel(true);
-    }
-
-    /**
-     * Indicate that a hero has reached a destination
-     */
-    onDestinationArrive(): void {
-        if (this.score.onDestinationArrive())
-            this.endLevel(true);
-    }
-
-    /**
-     * Indicate that an enemy has been defeated
-     */
-    onDefeatEnemy(): void {
-        if (this.score.onEnemyDefeated()) {
-            this.endLevel(true);
-        }
-    }
-
-    /**
-     * Returns number of enemies defeated
-     */
-    getEnemiesDefeated(): number {
-        return this.score.enemiesDefeated;
+        // Create the main scene and hud
+        this.world = new WorldScene(this.config, this.device);
+        this.hud = new OverlayScene(this.config, this.device);
+        // Set up the parallax scenes
+        this.background = new ParallaxScene(this.config);
+        this.foreground = new ParallaxScene(this.config);
     }
 
     /**
@@ -353,7 +279,7 @@ export class Stage {
         if (win) {
             if (this.winSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
-                this.winSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
+                this.winSceneBuilder(new OverlayApi(this.overlay, this.device, this));
                 this.winSceneBuilder = null;
             }
             else {
@@ -363,7 +289,7 @@ export class Stage {
         else {
             if (this.loseSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
-                this.loseSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
+                this.loseSceneBuilder(new OverlayApi(this.overlay, this.device, this));
                 this.loseSceneBuilder = null;
             }
             else {
@@ -372,4 +298,28 @@ export class Stage {
         }
     }
 
+    /** If the level has music attached to it, this starts playing it */
+    playMusic(): void {
+        if (!this.musicPlaying && this.music) {
+            this.musicPlaying = true;
+            this.music.play();
+        }
+    }
+
+    /** If the level has music attached to it, this pauses it */
+    pauseMusic(): void {
+        if (this.musicPlaying) {
+            this.musicPlaying = false;
+            this.music.stop();
+        }
+    }
+
+    /** If the level has music attached to it, this stops it */
+    stopMusic(): void {
+        if (this.musicPlaying) {
+            console.log("stopping music");
+            this.musicPlaying = false;
+            this.music.stop();
+        }
+    }
 }

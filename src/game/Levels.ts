@@ -19,7 +19,7 @@ import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
 export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Chooser
-    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); });
+    jl.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); });
 
     // In this level, all we have is a hero (the green ball) who needs to make it to the destination (a mustard colored
     // ball). The game is configured to use tilt to control the world.  If you're running on a computer, arrow keys will
@@ -488,7 +488,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 return true;
             });
             overlay.addTextCentered(8, 4.5, "Arial", "#FFFFFF", 28, () => "Great Job", 0);
-            jl.nav.playSound("winsound.ogg");
+            jl.playSound("winsound.ogg");
         });
     }
 
@@ -731,7 +731,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // draw an enemy.  It does 2 units of damage.  If it disappears, it will make a sound
         let e = jl.world.makeEnemyAsCircle(10, 6, .5, .5, "redball.png");
-        e.onDefeated = (e: Enemy, h: WorldActor) => { jl.nav.playSound("slowdown.ogg"); };
+        e.onDefeated = (e: Enemy, h: WorldActor) => { jl.playSound("slowdown.ogg"); };
 
         // draw another enemy.  It is too deadly for us to ever defeat.
         let e2 = jl.world.makeEnemyAsBox(7, 7, 2, 2, "redball.png");
@@ -739,7 +739,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // this goodie gives an extra "2" units of strength:
         let g = jl.world.makeGoodieAsCircle(14, 7, .5, .5, "blueball.png");
-        g.onHeroCollect = (g: Goodie, h: Hero) => { jl.nav.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); };
+        g.onHeroCollect = (g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); };
 
         // Display the hero's strength
         jl.hud.addText(.1, 8.5, "Arial", "#000000", 32, () => h.getStrength() + " Strength", 2);
@@ -787,7 +787,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addText(.1, 7.5, "Arial", "#3C46FF", 12, () => h.getInvincibleRemaining().toFixed(0) + " Invincibility", 2);
 
         // put a frames-per-second display on the screen.
-        jl.hud.addText(.1, 8, "Arial", "#C8C864", 12, () => jl.nav.getFPS().toFixed(0) + " fps", 2);
+        jl.hud.addText(.1, 8, "Arial", "#C8C864", 12, () => jl.getFPS().toFixed(0) + " fps", 2);
 
         welcomeMessage(jl, "The blue ball will make you invincible for 15 seconds");
         winMessage(jl, "Great Job");
@@ -931,8 +931,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set up our obstacle so that collision and touch make it play sounds
         let o = jl.world.makeObstacleAsCircle(5, 5, .75, .75, "purpleball.png");
         o.setPhysics(1, 0, 1);
-        o.setTapCallback(() => { jl.nav.playSound("lowpitch.ogg"); return true; });
-        o.heroCollision = () => { jl.nav.playSound("hipitch.ogg"); };
+        o.setTapCallback(() => { jl.playSound("lowpitch.ogg"); return true; });
+        o.heroCollision = () => { jl.playSound("hipitch.ogg"); };
 
         welcomeMessage(jl, "Touch the purple ball or collide with it, and a " + "sound will play");
         winMessage(jl, "Great Job");
@@ -1647,7 +1647,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // draw an enemy that makes a sound when it disappears
         let e = jl.world.makeEnemyAsCircle(8, 4, .5, .5, "redball.png");
-        e.onDefeated = (e: Enemy, a: WorldActor) => jl.nav.playSound("lowpitch.ogg");
+        e.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg");
 
         // This variable is part of the callback, so we can access it from our go() method
         let counter = 0.5;
@@ -1661,11 +1661,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 // make an enemy to the left and up
                 let left = jl.world.makeEnemyAsCircle(e.getXPosition() - counter,
                     y, .5, .5, "redball.png");
-                left.onDefeated = (e: Enemy, a: WorldActor) => jl.nav.playSound("lowpitch.ogg");
+                left.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg");
                 // make an enemy to the right and up
                 let right = jl.world.makeEnemyAsCircle(e.getXPosition() + counter,
                     y, .5, .5, "redball.png");
-                right.onDefeated = (e: Enemy, a: WorldActor) => jl.nav.playSound("lowpitch.ogg");
+                right.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg");
                 counter += 1;
             }
         });
@@ -1861,7 +1861,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             e.setPhysics(1.0, 0.3, 0.6);
             e.setRotationSpeed(1);
             e.setDamage(4);
-            e.onDefeated = (e: Enemy, a: WorldActor) => jl.nav.playSound("hipitch.ogg");
+            e.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("hipitch.ogg");
 
             // The first enemy we create will harm the hero even if the hero is invincible
             if (i == 0)
@@ -2390,7 +2390,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setDisappearSound("hipitch.ogg");
 
         let g = jl.world.makeGoodieAsCircle(0, 0, 2, 2, "blueball.png");
-        g.onHeroCollect = (g: Goodie, h: Hero) => jl.nav.playSound("lowpitch.ogg");
+        g.onHeroCollect = (g: Goodie, h: Hero) => jl.playSound("lowpitch.ogg");
     }
 
 
