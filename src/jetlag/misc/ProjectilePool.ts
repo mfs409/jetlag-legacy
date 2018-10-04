@@ -69,7 +69,7 @@ export class ProjectilePool {
             p.setEnabled(false);
             p.body.SetBullet(true);
             p.body.SetActive(false);
-            p.mDamage = strength;
+            p.damage = strength;
             this.pool.push(p);
         }
         this.nextIndex = 0;
@@ -115,10 +115,10 @@ export class ProjectilePool {
             b.mAnimator.switchToRandomIndex();
 
         // calculate offset for starting position of projectile, put it on screen
-        b.mRangeFrom.x = h.getXPosition() + offsetX;
-        b.mRangeFrom.y = h.getYPosition() + offsetY;
+        b.rangeFrom.x = h.getXPosition() + offsetX;
+        b.rangeFrom.y = h.getYPosition() + offsetY;
         b.body.SetActive(true);
-        b.body.SetTransform(b.mRangeFrom, 0);
+        b.body.SetTransform(b.rangeFrom, 0);
 
         // give the projectile velocity, show it, and play sound
         b.updateVelocity(velocityX, velocityY);
@@ -162,10 +162,10 @@ export class ProjectilePool {
         b.mAnimator.resetCurrentAnimation();
 
         // calculate offset for starting position of projectile, put it on screen
-        b.mRangeFrom.x = heroX + offsetX;
-        b.mRangeFrom.y = heroY + offsetY;
+        b.rangeFrom.x = heroX + offsetX;
+        b.rangeFrom.y = heroY + offsetY;
         b.body.SetActive(true);
-        b.body.SetTransform(b.mRangeFrom, 0);
+        b.body.SetTransform(b.rangeFrom, 0);
 
         // give the projectile velocity
         if (this.enableFixedVectorVelocity) {

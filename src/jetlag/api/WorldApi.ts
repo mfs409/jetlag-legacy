@@ -187,7 +187,7 @@ export class WorldApi {
      */
     public makeHeroAsCircle(x: number, y: number, width: number, height: number, imgName: string): Hero {
         let radius: number = Math.max(width, height);
-        let h: Hero = new Hero(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let h: Hero = new Hero(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
         this.stageManager.getCurrStage().score.mHeroesCreated++;
         h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);
         this.stageManager.getCurrStage().world.addActor(h, 0);
@@ -359,7 +359,7 @@ export class WorldApi {
      */
     public makeGoodieAsCircle(x: number, y: number, width: number, height: number, imgName: string): Goodie {
         let radius: number = Math.max(width, height);
-        let g: Goodie = new Goodie(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let g: Goodie = new Goodie(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
         g.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
         g.setCollisionsEnabled(false);
         this.stageManager.getCurrStage().world.addActor(g, 0);
@@ -634,7 +634,7 @@ export class WorldApi {
      */
     public setProjectileRange(distance: number): void {
         for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
-            p.mRange = distance;
+            p.range = distance;
     }
 
     /**
@@ -688,7 +688,7 @@ export class WorldApi {
      */
     public setCollisionOkForProjectiles(): void {
         for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
-            p.mDisappearOnCollide = false;
+            p.disappearOnCollide = false;
     }
 
     /**

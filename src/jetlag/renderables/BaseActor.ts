@@ -6,7 +6,7 @@ import { RouteDriver } from "../misc/Route"
 import { Route } from "../misc/Route"
 import { AnimationDriver } from "./AnimationDriver"
 import { Animation } from "./Animation"
-import { JetLagRenderer, JetLagSound } from "../misc/JetLagDevice"
+import { JetLagRenderer, JetLagSound, JetLagDebugSprite } from "../misc/JetLagDevice"
 import { TimedEvent } from "../misc/Timer"
 import { Camera } from "../misc/Camera"
 import { XY } from "../misc/XY"
@@ -70,12 +70,6 @@ export class BaseActor implements Renderable {
     /** A temp vector to help us avoid allocation */
     tmp = new XY(0, 0);
 
-    /** For debug rendering of the shape */
-    dbg = new PIXI.Graphics();
-
-    /** For debug rendering of the radius, if this is a circle */
-    dbg2 = new PIXI.Graphics();
-
     /** The z index of this actor. Valid range is [-2, 2] */
     private zIndex: number;
 
@@ -87,6 +81,9 @@ export class BaseActor implements Renderable {
 
     /** Sound to play when the actor disappears */
     disappearSound: JetLagSound;
+
+    /** A debug render context */
+    debug: JetLagDebugSprite;
 
     /** Code to run when this actor is tapped */
     tapHandler: (hudX: number, hudY: number) => boolean = null;
@@ -119,6 +116,7 @@ export class BaseActor implements Renderable {
      */
     constructor(scene: Scene, imgName: string, width: number, height: number) {
         this.mAnimator = new AnimationDriver(scene.stageManager.device.getRenderer(), imgName);
+        this.debug = scene.stageManager.device.getRenderer().makeDebugContext();
         this.mDisappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
         this.mDisappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
         this.scene = scene;

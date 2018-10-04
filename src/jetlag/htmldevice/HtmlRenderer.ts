@@ -7,7 +7,7 @@ import { Logger } from "../misc/Logger";
 import { JetLagRenderer, JetLagText, JetLagSprite } from "../misc/JetLagDevice"
 import { HtmlText } from "./HtmlText"
 import { HtmlSprite } from "./HtmlSprite"
-
+import { HtmlDebugSprite } from "./HtmlDebugSprite"
 import * as PIXI from 'pixi.js';
 
 /**
@@ -136,12 +136,12 @@ export class HtmlRenderer implements JetLagRenderer {
         sprite.setWidth(w);
         sprite.setHeight(h);
         sprite.setRotation(r);
-        this.mainContainer.addChild((sprite as HtmlSprite).sprite);
+        this.mainContainer.addChild(sprite.getRenderObject());
         // Debug rendering is the hard part!
         if (this.debugContainer != null) {
             if (actor.bodyStyle === BodyStyle.RECTANGLE) {
                 // For rectangles, just use the PIXI rectangle
-                let rect = actor.dbg;
+                let rect = actor.debug.getShape() as PIXI.Graphics;
                 rect.clear();
                 rect.lineStyle(1, 0x00FF00);
                 rect.drawRect(x, y, w, h);
@@ -153,14 +153,14 @@ export class HtmlRenderer implements JetLagRenderer {
             }
             else if (actor.bodyStyle === BodyStyle.CIRCLE) {
                 // For circles, use the PIXI Circle
-                let circ = actor.dbg;
+                let circ = actor.debug.getShape() as PIXI.Graphics;
                 circ.clear();
                 let radius = Math.max(w, h) / 2;
                 circ.lineStyle(1, 0x0000FF);
                 circ.drawCircle(x + w / 2, y + w / 2, radius);
                 this.debugContainer.addChild(circ);
                 // Also draw a radius, to indicate rotation
-                let line = actor.dbg2;
+                let line = actor.debug.getLine() as PIXI.Graphics;
                 line.clear();
                 line.position.set(x + w / 2, y + h / 2);
                 let xx = radius * Math.cos(r);
@@ -171,7 +171,7 @@ export class HtmlRenderer implements JetLagRenderer {
             else if (actor.bodyStyle === BodyStyle.POLYGON) {
                 // For polygons, we need to translate the points (they are 
                 // 0-relative in Box2d)
-                let poly = actor.dbg;
+                let poly = actor.debug.getShape() as PIXI.Graphics;
                 poly.clear;
                 poly.lineStyle(1, 0xFFFF00);
                 let pts: number[] = [];
@@ -215,10 +215,10 @@ export class HtmlRenderer implements JetLagRenderer {
         sprite.setPosition(x, y);
         sprite.setWidth(scale * sprite.getWidth());
         sprite.setHeight(scale * sprite.getHeight());
-        this.mainContainer.addChild((sprite as HtmlSprite).sprite);
+        this.mainContainer.addChild(sprite.getRenderObject());
         // Debug rendering: draw a box around the image
         if (this.debugContainer != null) {
-            let rect = (sprite as HtmlSprite).dbg;
+            let rect = sprite.getDebugShape() as PIXI.Graphics;
             rect.clear();
             rect.lineStyle(1, 0xFF0000);
             rect.drawRect(x + 1, y, sprite.getWidth() - 1, sprite.getHeight() - 1);
@@ -249,7 +249,7 @@ export class HtmlRenderer implements JetLagRenderer {
             y -= h / 2;
         }
         text.setPosition(x, y);
-        this.mainContainer.addChild((text as HtmlText).text);
+        this.mainContainer.addChild(text.getRenderObject());
     }
 
     /**
@@ -278,6 +278,9 @@ export class HtmlRenderer implements JetLagRenderer {
     public makeText(txt: string, opts: any) {
         return new HtmlText(new PIXI.Text(txt, opts));
     }
+
+    makeDebugContext() { return new HtmlDebugSprite(); }
+
 }
 
 

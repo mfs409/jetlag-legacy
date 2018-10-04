@@ -117,7 +117,7 @@ export class Enemy extends WorldActor {
         if (!projectile.getEnabled())
             return;
         // compute damage to determine if the enemy is defeated
-        this.mDamage -= projectile.mDamage;
+        this.mDamage -= projectile.damage;
         if (this.mDamage <= 0) {
             // hide the projectile quietly, so that the sound of the enemy can
             // be heard

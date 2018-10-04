@@ -5,7 +5,7 @@ import { XY } from "../misc/XY";
  * HtmlText provides JetLagText functionality via the PIXI.text type.
  */
 export class HtmlText implements JetLagText {
-    constructor(public text: PIXI.Text) { }
+    constructor(private text: PIXI.Text) { }
     getXPosition() { return this.text.position.x; }
     getYPosition() { return this.text.position.y; }
     setText(text: string) { this.text.text = text; }
@@ -17,4 +17,5 @@ export class HtmlText implements JetLagText {
         let bounds = this.text.getBounds();
         return new XY(bounds.width, bounds.height);
     }
+    getRenderObject(){return this.text;}
 }

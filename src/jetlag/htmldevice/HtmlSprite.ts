@@ -5,10 +5,10 @@ import { JetLagSprite } from "../misc/JetLagDevice"
  * to PIXI outside of this file.
  */
 export class HtmlSprite implements JetLagSprite {
-    constructor(private imgName: string, public sprite: PIXI.Sprite) { }
-
-    /** For debug rendering */
-    dbg = new PIXI.Graphics();
+    private debug: PIXI.Graphics;
+    constructor(private imgName: string, private sprite: PIXI.Sprite) { 
+        this.debug = new PIXI.Graphics();
+    }
 
     getImgName() { return this.imgName; }
 
@@ -27,4 +27,6 @@ export class HtmlSprite implements JetLagSprite {
         this.sprite.anchor.set(ax, ay);
         this.sprite.position.set(x, y);
     }
+    getRenderObject() { return this.sprite };
+    getDebugShape() { return this.debug; }
 }

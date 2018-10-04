@@ -60,7 +60,7 @@ export interface JetLagRenderer {
     getSprite(imgName: string): JetLagSprite;
     getFPS(): number;
     makeText(txt: string, opts: any): JetLagText;
-
+    makeDebugContext():JetLagDebugSprite;
 }
 
 /** Vibration provides an abstract interface for vibrating the device */
@@ -152,6 +152,7 @@ export interface JetLagText {
     getYPosition(): number;
     getBounds(): XY;
     setText(text: string): void;
+    getRenderObject():any;
 }
 
 export interface JetLagSprite {
@@ -165,4 +166,11 @@ export interface JetLagSprite {
     setHeight(h: number): void;
     setRotation(r: number): void;
     setAnchoredPosition(ax: number, ay: number, x: number, y: number): void;
+    getRenderObject():any;
+    getDebugShape(): any;
+}
+
+export interface JetLagDebugSprite {
+    getShape():any;
+    getLine():any;
 }

@@ -367,6 +367,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let o4 = jl.world.makeObstacleAsBox(9, 7, 0.5, 2, "red.png");
         o4.setPhysics(1, 0, 1);
 
+        // Oblong circles are not what you'd expect
+        jl.world.makeHeroAsCircle(13,2,2,1,"purpleball.png");
+        jl.world.makeDestinationAsCircle(13,2,2,1,"purpleball.png");
+        jl.world.makeObstacleAsCircle(13,2,2,1,"purpleball.png");
+        jl.world.makeEnemyAsCircle(13,2,2,1,"purpleball.png");
+        jl.world.makeGoodieAsCircle(13,2,2,1,"purpleball.png");
+
         // Create a polygon obstacle
         jl.world.makeObstacleAsPolygon(2, 2, 2, 5, "blueball.png", [-1, 2, -1, 0, 0, -3, 1, 0, 1, 1]);
 

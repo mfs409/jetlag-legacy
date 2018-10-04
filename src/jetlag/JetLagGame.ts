@@ -65,11 +65,11 @@ export class JetLagGame {
         let device = new HtmlDevice(cfg, domId);
         let manager = new JetLagManager(cfg, device);
 
-        // Things are a little bit convoluted here.  PIXI will load our assets
-        // asynchronously, after which the manager can initialize the first scene
-        // (it can't do that until the assets are loaded, because it wants to draw
-        // pictures into the scene).  Then, once the first scene is actually loaded,
-        // the manager can ask the renderer to launch the render loop.
+        // The renderer will load our assets asynchronously, after which the
+        // manager can initialize the first scene (it can't do that until the
+        // assets are loaded, because it wants to draw pictures into the scene).
+        // Then, once the first scene is actually loaded, the manager will ask
+        // the renderer to launch the render loop.
         device.getRenderer().loadAssets(() => { manager.onAssetsLoaded() });
     }
 }

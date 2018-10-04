@@ -4,13 +4,14 @@ import { WorldScene } from "../stage/WorldScene"
 import { Obstacle } from "./Obstacle"
 import { Camera } from "../misc/Camera"
 import { JetLagRenderer } from "../misc/JetLagDevice";
+import { XY } from "../misc/XY";
 
 /**
  * Projectiles are actors that can be thrown from the hero's location in order to remove enemies.
  */
 export class Projectile extends WorldActor {
     /** This is the initial point of the throw */
-    readonly mRangeFrom: PhysicsType2d.Vector2;
+    readonly rangeFrom = new XY(0, 0);
 
     /** 
      * We have to be careful in side-scrolling games, or else projectiles can
@@ -18,16 +19,16 @@ export class Projectile extends WorldActor {
      * distance away from the hero that a projectile can travel before we make
      * it disappear.
      */
-    mRange: number;
+    range: number;
 
     /**
      * When projectiles collide, and they are not sensors, one will disappear.
      * We can keep both on screen by setting this false
      */
-    mDisappearOnCollide: boolean;
+    disappearOnCollide: boolean;
 
     /** How much damage does this projectile do? */
-    mDamage: number;
+    damage: number;
 
     /**
      * Create a projectile, and give it a physics body
@@ -53,8 +54,7 @@ export class Projectile extends WorldActor {
         this.setCollisionsEnabled(false);
         this.disableRotation();
         this.scene.addActor(this, zIndex);
-        this.mDisappearOnCollide = true;
-        this.mRangeFrom = new PhysicsType2d.Vector2(0, 0);
+        this.disappearOnCollide = true;
     }
 
     /**
@@ -77,7 +77,7 @@ export class Projectile extends WorldActor {
             }
         }
         if (other instanceof Projectile) {
-            if (!this.mDisappearOnCollide)
+            if (!this.disappearOnCollide)
                 return;
         }
         // only disappear if other is not a sensor
@@ -99,9 +99,9 @@ export class Projectile extends WorldActor {
         if (!this.body.IsActive())
             return;
         // eliminate the projectile quietly if it has traveled too far
-        let dx = Math.abs(this.body.GetPosition().x - this.mRangeFrom.x);
-        let dy = Math.abs(this.body.GetPosition().y - this.mRangeFrom.y);
-        if (dx * dx + dy * dy > this.mRange * this.mRange) {
+        let dx = Math.abs(this.body.GetPosition().x - this.rangeFrom.x);
+        let dy = Math.abs(this.body.GetPosition().y - this.rangeFrom.y);
+        if (dx * dx + dy * dy > this.range * this.range) {
             this.remove(true);
             this.body.SetActive(false);
             return;
