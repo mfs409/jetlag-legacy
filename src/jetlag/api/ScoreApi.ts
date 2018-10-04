@@ -90,7 +90,7 @@ export class ScoreApi {
      */
     public setVictoryDestination(howMany: number): void {
         this.manager.getCurrStage().score.setWinDestination();
-        this.manager.getCurrStage().score.mVictoryHeroCount = howMany;
+        this.manager.getCurrStage().score.victoryHeroCount = howMany;
     }
 
     /**
@@ -121,56 +121,56 @@ export class ScoreApi {
      * Return the number of type-1 goodies that have been collected in the current level
      */
     public getGoodies1(): number {
-        return this.manager.getCurrStage().score.mGoodiesCollected[0];
+        return this.manager.getCurrStage().score.goodiesCollected[0];
     }
 
     /**
      * Return the number of type-2 goodies that have been collected in the current level
      */
     public getGoodies2(): number {
-        return this.manager.getCurrStage().score.mGoodiesCollected[1];
+        return this.manager.getCurrStage().score.goodiesCollected[1];
     }
 
     /**
      * Return the number of type-3 goodies that have been collected in the current level
      */
     public getGoodies3(): number {
-        return this.manager.getCurrStage().score.mGoodiesCollected[2];
+        return this.manager.getCurrStage().score.goodiesCollected[2];
     }
 
     /**
      * Return the number of type-4 goodies that have been collected in the current level
      */
     public getGoodies4(): number {
-        return this.manager.getCurrStage().score.mGoodiesCollected[3];
+        return this.manager.getCurrStage().score.goodiesCollected[3];
     }
 
     /**
      * Manually increment the number of goodies of type 1 that have been collected.
      */
     public incrementGoodies1() {
-        this.manager.getCurrStage().score.mGoodiesCollected[0]++;
+        this.manager.getCurrStage().score.goodiesCollected[0]++;
     }
 
     /**
      * Manually increment the number of goodies of type 2 that have been collected.
      */
     public incrementGoodies2() {
-        this.manager.getCurrStage().score.mGoodiesCollected[1]++;
+        this.manager.getCurrStage().score.goodiesCollected[1]++;
     }
 
     /**
      * Manually increment the number of goodies of type 3 that have been collected.
      */
     public incrementGoodies3() {
-        this.manager.getCurrStage().score.mGoodiesCollected[2]++;
+        this.manager.getCurrStage().score.goodiesCollected[2]++;
     }
 
     /**
      * Manually increment the number of goodies of type 4 that have been collected.
      */
     public incrementGoodies4() {
-        this.manager.getCurrStage().score.mGoodiesCollected[3]++;
+        this.manager.getCurrStage().score.goodiesCollected[3]++;
     }
 
     /**
@@ -179,7 +179,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies1(value: number) {
-        this.manager.getCurrStage().score.mGoodiesCollected[0] = value;
+        this.manager.getCurrStage().score.goodiesCollected[0] = value;
     }
 
     /**
@@ -188,7 +188,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies2(value: number) {
-        this.manager.getCurrStage().score.mGoodiesCollected[1] = value;
+        this.manager.getCurrStage().score.goodiesCollected[1] = value;
     }
 
     /**
@@ -197,7 +197,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies3(value: number) {
-        this.manager.getCurrStage().score.mGoodiesCollected[2] = value;
+        this.manager.getCurrStage().score.goodiesCollected[2] = value;
     }
 
     /**
@@ -206,14 +206,14 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies4(value: number) {
-        this.manager.getCurrStage().score.mGoodiesCollected[3] = value;
+        this.manager.getCurrStage().score.goodiesCollected[3] = value;
     }
 
     /**
      * Return the remaining time until the level is lost
      */
     public getLoseCountdown(): number {
-        return this.manager.getCurrStage().score.mLoseCountDownRemaining;
+        return this.manager.getCurrStage().score.loseCountDownRemaining;
     }
 
     /**
@@ -222,14 +222,14 @@ export class ScoreApi {
      * @param delta The amount of time to add before the timer expires
      */
     public updateTimerExpiration(delta: number): void {
-        this.manager.getCurrStage().score.mLoseCountDownRemaining += delta;
+        this.manager.getCurrStage().score.loseCountDownRemaining += delta;
     }
 
     /**
      * Return the remaining time until the level is won
      */
     public getWinCountdown(): number {
-        return this.manager.getCurrStage().score.mWinCountRemaining;
+        return this.manager.getCurrStage().score.winCountRemaining;
     }
 
     /**
@@ -239,7 +239,7 @@ export class ScoreApi {
      */
     public setLoseCountdown(timeout: number) {
         // Once the Lose CountDown is not -100, it will start counting down
-        this.manager.getCurrStage().score.mLoseCountDownRemaining = timeout;
+        this.manager.getCurrStage().score.loseCountDownRemaining = timeout;
     }
 
     /**
@@ -249,7 +249,7 @@ export class ScoreApi {
      */
     public setWinCountdown(timeout: number) {
         // Once the Win CountDown is not -100, it will start counting down
-        this.manager.getCurrStage().score.mWinCountRemaining = timeout;
+        this.manager.getCurrStage().score.winCountRemaining = timeout;
     }
 
     /**
@@ -259,7 +259,7 @@ export class ScoreApi {
      * @param newVal The new value of the stopwatch
      */
     public setStopwatch(newVal: number) {
-        this.manager.getCurrStage().score.mStopWatchProgress = newVal;
+        this.manager.getCurrStage().score.stopWatchProgress = newVal;
     }
 
     /**
@@ -267,9 +267,9 @@ export class ScoreApi {
      */
     public getStopwatch(): number {
         // Inactive stopwatch should return 0
-        if (this.manager.getCurrStage().score.mStopWatchProgress == -100)
+        if (this.manager.getCurrStage().score.stopWatchProgress == -100)
             return 0;
-        return this.manager.getCurrStage().score.mStopWatchProgress;
+        return this.manager.getCurrStage().score.stopWatchProgress;
     }
 
     /**

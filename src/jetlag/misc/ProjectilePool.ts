@@ -32,33 +32,33 @@ export class ProjectilePool {
     fixedVectorVelocity: number;
 
     /** Indicate that projectiles should face in the direction they are initially thrown */
-    mRotateVectorThrow: boolean;
+    rotateVectorThrow: boolean;
 
     /** Index of next available projectile in the pool */
     private nextIndex: number;
 
     /** Sound to play when projectiles are thrown */
-    mThrowSound: JetLagSound;
+    throwSound: JetLagSound;
 
     /** The sound to play when a projectile disappears */
-    mProjectileDisappearSound: JetLagSound;
+    projectileDisappearSound: JetLagSound;
 
     /** For choosing random images for the projectiles */
-    mRandomizeImages = false;
+    randomizeImages = false;
 
     /**
-    * Create a pool of projectiles, and set the way they are thrown.
-    *
-    * @param game    The currently active game
-    * @param size     number of projectiles that can be thrown at once
-    * @param width    width of a projectile
-    * @param height   height of a projectile
-    * @param imgName  image to use for projectiles
-    * @param strength specifies the amount of damage that a projectile does to an
-    *                 enemy
-    * @param zIndex   The z plane on which the projectiles should be drawn
-    * @param isCircle Should projectiles have an underlying circle or box shape?
-    */
+     * Create a pool of projectiles, and set the way they are thrown.
+     *
+     * @param game    The currently active game
+     * @param size     number of projectiles that can be thrown at once
+     * @param width    width of a projectile
+     * @param height   height of a projectile
+     * @param imgName  image to use for projectiles
+     * @param strength specifies the amount of damage that a projectile does to an
+     *                 enemy
+     * @param zIndex   The z plane on which the projectiles should be drawn
+     * @param isCircle Should projectiles have an underlying circle or box shape?
+     */
     constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, size: number, width: number, height: number,
         imgName: string, strength: number, zIndex: number, isCircle: boolean) {
         // set up the pool
@@ -75,25 +75,25 @@ export class ProjectilePool {
         this.nextIndex = 0;
         this.poolSize = size;
         // record vars that describe how the projectile behaves
-        this.mThrowSound = null;
-        this.mProjectileDisappearSound = null;
+        this.throwSound = null;
+        this.projectileDisappearSound = null;
         this.remaining = -1;
         this.sensor = true;
     }
 
     /**
-    * Throw a projectile. This is for throwing in a single, predetermined direction
-    *
-    * @param h         The hero who is performing the throw
-    * @param offsetX   specifies the x distance between the top left of the
-    *                  projectile and the top left of the hero throwing the
-    *                  projectile
-    * @param offsetY   specifies the y distance between the top left of the
-    *                  projectile and the top left of the hero throwing the
-    *                  projectile
-    * @param velocityX The X velocity of the projectile when it is thrown
-    * @param velocityY The Y velocity of the projectile when it is thrown
-    */
+     * Throw a projectile. This is for throwing in a single, predetermined direction
+     *
+     * @param h         The hero who is performing the throw
+     * @param offsetX   specifies the x distance between the top left of the
+     *                  projectile and the top left of the hero throwing the
+     *                  projectile
+     * @param offsetY   specifies the y distance between the top left of the
+     *                  projectile and the top left of the hero throwing the
+     *                  projectile
+     * @param velocityX The X velocity of the projectile when it is thrown
+     * @param velocityY The Y velocity of the projectile when it is thrown
+     */
     throwFixed(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): void {
         // have we reached our limit?
         if (this.remaining == 0)
@@ -109,10 +109,10 @@ export class ProjectilePool {
         let b: Projectile = this.pool[this.nextIndex];
         this.nextIndex = (this.nextIndex + 1) % this.poolSize;
         b.setCollisionsEnabled(!this.sensor);
-        b.mAnimator.resetCurrentAnimation();
+        b.animator.resetCurrentAnimation();
 
-        if (this.mRandomizeImages)
-            b.mAnimator.switchToRandomIndex();
+        if (this.randomizeImages)
+            b.animator.switchToRandomIndex();
 
         // calculate offset for starting position of projectile, put it on screen
         b.rangeFrom.x = h.getXPosition() + offsetX;
@@ -123,27 +123,27 @@ export class ProjectilePool {
         // give the projectile velocity, show it, and play sound
         b.updateVelocity(velocityX, velocityY);
         b.setEnabled(true);
-        if (this.mThrowSound)
-            this.mThrowSound.play();
-        b.disappearSound = this.mProjectileDisappearSound;
+        if (this.throwSound)
+            this.throwSound.play();
+        b.disappearSound = this.projectileDisappearSound;
         h.doThrowAnimation();
     }
 
     /**
-    * Throw a projectile. This is for throwing in the direction of a specified point
-    *
-    * @param heroX   x coordinate of the top left corner of the thrower
-    * @param heroY   y coordinate of the top left corner of the thrower
-    * @param toX     x coordinate of the point at which to throw
-    * @param toY     y coordinate of the point at which to throw
-    * @param h       The hero who is performing the throw
-    * @param offsetX specifies the x distance between the top left of the
-    *                projectile and the top left of the hero throwing the
-    *                projectile
-    * @param offsetY specifies the y distance between the top left of the
-    *                projectile and the top left of the hero throwing the
-    *                projectile
-    */
+     * Throw a projectile. This is for throwing in the direction of a specified point
+     *
+     * @param heroX   x coordinate of the top left corner of the thrower
+     * @param heroY   y coordinate of the top left corner of the thrower
+     * @param toX     x coordinate of the point at which to throw
+     * @param toY     y coordinate of the point at which to throw
+     * @param h       The hero who is performing the throw
+     * @param offsetX specifies the x distance between the top left of the
+     *                projectile and the top left of the hero throwing the
+     *                projectile
+     * @param offsetY specifies the y distance between the top left of the
+     *                projectile and the top left of the hero throwing the
+     *                projectile
+     */
     throwAt(heroX: number, heroY: number, toX: number, toY: number, h: Hero, offsetX: number, offsetY: number): void {
         // have we reached our limit?
         if (this.remaining == 0)
@@ -159,7 +159,7 @@ export class ProjectilePool {
         let b: Projectile = this.pool[this.nextIndex];
         this.nextIndex = (this.nextIndex + 1) % this.poolSize;
         b.setCollisionsEnabled(!this.sensor);
-        b.mAnimator.resetCurrentAnimation();
+        b.animator.resetCurrentAnimation();
 
         // calculate offset for starting position of projectile, put it on screen
         b.rangeFrom.x = heroX + offsetX;
@@ -189,16 +189,16 @@ export class ProjectilePool {
         }
 
         // rotate the projectile
-        if (this.mRotateVectorThrow) {
+        if (this.rotateVectorThrow) {
             let angle = Math.atan2(toY - heroY - offsetY, toX - heroX - offsetX) - Math.atan2(-1, 0);
             b.body.SetTransform(b.body.GetPosition(), angle);
         }
 
         // show the projectile, play sound, and animate the hero
         b.setEnabled(true);
-        if (this.mThrowSound)
-            this.mThrowSound.play();
-        b.disappearSound = this.mProjectileDisappearSound;
+        if (this.throwSound)
+            this.throwSound.play();
+        b.disappearSound = this.projectileDisappearSound;
         h.doThrowAnimation();
     }
 }

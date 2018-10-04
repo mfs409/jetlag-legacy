@@ -22,7 +22,19 @@ export class Enemy extends WorldActor {
      * Amount of damage this enemy does to a hero on a collision. The default is
      * 2, so that an enemy will defeat a hero and not disappear.
      */
-    mDamage: number;
+    damage: number;
+
+    /** Does a crawling hero automatically defeat this enemy? */
+    defeatByCrawl: boolean;
+
+    /** Does an in-air hero automatically defeat this enemy */
+    defeatByJump: boolean;
+
+    /** When the enemy collides with an invincible hero, does the enemy stay alive? */
+    immuneToInvincibility: boolean;
+
+    /** When the enemy collides with an invincible hero, does it stay alive and damage the hero? */
+    alwaysDoesDamage: boolean;
 
     /**
      * Create a basic Enemy.  The enemy won't yet have any physics attached to it.
@@ -35,7 +47,7 @@ export class Enemy extends WorldActor {
      */
     constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private manager: JetLagManager, width: number, height: number, imgName: string) {
         super(scene, device, config, imgName, width, height);
-        this.mDamage = 2;
+        this.damage = 2;
     }
 
     /**
@@ -63,7 +75,7 @@ export class Enemy extends WorldActor {
      *               so that the enemy defeats the hero but does not disappear.
      */
     public setDamage(amount: number): void {
-        this.mDamage = amount;
+        this.damage = amount;
     }
 
     /**
@@ -85,18 +97,6 @@ export class Enemy extends WorldActor {
         }
     }
 
-    /** Does a crawling hero automatically defeat this enemy? */
-    mDefeatByCrawl: boolean;
-
-    /** Does an in-air hero automatically defeat this enemy */
-    mDefeatByJump: boolean;
-
-    /** When the enemy collides with an invincible hero, does the enemy stay alive? */
-    mImmuneToInvincibility: boolean;
-
-    /** When the enemy collides with an invincible hero, does it stay alive and damage the hero? */
-    mAlwaysDoesDamage: boolean;
-
     /**
      * Dispatch method for handling Enemy collisions with Obstacles
      *
@@ -105,8 +105,8 @@ export class Enemy extends WorldActor {
      */
     private onCollideWithObstacle(obstacle: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
         // handle any callbacks the obstacle has
-        if (obstacle.mEnemyCollision != null)
-            obstacle.mEnemyCollision(obstacle, this, contact);
+        if (obstacle.enemyCollision != null)
+            obstacle.enemyCollision(obstacle, this, contact);
     }
 
     /**
@@ -119,8 +119,8 @@ export class Enemy extends WorldActor {
         if (!projectile.getEnabled())
             return;
         // compute damage to determine if the enemy is defeated
-        this.mDamage -= projectile.damage;
-        if (this.mDamage <= 0) {
+        this.damage -= projectile.damage;
+        if (this.damage <= 0) {
             // hide the projectile quietly, so that the sound of the enemy can
             // be heard
             projectile.remove(true);
@@ -136,7 +136,7 @@ export class Enemy extends WorldActor {
      * Indicate that this enemy can be defeated by crawling into it
      */
     public setDefeatByCrawl() {
-        this.mDefeatByCrawl = true;
+        this.defeatByCrawl = true;
         // make sure heroes don't ricochet off of this enemy when defeating it via crawling
         this.setCollisionsEnabled(false);
     }
@@ -145,21 +145,21 @@ export class Enemy extends WorldActor {
      * Mark this enemy as one that can be defeated by jumping
      */
     public setDefeatByJump(): void {
-        this.mDefeatByJump = true;
+        this.defeatByJump = true;
     }
 
     /**
      * Make this enemy resist invincibility
      */
     public setResistInvincibility(): void {
-        this.mImmuneToInvincibility = true;
+        this.immuneToInvincibility = true;
     }
 
     /**
      * Make this enemy damage the hero even when the hero is invincible
      */
     public setImmuneToInvincibility(): void {
-        this.mAlwaysDoesDamage = true;
+        this.alwaysDoesDamage = true;
     }
 
     /**

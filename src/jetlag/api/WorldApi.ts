@@ -25,6 +25,7 @@ export class WorldApi {
     private hud: OverlayApi;
 
     /** Set the hud for this API object */
+    // TODO: HUD only used for faking tilt... do we need it?
     setHud(hud: OverlayApi) { this.hud = hud; }
 
     /**
@@ -174,7 +175,7 @@ export class WorldApi {
     public makeHeroAsCircle(x: number, y: number, width: number, height: number, imgName: string): Hero {
         let radius: number = Math.max(width, height);
         let h: Hero = new Hero(this.manager.getCurrStage().world, this.device, this.config, this.manager, radius, radius, imgName);
-        this.manager.getCurrStage().score.mHeroesCreated++;
+        this.manager.getCurrStage().score.heroesCreated++;
         h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);
         this.manager.getCurrStage().world.addActor(h, 0);
         return h;
@@ -192,7 +193,7 @@ export class WorldApi {
      */
     public makeHeroAsBox(x: number, y: number, width: number, height: number, imgName: string): Hero {
         let h: Hero = new Hero(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
-        this.manager.getCurrStage().score.mHeroesCreated++;
+        this.manager.getCurrStage().score.heroesCreated++;
         h.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y);
         this.manager.getCurrStage().world.addActor(h, 0);
         return h;
@@ -213,7 +214,7 @@ export class WorldApi {
      */
     public makeHeroAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Hero {
         let h: Hero = new Hero(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
-        this.manager.getCurrStage().score.mHeroesCreated++;
+        this.manager.getCurrStage().score.heroesCreated++;
         h.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         this.manager.getCurrStage().world.addActor(h, 0);
         return h;
@@ -232,7 +233,7 @@ export class WorldApi {
     public makeEnemyAsCircle(x: number, y: number, width: number, height: number, imgName: string): Enemy {
         let radius = Math.max(width, height);
         let e = new Enemy(this.manager.getCurrStage().world, this.device, this.config, this.manager, radius, radius, imgName);
-        this.manager.getCurrStage().score.mEnemiesCreated++;
+        this.manager.getCurrStage().score.enemiesCreated++;
         e.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
         this.manager.getCurrStage().world.addActor(e, 0);
         return e;
@@ -250,7 +251,7 @@ export class WorldApi {
      */
     public makeEnemyAsBox(x: number, y: number, width: number, height: number, imgName: string): Enemy {
         let e: Enemy = new Enemy(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
-        this.manager.getCurrStage().score.mEnemiesCreated++;
+        this.manager.getCurrStage().score.enemiesCreated++;
         e.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.manager.getCurrStage().world.addActor(e, 0);
         return e;
@@ -270,7 +271,7 @@ export class WorldApi {
      */
     public makeEnemyAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Enemy {
         let e: Enemy = new Enemy(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
-        this.manager.getCurrStage().score.mEnemiesCreated++;
+        this.manager.getCurrStage().score.enemiesCreated++;
         e.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         this.manager.getCurrStage().world.addActor(e, 0);
         return e;
@@ -666,7 +667,7 @@ export class WorldApi {
      * their direction or movement
      */
     public setRotateVectorThrowForProjectiles(): void {
-        this.manager.getCurrStage().world.projectilePool.mRotateVectorThrow = true;
+        this.manager.getCurrStage().world.projectilePool.rotateVectorThrow = true;
     }
 
     /**
@@ -702,7 +703,7 @@ export class WorldApi {
      * @param soundName Name of the sound file to play
      */
     public setThrowSound(soundName: string): void {
-        this.manager.getCurrStage().world.projectilePool.mThrowSound = this.device.getSpeaker().getSound(soundName);
+        this.manager.getCurrStage().world.projectilePool.throwSound = this.device.getSpeaker().getSound(soundName);
     }
 
     /**
@@ -711,7 +712,7 @@ export class WorldApi {
      * @param soundName the name of the sound file to play
      */
     public setProjectileDisappearSound(soundName: string): void {
-        this.manager.getCurrStage().world.projectilePool.mProjectileDisappearSound =
+        this.manager.getCurrStage().world.projectilePool.projectileDisappearSound =
             this.device.getSpeaker().getSound(soundName);
     }
 
@@ -768,8 +769,8 @@ export class WorldApi {
      */
     public setProjectileImageSource(imgName: string) {
         for (let p of this.manager.getCurrStage().world.projectilePool.pool)
-            p.mAnimator.updateImage(this.device.getRenderer(), imgName);
-        this.manager.getCurrStage().world.projectilePool.mRandomizeImages = true;
+            p.animator.updateImage(this.device.getRenderer(), imgName);
+        this.manager.getCurrStage().world.projectilePool.randomizeImages = true;
     }
 
     /**

@@ -25,7 +25,7 @@ export class Hero extends WorldActor {
      * hero to be defeated on any collision with an enemy, with the enemy *not*
      * disappearing
      */
-    private mStrength = 1;
+    private strength = 1;
 
     /** Time until the hero's invincibility runs out */
     private invincibleRemaining: number = 0;
@@ -35,6 +35,52 @@ export class Hero extends WorldActor {
      * simulate a jump 
      */
     private jumpImpulses: { x: number, y: number } = null;
+
+    /** 
+     * For tracking if the game should end immediately when this hero is
+     * defeated 
+     */
+    private mustSurvive: boolean;
+
+    /** Code to run when the hero's strength changes */
+    strengthChangeCallback: (h: Hero) => void;
+
+    /** cells involved in animation for invincibility */
+    private invincibleAnimation: Animation = null;
+
+    /** cells involved in animation for throwing */
+    private throwAnimation: Animation = null;
+
+    /** seconds that constitute a throw action */
+    private throwAnimateTotalLength: number;
+
+    /** how long until we stop showing the throw animation */
+    private throwAnimationTimeRemaining: number;
+
+    /** 
+     * Track if the hero is in the air, so that it can't jump when it isn't
+     * touching anything. This does not quite work as desired, but is good
+     * enough for JetLag.
+     */
+    private inAir = false;
+
+    /** Indicate that the hero can jump while in the air */
+    private allowMultiJump: boolean;
+
+    /** Sound to play when a jump occurs */
+    private jumpSound: JetLagSound;
+
+    /** cells involved in animation for jumping */
+    private jumpAnimation: Animation;
+
+    /** Is the hero currently in crawl mode? */
+    private crawling: boolean;
+
+    /** cells involved in animation for crawling */
+    private crawlAnimation: Animation;
+
+    /** For tracking the current amount of rotation of the hero */
+    private currentRotation = 0;
 
     /** Report the time until the hero's invincibility runs out */
     getInvincibleRemaining() {
@@ -47,8 +93,8 @@ export class Hero extends WorldActor {
      */
     setInvincibleRemaining(amount: number) {
         this.invincibleRemaining = amount * 1000;
-        if (this.mInvincibleAnimation != null && amount > 0)
-            this.mAnimator.setCurrentAnimation(this.mInvincibleAnimation);
+        if (this.invincibleAnimation != null && amount > 0)
+            this.animator.setCurrentAnimation(this.invincibleAnimation);
     }
 
     /**
@@ -74,11 +120,11 @@ export class Hero extends WorldActor {
      */
     render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number): void {
         // determine when to turn off throw animations
-        if (this.mThrowAnimationTimeRemaining > 0) {
-            this.mThrowAnimationTimeRemaining -= elapsedMillis;
-            if (this.mThrowAnimationTimeRemaining <= 0) {
-                this.mThrowAnimationTimeRemaining = 0;
-                this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
+        if (this.throwAnimationTimeRemaining > 0) {
+            this.throwAnimationTimeRemaining -= elapsedMillis;
+            if (this.throwAnimationTimeRemaining <= 0) {
+                this.throwAnimationTimeRemaining = 0;
+                this.animator.setCurrentAnimation(this.defaultAnimation);
             }
         }
 
@@ -88,22 +134,22 @@ export class Hero extends WorldActor {
             this.invincibleRemaining -= elapsedMillis;
             if (this.invincibleRemaining <= 0) {
                 this.invincibleRemaining = 0;
-                if (this.mInvincibleAnimation != null)
-                    this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
+                if (this.invincibleAnimation != null)
+                    this.animator.setCurrentAnimation(this.defaultAnimation);
             }
         }
         super.render(renderer, camera, elapsedMillis);
     }
 
     /**
-    * Code to run when a Hero collides with a WorldActor.
-    *
-    * The Hero is the dominant participant in all collisions. Whenever the hero
-    * collides with something, we need to figure out what to do
-    *
-    * @param other   Other object involved in this collision
-    * @param contact A description of the contact that caused this collision
-    */
+     * Code to run when a Hero collides with a WorldActor.
+     *
+     * The Hero is the dominant participant in all collisions. Whenever the hero
+     * collides with something, we need to figure out what to do
+     *
+     * @param other   Other object involved in this collision
+     * @param contact A description of the contact that caused this collision
+     */
     onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
         // NB: we currently ignore Projectile and Hero
         if (other instanceof Enemy) {
@@ -118,10 +164,10 @@ export class Hero extends WorldActor {
     }
 
     /**
-    * Dispatch method for handling Hero collisions with Destinations
-    *
-    * @param destination The destination with which this hero collided
-    */
+     * Dispatch method for handling Hero collisions with Destinations
+     *
+     * @param destination The destination with which this hero collided
+     */
     private onCollideWithDestination(destination: Destination): void {
         if (!this.getEnabled() || !destination.getEnabled())
             return;
@@ -133,17 +179,17 @@ export class Hero extends WorldActor {
     }
 
     /**
-    * Dispatch method for handling Hero collisions with Enemies
-    *
-    * @param enemy The enemy with which this hero collided
-    */
+     * Dispatch method for handling Hero collisions with Enemies
+     *
+     * @param enemy The enemy with which this hero collided
+     */
     private onCollideWithEnemy(enemy: Enemy): void {
         // if the enemy always defeats the hero, no matter what, then defeat the
         // hero
-        if (enemy.mAlwaysDoesDamage) {
+        if (enemy.alwaysDoesDamage) {
             this.remove(false);
             this.manager.getCurrStage().defeatHero(enemy, this);
-            if (this.mMustSurvive) {
+            if (this.mustSurvive) {
                 this.manager.getCurrStage().endLevel(false);
             }
             return;
@@ -151,52 +197,52 @@ export class Hero extends WorldActor {
         // handle hero invincibility
         if (this.invincibleRemaining > 0) {
             // if the enemy is immune to invincibility, do nothing
-            if (enemy.mImmuneToInvincibility) {
+            if (enemy.immuneToInvincibility) {
                 return;
             }
             enemy.defeat(true, this);
         }
         // defeat by crawling?
-        else if (this.mCrawling && enemy.mDefeatByCrawl) {
+        else if (this.crawling && enemy.defeatByCrawl) {
             enemy.defeat(true, this);
         }
         // // defeat by jumping only if the hero's bottom is above the enemy's head
-        else if (this.mInAir && enemy.mDefeatByJump && this.getYPosition() + this.size.y < enemy.getYPosition()) {
+        else if (this.inAir && enemy.defeatByJump && this.getYPosition() + this.size.y < enemy.getYPosition()) {
             enemy.defeat(true, this);
         }
         // when we can't defeat it by losing strength, remove the hero
-        else if (enemy.mDamage >= this.mStrength) {
+        else if (enemy.damage >= this.strength) {
             this.remove(false);
             this.manager.getCurrStage().defeatHero(enemy, this);
-            if (this.mMustSurvive) {
+            if (this.mustSurvive) {
                 this.manager.getCurrStage().endLevel(false);
             }
         }
         // when we can defeat it by losing strength
         else {
-            this.addStrength(-enemy.mDamage);
+            this.addStrength(-enemy.damage);
             enemy.defeat(true, this);
         }
     }
 
     /**
-     * Update the hero's strength, and then run the strength change callback (if
-     * any)
-     *
-     * @param amount The amount to add (use a negative value to subtract)
-     */
+      * Update the hero's strength, and then run the strength change callback (if
+      * any)
+      *
+      * @param amount The amount to add (use a negative value to subtract)
+      */
     private addStrength(amount: number): void {
-        this.mStrength += amount;
-        if (this.mStrengthChangeCallback != null) {
-            this.mStrengthChangeCallback(this);
+        this.strength += amount;
+        if (this.strengthChangeCallback != null) {
+            this.strengthChangeCallback(this);
         }
     }
 
     /**
-    * Dispatch method for handling Hero collisions with Obstacles
-    *
-    * @param o The obstacle with which this hero collided
-    */
+     * Dispatch method for handling Hero collisions with Obstacles
+     *
+     * @param o The obstacle with which this hero collided
+     */
     private onCollideWithObstacle(o: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
         // do we need to play a sound?
         o.playCollideSound();
@@ -210,27 +256,27 @@ export class Hero extends WorldActor {
         }
 
         // reset rotation of hero if this obstacle is not a sensor
-        if (this.mCurrentRotation != 0 && !sensor)
-            this.increaseRotation(-this.mCurrentRotation);
+        if (this.currentRotation != 0 && !sensor)
+            this.increaseRotation(-this.currentRotation);
 
         // if there is code attached to the obstacle for modifying the hero's
         // behavior, run it
-        if (o.mHeroCollision != null)
-            o.mHeroCollision(o, this, contact);
+        if (o.heroCollision != null)
+            o.heroCollision(o, this, contact);
 
         // If this is a wall, then mark us not in the air so we can do more
         // jumps. Note that sensors should not enable jumps for the hero.
-        if ((this.mInAir || this.mAllowMultiJump) && !sensor
-            && !o.mNoJumpReenable) {
+        if ((this.inAir || this.allowMultiJump) && !sensor
+            && !o.noJumpReenable) {
             this.stopJump();
         }
     }
 
     /**
-    * Dispatch method for handling Hero collisions with Goodies
-    *
-    * @param g The goodie with which this hero collided
-    */
+     * Dispatch method for handling Hero collisions with Goodies
+     *
+     * @param g The goodie with which this hero collided
+     */
     private onCollideWithGoodie(g: Goodie): void {
         // hide the goodie, count it, and update strength
         g.remove(false);
@@ -240,27 +286,25 @@ export class Hero extends WorldActor {
     }
 
     /**
-    * Return the hero's strength
-    *
-    * @return The strength of the hero
-    */
-    public getStrength(): number {
-        return this.mStrength;
-    }
+     * Return the hero's strength
+     *
+     * @return The strength of the hero
+     */
+    public getStrength(): number { return this.strength; }
 
     /**
-    * Change the hero's strength.
-    *
-    * NB: calling this will not run any strength change callbacks... they only
-    *     run in conjunction with collisions with goodies or enemies.
-    *
-    * @param amount The new strength of the hero
-    */
+     * Change the hero's strength.
+     *
+     * NB: calling this will not run any strength change callbacks... they only
+     *     run in conjunction with collisions with goodies or enemies.
+     *
+     * @param amount The new strength of the hero
+     */
     public setStrength(amount: number): void {
-        let old = this.mStrength;
-        this.mStrength = amount;
-        if (old != amount && this.mStrengthChangeCallback != null) {
-            this.mStrengthChangeCallback(this);
+        let old = this.strength;
+        this.strength = amount;
+        if (old != amount && this.strengthChangeCallback != null) {
+            this.strengthChangeCallback(this);
         }
     }
 
@@ -275,85 +319,38 @@ export class Hero extends WorldActor {
         this.jumpImpulses = new PhysicsType2d.Vector2(x, -y);
     }
 
-    /** 
-     * For tracking if the game should end immediately when this hero is
-     * defeated 
-     */
-    private mMustSurvive: boolean;
-
-    /** Code to run when the hero's strength changes */
-    mStrengthChangeCallback: (h: Hero) => void;
-
-
-    /** cells involved in animation for invincibility */
-    private mInvincibleAnimation: Animation = null;
-
-    /** cells involved in animation for throwing */
-    private mThrowAnimation: Animation = null;
-
-    /** seconds that constitute a throw action */
-    private mThrowAnimateTotalLength: number;
-
-    /** how long until we stop showing the throw animation */
-    private mThrowAnimationTimeRemaining: number;
-
-    /** 
-     * Track if the hero is in the air, so that it can't jump when it isn't
-     * touching anything. This does not quite work as desired, but is good
-     * enough for JetLag.
-     */
-    private mInAir = false;
-
-    /** Indicate that the hero can jump while in the air */
-    private mAllowMultiJump: boolean;
-
-    /** Sound to play when a jump occurs */
-    private mJumpSound: JetLagSound;
-
-    /** cells involved in animation for jumping */
-    private mJumpAnimation: Animation;
-
-    /** Is the hero currently in crawl mode? */
-    private mCrawling: boolean;
-
-    /** cells involved in animation for crawling */
-    private mCrawlAnimation: Animation;
-
-    /** For tracking the current amount of rotation of the hero */
-    private mCurrentRotation = 0;
-
     /**
-    * Make the hero jump, unless it is in the air and not multi-jump
-    */
+     * Make the hero jump, unless it is in the air and not multi-jump
+     */
     jump(): void {
         // NB: multi-jump prevents us from ever setting mInAir, so this is safe:
-        if (this.mInAir) {
+        if (this.inAir) {
             return;
         }
         let v = this.body.GetLinearVelocity();
         v.x = v.x + this.jumpImpulses.x;
         v.y = v.y + this.jumpImpulses.y;
         this.updateVelocity(v.x, v.y);
-        if (!this.mAllowMultiJump) {
-            this.mInAir = true;
+        if (!this.allowMultiJump) {
+            this.inAir = true;
         }
-        if (this.mJumpAnimation != null)
-            this.mAnimator.setCurrentAnimation(this.mJumpAnimation);
+        if (this.jumpAnimation != null)
+            this.animator.setCurrentAnimation(this.jumpAnimation);
 
-        if (this.mJumpSound != null) {
-            this.mJumpSound.play();
+        if (this.jumpSound != null) {
+            this.jumpSound.play();
         }
         // suspend creation of sticky joints, so the hero can actually move
-        this.mStickyDelay = window.performance.now() + 10;
+        this.stickyDelay = window.performance.now() + 10;
     }
 
     /**
-    * Stop the jump animation for a hero, and make it eligible to jump again
-    */
+     * Stop the jump animation for a hero, and make it eligible to jump again
+     */
     private stopJump(): void {
-        if (this.mInAir || this.mAllowMultiJump) {
-            this.mInAir = false;
-            this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
+        if (this.inAir || this.allowMultiJump) {
+            this.inAir = false;
+            this.animator.setCurrentAnimation(this.defaultAnimation);
         }
     }
 
@@ -361,9 +358,9 @@ export class Hero extends WorldActor {
      * Make the hero's throw animation play while it is throwing a projectile
      */
     doThrowAnimation() {
-        if (this.mThrowAnimation != null) {
-            this.mAnimator.setCurrentAnimation(this.mThrowAnimation);
-            this.mThrowAnimationTimeRemaining = this.mThrowAnimateTotalLength * 1000;
+        if (this.throwAnimation != null) {
+            this.animator.setCurrentAnimation(this.throwAnimation);
+            this.throwAnimationTimeRemaining = this.throwAnimateTotalLength * 1000;
         }
     }
 
@@ -372,37 +369,37 @@ export class Hero extends WorldActor {
      * crawling
      */
     crawlOn(rotate: number): void {
-        if (this.mCrawling) {
+        if (this.crawling) {
             return;
         }
-        this.mCrawling = true;
+        this.crawling = true;
         this.body.SetTransform(this.body.GetPosition(), this.body.GetAngle() + rotate);
-        if (this.mCrawlAnimation != null)
-            this.mAnimator.setCurrentAnimation(this.mCrawlAnimation);
+        if (this.crawlAnimation != null)
+            this.animator.setCurrentAnimation(this.crawlAnimation);
     }
 
     /**
     * Take the hero out of crawl mode
     */
     crawlOff(rotate: number): void {
-        if (!this.mCrawling) {
+        if (!this.crawling) {
             return;
         }
-        this.mCrawling = false;
+        this.crawling = false;
         this.body.SetTransform(this.body.GetPosition(), this.body.GetAngle() - rotate);
-        this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
+        this.animator.setCurrentAnimation(this.defaultAnimation);
     }
 
     /**
-    * Change the rotation of the hero
-    *
-    * @param delta How much to add to the current rotation
-    */
+     * Change the rotation of the hero
+     *
+     * @param delta How much to add to the current rotation
+     */
     increaseRotation(delta: number): void {
-        if (this.mInAir) {
-            this.mCurrentRotation += delta;
+        if (this.inAir) {
+            this.currentRotation += delta;
             this.body.SetAngularVelocity(0);
-            this.body.SetTransform(this.body.GetPosition(), this.mCurrentRotation);
+            this.body.SetTransform(this.body.GetPosition(), this.currentRotation);
         }
     }
 
@@ -430,7 +427,7 @@ export class Hero extends WorldActor {
      * Indicate that this hero can jump while it is in the air
      */
     public setMultiJumpOn(): void {
-        this.mAllowMultiJump = true;
+        this.allowMultiJump = true;
     }
 
     /**
@@ -450,7 +447,7 @@ export class Hero extends WorldActor {
      * @param animation The animation to display
      */
     public setJumpAnimation(animation: Animation) {
-        this.mJumpAnimation = animation;
+        this.jumpAnimation = animation;
     }
 
     /**
@@ -459,7 +456,7 @@ export class Hero extends WorldActor {
      * @param soundName The name of the sound file to use
      */
     public setJumpSound(soundName: string): void {
-        this.mJumpSound = this.device.getSpeaker().getSound(soundName);
+        this.jumpSound = this.device.getSpeaker().getSound(soundName);
     }
 
     /**
@@ -468,10 +465,10 @@ export class Hero extends WorldActor {
      * @param animation The animation to display
      */
     public setThrowAnimation(animation: Animation) {
-        this.mThrowAnimation = animation;
+        this.throwAnimation = animation;
         // compute the length of the throw sequence, so that we can get our
         // timer right for restoring the default animation
-        this.mThrowAnimateTotalLength = animation.getDuration() / 1000;
+        this.throwAnimateTotalLength = animation.getDuration() / 1000;
     }
 
     /**
@@ -480,7 +477,7 @@ export class Hero extends WorldActor {
      * @param animation The animation to display
      */
     public setCrawlAnimation(animation: Animation) {
-        this.mCrawlAnimation = animation;
+        this.crawlAnimation = animation;
     }
 
     /**
@@ -489,13 +486,13 @@ export class Hero extends WorldActor {
      * @param a The animation to display
      */
     public setInvincibleAnimation(a: Animation) {
-        this.mInvincibleAnimation = a;
+        this.invincibleAnimation = a;
     }
 
     /**
      * Indicate that the level should end immediately if this hero is defeated
      */
     public setMustSurvive(): void {
-        this.mMustSurvive = true;
+        this.mustSurvive = true;
     }
 }

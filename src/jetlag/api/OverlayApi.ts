@@ -179,7 +179,7 @@ export class OverlayApi {
             let dx = (w.x - actor.getXPosition()) * actor.flickMultiplier * 1000 / time;
             let dy = w.y - actor.getYPosition() * actor.flickMultiplier * 1000 / time;
             // prep the actor and flick it
-            actor.mHover = null;
+            actor.hover = null;
             actor.updateVelocity(dx, dy);
             return true;
         };

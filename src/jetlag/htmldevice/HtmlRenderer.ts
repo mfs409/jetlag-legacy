@@ -131,7 +131,7 @@ export class HtmlRenderer implements JetLagRenderer {
         let h = s * (actor.getHeight());
         let r = actor.getRotation();
         // Configure the sprite (image) and put it on screen
-        let sprite = actor.mAnimator.getCurrent();
+        let sprite = actor.animator.getCurrent();
         sprite.setAnchoredPosition(.5, .5, x + w / 2, y + h / 2);
         sprite.setWidth(w);
         sprite.setHeight(h);

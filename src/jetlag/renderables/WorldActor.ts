@@ -15,10 +15,44 @@ import { JetLagConfig } from "../JetLagConfig";
  */
 export abstract class WorldActor extends BaseActor {
   /** When the camera follows the actor without centering on it, this gives us the difference between the actor and camera */
-  mCameraOffset: PhysicsType2d.Vector2 = new PhysicsType2d.Vector2(0, 0);
+  cameraOffset: PhysicsType2d.Vector2 = new PhysicsType2d.Vector2(0, 0);
 
   /** By default, actors can't be dragged on screen */
   draggable = false;
+
+  /** A vector for computing hover placement */
+  hover: PhysicsType2d.Vector2 | null;
+
+  /** 
+   * Disable 3 of 4 sides of a Actors, to allow walking through walls. The value
+   * reflects the side that remains active. 0 is top, 1 is right, 2 is bottom, 3
+   * is left
+   */
+  isOneSided: number = -1;
+
+  /** Actors with a matching nonzero Id don't collide with each other */
+  passThroughId: number = 0;
+
+  /** A definition for when we attach a revolute joint to this actor */
+  private revJointDef: PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition;
+
+  /** A joint that allows this actor to revolve around another */
+  private revJoint: PhysicsType2d.Dynamics.Joints.Joint;
+
+  /** Sometimes an actor collides with another actor, and should stick to it. In that case, we create two joints to connect the two actors. This is the Distance joint that connects them */
+  distJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
+
+  /** Sometimes an actor collides with another actor, and should stick to it.  In that case, we create two joints to connect the two actors. This is the Weld joint that connects them */
+  weldJoint: PhysicsType2d.Dynamics.Joints.WeldJoint;
+
+  /** When we have actors stuck together, we might want to set a brief delay before they can re-join. This field represents that delay time, in milliseconds. */
+  stickyDelay: number;
+
+  /** Track if Heros stick to this WorldActor. The array has 4 positions, corresponding to top, right, bottom, left */
+  isSticky: boolean[] = [false, false, false, false];
+
+  /** A multiplier for flicking, to control how fast it goes */
+  flickMultiplier: number = 0;
 
   /**
    * Create a new actor that does not yet have physics, but that has a renderable picture
@@ -49,8 +83,8 @@ export abstract class WorldActor extends BaseActor {
    * @param y Amount of y distance between actor and center
    */
   public setCameraOffset(x: number, y: number): void {
-    this.mCameraOffset.x = x;
-    this.mCameraOffset.y = y;
+    this.cameraOffset.x = x;
+    this.cameraOffset.y = y;
   }
 
   /**
@@ -176,37 +210,6 @@ export abstract class WorldActor extends BaseActor {
     });
   }
 
-  /** A vector for computing hover placement */
-  mHover: PhysicsType2d.Vector2 | null;
-
-  /** 
-   * Disable 3 of 4 sides of a Actors, to allow walking through walls. The value
-   * reflects the side that remains active. 0 is top, 1 is right, 2 is bottom, 3
-   * is left
-   */
-  mIsOneSided: number = -1;
-
-  /** Actors with a matching nonzero Id don't collide with each other */
-  mPassThroughId: number = 0;
-
-  /** A definition for when we attach a revolute joint to this actor */
-  private mRevJointDef: PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition;
-
-  /** A joint that allows this actor to revolve around another */
-  private mRevJoint: PhysicsType2d.Dynamics.Joints.Joint;
-
-  /** Sometimes an actor collides with another actor, and should stick to it. In that case, we create two joints to connect the two actors. This is the Distance joint that connects them */
-  mDJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
-
-  /** Sometimes an actor collides with another actor, and should stick to it.  In that case, we create two joints to connect the two actors. This is the Weld joint that connects them */
-  mWJoint: PhysicsType2d.Dynamics.Joints.WeldJoint;
-
-  /** When we have actors stuck together, we might want to set a brief delay before they can re-join. This field represents that delay time, in milliseconds. */
-  mStickyDelay: number;
-
-  /** Track if Heros stick to this WorldActor. The array has 4 positions, corresponding to top, right, bottom, left */
-  mIsSticky: boolean[] = [false, false, false, false];
-
   /**
    * Indicate that touching this object will cause some special code to run
    *
@@ -236,7 +239,7 @@ export abstract class WorldActor extends BaseActor {
    *             -1 means "none"
    */
   public setOneSided(side: number): void {
-    this.mIsOneSided = side;
+    this.isOneSided = side;
   }
 
   /**
@@ -245,12 +248,8 @@ export abstract class WorldActor extends BaseActor {
    * @param id The number for this class of non-interacting actors
    */
   public setPassThrough(id: number): void {
-    this.mPassThroughId = id;
+    this.passThroughId = id;
   }
-
-
-  /** A multiplier for flicking, to control how fast it goes */
-  flickMultiplier: number = 0;
 
   /**
    * Indicate that this actor can be flicked on the screen
@@ -276,14 +275,14 @@ export abstract class WorldActor extends BaseActor {
    */
   public setHover(x: number, y: number) {
     let pmr = this.config.pixelMeterRatio;
-    this.mHover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
+    this.hover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
     this.scene.repeatEvents.push(() => {
-      if (this.mHover == null)
+      if (this.hover == null)
         return;
-      this.mHover.Set(x * pmr, y * pmr);
-      let a = this.scene.camera.screenToMeters(this.mHover.x, this.mHover.y);
-      this.mHover.Set(a.x, a.y);
-      this.body.SetTransform(this.mHover, this.body.GetAngle());
+      this.hover.Set(x * pmr, y * pmr);
+      let a = this.scene.camera.screenToMeters(this.hover.x, this.hover.y);
+      this.hover.Set(a.x, a.y);
+      this.body.SetTransform(this.hover, this.body.GetAngle());
     });
   }
 
@@ -296,7 +295,7 @@ export abstract class WorldActor extends BaseActor {
    * @param left   Is the left side sticky?
    */
   public setSticky(top: boolean, right: boolean, bottom: boolean, left: boolean) {
-    this.mIsSticky = [bottom, right, top, left];
+    this.isSticky = [bottom, right, top, left];
   }
 
   /**
@@ -313,16 +312,16 @@ export abstract class WorldActor extends BaseActor {
     // make the body dynamic
     this.setCanFall();
     // create joint, connect anchors
-    this.mRevJointDef = new PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition();
-    this.mRevJointDef.bodyA = anchor.body;
-    this.mRevJointDef.bodyB = this.body;
-    this.mRevJointDef.localAnchorA.Set(anchorX, anchorY);
-    this.mRevJointDef.localAnchorB.Set(localAnchorX, localAnchorY);
+    this.revJointDef = new PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition();
+    this.revJointDef.bodyA = anchor.body;
+    this.revJointDef.bodyB = this.body;
+    this.revJointDef.localAnchorA.Set(anchorX, anchorY);
+    this.revJointDef.localAnchorB.Set(localAnchorX, localAnchorY);
     // rotator and anchor don't collide
-    this.mRevJointDef.collideConnected = false;
-    this.mRevJointDef.referenceAngle = 0;
-    this.mRevJointDef.enableLimit = false;
-    this.mRevJoint = this.scene.world.CreateJoint(this.mRevJointDef);
+    this.revJointDef.collideConnected = false;
+    this.revJointDef.referenceAngle = 0;
+    this.revJointDef.enableLimit = false;
+    this.revJoint = this.scene.world.CreateJoint(this.revJointDef);
   }
 
   /**
@@ -333,11 +332,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.scene.world.DestroyJoint(this.mRevJoint);
-    this.mRevJointDef.enableMotor = true;
-    this.mRevJointDef.motorSpeed = motorSpeed;
-    this.mRevJointDef.maxMotorTorque = motorTorque;
-    this.mRevJoint = this.scene.world.CreateJoint(this.mRevJointDef);
+    this.scene.world.DestroyJoint(this.revJoint);
+    this.revJointDef.enableMotor = true;
+    this.revJointDef.motorSpeed = motorSpeed;
+    this.revJointDef.maxMotorTorque = motorTorque;
+    this.revJoint = this.scene.world.CreateJoint(this.revJointDef);
   }
 
   /**
@@ -348,11 +347,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.scene.world.DestroyJoint(this.mRevJoint);
-    this.mRevJointDef.upperAngle = upper;
-    this.mRevJointDef.lowerAngle = lower;
-    this.mRevJointDef.enableLimit = true;
-    this.mRevJoint = this.scene.world.CreateJoint(this.mRevJointDef);
+    this.scene.world.DestroyJoint(this.revJoint);
+    this.revJointDef.upperAngle = upper;
+    this.revJointDef.lowerAngle = lower;
+    this.revJointDef.enableLimit = true;
+    this.revJoint = this.scene.world.CreateJoint(this.revJointDef);
   }
 
   /**
@@ -409,11 +408,11 @@ export abstract class WorldActor extends BaseActor {
    */
   breakJoints() {
     // Clobber any joints, or this won't be able to move
-    if (this.mDJoint != null) {
-      this.scene.world.DestroyJoint(this.mDJoint);
-      this.mDJoint = null;
-      this.scene.world.DestroyJoint(this.mWJoint);
-      this.mWJoint = null;
+    if (this.distJoint != null) {
+      this.scene.world.DestroyJoint(this.distJoint);
+      this.distJoint = null;
+      this.scene.world.DestroyJoint(this.weldJoint);
+      this.weldJoint = null;
     }
   }
 }

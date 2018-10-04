@@ -37,7 +37,7 @@ export class RouteDriver {
   private readonly loop: boolean;
 
   /** A temp for computing positions */
-  private mRouteVec = new PhysicsType2d.Vector2(0, 0);
+  private routeVec = new PhysicsType2d.Vector2(0, 0);
 
   /** Is the route still running? */
   private done = false;
@@ -83,12 +83,12 @@ export class RouteDriver {
     this.actor.body.SetTransform(new PhysicsType2d.Vector2(this.route.points[0].x + this.actor.size.x / 2, this.route.points[0].y + this.actor.size.y / 2), 0);
     // set up our next goal, start moving toward it
     this.nextIndex = 1;
-    this.mRouteVec.x = this.route.points[this.nextIndex].x - this.actor.getXPosition();
-    this.mRouteVec.y = this.route.points[this.nextIndex].y - this.actor.getYPosition();
+    this.routeVec.x = this.route.points[this.nextIndex].x - this.actor.getXPosition();
+    this.routeVec.y = this.route.points[this.nextIndex].y - this.actor.getYPosition();
     // normalize and scale the vector, then apply the velocity
-    this.mRouteVec.Normalize();
-    this.mRouteVec = this.mRouteVec.Multiply(this.velocity);
-    this.actor.body.SetLinearVelocity(this.mRouteVec);
+    this.routeVec.Normalize();
+    this.routeVec = this.routeVec.Multiply(this.velocity);
+    this.actor.body.SetLinearVelocity(this.routeVec);
   }
 
   /**
@@ -122,11 +122,11 @@ export class RouteDriver {
         }
       } else {
         // advance to next point
-        this.mRouteVec.x = this.route.points[this.nextIndex].x - this.actor.getXPosition();
-        this.mRouteVec.y = this.route.points[this.nextIndex].y - this.actor.getYPosition();
-        this.mRouteVec.Normalize();
-        this.mRouteVec = this.mRouteVec.Multiply(this.velocity);
-        this.actor.body.SetLinearVelocity(this.mRouteVec);
+        this.routeVec.x = this.route.points[this.nextIndex].x - this.actor.getXPosition();
+        this.routeVec.y = this.route.points[this.nextIndex].y - this.actor.getYPosition();
+        this.routeVec.Normalize();
+        this.routeVec = this.routeVec.Multiply(this.velocity);
+        this.actor.body.SetLinearVelocity(this.routeVec);
       }
     }
     // NB: 'else keep going at current velocity'

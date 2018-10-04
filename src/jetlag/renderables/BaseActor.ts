@@ -103,6 +103,27 @@ export class BaseActor implements Renderable {
     /** handler for swipe event */
     swipeHandler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean = null;
 
+    /** Animation support: this tracks the current state of the active animation (if any) */
+    animator: AnimationDriver;
+
+    /** Animation support: the cells of the default animation */
+    defaultAnimation: Animation;
+
+    /** Animation support: the cells of the animation to use when moving backwards */
+    defaultReverseAnimation: Animation;
+
+    /** Animation support: the cells of the disappearance animation */
+    private disapperAnimation: Animation;
+
+    /** Animation support: the dimensions of the disappearance animation */
+    private disappearAnimateSize: PhysicsType2d.Vector2;
+
+    /** Animation support: the offset for placing the disappearance animation relative to the disappearing actor */
+    private disappearAnimateOffset: PhysicsType2d.Vector2;
+
+    /** Extra data for the game designer to attach to the actor */
+    private extra: any = {};
+
     /**
      * Create a new BaseActor by creating an image that can be rendered to the screen
      *
@@ -112,10 +133,10 @@ export class BaseActor implements Renderable {
      * @param height  The height of the actor's image and body, in meters
      */
     constructor(protected scene: Scene, protected device: JetLagDevice, imgName: string, width: number, height: number) {
-        this.mAnimator = new AnimationDriver(device.getRenderer(), imgName);
+        this.animator = new AnimationDriver(device.getRenderer(), imgName);
         this.debug = device.getRenderer().makeDebugContext();
-        this.mDisappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
-        this.mDisappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
+        this.disappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
+        this.disappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
         this.scene = scene;
         this.size = new PhysicsType2d.Vector2(width, height);
         this.zIndex = 0;
@@ -254,16 +275,16 @@ export class BaseActor implements Renderable {
         if (this.route) this.route.drive();
 
         // choose the default TextureRegion to show... this is how we animate
-        this.mAnimator.advanceAnimation(elapsedMillis);
+        this.animator.advanceAnimation(elapsedMillis);
 
         // Flip the animation?
-        if (this.mDefaultReverseAnimation != null && this.body.GetLinearVelocity().x < 0) {
-            if (this.mAnimator.currentAnimation != this.mDefaultReverseAnimation)
-                this.mAnimator.setCurrentAnimation(this.mDefaultReverseAnimation);
-        } else if (this.mDefaultReverseAnimation != null && this.body.GetLinearVelocity().x > 0) {
-            if (this.mAnimator.currentAnimation == this.mDefaultReverseAnimation)
-                if (this.mDefaultAnimation != null)
-                    this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
+        if (this.defaultReverseAnimation != null && this.body.GetLinearVelocity().x < 0) {
+            if (this.animator.currentAnimation != this.defaultReverseAnimation)
+                this.animator.setCurrentAnimation(this.defaultReverseAnimation);
+        } else if (this.defaultReverseAnimation != null && this.body.GetLinearVelocity().x > 0) {
+            if (this.animator.currentAnimation == this.defaultReverseAnimation)
+                if (this.defaultAnimation != null)
+                    this.animator.setCurrentAnimation(this.defaultAnimation);
         }
 
         renderer.addActorToFrame(this, camera);
@@ -375,14 +396,14 @@ export class BaseActor implements Renderable {
             this.disappearSound.play();
         // To do a disappear animation after we've removed the actor, we draw an actor, so that
         // we have a clean hook into the animation system, but we disable its physics
-        if (this.mDisappearAnimation != null) {
-            let x = this.getXPosition() + this.mDisappearAnimateOffset.x;
-            let y = this.getYPosition() + this.mDisappearAnimateOffset.y;
-            let o = new BaseActor(this.scene, this.device, "", this.mDisappearAnimateSize.x, this.mDisappearAnimateSize.y);
+        if (this.disapperAnimation != null) {
+            let x = this.getXPosition() + this.disappearAnimateOffset.x;
+            let y = this.getYPosition() + this.disappearAnimateOffset.y;
+            let o = new BaseActor(this.scene, this.device, "", this.disappearAnimateSize.x, this.disappearAnimateSize.y);
             o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
             this.scene.addActor(o, 0);
             o.body.SetActive(false);
-            o.setDefaultAnimation(this.mDisappearAnimation);
+            o.setDefaultAnimation(this.disapperAnimation);
         }
     }
 
@@ -450,7 +471,7 @@ export class BaseActor implements Renderable {
      * @param imgName The name of the new image file to use
      */
     public setImage(imgName: string) {
-        this.mAnimator.updateImage(this.device.getRenderer(), imgName);
+        this.animator.updateImage(this.device.getRenderer(), imgName);
     }
 
     /**
@@ -570,8 +591,8 @@ export class BaseActor implements Renderable {
      * @param animation The animation to display
      */
     public setDefaultAnimation(animation: Animation) {
-        this.mDefaultAnimation = animation;
-        this.mAnimator.setCurrentAnimation(this.mDefaultAnimation);
+        this.defaultAnimation = animation;
+        this.animator.setCurrentAnimation(this.defaultAnimation);
     }
 
     /**
@@ -580,7 +601,7 @@ export class BaseActor implements Renderable {
      * @param animation The animation to display
      */
     public setDefaultReverseAnimation(animation: Animation) {
-        this.mDefaultReverseAnimation = animation;
+        this.defaultReverseAnimation = animation;
     }
 
     /**
@@ -593,9 +614,9 @@ export class BaseActor implements Renderable {
      * @param height    The height of the animation, in case it's not the same as the actor height
      */
     public setDisappearAnimation(animation: Animation, offsetX: number, offsetY: number, width: number, height: number) {
-        this.mDisappearAnimation = animation;
-        this.mDisappearAnimateOffset.Set(offsetX, offsetY);
-        this.mDisappearAnimateSize.Set(width, height);
+        this.disapperAnimation = animation;
+        this.disappearAnimateOffset.Set(offsetX, offsetY);
+        this.disappearAnimateSize.Set(width, height);
     }
 
     /**
@@ -651,27 +672,6 @@ export class BaseActor implements Renderable {
     public setAngularDamping(amount: number): void {
         this.body.SetAngularDamping(amount);
     }
-
-    /** Animation support: this tracks the current state of the active animation (if any) */
-    mAnimator: AnimationDriver;
-
-    /** Animation support: the cells of the default animation */
-    mDefaultAnimation: Animation;
-
-    /** Animation support: the cells of the animation to use when moving backwards */
-    mDefaultReverseAnimation: Animation;
-
-    /** Animation support: the cells of the disappearance animation */
-    private mDisappearAnimation: Animation;
-
-    /** Animation support: the dimensions of the disappearance animation */
-    private mDisappearAnimateSize: PhysicsType2d.Vector2;
-
-    /** Animation support: the offset for placing the disappearance animation relative to the disappearing actor */
-    private mDisappearAnimateOffset: PhysicsType2d.Vector2;
-
-    /** Extra data for the game designer to attach to the actor */
-    private extra: any = {};
 
     /**
      * Indicate that this actor should be immune to the force of gravity

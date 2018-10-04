@@ -20,16 +20,16 @@ export class Score {
   private victoryGoodieCount: number[] = [0, 0, 0, 0];
 
   /** Track the number of heroes that have been created */
-  mHeroesCreated: number;
+  heroesCreated: number;
 
   /** Count of the goodies that have been collected in this level */
-  mGoodiesCollected: Array<number>;
+  goodiesCollected: Array<number>;
 
   /** Count the number of enemies that have been created */
-  mEnemiesCreated: number;
+  enemiesCreated: number;
 
   /** Count the enemies that have been defeated */
-  mEnemiesDefeated: number;
+  enemiesDefeated: number;
 
   /** Describes how a level is won. */
   private victoryType: VictoryType;
@@ -40,25 +40,25 @@ export class Score {
    * 
    * NB: -1 indicates the timer is not active
    */
-  mLoseCountDownRemaining: number;
+  loseCountDownRemaining: number;
 
   /** Time that must pass before the level ends in victory */
-  mWinCountRemaining: number;
+  winCountRemaining: number;
 
   /** This is a stopwatch, for levels where we count how long the game has been running */
-  mStopWatchProgress: number;
+  stopWatchProgress: number;
 
   /** This is how far the hero has traveled */
-  mDistance: number;
+  distance: number;
 
   /** Track the number of heroes that have been removed/defeated */
-  mHeroesDefeated: number;
+  heroesDefeated: number;
 
   /** Number of heroes who have arrived at any destination yet */
-  mDestinationArrivals: number;
+  destinationArrivals: number;
 
   /** This is the number of heroes who must reach destinations, if we're in DESTINATION mode */
-  mVictoryHeroCount: number;
+  victoryHeroCount: number;
 
   /** The number of enemies that must be defeated, if we're in ENEMYCOUNT mode. -1 means "all" */
   private victoryEnemyCount: number;
@@ -68,16 +68,16 @@ export class Score {
    */
   reset() {
     this.victoryGoodieCount = [0, 0, 0, 0];
-    this.mHeroesCreated = 0;
-    this.mGoodiesCollected = [0, 0, 0, 0];
-    this.mEnemiesCreated = 0;
-    this.mEnemiesDefeated = 0;
-    this.mLoseCountDownRemaining = -100;
-    this.mWinCountRemaining = -100;
-    this.mStopWatchProgress = -100;
-    this.mDistance = 0;
-    this.mHeroesDefeated = 0;
-    this.mDestinationArrivals = 0;
+    this.heroesCreated = 0;
+    this.goodiesCollected = [0, 0, 0, 0];
+    this.enemiesCreated = 0;
+    this.enemiesDefeated = 0;
+    this.loseCountDownRemaining = -100;
+    this.winCountRemaining = -100;
+    this.stopWatchProgress = -100;
+    this.distance = 0;
+    this.heroesDefeated = 0;
+    this.destinationArrivals = 0;
     this.victoryType = VictoryType.DESTINATION;
   }
 
@@ -87,8 +87,8 @@ export class Score {
    */
   onDestinationArrive() {
     // check if the level is complete
-    this.mDestinationArrivals++;
-    return ((this.victoryType == VictoryType.DESTINATION) && (this.mDestinationArrivals >= this.mVictoryHeroCount));
+    this.destinationArrivals++;
+    return ((this.victoryType == VictoryType.DESTINATION) && (this.destinationArrivals >= this.victoryHeroCount));
   }
 
   /**
@@ -99,7 +99,7 @@ export class Score {
   onGoodieCollected(goodie: Goodie): boolean {
     // Update goodie counts
     for (let i = 0; i < 4; i++) {
-      this.mGoodiesCollected[i] += goodie.score[i];
+      this.goodiesCollected[i] += goodie.score[i];
     }
     // possibly win the level, but only if we win on goodie count and all
     // four counts are high enough
@@ -108,7 +108,7 @@ export class Score {
     }
     let match: boolean = true;
     for (let i = 0; i < 4; ++i) {
-      match = match && (this.victoryGoodieCount[i] <= this.mGoodiesCollected[i]);
+      match = match && (this.victoryGoodieCount[i] <= this.goodiesCollected[i]);
     }
     return match;
   }
@@ -118,15 +118,15 @@ export class Score {
    */
   onEnemyDefeated(): boolean {
     // update the count of defeated enemies
-    this.mEnemiesDefeated++;
+    this.enemiesDefeated++;
     // if we win by defeating enemies, see if we've defeated enough of them:
     let win: boolean = false;
     if (this.victoryType == VictoryType.ENEMYCOUNT) {
       // -1 means "defeat all enemies"
       if (this.victoryEnemyCount == -1) {
-        win = this.mEnemiesDefeated == this.mEnemiesCreated;
+        win = this.enemiesDefeated == this.enemiesCreated;
       } else {
-        win = this.mEnemiesDefeated >= this.victoryEnemyCount;
+        win = this.enemiesDefeated >= this.victoryEnemyCount;
       }
     }
     return win;

@@ -14,7 +14,7 @@ export class RenderableText implements Renderable {
     private visible: boolean = true;
 
     /** The low-level text object that we pass to the Renderer */
-    private jlText: JetLagText;
+    private text: JetLagText;
 
     /** coordinate of the text */
     private readonly coord = new XY(0, 0);
@@ -41,7 +41,7 @@ export class RenderableText implements Renderable {
         this.coord.Set(x, y);
         this.producer = producer;
         this.center = center;
-        this.jlText = renderer.makeText("", { fontFamily: fontFamily, fontSize: fontSize, fill: fontColor });
+        this.text = renderer.makeText("", { fontFamily: fontFamily, fontSize: fontSize, fill: fontColor });
     }
 
     /**
@@ -62,8 +62,8 @@ export class RenderableText implements Renderable {
         if (!this.visible)
             return;
         // Set the world position and the text, then let the renderer decide where to put it...
-        this.jlText.setText(this.producer());
-        this.jlText.setPosition(this.coord.x,this.coord.y);
-        renderer.addTextToFrame(this.jlText, camera, this.center);
+        this.text.setText(this.producer());
+        this.text.setPosition(this.coord.x, this.coord.y);
+        renderer.addTextToFrame(this.text, camera, this.center);
     }
 }

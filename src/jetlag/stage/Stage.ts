@@ -214,21 +214,21 @@ export class Stage {
 
         // Update the win/lose timers
         // Check the countdown timers
-        if (this.score.mLoseCountDownRemaining != -100) {
-            this.score.mLoseCountDownRemaining -= elapsedTime / 1000;
-            if (this.score.mLoseCountDownRemaining < 0) {
+        if (this.score.loseCountDownRemaining != -100) {
+            this.score.loseCountDownRemaining -= elapsedTime / 1000;
+            if (this.score.loseCountDownRemaining < 0) {
                 this.endLevel(false);
             }
         }
-        if (this.score.mWinCountRemaining != -100) {
-            this.score.mWinCountRemaining -= elapsedTime / 1000;
-            if (this.score.mWinCountRemaining < 0) {
+        if (this.score.winCountRemaining != -100) {
+            this.score.winCountRemaining -= elapsedTime / 1000;
+            if (this.score.winCountRemaining < 0) {
                 // TODO:
                 this.endLevel(true);
             }
         }
-        if (this.score.mStopWatchProgress != -100) {
-            this.score.mStopWatchProgress += elapsedTime / 1000;
+        if (this.score.stopWatchProgress != -100) {
+            this.score.stopWatchProgress += elapsedTime / 1000;
         }
 
         // handle accelerometer stuff... note that accelerometer is effectively disabled during a
@@ -276,8 +276,8 @@ export class Stage {
     }
 
     /**
-     * Before we call programmer code to load a new scene, we call this to ensure that everything is
-     * in a clean state.
+     * Before we call programmer code to load a new scene, we call this to
+     * ensure that everything is in a clean state.
      */
     onScreenChange(): void {
         this.world.stopMusic();
@@ -301,8 +301,8 @@ export class Stage {
      * @param enemy The enemy who defeated the hero
      */
     defeatHero(enemy: Enemy, hero: Hero): void {
-        this.score.mHeroesDefeated++;
-        if (this.score.mHeroesDefeated == this.score.mHeroesCreated) {
+        this.score.heroesDefeated++;
+        if (this.score.heroesDefeated == this.score.heroesCreated) {
             if (enemy.onDefeatHero)
                 enemy.onDefeatHero(enemy, hero);
             this.endLevel(false);
@@ -340,7 +340,7 @@ export class Stage {
      * Returns number of enemies defeated
      */
     getEnemiesDefeated(): number {
-        return this.score.mEnemiesDefeated;
+        return this.score.enemiesDefeated;
     }
 
     /**

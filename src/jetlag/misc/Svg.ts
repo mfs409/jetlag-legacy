@@ -27,23 +27,23 @@ export class Svg {
     world: WorldApi;
 
     /** Coordinate of the last point we drew */
-    private mLast = new PhysicsType2d.Vector2(0, 0);
+    private last = new PhysicsType2d.Vector2(0, 0);
 
     /** Coordinate of the first point we drew */
-    private mFirst = new PhysicsType2d.Vector2(0, 0);
+    private first = new PhysicsType2d.Vector2(0, 0);
 
     /** Coordinate of the current point being drawn */
-    private mCurr = new PhysicsType2d.Vector2(0, 0);
+    private curr = new PhysicsType2d.Vector2(0, 0);
 
     /** The requested stretch factor */
-    private mUserStretch = { x: 1, y: 1 };
+    private userStretch = { x: 1, y: 1 };
 
     /**
      * The parser is essentially a finite state machine. The states are 0 for 
      * "read next x", 1 for "read next y", -2 for "read first x", and -1 for 
      * "read first y" 
      */
-    private mState = 0;
+    private state = 0;
 
     /** The SVG transform */
     private transform = { x: 0, y: 0 };
@@ -53,14 +53,14 @@ export class Svg {
      * field to swallow a fixed number of values, so that the curve definition
      * becomes a line definition
      */
-    private mSwallow: number;
+    private swallow: number;
 
     /**
      * Track if we're parsing a curve or a line. Valid values are 0 for 
      * "uninitialized", 1 for "starting to read", 2 for "parsing curve", and 3 
      * for "parsing line"
      */
-    private mMode = 0;
+    private mode = 0;
 
     /**
      * Process an SVG file and go through all of the "path" elements in the
@@ -77,8 +77,8 @@ export class Svg {
         xhr.open("GET", cfg.resourcePrefix + file, true);
         xhr.send();
         this.config = cfg;
-        this.mUserStretch.x = sx;
-        this.mUserStretch.y = sy;
+        this.userStretch.x = sx;
+        this.userStretch.y = sy;
     }
 
     /**
@@ -142,12 +142,12 @@ export class Svg {
             switch (s) {
                 // start of the path, relative mode
                 case "m":
-                    this.mState = -2;
+                    this.state = -2;
                     absolute = false;
                     break;
                 // start of the path, absolute mode
                 case "M":
-                    this.mState = -2;
+                    this.state = -2;
                     absolute = true;
                     break;
                 // beginning of a (set of) curve definitions, relative mode
@@ -155,71 +155,71 @@ export class Svg {
                 // NB: we coerce curves into lines by ignoring the first four
                 // parameters... this leaves us with just the endpoints
                 case "c":
-                    this.mMode = 2;
-                    this.mSwallow = 4;
+                    this.mode = 2;
+                    this.swallow = 4;
                     break;
                 // end of path, relative mode
                 case "z":
                     // draw a connecting line to complete the shape
-                    this.addLine(this.mLast, this.mFirst);
+                    this.addLine(this.last, this.first);
                     break;
                 // beginning of a (set of) line definitions, relative mode
                 case "l":
-                    this.mMode = 3;
+                    this.mode = 3;
                     absolute = false;
-                    this.mSwallow = 0;
+                    this.swallow = 0;
                     break;
                 // beginning of a (set of) line definitions, absolute mode
                 case "L":
-                    this.mMode = 3;
+                    this.mode = 3;
                     absolute = true;
-                    this.mSwallow = 0;
+                    this.swallow = 0;
                     break;
                 // floating point data that defines an endpoint of a line or curve
                 default:
                     // if it's a curve, we might need to swallow this value
-                    if (this.mSwallow > 0) {
-                        this.mSwallow--;
+                    if (this.swallow > 0) {
+                        this.swallow--;
                     }
                     // get the next point
                     else {
                         // convert next point to float
                         let val = parseFloat(s);
                         // if it's the initial x, save it
-                        if (this.mState == -2) {
-                            this.mState = -1;
-                            this.mLast.x = val;
-                            this.mFirst.x = val;
+                        if (this.state == -2) {
+                            this.state = -1;
+                            this.last.x = val;
+                            this.first.x = val;
                         }
                         // if it's the initial y, save it... can't draw a line yet, because we
                         // have one endpoint
-                        else if (this.mState == -1) {
-                            this.mState = 0;
-                            this.mLast.y = val;
-                            this.mFirst.y = val;
+                        else if (this.state == -1) {
+                            this.state = 0;
+                            this.last.y = val;
+                            this.first.y = val;
                         }
                         // if it's an X value, save it
-                        else if (this.mState == 0) {
+                        else if (this.state == 0) {
                             if (absolute)
-                                this.mCurr.x = val;
+                                this.curr.x = val;
                             else
-                                this.mCurr.x = this.mLast.x + val;
-                            this.mState = 1;
+                                this.curr.x = this.last.x + val;
+                            this.state = 1;
                         }
                         // if it's a Y value, save it and draw a line
-                        else if (this.mState == 1) {
-                            this.mState = 0;
+                        else if (this.state == 1) {
+                            this.state = 0;
                             if (absolute)
-                                this.mCurr.y = val;
+                                this.curr.y = val;
                             else
-                                this.mCurr.y = this.mLast.y - val;
+                                this.curr.y = this.last.y - val;
                             // draw the line
-                            this.addLine(this.mLast, this.mCurr);
-                            this.mLast.x = this.mCurr.x;
-                            this.mLast.y = this.mCurr.y;
+                            this.addLine(this.last, this.curr);
+                            this.last.x = this.curr.x;
+                            this.last.y = this.curr.y;
                             // if we are in curve mode, reinitialize the swallower
-                            if (this.mMode == 2)
-                                this.mSwallow = 4;
+                            if (this.mode == 2)
+                                this.swallow = 4;
                         }
                     }
                     break;
@@ -252,8 +252,8 @@ export class Svg {
         y1 += this.transform.y;
         y2 += this.transform.y;
         // reflect through mFirst.y
-        y1 = this.mFirst.y - y1;
-        y2 = this.mFirst.y - y2;
+        y1 = this.first.y - y1;
+        y2 = this.first.y - y2;
         // convert the coordinates to meters
         x1 /= this.config.pixelMeterRatio;
         y1 /= this.config.pixelMeterRatio;
@@ -265,10 +265,10 @@ export class Svg {
         x2 += this.translate.x;
         y2 += this.translate.y;
         // multiply the coordinates by the stretch
-        x1 *= this.mUserStretch.x;
-        y1 *= this.mUserStretch.y;
-        x2 *= this.mUserStretch.x;
-        y2 *= this.mUserStretch.y;
+        x1 *= this.userStretch.x;
+        y1 *= this.userStretch.y;
+        x2 *= this.userStretch.x;
+        y2 *= this.userStretch.y;
         this.drawLine(x1, y1, x2, y2);
     }
 

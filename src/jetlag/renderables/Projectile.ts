@@ -70,8 +70,8 @@ export class Projectile extends WorldActor {
         // if this is an obstacle, check if it is a projectile callback, and if so, do the callback
         if (other instanceof Obstacle) {
             let o: Obstacle = other as Obstacle;
-            if (o.mProjectileCollision) {
-                o.mProjectileCollision(o, this, contact);
+            if (o.projectileCollision) {
+                o.projectileCollision(o, this, contact);
                 // return... don't remove the projectile
                 return;
             }
