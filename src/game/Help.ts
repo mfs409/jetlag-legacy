@@ -64,8 +64,8 @@ export function buildHelpScreen(index: number, jl: JetLagApi): void {
                 "of classic Atari games.  The possibilities are endless!\n\n" +
                 "If you're not sure where to start, consider making small changes to the levels, such as changing\n" +
                 "the numbers that are passed to different functions.\n\n" +
-                "Start with the \"Levels.ts\" file in the \"code\" folder, then move on to other files in that folder, until\n" +
-                "you have a plan for how to build your next game."
+                "Start with the \"Levels.ts\" file in the \"src/game\" folder, then move on to other files in that folder,\n" +
+                "until you have a plan for how to build your next game."
             , 0);
 
         // set up a control to go to the splash screen on screen tap
