@@ -13,9 +13,6 @@ import { WorldScene } from "../stage/WorldScene"
  * Hero, Goodie, Destination, Enemy, Obstacle, and Projectile objects.
  */
 export abstract class WorldActor extends BaseActor {
-  /** A reference to the top-level Lol object */
-  readonly stageManager: JetLagManager
-
   /** When the camera follows the actor without centering on it, this gives us the difference between the actor and camera */
   mCameraOffset: PhysicsType2d.Vector2 = new PhysicsType2d.Vector2(0, 0);
 
@@ -31,9 +28,8 @@ export abstract class WorldActor extends BaseActor {
    * @param width   The width
    * @param height  The height
    */
-  constructor(manager: JetLagManager, scene: WorldScene, imgName: string, width: number, height: number) {
+  constructor(public readonly manager: JetLagManager, scene: WorldScene, imgName: string, width: number, height: number) {
     super(scene, imgName, width, height);
-    this.stageManager = manager;
   }
 
   /**
@@ -228,7 +224,7 @@ export abstract class WorldActor extends BaseActor {
     this.setTapCallback((worldX: number, worldY: number) => {
       // check goodies, if any not big enough, then fail
       for (let i = 0; i < 4; ++i) {
-        if (activations[i] > this.stageManager.getCurrStage().score.mGoodiesCollected[i]) {
+        if (activations[i] > this.manager.getCurrStage().score.mGoodiesCollected[i]) {
           return true;
         }
       }
@@ -286,13 +282,13 @@ export abstract class WorldActor extends BaseActor {
    * @param y the Y coordinate (in pixels) where the actor should appear
    */
   public setHover(x: number, y: number) {
-    let pmr = this.stageManager.config.pixelMeterRatio;
+    let pmr = this.manager.config.pixelMeterRatio;
     this.mHover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
-    this.stageManager.getCurrStage().world.repeatEvents.push(() => {
+    this.manager.getCurrStage().world.repeatEvents.push(() => {
       if (this.mHover == null)
         return;
       this.mHover.Set(x * pmr, y * pmr);
-      let a = this.stageManager.getCurrStage().world.camera.screenToMeters(this.mHover.x, this.mHover.y);
+      let a = this.manager.getCurrStage().world.camera.screenToMeters(this.mHover.x, this.mHover.y);
       this.mHover.Set(a.x, a.y);
       this.body.SetTransform(this.mHover, this.body.GetAngle());
     });

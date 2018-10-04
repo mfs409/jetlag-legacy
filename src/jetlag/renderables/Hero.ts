@@ -125,7 +125,7 @@ export class Hero extends WorldActor {
         if (!this.getEnabled() || !destination.getEnabled())
             return;
         if (destination.receive(this)) {
-            this.stageManager.getCurrStage().onDestinationArrive();
+            this.manager.getCurrStage().onDestinationArrive();
             // hide the hero quietly, since the destination might make a sound
             this.remove(true);
         }
@@ -141,9 +141,9 @@ export class Hero extends WorldActor {
         // hero
         if (enemy.mAlwaysDoesDamage) {
             this.remove(false);
-            this.stageManager.getCurrStage().defeatHero(enemy, this);
+            this.manager.getCurrStage().defeatHero(enemy, this);
             if (this.mMustSurvive) {
-                this.stageManager.getCurrStage().endLevel(false);
+                this.manager.getCurrStage().endLevel(false);
             }
             return;
         }
@@ -166,9 +166,9 @@ export class Hero extends WorldActor {
         // when we can't defeat it by losing strength, remove the hero
         else if (enemy.mDamage >= this.mStrength) {
             this.remove(false);
-            this.stageManager.getCurrStage().defeatHero(enemy, this);
+            this.manager.getCurrStage().defeatHero(enemy, this);
             if (this.mMustSurvive) {
-                this.stageManager.getCurrStage().endLevel(false);
+                this.manager.getCurrStage().endLevel(false);
             }
         }
         // when we can defeat it by losing strength
@@ -235,7 +235,7 @@ export class Hero extends WorldActor {
         g.remove(false);
         if (g.onHeroCollect)
             g.onHeroCollect(g, this);
-        this.stageManager.getCurrStage().onGoodieCollected(g);
+        this.manager.getCurrStage().onGoodieCollected(g);
     }
 
     /**
@@ -299,7 +299,7 @@ export class Hero extends WorldActor {
     /** 
      * Track if the hero is in the air, so that it can't jump when it isn't
      * touching anything. This does not quite work as desired, but is good
-     * enough for LOL 
+     * enough for JetLag.
      */
     private mInAir = false;
 
@@ -458,7 +458,7 @@ export class Hero extends WorldActor {
      * @param soundName The name of the sound file to use
      */
     public setJumpSound(soundName: string): void {
-        this.mJumpSound = this.stageManager.device.getSpeaker().getSound(soundName);
+        this.mJumpSound = this.manager.device.getSpeaker().getSound(soundName);
     }
 
     /**

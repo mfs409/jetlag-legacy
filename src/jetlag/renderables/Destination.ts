@@ -90,6 +90,6 @@ export class Destination extends WorldActor {
      * @param soundName The name of the sound file that should play
      */
     public setArrivalSound(soundName: string): void {
-        this.arrivalSound = this.stageManager.device.getSpeaker().getSound(soundName);
+        this.arrivalSound = this.manager.device.getSpeaker().getSound(soundName);
     }
 }

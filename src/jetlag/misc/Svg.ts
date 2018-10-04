@@ -6,12 +6,12 @@ import { JetLagConfig } from "../JetLagConfig";
 // TOPLEFT strategy to the placement, instead of translation.
 
 /**
- * The Svg infrastructure allows the game designer to load SVG line drawings 
- * into a game. SVG line drawings can be made in InkScape. In LOL, we do not use
- * line drawings to their full potential. We only use them to define a set of 
- * invisible lines for a simple, stationary obstacle. You should draw a picture 
- * on top of your line drawing, so that the player knows that there is an actor 
- * on the screen.
+ * The Svg infrastructure allows the game designer to load SVG line drawings
+ * into a game. SVG line drawings can be made in InkScape. In JetLag, we do not
+ * use line drawings to their full potential. We only use them to define a set
+ * of invisible lines for a simple, stationary obstacle. You should draw a
+ * picture on top of your line drawing, so that the player knows that there is
+ * an actor on the screen.
  */
 export class Svg {
     /** A copy of the configuration object for the game */

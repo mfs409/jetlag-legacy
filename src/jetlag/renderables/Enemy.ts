@@ -79,7 +79,7 @@ export class Enemy extends WorldActor {
 
         // possibly update score
         if (increaseScore) {
-            this.stageManager.getCurrStage().onDefeatEnemy();
+            this.manager.getCurrStage().onDefeatEnemy();
         }
     }
 
@@ -165,7 +165,7 @@ export class Enemy extends WorldActor {
      */
     public setDisappearOnTouch() {
         this.setTapCallback(() => {
-            this.stageManager.device.getVibration().vibrate(100);
+            this.manager.device.getVibration().vibrate(100);
             this.defeat(true, null);
             this.setTapCallback(null);
             return true;

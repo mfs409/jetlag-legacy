@@ -15,9 +15,6 @@ import { JetLagRenderer } from "../misc/JetLagDevice";
  * of which more than one may be active at a time.
  */
 export class Stage {
-    /** The top-level StageManager, with access to all device features */
-    private stageManager: JetLagManager;
-
     /** The physics world in which all actors exist */
     world: WorldScene;
 
@@ -61,12 +58,12 @@ export class Stage {
     foreground: ParallaxScene;
 
     /**
-     * Construct the LolManager, build the scenes, set up the state machine, and clear the scores.
+     * Construct the stage, build the scenes, set up the state machine, and
+     * clear the scores.
      *
-     * @param manager The top-level StageManager
+     * @param manager The JetLagManager that navigates among stages
      */
-    constructor(manager: JetLagManager) {
-        this.stageManager = manager;
+    constructor(private stageManager: JetLagManager) {
         // build scenes and facts
         this.createScenes();
         this.resetScores();

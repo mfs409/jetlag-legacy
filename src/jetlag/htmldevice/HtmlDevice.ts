@@ -12,7 +12,7 @@ import { HtmlStorage } from "./HtmlStorage"
 
 /**
  * Device bundles the abstractions of the parts of a game device.  This lets the
- * rest of liblol-ts use Device, instead of needing to have references to the
+ * rest of JetLag use Device, instead of needing to have references to the
  * various subsystems' abstractions.
  */
 export class HtmlDevice implements JetLagDevice {
