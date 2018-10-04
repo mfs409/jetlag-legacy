@@ -1,10 +1,11 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../stage/WorldScene"
+import { WorldScene } from "../scenes/WorldScene"
 import { Obstacle } from "./Obstacle"
 import { Camera } from "../misc/Camera"
 import { JetLagRenderer, JetLagDevice } from "../misc/JetLagDevice";
 import { XY } from "../misc/XY";
 import { JetLagConfig } from "../JetLagConfig";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * Projectiles are actors that can be thrown from the hero's location in order to remove enemies.
@@ -41,8 +42,8 @@ export class Projectile extends WorldActor {
      * @param zIndex   The z plane of the projectile
      * @param isCircle True if it is a circle, false if it is a box
      */
-    constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, width: number, height: number, imgName: string, x: number, y: number, zIndex: number, isCircle: boolean) {
-        super(level, device, config, imgName, width, height);
+    constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, stage: JetLagStage, width: number, height: number, imgName: string, x: number, y: number, zIndex: number, isCircle: boolean) {
+        super(level, device, config, stage, imgName, width, height);
         if (isCircle) {
             let radius = Math.max(width, height);
             this.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);

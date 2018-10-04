@@ -1,6 +1,6 @@
 import { JetLagManager } from "../JetLagManager"
 import { OverlayApi } from "./OverlayApi"
-import { Stage } from "../stage/Stage";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * NavigationApi is the "kitchen sink".  It has everything for moving between
@@ -14,7 +14,7 @@ export class NavigationApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private manager: JetLagManager, private stage: Stage) { }
+    constructor(private manager: JetLagManager, private stage: JetLagStage) { }
 
     /**
      * load the level-chooser screen. Note that when the chooser is disabled, we
@@ -77,7 +77,7 @@ export class NavigationApi {
      * @param builder The code to run to create the initial welcome screen
      */
     public setWelcomeSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.stage.welcomeSceneBuilder = builder;
+        this.stage.setWelcomeSceneBuilder(builder);
     }
 
     /**
@@ -87,7 +87,7 @@ export class NavigationApi {
      * @param builder The code to run to create the win scene
      */
     public setWinSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.stage.winSceneBuilder = builder;
+        this.stage.setWinSceneBuilder(builder);
     }
 
     /**
@@ -97,7 +97,7 @@ export class NavigationApi {
      * @param builder The code to run to create the lose scene
      */
     public setLoseSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.stage.loseSceneBuilder = builder;
+        this.stage.setLoseSceneBuilder(builder);
     }
 
     /**
@@ -107,6 +107,6 @@ export class NavigationApi {
      * @param builder The code to run to create the pause scene
      */
     public setPauseSceneBuilder(builder: (overlay: OverlayApi) => void) {
-        this.stage.pauseSceneBuilder = builder;
+        this.stage.setPauseSceneBuilder(builder);
     }
 }

@@ -1,7 +1,7 @@
 /// <reference path="../../../typings/PhysicsType2d.v0_9.d.ts" />
 
 import { Renderable } from "./Renderable"
-import { Scene } from "../stage/Scene"
+import { Scene } from "../scenes/Scene"
 import { RouteDriver } from "../misc/Route"
 import { Route } from "../misc/Route"
 import { AnimationDriver } from "./AnimationDriver"
@@ -156,7 +156,7 @@ export class BaseActor implements Renderable {
         boxBodyDef.type = type;
         boxBodyDef.position.x = x + this.size.x / 2;
         boxBodyDef.position.y = y + this.size.y / 2;
-        this.body = this.scene.world.CreateBody(boxBodyDef);
+        this.body = this.scene.createBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
         fd.shape = shape;
@@ -195,7 +195,7 @@ export class BaseActor implements Renderable {
         boxBodyDef.type = type;
         boxBodyDef.position.x = x + this.size.x / 2;
         boxBodyDef.position.y = y + this.size.y / 2;
-        this.body = this.scene.world.CreateBody(boxBodyDef);
+        this.body = this.scene.createBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
         fd.shape = shape;
@@ -225,7 +225,7 @@ export class BaseActor implements Renderable {
         boxBodyDef.type = type;
         boxBodyDef.position.x = x + this.size.x / 2;
         boxBodyDef.position.y = y + this.size.y / 2;
-        this.body = this.scene.world.CreateBody(boxBodyDef);
+        this.body = this.scene.createBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
         fd.shape = shape;

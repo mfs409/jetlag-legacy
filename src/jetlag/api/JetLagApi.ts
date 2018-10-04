@@ -5,8 +5,7 @@ import { JetLagManager } from "../JetLagManager"
 import { NavigationApi } from "./NavigationApi"
 import { JetLagConfig } from "../JetLagConfig";
 import { JetLagDevice, JetLagKeys } from "../misc/JetLagDevice";
-import { Stage } from "../stage/Stage";
-import { OverlayScene } from "../stage/OverlayScene";
+import { JetLagStage } from "../JetLagStage";
 import { Score } from "../misc/Score";
 
 /**
@@ -45,9 +44,9 @@ export class JetLagApi {
     readonly nav: NavigationApi;
 
     /** Construct the JetLag API from a manager object */
-    constructor(manager: JetLagManager, config: JetLagConfig, private device: JetLagDevice, stage: Stage, hud: OverlayScene, score: Score) {
+    constructor(manager: JetLagManager, config: JetLagConfig, private device: JetLagDevice, stage: JetLagStage, score: Score) {
         this.world = new WorldApi(device, config, stage, score);
-        this.hud = new OverlayApi(hud, device, stage);
+        this.hud = new OverlayApi(stage.getHud(), device, stage);
         this.score = new ScoreApi(device, stage, score);
         this.nav = new NavigationApi(manager, stage);
     }

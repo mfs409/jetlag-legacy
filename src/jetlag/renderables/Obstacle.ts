@@ -1,10 +1,11 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../stage/WorldScene"
+import { WorldScene } from "../scenes/WorldScene"
 import { Enemy } from "./Enemy"
 import { Hero } from "./Hero"
 import { TimedEvent } from "../misc/Timer"
 import { JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * Obstacles are usually walls, except they can move, and can be used to run all sorts of arbitrary
@@ -41,8 +42,8 @@ export class Obstacle extends WorldActor {
      * @param height  height of this Obstacle
      * @param imgName Name of the image file to use
      */
-    constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, width: number, height: number, imgName: string) {
-        super(level, device, config, imgName, width, height);
+    constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, stage: JetLagStage, width: number, height: number, imgName: string) {
+        super(level, device, config, stage, imgName, width, height);
     }
 
     /**

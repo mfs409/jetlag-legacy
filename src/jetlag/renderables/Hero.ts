@@ -1,5 +1,5 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../stage/WorldScene"
+import { WorldScene } from "../scenes/WorldScene"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"
@@ -8,7 +8,7 @@ import { Animation } from "./Animation"
 import { Camera } from "../misc/Camera"
 import { JetLagRenderer, JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
-import { Stage } from "../stage/Stage";
+import { JetLagStage } from "../JetLagStage";
 import { Score } from "../misc/Score";
 
 /**
@@ -108,9 +108,9 @@ export class Hero extends WorldActor {
     * @param imgName The name of the file that has the default image for this
     *                hero
     */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private stage: Stage, private score: Score, width: number,
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, stage: JetLagStage, private score: Score, width: number,
         height: number, imgName: string) {
-        super(scene, device, config, imgName, width, height);
+        super(scene, device, config, stage, imgName, width, height);
     }
 
     /**

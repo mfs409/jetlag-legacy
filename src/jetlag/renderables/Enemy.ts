@@ -1,11 +1,12 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../stage/WorldScene"
+import { WorldScene } from "../scenes/WorldScene"
 import { Hero } from "./Hero"
 import { Obstacle } from "./Obstacle"
 import { Projectile } from "./Projectile"
 import { JetLagConfig } from "../JetLagConfig";
 import { JetLagDevice } from "../misc/JetLagDevice";
 import { Score } from "../misc/Score";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * Enemies are things to be avoided or defeated by the Hero. Enemies do damage to heroes when they
@@ -45,8 +46,8 @@ export class Enemy extends WorldActor {
      * @param height  Height of this enemy
      * @param imgName Image to display
      */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private score: Score, width: number, height: number, imgName: string) {
-        super(scene, device, config, imgName, width, height);
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private score: Score, stage: JetLagStage, width: number, height: number, imgName: string) {
+        super(scene, device, config, stage, imgName, width, height);
         this.damage = 2;
     }
 

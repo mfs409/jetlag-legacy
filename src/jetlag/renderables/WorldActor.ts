@@ -1,8 +1,9 @@
 import { BaseActor } from "./BaseActor"
 import { Hero } from "./Hero"
-import { WorldScene } from "../stage/WorldScene"
+import { WorldScene } from "../scenes/WorldScene"
 import { JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * WorldActor is the base class upon which every actor in the main game is
@@ -63,7 +64,7 @@ export abstract class WorldActor extends BaseActor {
    * @param width   The width
    * @param height  The height
    */
-  constructor(scene: WorldScene, device: JetLagDevice, protected config: JetLagConfig, imgName: string, width: number, height: number) {
+  constructor(scene: WorldScene, device: JetLagDevice, protected config: JetLagConfig, protected stage: JetLagStage, imgName: string, width: number, height: number) {
     super(scene, device, imgName, width, height);
   }
 
@@ -205,7 +206,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setTouchToThrow(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
     this.setTapCallback((worldX: number, worldY: number) => {
-      (this.scene as WorldScene).projectilePool.throwFixed(h, offsetX, offsetY, velocityX, velocityY);
+      this.stage.getProjectilePool().throwFixed(h, offsetX, offsetY, velocityX, velocityY);
       return true;
     });
   }
@@ -321,7 +322,7 @@ export abstract class WorldActor extends BaseActor {
     this.revJointDef.collideConnected = false;
     this.revJointDef.referenceAngle = 0;
     this.revJointDef.enableLimit = false;
-    this.revJoint = this.scene.world.CreateJoint(this.revJointDef);
+    this.revJoint = this.scene.createJoint(this.revJointDef);
   }
 
   /**
@@ -332,11 +333,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.scene.world.DestroyJoint(this.revJoint);
+    this.scene.destroyJoint(this.revJoint);
     this.revJointDef.enableMotor = true;
     this.revJointDef.motorSpeed = motorSpeed;
     this.revJointDef.maxMotorTorque = motorTorque;
-    this.revJoint = this.scene.world.CreateJoint(this.revJointDef);
+    this.revJoint = this.scene.createJoint(this.revJointDef);
   }
 
   /**
@@ -347,11 +348,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.scene.world.DestroyJoint(this.revJoint);
+    this.scene.destroyJoint(this.revJoint);
     this.revJointDef.upperAngle = upper;
     this.revJointDef.lowerAngle = lower;
     this.revJointDef.enableLimit = true;
-    this.revJoint = this.scene.world.CreateJoint(this.revJointDef);
+    this.revJoint = this.scene.createJoint(this.revJointDef);
   }
 
   /**
@@ -374,7 +375,7 @@ export abstract class WorldActor extends BaseActor {
     w.localAnchorB.Set(otherX, otherY);
     w.referenceAngle = angle;
     w.collideConnected = false;
-    this.scene.world.CreateJoint(w);
+    this.scene.createJoint(w);
   }
 
   /**
@@ -400,7 +401,7 @@ export abstract class WorldActor extends BaseActor {
     mDistJointDef.dampingRatio = 0.1;
     mDistJointDef.frequencyHz = 2;
 
-    this.scene.world.CreateJoint(mDistJointDef);
+    this.scene.createJoint(mDistJointDef);
   }
 
   /**
@@ -409,9 +410,9 @@ export abstract class WorldActor extends BaseActor {
   breakJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint != null) {
-      this.scene.world.DestroyJoint(this.distJoint);
+      this.scene.destroyJoint(this.distJoint);
       this.distJoint = null;
-      this.scene.world.DestroyJoint(this.weldJoint);
+      this.scene.destroyJoint(this.weldJoint);
       this.weldJoint = null;
     }
   }

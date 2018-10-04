@@ -17,22 +17,22 @@ import { JetLagConfig } from "../JetLagConfig";
  * inside of them, and we render all components of a scene at the same time.
  *
  * There is a close relationship between a BaseActor and a Scene, namely that a
- * BaseActor should not need any scene functionality that is not present in
+ * BaseActor should not need any functionality that is not present in
  * Scene.  In contrast, a WorldActor may need functionality that is added by
  * WorldScene.
  */
 export abstract class Scene {
   /** The physics world in which all actors interact */
-  readonly world: PhysicsType2d.Dynamics.World;
+  protected readonly world: PhysicsType2d.Dynamics.World;
 
   /** Anything in the world that can be rendered, in 5 planes [-2, -1, 0, 1, 2] */
-  readonly renderables: Renderable[][];
+  protected readonly renderables: Renderable[][];
 
-  // The camera will make sure important actors are on screen
+  /** The camera will make sure important actors are on screen */
   readonly camera: Camera;
 
   /** For querying the point that was toucned */
-  pointQuerier = new PointToActorCallback();
+  readonly pointQuerier = new PointToActorCallback();
 
   /** Events that get processed on the next render, then discarded */
   readonly oneTimeEvents: (() => void)[] = [];
@@ -211,6 +211,26 @@ export abstract class Scene {
     for (let a of this.renderables) {
       a.length = 0;
     }
+  }
+
+  public advanceWorld(dt: number, velocityIterations: number, positionIterations: number) {
+    this.world.Step(dt, velocityIterations, positionIterations);
+  }
+
+  public setGravity(newXGravity: number, newYGravity: number): void {
+    this.world.SetGravity(new PhysicsType2d.Vector2(newXGravity, newYGravity));
+  }
+
+  public createBody(def: PhysicsType2d.Dynamics.BodyDefinition) {
+    return this.world.CreateBody(def);
+  }
+
+  public createJoint(def: PhysicsType2d.Dynamics.Joints.JointDefinition) {
+    return this.world.CreateJoint(def);
+  }
+
+  public destroyJoint(joint: PhysicsType2d.Dynamics.Joints.Joint) {
+    this.world.DestroyJoint(joint);
   }
 
   /**

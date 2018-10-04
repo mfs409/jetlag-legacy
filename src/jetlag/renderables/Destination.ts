@@ -1,8 +1,9 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../stage/WorldScene"
+import { WorldScene } from "../scenes/WorldScene"
 import { Hero } from "./Hero"
 import { JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagConfig } from "../JetLagConfig";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * Destinations are actors that the Hero should try to reach. When a Hero reaches a destination, the
@@ -33,8 +34,8 @@ export class Destination extends WorldActor {
      * @param height The height, in meters, of the Destination
      * @param imgName The image to display for this destination
      */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, width: number, height: number, imgName: string) {
-        super(scene, device, config, imgName, width, height);
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, stage: JetLagStage, width: number, height: number, imgName: string) {
+        super(scene, device, config, stage, imgName, width, height);
         this.capacity = 1;
         this.holding = 0;
     }

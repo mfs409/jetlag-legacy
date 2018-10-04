@@ -1,5 +1,5 @@
 import { JetLagDevice } from "../misc/JetLagDevice";
-import { Stage } from "../stage/Stage";
+import { JetLagStage } from "../JetLagStage";
 import { Score } from "../misc/Score";
 
 /**
@@ -12,7 +12,7 @@ export class ScoreApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private device: JetLagDevice, private stage: Stage, private score: Score) { }
+    constructor(private device: JetLagDevice, private stage: JetLagStage, private score: Score) { }
 
     /**
      * Look up a fact that was stored for the current game session. If no such fact exists,
@@ -284,7 +284,7 @@ export class ScoreApi {
      * Generate text indicating the number of remaining projectiles
      */
     public getRemainingProjectiles() {
-        return this.stage.world.projectilePool.remaining;
+        return this.stage.getProjectilePool().remaining;
     }
 
     /**

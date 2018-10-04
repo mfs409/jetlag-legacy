@@ -1,69 +1,133 @@
-import { JetLagManager } from "../JetLagManager"
-import { WorldScene } from "./WorldScene"
-import { OverlayScene } from "./OverlayScene"
-import { OverlayApi } from "../api/OverlayApi"
-import { ParallaxScene } from "./ParallaxScene"
-import { Score } from "../misc/Score"
-import { Logger } from "../misc/Logger";
-import { JetLagRenderer, JetLagDevice, JetLagSound } from "../misc/JetLagDevice";
-import { JetLagConfig } from "../JetLagConfig";
+import { JetLagManager } from "./JetLagManager"
+import { WorldScene } from "./scenes/WorldScene"
+import { OverlayScene } from "./scenes/OverlayScene"
+import { OverlayApi } from "./api/OverlayApi"
+import { ParallaxScene } from "./scenes/ParallaxScene"
+import { Score } from "./misc/Score"
+import { Logger } from "./misc/Logger";
+import { JetLagRenderer, JetLagDevice, JetLagSound } from "./misc/JetLagDevice";
+import { JetLagConfig } from "./JetLagConfig";
+import { ProjectilePool } from "./misc/ProjectilePool";
 
 /**
- * Stage is a fully interactive portion of the game.  It has several scenes, 
- * of which more than one may be active at a time.
+ * JetLagStage is the container for all of the functionality for the playable
+ * portion of a game.  JetLagStage has several components:
+ * - The WorldScene, where all the action of the game happens
+ * - The heads-up display (HUD), where the user interface of the game is drawn.
+ * - The Score object
+ * - The background music and background color
+ * - The background and foreground parallax layers
+ * - The code for building, managing, and dismissing the win/lose/pause/welcome
+ *   scenes
+ *
+ * JetLagStage is effectively a singleton: we re-use it for every stage that
+ * gets displayed.
+ *
+ * JetLagStage is also the unit that receives all gestures, and forwards them to
+ * either the hud, the world, or one of the overlay scenes.  (Note: strictly
+ * speaking, the HUD is just an overlay scene.)
+ *
+ * JetLagStage does not manage transitions between stages on its own. Instead,
+ * it has mechanisms (onScreenChange and endLevel) for resetting itself at the
+ * beginning of a stage, and cleaning itself up at the end of a stage.
  */
-export class Stage {
+export class JetLagStage {
     /** The physics world in which all actors exist */
-    world: WorldScene;
+    private world: WorldScene;
 
     /** A heads-up display */
-    hud: OverlayScene;
+    private hud: OverlayScene;
 
     /** Any pause, win, or lose scene that supercedes the world and hud */
-    overlay: OverlayScene;
+    private overlay: OverlayScene;
 
     /** Should gestures route to the HUD first, or to the WORLD first? */
-    gestureHudFirst = true;
+    private gestureHudFirst = true;
 
     /** Background color for the stage being drawn; defaults to black */
-    backgroundColor = 0xFFFFFF;
+    private backgroundColor = 0xFFFFFF;
 
     /** The function for creating this level's pre-scene */
-    welcomeSceneBuilder: (overlay: OverlayApi) => void = null;
+    private welcomeSceneBuilder: (overlay: OverlayApi) => void = null;
 
     /** The function for creating this level's win scene */
-    winSceneBuilder: (overlay: OverlayApi) => void = null;
+    private winSceneBuilder: (overlay: OverlayApi) => void = null;
 
     /** The function for creating this level's lose scene */
-    loseSceneBuilder: (overlay: OverlayApi) => void = null;
+    private loseSceneBuilder: (overlay: OverlayApi) => void = null;
 
     /** The function for creating this level's pause scene */
-    pauseSceneBuilder: (overlay: OverlayApi) => void = null;
+    private pauseSceneBuilder: (overlay: OverlayApi) => void = null;
 
     /** Track all the scores */
     private score: Score;
 
     /** The background layers */
-    background: ParallaxScene;
+    private background: ParallaxScene;
 
     /** The foreground layers */
-    foreground: ParallaxScene;
+    private foreground: ParallaxScene;
 
     /** The music, if any */
-    music: JetLagSound = null;
+    private music: JetLagSound = null;
 
     /** Whether the music is playing or not */
     private musicPlaying = false;
 
+    /** A pool of projectiles for use by the hero */
+    private projectilePool: ProjectilePool;
+
+    /** Getter for the projectile pool */
+    public getProjectilePool() { return this.projectilePool; }
+
+    /** Getter for the WorldScene */
+    public getWorld() { return this.world; }
+
+    /** Getter for the HUD */
+    public getHud() { return this.hud; }
+
+    /** Getter for the background layers */
+    public getBackground() { return this.background; }
+
+    /** Getter for the foreground layers */
+    public getForeground() { return this.foreground; }
+
+    /** Set the code to run to build the welcome scene */
+    public setWelcomeSceneBuilder(builder: (overlay: OverlayApi) => void) { this.welcomeSceneBuilder = builder; }
+
+    /** Set the code to run to build the win scene */
+    public setWinSceneBuilder(builder: (overlay: OverlayApi) => void) { this.winSceneBuilder = builder; }
+
+    /** Set the code to run to build the lose scene */
+    public setLoseSceneBuilder(builder: (overlay: OverlayApi) => void) { this.loseSceneBuilder = builder; }
+
+    /** Set the code to run to build the pause scene */
+    public setPauseSceneBuilder(builder: (overlay: OverlayApi) => void) { this.pauseSceneBuilder = builder; }
+
+    /** Should gestures go to the HUD first (true), or to the world first (false) */
+    public setGestureHudFirst(val: boolean) { this.gestureHudFirst = val; }
+
+    /** Set the background color (i.e., #FFFFFF) */
+    public setBackgroundColor(color: number) { this.backgroundColor = color; }
+
+    /** Setter for the projectile pool */
+    public setProjectilePool(pool: ProjectilePool) { this.projectilePool = pool; }
+
     /**
-     * Construct the stage, build the scenes, set up the state machine, and
-     * clear the scores.
+     * Construct a basic stage.  Note that there is a mutual dependency between
+     * a stage and a score.  Do not use a stage until after calling setScore()
+     * with a non-null value.  Note, too, that a stage is not usable until
+     * onScreenChange() has been called.
      *
      * @param manager The JetLagManager that navigates among stages
      */
     constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) { }
 
+    /** Set the score object */
     setScore(score: Score) { this.score = score; }
+
+    /** Set the music for the stage */
+    setMusic(music: JetLagSound) { this.music = music; }
 
     /**
      * Handle a TAP event
@@ -98,9 +162,7 @@ export class Stage {
         }
     }
 
-    /** 
-     * Handle the start of a pan
-     */
+    /** Handle the start of a pan */
     panStart(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.panStart(screenX, screenY);
@@ -217,7 +279,7 @@ export class Stage {
         //
         // NB: in Box2d, This is the recommended rate for phones, though it seems like we should be
         //     using /elapsedTime/ instead of 1/45f
-        this.world.world.Step(1 / 45, 8, 3);
+        this.world.advanceWorld(1 / 45, 8, 3);
 
         // Execute any one time events, then clear the list
         for (let e of this.world.oneTimeEvents)
@@ -249,6 +311,7 @@ export class Stage {
     onScreenChange(): void {
         this.stopMusic();
         this.music = null;
+        this.projectilePool = null;
 
         this.score.reset();
         this.device.getStorage().clearLevelFacts();

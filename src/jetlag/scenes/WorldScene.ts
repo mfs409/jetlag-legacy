@@ -1,6 +1,5 @@
 import { Scene } from "./Scene"
 import { WorldActor } from "../renderables/WorldActor"
-import { ProjectilePool } from "../misc/ProjectilePool"
 import { Hero } from "../renderables/Hero"
 import { Enemy } from "../renderables/Enemy"
 import { Projectile } from "../renderables/Projectile"
@@ -18,22 +17,29 @@ export class WorldScene extends Scene {
     readonly tiltActors: WorldActor[] = [];
 
     /** Magnitude of the maximum gravity the accelerometer can create */
-    tiltMax = { x: 0, y: 0 };
+    readonly tiltMax = { x: 0, y: 0 };
 
     /** Track if we have an override for gravity to be translated into velocity */
-    tiltVelocityOverride = false;
+    private tiltVelocityOverride = false;
 
     /** A multiplier to make gravity change faster or slower than the accelerometer default */
     private tiltMultiplier: number = 1;
 
     /** This is the WorldActor that the camera chases, if any */
-    cameraChaseActor: WorldActor = null;
+    private cameraChaseActor: WorldActor = null;
 
     /** A temp vector, to avoid allocation in the tilt code */
     private tiltVec = new XY(0, 0);
 
-    /** A pool of projectiles for use by the hero */
-    projectilePool: ProjectilePool;
+    /** Setter for tilt velocity override */
+    public setTiltVelocityOverride(override: boolean) {
+        this.tiltVelocityOverride = override;
+    }
+
+    /** Set the actor who the camera should chase */
+    public setCameraChaseActor(actor: WorldActor) {
+        this.cameraChaseActor = actor;
+    }
 
     /**
      * Construct a World for the current level.  The World will have a camera,

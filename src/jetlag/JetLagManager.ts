@@ -1,7 +1,7 @@
 import { JetLagConfig } from "./JetLagConfig"
 import { JetLagDevice, JetLagTouchReceiverHolder, JetLagTouchReceiver } from "./misc/JetLagDevice"
 import { JetLagApi } from "./api/JetLagApi"
-import { Stage } from "./stage/Stage"
+import { JetLagStage } from "./JetLagStage"
 import { Score } from "./misc/Score";
 
 /** Types of stages in the game */
@@ -25,7 +25,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
     private stageNum = 1;
 
     /** The currently active stage, if any */
-    private stage: Stage;
+    private stage: JetLagStage;
 
     /** The score object for the game */
     private score: Score;
@@ -62,7 +62,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
     public onAssetsLoaded() {
         // Be sure to refresh the mute state from the persistent storage
         this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
-        this.stage = new Stage(this, this.device, this.config);
+        this.stage = new JetLagStage(this, this.device, this.config);
         this.score = new Score(this.stage);
         this.stage.setScore(this.score);
         this.doSplash(1);
@@ -78,7 +78,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
         this.stageNum = index;
         this.stageType = StageTypes.SPLASH;
         this.stage.onScreenChange();
-        this.config.splashBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.stage.hud, this.score));
+        this.config.splashBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.score));
     }
 
     /**
@@ -90,7 +90,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
         this.stageNum = index;
         this.stageType = StageTypes.PLAY;
         this.stage.onScreenChange();
-        this.config.levelBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.stage.hud, this.score));
+        this.config.levelBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.score));
     }
 
     /**
@@ -102,7 +102,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
         this.stageNum = index;
         this.stageType = StageTypes.HELP;
         this.stage.onScreenChange();
-        this.config.helpBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.stage.hud, this.score));
+        this.config.helpBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.score));
     }
 
     /**
@@ -114,7 +114,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
         this.stageNum = index;
         this.stageType = StageTypes.STORE;
         this.stage.onScreenChange();
-        this.config.storeBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.stage.hud, this.score));
+        this.config.storeBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.score));
     }
 
     /**
@@ -136,7 +136,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
         this.stageNum = index;
         this.stageType = StageTypes.CHOOSER;
         this.stage.onScreenChange();
-        this.config.chooserBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.stage.hud, this.score));
+        this.config.chooserBuilder(index, new JetLagApi(this, this.config, this.device, this.stage, this.score));
     }
 
     /** Quit the game.  Stop the music before quitting. */

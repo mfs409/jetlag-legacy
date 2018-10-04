@@ -1,4 +1,4 @@
-import { OverlayScene } from "../stage/OverlayScene"
+import { OverlayScene } from "../scenes/OverlayScene"
 import { WorldActor } from "../renderables/WorldActor"
 import { TimedEvent } from "../misc/Timer"
 import { Renderable } from "../renderables/Renderable"
@@ -6,7 +6,7 @@ import { Hero } from "../renderables/Hero"
 import { Route } from "../misc/Route";
 import { BaseActor } from "../renderables/BaseActor";
 import { JetLagDevice } from "../misc/JetLagDevice";
-import { Stage } from "../stage/Stage";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
@@ -19,7 +19,7 @@ export class OverlayApi {
      *
      * @param overlay the StageManager for the game
      */
-    constructor(private overlay: OverlayScene, private device: JetLagDevice, private stage: Stage) { }
+    constructor(private overlay: OverlayScene, private device: JetLagDevice, private stage: JetLagStage) { }
 
     /**
      * Convert coordinates on the overlay to coordinates in the world
@@ -31,7 +31,7 @@ export class OverlayApi {
      */
     public overlayToMeters(x: number, y: number) {
         let pixels1 = this.overlay.camera.metersToScreen(x, y);
-        let pixels2 = this.stage.world.camera.screenToMeters(pixels1.x, pixels1.y);
+        let pixels2 = this.stage.getWorld().camera.screenToMeters(pixels1.x, pixels1.y);
         return pixels2;
     }
 
@@ -93,7 +93,7 @@ export class OverlayApi {
             // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
             // If worldactor with draggable, we're good
-            let actor = this.stage.world.actorAt(pixels.x, pixels.y);
+            let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
             if (actor == null)
                 return false;
             if (!(actor instanceof WorldActor))
@@ -109,7 +109,7 @@ export class OverlayApi {
             if (foundActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
+            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             foundActor.setPosition(meters.x - foundActor.getWidth() / 2, meters.y - foundActor.getHeight() / 2);
             return true;
         }
@@ -137,7 +137,7 @@ export class OverlayApi {
             // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
             let pixels = this.overlay.camera.metersToScreen(hudX0, hudY0);
             // If worldactor with flickMultiplier, we're good
-            let actor = this.stage.world.actorAt(pixels.x, pixels.y);
+            let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
             if (actor == null)
                 return false;
             if (!(actor instanceof WorldActor))
@@ -146,7 +146,7 @@ export class OverlayApi {
                 return false;
             // Figure out the velocity to apply
             let p2 = this.overlay.camera.metersToScreen(hudX1, hudY1);
-            let w = this.stage.world.camera.screenToMeters(p2.x, p2.y);
+            let w = this.stage.getWorld().camera.screenToMeters(p2.x, p2.y);
             let dx = (w.x - actor.getXPosition()) * actor.flickMultiplier * 1000 / time;
             let dy = w.y - actor.getYPosition() * actor.flickMultiplier * 1000 / time;
             // prep the actor and flick it
@@ -173,12 +173,12 @@ export class OverlayApi {
      * @param imgName The background image for the region, if any
      */
     public createPokeToPlaceZone(x: number, y: number, width: number, height: number, imgName: string) {
-        this.stage.gestureHudFirst = false;
+        this.stage.setGestureHudFirst(false);
         this.addTapControl(x, y, width, height, imgName, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
+            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             this.activeActor.setPosition(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
             this.activeActor = null;
             return true;
@@ -198,12 +198,12 @@ export class OverlayApi {
      * @param clear Should the active actor be cleared (so that subsequent touches won't change its trajectory)
      */
     public createPokeToMoveZone(x: number, y: number, width: number, height: number, velocity: number, imgName: string, clear: boolean) {
-        this.stage.gestureHudFirst = false;
+        this.stage.setGestureHudFirst(false);
         this.addTapControl(x, y, width, height, imgName, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
+            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             let r = new Route().to(this.activeActor.getXPosition(), this.activeActor.getYPosition()).to(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
             this.activeActor.setAbsoluteVelocity(0, 0);
             this.activeActor.setRotationSpeed(0);
@@ -227,12 +227,12 @@ export class OverlayApi {
      * @param clear Should the active actor be cleared (so that subsequent touches won't change its trajectory)
      */
     public createPokeToRunZone(x: number, y: number, width: number, height: number, velocity: number, imgName: string, clear: boolean) {
-        this.stage.gestureHudFirst = false;
+        this.stage.setGestureHudFirst(false);
         this.addTapControl(x, y, width, height, imgName, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
+            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             let dx = this.activeActor.getXPosition() - (meters.x - this.activeActor.getWidth() / 2);
             let dy = this.activeActor.getYPosition() - (meters.y - this.activeActor.getHeight() / 2);
             let hy = Math.sqrt(dx * dx + dy * dy) / velocity;
@@ -358,7 +358,7 @@ export class OverlayApi {
      * @return The control, so we can do more with it as needed.
      */
     public addToggleButton(x: number, y: number, width: number, height: number, imgName: string, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
-        let c = new BaseActor(this.stage.hud, this.device, imgName, width, height);
+        let c = new BaseActor(this.stage.getHud(), this.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let active = false; // will be captured by lambdas below
         c.touchDownHandler = (hudX: number, hudY: number) => {
@@ -374,8 +374,8 @@ export class OverlayApi {
             return true;
         }
         // Put the control and events in the appropriate lists
-        this.stage.hud.addActor(c, 0);
-        this.stage.world.repeatEvents.push(() => { if (active) whileDownAction(); });
+        this.stage.getHud().addActor(c, 0);
+        this.stage.getWorld().repeatEvents.push(() => { if (active) whileDownAction(); });
         return c;
     }
 
@@ -393,7 +393,7 @@ export class OverlayApi {
      */
     public ThrowFixedAction(hero: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): (hudX: number, hudY: number) => boolean {
         return (hudX: number, hudY: number) => {
-            this.stage.world.projectilePool.throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
+            this.stage.getProjectilePool().throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
             return true;
         }
     }
@@ -472,14 +472,14 @@ export class OverlayApi {
      * @return The button that was created
      */
     public addDirectionalThrowButton(x: number, y: number, width: number, height: number, imgName: string, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
-        let c = new BaseActor(this.stage.hud, this.device, imgName, width, height);
+        let c = new BaseActor(this.stage.getHud(), this.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let v = new PhysicsType2d.Vector2(0, 0);
         let isHolding = false;
         c.touchDownHandler = (hudX: number, hudY: number) => {
             isHolding = true;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let world = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
+            let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             v.x = world.x;
             v.y = world.y;
             return true;
@@ -490,20 +490,20 @@ export class OverlayApi {
         }
         c.panMoveHandler = (hudX: number, hudY: number) => {
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let world = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
+            let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             v.x = world.x;
             v.y = world.y;
             return isHolding;
         }
-        this.stage.hud.addActor(c, 0);
+        this.stage.getHud().addActor(c, 0);
 
         let mLastThrow = 0;
-        this.stage.world.repeatEvents.push(() => {
+        this.stage.getWorld().repeatEvents.push(() => {
             if (isHolding) {
                 let now = new Date().getTime();
                 if (mLastThrow + milliDelay < now) {
                     mLastThrow = now;
-                    this.stage.world.projectilePool.throwAt(h.body.GetPosition().x,
+                    this.stage.getProjectilePool().throwAt(h.body.GetPosition().x,
                         h.body.GetPosition().y, v.x, v.y, h, offsetX, offsetY);
                 }
             }
@@ -525,8 +525,8 @@ export class OverlayApi {
     public ThrowDirectionalAction(hero: Hero, offsetX: number, offsetY: number) {
         return (hudX: number, hudY: number) => {
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let world = this.stage.world.camera.screenToMeters(pixels.x, pixels.y);
-            this.stage.world.projectilePool.throwAt(hero.body.GetPosition().x, hero.body.GetPosition().y, world.x, world.y, hero, offsetX, offsetY);
+            let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            this.stage.getProjectilePool().throwAt(hero.body.GetPosition().x, hero.body.GetPosition().y, world.x, world.y, hero, offsetX, offsetY);
             return true;
         };
     }
@@ -564,7 +564,7 @@ export class OverlayApi {
             let now = new Date().getTime();
             if (mLastThrow + milliDelay < now) {
                 mLastThrow = now;
-                this.stage.world.projectilePool.throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
+                this.stage.getProjectilePool().throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
             }
         }
     }

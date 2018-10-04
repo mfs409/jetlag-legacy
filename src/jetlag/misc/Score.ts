@@ -1,5 +1,5 @@
 import { Goodie } from "../renderables/Goodie";
-import { Stage } from "../stage/Stage";
+import { JetLagStage } from "../JetLagStage";
 import { Enemy } from "../renderables/Enemy";
 import { Hero } from "../renderables/Hero";
 
@@ -73,7 +73,7 @@ export class Score {
   /** The number of enemies that must be defeated, if we're in ENEMYCOUNT mode. -1 means "all" */
   private victoryEnemyCount: number;
 
-  constructor(private stage: Stage) { }
+  constructor(private stage: JetLagStage) { }
 
   /**
    * Reset all the scores at the beginning of a new level

@@ -1,4 +1,4 @@
-import { Scene } from "../stage/Scene"
+import { Scene } from "./Scene"
 import { JetLagRenderer } from "../misc/JetLagDevice";
 
 /**
