@@ -19,7 +19,7 @@ import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
 export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Chooser
-    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, null); });
+    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); });
 
     // In this level, all we have is a hero (the green ball) who needs to make it to the destination (a mustard colored
     // ball). The game is configured to use tilt to control the world.  If you're running on a computer, arrow keys will
@@ -368,11 +368,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o4.setPhysics(1, 0, 1);
 
         // Oblong circles are not what you'd expect
-        jl.world.makeHeroAsCircle(13,2,2,1,"purpleball.png");
-        jl.world.makeDestinationAsCircle(13,2,2,1,"purpleball.png");
-        jl.world.makeObstacleAsCircle(13,2,2,1,"purpleball.png");
-        jl.world.makeEnemyAsCircle(13,2,2,1,"purpleball.png");
-        jl.world.makeGoodieAsCircle(13,2,2,1,"purpleball.png");
+        jl.world.makeHeroAsCircle(13, 2, 2, 1, "purpleball.png");
+        jl.world.makeDestinationAsCircle(13, 2, 2, 1, "purpleball.png");
+        jl.world.makeObstacleAsCircle(13, 2, 2, 1, "purpleball.png");
+        jl.world.makeEnemyAsCircle(13, 2, 2, 1, "purpleball.png");
+        jl.world.makeGoodieAsCircle(13, 2, 2, 1, "purpleball.png");
 
         // Create a polygon obstacle
         jl.world.makeObstacleAsPolygon(2, 2, 2, 5, "blueball.png", [-1, 2, -1, 0, 0, -3, 1, 0, 1, 1]);
@@ -2378,14 +2378,15 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // goodie we need to get in order to activate the obstacle
         let o = jl.world.makeObstacleAsCircle(10, 5, .5, .5, "purpleball.png");
         o.setPhysics(1, 0, 1);
-        o.setTouchCallback(1, 0, 0, 0, true, (actor: WorldActor) => {
-            // note: we could draw a picture of an open chest in the
-            // obstacle's place, or even use a disappear animation whose
-            // final frame looks like an open treasure chest.
-            actor.remove(false);
-            for (let i = 0; i < 3; ++i)
-                jl.world.makeGoodieAsCircle(3 * i, 9 - i, .5, .5, "blueball.png");
-        });
+        o.setTouchCallback(() => { return jl.score.getGoodies1() >= 1; }, true,
+            (actor: WorldActor) => {
+                // note: we could draw a picture of an open chest in the
+                // obstacle's place, or even use a disappear animation whose
+                // final frame looks like an open treasure chest.
+                actor.remove(false);
+                for (let i = 0; i < 3; ++i)
+                    jl.world.makeGoodieAsCircle(3 * i, 9 - i, .5, .5, "blueball.png");
+            });
         o.setDisappearSound("hipitch.ogg");
 
         let g = jl.world.makeGoodieAsCircle(0, 0, 2, 2, "blueball.png");

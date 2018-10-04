@@ -7,7 +7,8 @@ import { Goodie } from "./Goodie"
 import { Obstacle } from "./Obstacle"
 import { Animation } from "./Animation"
 import { Camera } from "../misc/Camera"
-import { JetLagRenderer, JetLagSound } from "../misc/JetLagDevice";
+import { JetLagRenderer, JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -60,9 +61,9 @@ export class Hero extends WorldActor {
     * @param imgName The name of the file that has the default image for this
     *                hero
     */
-    constructor(manager: JetLagManager, scene: WorldScene, width: number,
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private manager: JetLagManager, width: number,
         height: number, imgName: string) {
-        super(manager, scene, imgName, width, height);
+        super(scene, device, config, imgName, width, height);
     }
 
     /**
@@ -458,7 +459,7 @@ export class Hero extends WorldActor {
      * @param soundName The name of the sound file to use
      */
     public setJumpSound(soundName: string): void {
-        this.mJumpSound = this.manager.device.getSpeaker().getSound(soundName);
+        this.mJumpSound = this.device.getSpeaker().getSound(soundName);
     }
 
     /**

@@ -1,7 +1,8 @@
-import { JetLagManager } from "../JetLagManager"
 import { BaseActor } from "./BaseActor"
 import { Hero } from "./Hero"
 import { WorldScene } from "../stage/WorldScene"
+import { JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * WorldActor is the base class upon which every actor in the main game is
@@ -28,8 +29,8 @@ export abstract class WorldActor extends BaseActor {
    * @param width   The width
    * @param height  The height
    */
-  constructor(public readonly manager: JetLagManager, scene: WorldScene, imgName: string, width: number, height: number) {
-    super(scene, imgName, width, height);
+  constructor(scene: WorldScene, device: JetLagDevice, protected config: JetLagConfig, imgName: string, width: number, height: number) {
+    super(scene, device, imgName, width, height);
   }
 
   /**
@@ -216,24 +217,16 @@ export abstract class WorldActor extends BaseActor {
    * @param disappear          True if the actor should disappear when the callback runs
    * @param callback           The callback to run when the actor is touched
    */
-  public setTouchCallback(activationGoodies1: number, activationGoodies2: number,
-    activationGoodies3: number, activationGoodies4: number,
-    disappear: boolean, callback: (actor: WorldActor) => void) {
-    let activations = [activationGoodies1, activationGoodies2, activationGoodies3, activationGoodies4];
+  public setTouchCallback(activation: () => boolean, disappear: boolean, callback: (actor: WorldActor) => void) {
     // set the code to run on touch
     this.setTapCallback((worldX: number, worldY: number) => {
-      // check goodies, if any not big enough, then fail
-      for (let i = 0; i < 4; ++i) {
-        if (activations[i] > this.manager.getCurrStage().score.mGoodiesCollected[i]) {
-          return true;
-        }
-      }
+      if (!activation())
+        return false;
       if (disappear)
         this.remove(false);
       callback(this);
       return true;
     });
-    return true;
   }
 
   /**
@@ -282,13 +275,13 @@ export abstract class WorldActor extends BaseActor {
    * @param y the Y coordinate (in pixels) where the actor should appear
    */
   public setHover(x: number, y: number) {
-    let pmr = this.manager.config.pixelMeterRatio;
+    let pmr = this.config.pixelMeterRatio;
     this.mHover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
-    this.manager.getCurrStage().world.repeatEvents.push(() => {
+    this.scene.repeatEvents.push(() => {
       if (this.mHover == null)
         return;
       this.mHover.Set(x * pmr, y * pmr);
-      let a = this.manager.getCurrStage().world.camera.screenToMeters(this.mHover.x, this.mHover.y);
+      let a = this.scene.camera.screenToMeters(this.mHover.x, this.mHover.y);
       this.mHover.Set(a.x, a.y);
       this.body.SetTransform(this.mHover, this.body.GetAngle());
     });

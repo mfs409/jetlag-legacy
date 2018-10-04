@@ -1,8 +1,8 @@
 import { WorldScene } from "../stage/WorldScene"
 import { Projectile } from "../renderables/Projectile"
 import { Hero } from "../renderables/Hero"
-import { JetLagManager } from "../JetLagManager"
-import { JetLagSound } from "./JetLagDevice";
+import { JetLagSound, JetLagDevice } from "./JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
 * ProjectilePool stores a set of projectiles.  We can get into lots of
@@ -59,13 +59,13 @@ export class ProjectilePool {
     * @param zIndex   The z plane on which the projectiles should be drawn
     * @param isCircle Should projectiles have an underlying circle or box shape?
     */
-    constructor(manager: JetLagManager, level: WorldScene, size: number, width: number, height: number,
+    constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, size: number, width: number, height: number,
         imgName: string, strength: number, zIndex: number, isCircle: boolean) {
         // set up the pool
         this.pool = [];
         // don't draw all projectiles in same place...
         for (let i = 0; i < size; ++i) {
-            let p = new Projectile(manager, level, width, height, imgName, -100 - i * width, -100 - i * height, zIndex, isCircle);
+            let p = new Projectile(level, device, config, width, height, imgName, -100 - i * width, -100 - i * height, zIndex, isCircle);
             p.setEnabled(false);
             p.body.SetBullet(true);
             p.body.SetActive(false);

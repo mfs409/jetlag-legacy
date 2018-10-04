@@ -1,4 +1,5 @@
 import { JetLagManager } from "../JetLagManager"
+import { JetLagDevice } from "../misc/JetLagDevice";
 
 /**
  * ScoreApi provides an interface for configuring everything related to the
@@ -10,7 +11,7 @@ export class ScoreApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private manager: JetLagManager) { }
+    constructor(private manager: JetLagManager, private device: JetLagDevice) { }
 
     /**
      * Look up a fact that was stored for the current game session. If no such fact exists,
@@ -21,7 +22,7 @@ export class ScoreApi {
      * @return The string value corresponding to the last value stored
      */
     public getGameFact(factName: string, defaultVal: string): string {
-        return this.manager.device.getStorage().getPersistent(factName, defaultVal);
+        return this.device.getStorage().getPersistent(factName, defaultVal);
     }
 
     /**
@@ -33,7 +34,7 @@ export class ScoreApi {
      * @return The integer value corresponding to the last value stored
      */
     public getLevelFact(factName: string, defaultVal: string): string {
-        return this.manager.device.getStorage().getLevel(factName, defaultVal);
+        return this.device.getStorage().getLevel(factName, defaultVal);
     }
 
     /**
@@ -45,7 +46,7 @@ export class ScoreApi {
      * @return The integer value corresponding to the last value stored
      */
     public getSessionFact(factName: string, defaultVal: string) {
-        return this.manager.device.getStorage().getSession(factName, defaultVal);
+        return this.device.getStorage().getSession(factName, defaultVal);
     }
 
     /**
@@ -56,7 +57,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setLevelFact(factName: string, factValue: string) {
-        this.manager.device.getStorage().setLevel(factName, factValue);
+        this.device.getStorage().setLevel(factName, factValue);
     }
 
     /**
@@ -67,7 +68,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setSessionFact(factName: string, factValue: string) {
-        this.manager.device.getStorage().setSession(factName, factValue);
+        this.device.getStorage().setSession(factName, factValue);
     }
 
 
@@ -79,7 +80,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setGameFact(factName: string, factValue: string) {
-        this.manager.device.getStorage().setPersistent(factName, factValue);
+        this.device.getStorage().setPersistent(factName, factValue);
     }
 
     /**

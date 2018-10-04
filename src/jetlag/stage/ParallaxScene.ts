@@ -1,7 +1,7 @@
-import { JetLagManager } from "../JetLagManager"
 import { ParallaxLayer } from "../renderables/ParallaxLayer"
 import { Camera } from "../misc/Camera"
 import { JetLagRenderer } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * ParallaxScenes present a set of images that seem to scroll relative to the 
@@ -13,9 +13,6 @@ import { JetLagRenderer } from "../misc/JetLagDevice";
  * - in-between should be interesting
  */
 export class ParallaxScene {
-    /** The game-wide configuration object */
-    private manager: JetLagManager;
-
     /** All the layers to show as part of this scene */
     layers: ParallaxLayer[] = [];
 
@@ -24,9 +21,7 @@ export class ParallaxScene {
      *
      * @param config The game-wide configuration object
      */
-    constructor(manager: JetLagManager) {
-        this.manager = manager;
-    }
+    constructor(private config: JetLagConfig) { }
 
     /**
      * Render all of the layers of this parallax scene
@@ -69,8 +64,8 @@ export class ParallaxScene {
     private normalizeAndRender(pl: ParallaxLayer, sb: JetLagRenderer, worldCamera: Camera) {
         let x = worldCamera.getOffsetX(); // left of viewport
         let y = worldCamera.getOffsetY(); // top of viewport
-        let camW = this.manager.config.screenWidth / this.manager.config.pixelMeterRatio;
-        let camH = this.manager.config.screenHeight / this.manager.config.pixelMeterRatio;
+        let camW = this.config.screenWidth / this.config.pixelMeterRatio;
+        let camH = this.config.screenHeight / this.config.pixelMeterRatio;
         // Normalize the reference tile
         if (pl.isHoriz) {
             while (pl.lastX > x + camW)
@@ -130,8 +125,8 @@ export class ParallaxScene {
     private renderVisibleTiles(sb: JetLagRenderer, pl: ParallaxLayer, worldCamera: Camera) {
         let x = worldCamera.getOffsetX(); // left of viewport
         let y = worldCamera.getOffsetY(); // top of viewport
-        let camW = this.manager.config.screenWidth / this.manager.config.pixelMeterRatio;
-        let camH = this.manager.config.screenHeight / this.manager.config.pixelMeterRatio;
+        let camW = this.config.screenWidth / this.config.pixelMeterRatio;
+        let camH = this.config.screenHeight / this.config.pixelMeterRatio;
         if (pl.isHoriz) {
             let i = 0;
             let plx = pl.lastX;
@@ -150,7 +145,7 @@ export class ParallaxScene {
             while (ply < y + camH) {
                 pl.images[i].setPosition(pl.lastX, ply);
                 pl.images[i].setHeight(pl.height);
-                pl.images[i].setWidth( pl.width);
+                pl.images[i].setWidth(pl.width);
                 sb.addPictureToFrame(pl.images[i], worldCamera);
                 ply += pl.height;
                 i++;

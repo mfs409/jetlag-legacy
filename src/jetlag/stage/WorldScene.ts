@@ -1,13 +1,13 @@
 import { Scene } from "./Scene"
 import { WorldActor } from "../renderables/WorldActor"
 import { ProjectilePool } from "../misc/ProjectilePool"
-import { JetLagManager } from "../JetLagManager"
 import { Hero } from "../renderables/Hero"
 import { Enemy } from "../renderables/Enemy"
 import { Projectile } from "../renderables/Projectile"
-import { JetLagRenderer } from "../misc/JetLagDevice"
+import { JetLagRenderer, JetLagDevice } from "../misc/JetLagDevice"
 import { XY } from "../misc/XY"
 import { JetLagSound } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
@@ -49,8 +49,8 @@ export class WorldScene extends Scene {
      *
      * @param manager: The game-wide Jetlag manager
      */
-    constructor(manager: JetLagManager) {
-        super(manager);
+    constructor(config: JetLagConfig, device: JetLagDevice) {
+        super(config, device);
         this.configureCollisionHandlers();
     }
 

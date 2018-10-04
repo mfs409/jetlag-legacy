@@ -18,7 +18,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     // gravitational forces
 
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Splash
-    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, null); });
+    jl.hud.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); });
 
     // screen 1: show levels 1 --> 24
     //

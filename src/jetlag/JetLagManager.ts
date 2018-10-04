@@ -4,7 +4,7 @@ import { JetLagApi } from "./api/JetLagApi"
 import { Stage } from "./stage/Stage"
 
 /** Types of stages in the game */
-enum STAGETYPES {
+enum StageTypes {
     SPLASH = 0, HELP = 1, CHOOSER = 2, STORE = 3, PLAY = 4, COUNT = 5
 }
 
@@ -18,13 +18,10 @@ enum STAGETYPES {
  */
 export class JetLagManager implements JetLagTouchReceiverHolder {
     /** The current type of stage that we are showing */
-    private currentStageType: number;
+    private currStageType: number;
 
-    /** 
-     * The level within the current stage (e.g., we are in PLAY scene 4, and
-     * will return to CHOOSER 2) 
-     */
-    private readonly modeStates: number[] = [];
+    /** The level within the current stage */
+    private currStageNum: number;
 
     /** The currently active stage, if any */
     private currStage: Stage;
@@ -35,15 +32,12 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      * constructed JetLagManager can't function until the device's renderer is
      * fully loaded.
      *
-     * @param cfg The game config object
+     * @param cfg    The game config object
      * @param device The abstract device (with touch, sound, etc)
      */
-    constructor(public readonly config: JetLagConfig, public readonly device: JetLagDevice) {
-        this.device = device;
-        // Put each mode in state 1, since the first level is level 1
-        for (let i = 0; i < STAGETYPES.COUNT; ++i) {
-            this.modeStates.push(1);
-        }
+    constructor(private readonly config: JetLagConfig, private readonly device: JetLagDevice) {
+        // Start in stage 1 of whatever we're going into
+        this.currStageNum = 1;
         // Register the manager with the device's gesture handler, so that all
         // gestures get routed through the manager to the stage.  See
         // TouchReceiverHolder for more information.
@@ -52,9 +46,9 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
 
     /**
      * JetLagManager can't handle gestures itself, but its stage can.  The stage
-     * changes over time (e.g., Play vs. Help), so JetLagManager has to be a
-     * TouchReceiverHolder, not a TouchReceiver.  To satisfy the interface, we
-     * need this method.  Note that the Stage is a TouchReceiver.
+     * changes over time (e.g., Play vs. Help), so JetLagManager has to behave
+     * as a TouchReceiverHolder, not a TouchReceiver.  Note that the Stage is a
+     * TouchReceiver.
      */
     getTouchReceiver(): JetLagTouchReceiver { return this.currStage; }
 
@@ -69,8 +63,8 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
     onAssetsLoaded() {
         // Be sure to refresh the mute state from the persistent storage
         this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
-        this.currStage = new Stage(this);
-        this.doSplash(this.modeStates[STAGETYPES.SPLASH]);
+        this.currStage = new Stage(this, this.device, this.config);
+        this.doSplash(1);
         this.device.getRenderer().startRenderLoop(this);
     }
 
@@ -84,13 +78,10 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      * @param index The index of the splash screen to load
      */
     doSplash(index: number): void {
-        for (let i = 0; i < STAGETYPES.COUNT; ++i) {
-            this.modeStates[i] = 1;
-        }
-        this.modeStates[STAGETYPES.SPLASH] = index;
-        this.currentStageType = STAGETYPES.SPLASH;
+        this.currStageNum = index;
+        this.currStageType = StageTypes.SPLASH;
         this.currStage.onScreenChange();
-        this.config.splashBuilder(index, new JetLagApi(this));
+        this.config.splashBuilder(index, new JetLagApi(this, this.config, this.device));
     }
 
     /**
@@ -100,10 +91,10 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      * @param index The index of the level to load
      */
     doPlay(index: number): void {
-        this.modeStates[STAGETYPES.PLAY] = index;
-        this.currentStageType = STAGETYPES.PLAY;
+        this.currStageNum = index;
+        this.currStageType = StageTypes.PLAY;
         this.currStage.onScreenChange();
-        this.config.levelBuilder(index, new JetLagApi(this));
+        this.config.levelBuilder(index, new JetLagApi(this, this.config, this.device));
     }
 
     /**
@@ -112,10 +103,10 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      * @param index The index of the help level to load
      */
     doHelp(index: number): void {
-        this.modeStates[STAGETYPES.HELP] = index;
-        this.currentStageType = STAGETYPES.HELP;
+        this.currStageNum = index;
+        this.currStageType = StageTypes.HELP;
         this.currStage.onScreenChange();
-        this.config.helpBuilder(index, new JetLagApi(this));
+        this.config.helpBuilder(index, new JetLagApi(this, this.config, this.device));
     }
 
     /**
@@ -124,10 +115,10 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      * @param index The index of the help level to load
      */
     doStore(index: number): void {
-        this.modeStates[STAGETYPES.STORE] = index;
-        this.currentStageType = STAGETYPES.STORE;
+        this.currStageNum = index;
+        this.currStageType = StageTypes.STORE;
         this.currStage.onScreenChange();
-        this.config.storeBuilder(index, new JetLagApi(this));
+        this.config.storeBuilder(index, new JetLagApi(this, this.config, this.device));
     }
 
     /**
@@ -139,44 +130,40 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
         // if chooser disabled, then we either called this from splash, or from
         // a game level
         if (!this.config.enableChooser) {
-            if (this.currentStageType == STAGETYPES.PLAY) {
-                this.doSplash(this.modeStates[STAGETYPES.SPLASH]);
+            if (this.currStageType == StageTypes.PLAY) {
+                this.doSplash(1);
             } else {
-                this.doPlay(this.modeStates[STAGETYPES.PLAY]);
+                this.doPlay(1);
             }
             return;
         }
         // the chooser is not disabled
-        this.modeStates[STAGETYPES.CHOOSER] = index;
-        this.currentStageType = STAGETYPES.CHOOSER;
+        this.currStageNum = index;
+        this.currStageType = StageTypes.CHOOSER;
         this.currStage.onScreenChange();
-        this.config.chooserBuilder(index, new JetLagApi(this));
+        this.config.chooserBuilder(index, new JetLagApi(this, this.config, this.device));
     }
 
-    /**
-     * Quit the game.  Stop the music, just to play it safe...
-     */
+    /** Quit the game.  Stop the music, just to play it safe... */
     public doQuit() {
         this.currStage.world.stopMusic();
         this.device.getProcess().exit();
     }
 
     /**
-     * Move forward to the next level, if there is one, and otherwise go back to
-     * the chooser.
+     * Move forward to the next level, if there is one, or else go back to the
+     * chooser.
      */
     public advanceLevel(): void {
-        // Make sure to stop the music!
-        if (this.modeStates[STAGETYPES.PLAY] == this.config.numLevels) {
+        if (this.currStageNum == this.config.numLevels) {
             this.doChooser(1);
         } else {
-            this.modeStates[STAGETYPES.PLAY]++;
-            this.doPlay(this.modeStates[STAGETYPES.PLAY]);
+            this.doPlay(++this.currStageNum);
         }
     }
 
     /** Start a level over again. */
-    public repeatLevel(): void { this.doPlay(this.modeStates[STAGETYPES.PLAY]); }
+    public repeatLevel(): void { this.doPlay(this.currStageNum); }
 
     /**
      * This code is called repeatedly to update the game state and re-draw the

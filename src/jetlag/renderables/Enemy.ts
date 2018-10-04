@@ -4,6 +4,8 @@ import { WorldScene } from "../stage/WorldScene"
 import { Hero } from "./Hero"
 import { Obstacle } from "./Obstacle"
 import { Projectile } from "./Projectile"
+import { JetLagConfig } from "../JetLagConfig";
+import { JetLagDevice } from "../misc/JetLagDevice";
 
 /**
  * Enemies are things to be avoided or defeated by the Hero. Enemies do damage to heroes when they
@@ -31,8 +33,8 @@ export class Enemy extends WorldActor {
      * @param height  Height of this enemy
      * @param imgName Image to display
      */
-    constructor(manager: JetLagManager, scene: WorldScene, width: number, height: number, imgName: string) {
-        super(manager, scene, imgName, width, height);
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private manager: JetLagManager, width: number, height: number, imgName: string) {
+        super(scene, device, config, imgName, width, height);
         this.mDamage = 2;
     }
 
@@ -165,7 +167,7 @@ export class Enemy extends WorldActor {
      */
     public setDisappearOnTouch() {
         this.setTapCallback(() => {
-            this.manager.device.getVibration().vibrate(100);
+            this.device.getVibration().vibrate(100);
             this.defeat(true, null);
             this.setTapCallback(null);
             return true;

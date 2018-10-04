@@ -6,7 +6,7 @@ import { RouteDriver } from "../misc/Route"
 import { Route } from "../misc/Route"
 import { AnimationDriver } from "./AnimationDriver"
 import { Animation } from "./Animation"
-import { JetLagRenderer, JetLagSound, JetLagDebugSprite } from "../misc/JetLagDevice"
+import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../misc/JetLagDevice"
 import { TimedEvent } from "../misc/Timer"
 import { Camera } from "../misc/Camera"
 import { XY } from "../misc/XY"
@@ -51,9 +51,6 @@ export class BaseActor implements Renderable {
     public getEnabled() {
         return this.enabled;
     }
-
-    /** The level in which this Actor exists */
-    protected readonly scene: Scene;
 
     /** Physics body for this WorldActor */
     body: PhysicsType2d.Dynamics.Body;
@@ -114,9 +111,9 @@ export class BaseActor implements Renderable {
      * @param width   The width of the actor's image and body, in meters
      * @param height  The height of the actor's image and body, in meters
      */
-    constructor(scene: Scene, imgName: string, width: number, height: number) {
-        this.mAnimator = new AnimationDriver(scene.stageManager.device.getRenderer(), imgName);
-        this.debug = scene.stageManager.device.getRenderer().makeDebugContext();
+    constructor(protected scene: Scene, protected device: JetLagDevice, imgName: string, width: number, height: number) {
+        this.mAnimator = new AnimationDriver(device.getRenderer(), imgName);
+        this.debug = device.getRenderer().makeDebugContext();
         this.mDisappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
         this.mDisappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
         this.scene = scene;
@@ -381,7 +378,7 @@ export class BaseActor implements Renderable {
         if (this.mDisappearAnimation != null) {
             let x = this.getXPosition() + this.mDisappearAnimateOffset.x;
             let y = this.getYPosition() + this.mDisappearAnimateOffset.y;
-            let o = new BaseActor(this.scene, "", this.mDisappearAnimateSize.x, this.mDisappearAnimateSize.y);
+            let o = new BaseActor(this.scene, this.device, "", this.mDisappearAnimateSize.x, this.mDisappearAnimateSize.y);
             o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
             this.scene.addActor(o, 0);
             o.body.SetActive(false);
@@ -453,7 +450,7 @@ export class BaseActor implements Renderable {
      * @param imgName The name of the new image file to use
      */
     public setImage(imgName: string) {
-        this.mAnimator.updateImage(this.scene.stageManager.device.getRenderer(), imgName);
+        this.mAnimator.updateImage(this.device.getRenderer(), imgName);
     }
 
     /**
@@ -533,7 +530,7 @@ export class BaseActor implements Renderable {
      * @param quiet Should the item should disappear quietly, or play its disappear sound?
      */
     public setDisappearDelay(delay: number, quiet: boolean): void {
-        this.scene.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(delay, false, () => this.remove(quiet)));
+        this.scene.timer.addEvent(new TimedEvent(delay, false, () => this.remove(quiet)));
     }
 
     /**
@@ -544,7 +541,7 @@ export class BaseActor implements Renderable {
     public setAppearDelay(delay: number): void {
         this.setEnabled(false);
         this.body.SetActive(false);
-        this.scene.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(delay, false, () => {
+        this.scene.timer.addEvent(new TimedEvent(delay, false, () => {
             this.setEnabled(true);
             this.body.SetActive(true);
         }));
@@ -563,7 +560,7 @@ export class BaseActor implements Renderable {
      * @param soundName The name of the sound file to play
      */
     public setDisappearSound(soundName: string): void {
-        this.disappearSound = this.scene.stageManager.device.getSpeaker().getSound(soundName);
+        this.disappearSound = this.device.getSpeaker().getSound(soundName);
     }
 
 
@@ -634,7 +631,7 @@ export class BaseActor implements Renderable {
                 done = true;
             }
         });
-        this.scene.stageManager.getCurrStage().world.timer.addEvent(te);
+        this.scene.timer.addEvent(te);
     }
 
     /**

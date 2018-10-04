@@ -1,5 +1,6 @@
 import { JetLagManager } from "../JetLagManager"
 import { OverlayApi } from "./OverlayApi"
+import { JetLagDevice } from "../misc/JetLagDevice";
 
 /**
  * NavigationApi is the "kitchen sink".  It has everything for moving between
@@ -13,11 +14,11 @@ export class NavigationApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private manager: JetLagManager) { }
+    constructor(private manager: JetLagManager, private device: JetLagDevice) { }
 
     /**
-     * load the level-chooser screen. Note that when the chooser is disabled, we jump straight to
-     * level 1.
+     * load the level-chooser screen. Note that when the chooser is disabled, we
+     * jump straight to level 1.
      *
      * @param whichChooser The chooser screen to create
      */
@@ -70,15 +71,15 @@ export class NavigationApi {
      */
     public toggleMute() {
         // volume is either 1 or 0
-        if (this.manager.device.getStorage().getPersistent("volume", "1") === "1") {
+        if (this.device.getStorage().getPersistent("volume", "1") === "1") {
             // set volume to 0, set image to 'unmute'
-            this.manager.device.getStorage().setPersistent("volume", "0");
+            this.device.getStorage().setPersistent("volume", "0");
         } else {
             // set volume to 1, set image to 'mute'
-            this.manager.device.getStorage().setPersistent("volume", "1");
+            this.device.getStorage().setPersistent("volume", "1");
         }
         // update all music
-        this.manager.device.getSpeaker().resetMusicVolume(parseInt(this.manager.device.getStorage().getPersistent("volume", "1")));
+        this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
     }
 
     /**
@@ -86,7 +87,7 @@ export class NavigationApi {
      * corresponds to muted.
      */
     public getVolume() {
-        return this.manager.device.getStorage().getPersistent("volume", "1") === "1";
+        return this.device.getStorage().getPersistent("volume", "1") === "1";
     }
 
     /**
@@ -151,13 +152,11 @@ export class NavigationApi {
      * @param soundName The name of the sound asset to play
      */
     public playSound(soundName: string) {
-        this.manager.device.getSpeaker().getSound(soundName).play();
+        this.device.getSpeaker().getSound(soundName).play();
     }
 
-    /**
-     * Generate text indicating the current FPS
-     */
+    /** Generate text indicating the current FPS */
     public getFPS(): number {
-        return this.manager.device.getRenderer().getFPS();
+        return this.device.getRenderer().getFPS();
     }
 }

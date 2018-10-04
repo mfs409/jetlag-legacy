@@ -1,4 +1,3 @@
-import { JetLagManager } from "../JetLagManager"
 import { BaseActor } from "../renderables/BaseActor"
 import { Renderable } from "../renderables/Renderable"
 import { RenderableText } from "../renderables/RenderableText"
@@ -6,7 +5,8 @@ import { Picture } from "../renderables/Picture"
 import { Timer } from "../misc/Timer"
 import { Camera } from "../misc/Camera"
 import { PointToActorCallback } from "../misc/PointToActorCallback"
-import { JetLagRenderer } from "../misc/JetLagDevice";
+import { JetLagRenderer, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * Scene represents an interactive, dynamic, visible portion of a game.
@@ -22,9 +22,6 @@ import { JetLagRenderer } from "../misc/JetLagDevice";
  * WorldScene.
  */
 export abstract class Scene {
-  /** The JetLag manager object */
-  readonly stageManager: JetLagManager;
-
   /** The physics world in which all actors interact */
   readonly world: PhysicsType2d.Dynamics.World;
 
@@ -55,14 +52,12 @@ export abstract class Scene {
    * @param media  All image and sound assets for the game
    * @param config The game-wide configuration
    */
-  constructor(manager: JetLagManager) {
-    this.stageManager = manager;
-
-    let w = this.stageManager.config.screenWidth / this.stageManager.config.pixelMeterRatio;
-    let h = this.stageManager.config.screenHeight / this.stageManager.config.pixelMeterRatio;
+  constructor(private config: JetLagConfig, private device: JetLagDevice) {
+    let w = this.config.screenWidth / this.config.pixelMeterRatio;
+    let h = this.config.screenHeight / this.config.pixelMeterRatio;
 
     // set up the game camera, with (0, 0) in the top left
-    this.camera = new Camera(w, h, this.stageManager.config.pixelMeterRatio, manager.config);
+    this.camera = new Camera(w, h, this.config.pixelMeterRatio, config);
 
     // create a world with no default gravitational forces
     this.world = new PhysicsType2d.Dynamics.World(new PhysicsType2d.Vector2(0, 0));
@@ -236,7 +231,7 @@ export abstract class Scene {
     height: number, imgName: string, zIndex: number): Picture {
     // set up the image to display
     // NB: this will fail gracefully (no crash) for invalid file names
-    let r = new Picture(x, y, width, height, imgName, this.stageManager.device.getRenderer());
+    let r = new Picture(x, y, width, height, imgName, this.device.getRenderer());
     this.addActor(r, zIndex);
     return r;
   }
@@ -254,7 +249,7 @@ export abstract class Scene {
    * @return A Renderable of the text, so it can be enabled/disabled by program code
    */
   public addText(x: number, y: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): RenderableText {
-    let t = new RenderableText(this.stageManager.device.getRenderer(), fontName, fontSize, fontColor, x, y, false, producer);
+    let t = new RenderableText(this.device.getRenderer(), fontName, fontSize, fontColor, x, y, false, producer);
     this.addActor(t, zIndex);
     return t;
   }
@@ -273,7 +268,7 @@ export abstract class Scene {
    *         code
    */
   public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): RenderableText {
-    let t = new RenderableText(this.stageManager.device.getRenderer(), fontName, fontSize, fontColor, centerX, centerY, true, producer);
+    let t = new RenderableText(this.device.getRenderer(), fontName, fontSize, fontColor, centerX, centerY, true, producer);
     this.addActor(t, zIndex);
     return t;
   }

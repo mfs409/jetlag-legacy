@@ -3,6 +3,8 @@ import { WorldApi } from "./WorldApi"
 import { OverlayApi } from "./OverlayApi"
 import { JetLagManager } from "../JetLagManager"
 import { NavigationApi } from "./NavigationApi"
+import { JetLagConfig } from "../JetLagConfig";
+import { JetLagDevice } from "../misc/JetLagDevice";
 
 /**
  * JetLagApi provides a broad, public, declarative interface to the core
@@ -40,11 +42,11 @@ export class JetLagApi {
     readonly nav: NavigationApi;
 
     /** Construct the JetLag API from a manager object */
-    constructor(manager: JetLagManager) {
-        this.world = new WorldApi(manager);
-        this.hud = new OverlayApi(manager.getCurrStage().hud);
-        this.score = new ScoreApi(manager);
-        this.nav = new NavigationApi(manager);
+    constructor(manager: JetLagManager, config: JetLagConfig, device: JetLagDevice) {
+        this.world = new WorldApi(manager, device, config);
+        this.hud = new OverlayApi(manager.getCurrStage().hud, device, manager);
+        this.score = new ScoreApi(manager, device);
+        this.nav = new NavigationApi(manager, device);
         this.world.setHud(this.hud);
     }
 }

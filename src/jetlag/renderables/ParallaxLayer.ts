@@ -1,5 +1,5 @@
-import { JetLagManager } from "../JetLagManager"
-import { JetLagSprite } from "../misc/JetLagDevice";
+import { JetLagSprite, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * This object holds the configuration information for a Parallax layer.
@@ -48,7 +48,7 @@ export class ParallaxLayer {
      * @param imgName The name of the image file to use as the background
      * @param manager The JetLagManager
      */
-    constructor(x: number, y: number, width: number, height: number, speed: number, isX: boolean, isAuto: boolean, imgName: string, manager: JetLagManager) {
+    constructor(x: number, y: number, width: number, height: number, speed: number, isX: boolean, isAuto: boolean, imgName: string, config: JetLagConfig, device: JetLagDevice) {
         this.scrollSpeed = speed;
         this.isHoriz = isX;
         this.isAuto = isAuto;
@@ -59,14 +59,14 @@ export class ParallaxLayer {
         // figure out how many sprites we need to properly tile the image
         let num = 1;
         if (this.isHoriz) {
-            let screenWidthMeters = manager.config.screenWidth / manager.config.pixelMeterRatio;
+            let screenWidthMeters = config.screenWidth / config.pixelMeterRatio;
             num += Math.ceil(screenWidthMeters / this.width);
         }
         else {
-            let screenHeightMeters = manager.config.screenHeight / manager.config.pixelMeterRatio;
+            let screenHeightMeters = config.screenHeight / config.pixelMeterRatio;
             num += Math.ceil(screenHeightMeters / this.height);
         }
         for (let i = 0; i < num; ++i)
-            this.images.push(manager.device.getRenderer().getSprite(imgName));
+            this.images.push(device.getRenderer().getSprite(imgName));
     }
 }

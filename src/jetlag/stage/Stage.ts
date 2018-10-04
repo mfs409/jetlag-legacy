@@ -8,7 +8,8 @@ import { Hero } from "../renderables/Hero"
 import { Goodie } from "../renderables/Goodie"
 import { Enemy } from "../renderables/Enemy"
 import { Logger } from "../misc/Logger";
-import { JetLagRenderer } from "../misc/JetLagDevice";
+import { JetLagRenderer, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * Stage is a fully interactive portion of the game.  It has several scenes, 
@@ -63,7 +64,7 @@ export class Stage {
      *
      * @param manager The JetLagManager that navigates among stages
      */
-    constructor(private stageManager: JetLagManager) {
+    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) {
         // build scenes and facts
         this.createScenes();
         this.resetScores();
@@ -82,7 +83,7 @@ export class Stage {
             return;
         }
 
-        if (this.stageManager.config.debugMode) {
+        if (this.config.debugMode) {
             let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
             let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
             Logger.info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
@@ -169,11 +170,11 @@ export class Stage {
      */
     private createScenes(): void {
         // Create the main scene and hud
-        this.world = new WorldScene(this.stageManager);
-        this.hud = new OverlayScene(this.stageManager);
+        this.world = new WorldScene(this.config, this.device);
+        this.hud = new OverlayScene(this.config, this.device);
         // Set up the parallax scenes
-        this.background = new ParallaxScene(this.stageManager);
-        this.foreground = new ParallaxScene(this.stageManager);
+        this.background = new ParallaxScene(this.config);
+        this.foreground = new ParallaxScene(this.config);
     }
 
     /** 
@@ -192,13 +193,13 @@ export class Stage {
         // Handle pauses due to pre, pause, or post scenes.  Note that these handle their own screen
         // touches, and that win and lose scenes should come first.
         if (this.welcomeSceneBuilder) {
-            this.overlay = new OverlayScene(this.stageManager);
-            this.welcomeSceneBuilder(new OverlayApi(this.overlay));
+            this.overlay = new OverlayScene(this.config, this.device);
+            this.welcomeSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
             this.welcomeSceneBuilder = null;
         }
         if (this.pauseSceneBuilder) {
-            this.overlay = new OverlayScene(this.stageManager);
-            this.pauseSceneBuilder(new OverlayApi(this.overlay));
+            this.overlay = new OverlayScene(this.config, this.device);
+            this.pauseSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
             this.pauseSceneBuilder = null;
         }
         if (this.overlay) {
@@ -233,7 +234,7 @@ export class Stage {
         // handle accelerometer stuff... note that accelerometer is effectively disabled during a
         // popup... we could change that by moving this to the top, but that's probably not going to
         // produce logical behavior
-        this.world.handleTilt(this.stageManager.device.getAccelerometer().get().x, this.stageManager.device.getAccelerometer().get().y);
+        this.world.handleTilt(this.device.getAccelerometer().get().x, this.device.getAccelerometer().get().y);
 
         // Advance the physics world by 1/45 of a second.
         //
@@ -271,7 +272,7 @@ export class Stage {
         this.score.reset();
         this.loseCountdownText = "";
         this.winCountdownText = "";
-        this.stageManager.device.getStorage().clearLevelFacts();
+        this.device.getStorage().clearLevelFacts();
     }
 
     /**
@@ -351,22 +352,22 @@ export class Stage {
     endLevel(win: boolean): void {
         if (win) {
             if (this.winSceneBuilder) {
-                this.overlay = new OverlayScene(this.stageManager);
-                this.winSceneBuilder(new OverlayApi(this.overlay));
+                this.overlay = new OverlayScene(this.config, this.device);
+                this.winSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
                 this.winSceneBuilder = null;
             }
             else {
-                this.stageManager.advanceLevel();
+                this.manager.advanceLevel();
             }
         }
         else {
             if (this.loseSceneBuilder) {
-                this.overlay = new OverlayScene(this.stageManager);
-                this.loseSceneBuilder(new OverlayApi(this.overlay));
+                this.overlay = new OverlayScene(this.config, this.device);
+                this.loseSceneBuilder(new OverlayApi(this.overlay, this.device, this.manager));
                 this.loseSceneBuilder = null;
             }
             else {
-                this.stageManager.repeatLevel();
+                this.manager.repeatLevel();
             }
         }
     }

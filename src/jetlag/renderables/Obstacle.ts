@@ -1,9 +1,10 @@
 import { WorldActor } from "./WorldActor"
-import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
 import { Enemy } from "./Enemy"
 import { Hero } from "./Hero"
 import { TimedEvent } from "../misc/Timer"
+import { JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * Obstacles are usually walls, except they can move, and can be used to run all sorts of arbitrary
@@ -25,8 +26,8 @@ export class Obstacle extends WorldActor {
      * @param height  height of this Obstacle
      * @param imgName Name of the image file to use
      */
-    constructor(manager: JetLagManager, level: WorldScene, width: number, height: number, imgName: string) {
-        super(manager, level, imgName, width, height);
+    constructor(level: WorldScene, device: JetLagDevice, config: JetLagConfig, width: number, height: number, imgName: string) {
+        super(level, device, config, imgName, width, height);
     }
 
     /**
@@ -119,7 +120,7 @@ export class Obstacle extends WorldActor {
             h.updateVelocity(v.x, v.y);
             // now set a timer to un-boost the speed
             if (boostDuration > 0) {
-                this.manager.getCurrStage().world.timer.addEvent(new TimedEvent(boostDuration, false, () => {
+                this.scene.timer.addEvent(new TimedEvent(boostDuration, false, () => {
                     let v: PhysicsType2d.Vector2 = h.body.GetLinearVelocity();
                     v.x -= boostAmountX;
                     v.y -= boostAmountY;

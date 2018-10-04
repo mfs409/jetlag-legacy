@@ -13,30 +13,19 @@ import { ProjectilePool } from "../misc/ProjectilePool";
 import { ParallaxLayer } from "../renderables/ParallaxLayer";
 import { Animation } from "../renderables/Animation";
 import { Svg } from "../misc/Svg";
-import { JetLagKeys } from "../misc/JetLagDevice";
+import { JetLagKeys, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * WorldApi provides the functionality needed for putting things into the world
  * (the main part of the game)
  */
 export class WorldApi {
-    /**
-     * stageManager provides access to the top level of the game, so that we can
-     * give the programmer access to all of the game parts.
-     */
-    private readonly stageManager: JetLagManager;
-
-    /**
-     * Sometimes we just need to get to the hud...
-     */
+    /** Sometimes we just need to get to the hud... */
     private hud: OverlayApi;
 
-    /**
-     * Set the hud for this API object
-     */
-    setHud(hud: OverlayApi) {
-        this.hud = hud;
-    }
+    /** Set the hud for this API object */
+    setHud(hud: OverlayApi) { this.hud = hud; }
 
     /**
      * Construct a level.  Since Level is merely a facade, this method need only store references to
@@ -44,10 +33,7 @@ export class WorldApi {
      *
      * @param manager the StageManager for the game
      */
-    constructor(manager: JetLagManager) {
-        // save game configuration information
-        this.stageManager = manager;
-    }
+    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) { }
 
     /**
      * Set the background music for this level
@@ -56,7 +42,7 @@ export class WorldApi {
      *                  have been registered as Music, not as a Sound
      */
     public setMusic(musicName: string): void {
-        this.stageManager.getCurrStage().world.music = this.stageManager.device.getSpeaker().getMusic(musicName);
+        this.manager.getCurrStage().world.music = this.device.getSpeaker().getMusic(musicName);
     }
 
     /**
@@ -75,7 +61,7 @@ export class WorldApi {
      * @returns The picture, so that it can be shown and hidden in the future.
      */
     public drawPicture(x: number, y: number, width: number, height: number, imgName: string, zIndex: number): Picture {
-        return this.stageManager.getCurrStage().world.makePicture(x, y, width, height, imgName, zIndex);
+        return this.manager.getCurrStage().world.makePicture(x, y, width, height, imgName, zIndex);
     }
 
     /**
@@ -86,7 +72,7 @@ export class WorldApi {
      *               forces upon objects, but instead the tilt of the phone directly sets velocities
      */
     public setTiltAsVelocity(toggle: boolean) {
-        this.stageManager.getCurrStage().world.tiltVelocityOverride = toggle;
+        this.manager.getCurrStage().world.tiltVelocityOverride = toggle;
     }
 
     /**
@@ -102,7 +88,7 @@ export class WorldApi {
      * @return A Renderable of the text, so it can be enabled/disabled by program code
      */
     public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, tp: () => string, zIndex: number): Renderable {
-        return this.stageManager.getCurrStage().world.addTextCentered(centerX, centerY, fontName, fontColor, fontSize, tp, zIndex);
+        return this.manager.getCurrStage().world.addTextCentered(centerX, centerY, fontName, fontColor, fontSize, tp, zIndex);
     }
 
     /**
@@ -118,7 +104,7 @@ export class WorldApi {
      * @return A Renderable of the text, so it can be enabled/disabled by program code
      */
     public addText(x: number, y: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): Renderable {
-        return this.stageManager.getCurrStage().world.addText(x, y, fontName, fontColor, fontSize, producer, zIndex);
+        return this.manager.getCurrStage().world.addText(x, y, fontName, fontColor, fontSize, producer, zIndex);
     }
 
     /**
@@ -133,9 +119,9 @@ export class WorldApi {
      */
     public makeObstacleAsCircle(x: number, y: number, width: number, height: number, imgName: string): Obstacle {
         let radius: number = Math.max(width, height);
-        let o: Obstacle = new Obstacle(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
+        let o: Obstacle = new Obstacle(this.manager.getCurrStage().world, this.device, this.config, radius, radius, imgName);
         o.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
-        this.stageManager.getCurrStage().world.addActor(o, 0);
+        this.manager.getCurrStage().world.addActor(o, 0);
         return o;
     }
 
@@ -150,9 +136,9 @@ export class WorldApi {
      * @return The obstacle, so that it can be further modified
      */
     public makeObstacleAsBox(x: number, y: number, width: number, height: number, imgName: string): Obstacle {
-        let o: Obstacle = new Obstacle(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let o: Obstacle = new Obstacle(this.manager.getCurrStage().world, this.device, this.config, width, height, imgName);
         o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        this.stageManager.getCurrStage().world.addActor(o, 0);
+        this.manager.getCurrStage().world.addActor(o, 0);
         return o;
     }
 
@@ -169,9 +155,9 @@ export class WorldApi {
      * @return The obstacle, so that it can be further modified
      */
     public makeObstacleAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Obstacle {
-        let o: Obstacle = new Obstacle(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let o: Obstacle = new Obstacle(this.manager.getCurrStage().world, this.device, this.config, width, height, imgName);
         o.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
-        this.stageManager.getCurrStage().world.addActor(o, 0);
+        this.manager.getCurrStage().world.addActor(o, 0);
         return o;
     }
 
@@ -187,10 +173,10 @@ export class WorldApi {
      */
     public makeHeroAsCircle(x: number, y: number, width: number, height: number, imgName: string): Hero {
         let radius: number = Math.max(width, height);
-        let h: Hero = new Hero(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
-        this.stageManager.getCurrStage().score.mHeroesCreated++;
+        let h: Hero = new Hero(this.manager.getCurrStage().world, this.device, this.config, this.manager, radius, radius, imgName);
+        this.manager.getCurrStage().score.mHeroesCreated++;
         h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);
-        this.stageManager.getCurrStage().world.addActor(h, 0);
+        this.manager.getCurrStage().world.addActor(h, 0);
         return h;
     }
 
@@ -205,10 +191,10 @@ export class WorldApi {
      * @return The hero that was created
      */
     public makeHeroAsBox(x: number, y: number, width: number, height: number, imgName: string): Hero {
-        let h: Hero = new Hero(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
-        this.stageManager.getCurrStage().score.mHeroesCreated++;
+        let h: Hero = new Hero(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
+        this.manager.getCurrStage().score.mHeroesCreated++;
         h.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y);
-        this.stageManager.getCurrStage().world.addActor(h, 0);
+        this.manager.getCurrStage().world.addActor(h, 0);
         return h;
     }
 
@@ -226,10 +212,10 @@ export class WorldApi {
      * @return The hero, so that it can be further modified
      */
     public makeHeroAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Hero {
-        let h: Hero = new Hero(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
-        this.stageManager.getCurrStage().score.mHeroesCreated++;
+        let h: Hero = new Hero(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
+        this.manager.getCurrStage().score.mHeroesCreated++;
         h.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
-        this.stageManager.getCurrStage().world.addActor(h, 0);
+        this.manager.getCurrStage().world.addActor(h, 0);
         return h;
     }
 
@@ -245,10 +231,10 @@ export class WorldApi {
      */
     public makeEnemyAsCircle(x: number, y: number, width: number, height: number, imgName: string): Enemy {
         let radius = Math.max(width, height);
-        let e = new Enemy(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
-        this.stageManager.getCurrStage().score.mEnemiesCreated++;
+        let e = new Enemy(this.manager.getCurrStage().world, this.device, this.config, this.manager, radius, radius, imgName);
+        this.manager.getCurrStage().score.mEnemiesCreated++;
         e.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
-        this.stageManager.getCurrStage().world.addActor(e, 0);
+        this.manager.getCurrStage().world.addActor(e, 0);
         return e;
     }
 
@@ -263,10 +249,10 @@ export class WorldApi {
      * @return The enemy, so that it can be modified further
      */
     public makeEnemyAsBox(x: number, y: number, width: number, height: number, imgName: string): Enemy {
-        let e: Enemy = new Enemy(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
-        this.stageManager.getCurrStage().score.mEnemiesCreated++;
+        let e: Enemy = new Enemy(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
+        this.manager.getCurrStage().score.mEnemiesCreated++;
         e.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        this.stageManager.getCurrStage().world.addActor(e, 0);
+        this.manager.getCurrStage().world.addActor(e, 0);
         return e;
     }
 
@@ -283,10 +269,10 @@ export class WorldApi {
      * @return The enemy, so that it can be further modified
      */
     public makeEnemyAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Enemy {
-        let e: Enemy = new Enemy(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
-        this.stageManager.getCurrStage().score.mEnemiesCreated++;
+        let e: Enemy = new Enemy(this.manager.getCurrStage().world, this.device, this.config, this.manager, width, height, imgName);
+        this.manager.getCurrStage().score.mEnemiesCreated++;
         e.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
-        this.stageManager.getCurrStage().world.addActor(e, 0);
+        this.manager.getCurrStage().world.addActor(e, 0);
         return e;
     }
 
@@ -302,10 +288,10 @@ export class WorldApi {
      */
     public makeDestinationAsCircle(x: number, y: number, width: number, height: number, imgName: string): Destination {
         let radius = Math.max(width, height);
-        let d: Destination = new Destination(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
+        let d: Destination = new Destination(this.manager.getCurrStage().world, this.device, this.config, radius, radius, imgName);
         d.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
         d.setCollisionsEnabled(false);
-        this.stageManager.getCurrStage().world.addActor(d, 0);
+        this.manager.getCurrStage().world.addActor(d, 0);
         return d;
     }
 
@@ -320,10 +306,10 @@ export class WorldApi {
      * @return The destination, so that it can be modified further
      */
     public makeDestinationAsBox(x: number, y: number, width: number, height: number, imgName: string): Destination {
-        let d: Destination = new Destination(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let d: Destination = new Destination(this.manager.getCurrStage().world, this.device, this.config, width, height, imgName);
         d.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         d.setCollisionsEnabled(false);
-        this.stageManager.getCurrStage().world.addActor(d, 0);
+        this.manager.getCurrStage().world.addActor(d, 0);
         return d;
     }
 
@@ -340,10 +326,10 @@ export class WorldApi {
      * @return The destination, so that it can be further modified
      */
     public makeDestinationAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Destination {
-        let d: Destination = new Destination(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let d: Destination = new Destination(this.manager.getCurrStage().world, this.device, this.config, width, height, imgName);
         d.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         d.setCollisionsEnabled(false);
-        this.stageManager.getCurrStage().world.addActor(d, 0);
+        this.manager.getCurrStage().world.addActor(d, 0);
         return d;
     }
 
@@ -359,10 +345,10 @@ export class WorldApi {
      */
     public makeGoodieAsCircle(x: number, y: number, width: number, height: number, imgName: string): Goodie {
         let radius: number = Math.max(width, height);
-        let g: Goodie = new Goodie(this.stageManager, this.stageManager.getCurrStage().world, radius, radius, imgName);
+        let g: Goodie = new Goodie(this.manager.getCurrStage().world, this.device, this.config, radius, radius, imgName);
         g.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
         g.setCollisionsEnabled(false);
-        this.stageManager.getCurrStage().world.addActor(g, 0);
+        this.manager.getCurrStage().world.addActor(g, 0);
         return g;
     }
 
@@ -377,10 +363,10 @@ export class WorldApi {
      * @return The goodie, so that it can be further modified
      */
     public makeGoodieAsBox(x: number, y: number, width: number, height: number, imgName: string): Goodie {
-        let g: Goodie = new Goodie(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let g: Goodie = new Goodie(this.manager.getCurrStage().world, this.device, this.config, width, height, imgName);
         g.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         g.setCollisionsEnabled(false);
-        this.stageManager.getCurrStage().world.addActor(g, 0);
+        this.manager.getCurrStage().world.addActor(g, 0);
         return g;
     }
 
@@ -397,10 +383,10 @@ export class WorldApi {
      * @return The goodie, so that it can be further modified
      */
     public makeGoodieAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Goodie {
-        let g: Goodie = new Goodie(this.stageManager, this.stageManager.getCurrStage().world, width, height, imgName);
+        let g: Goodie = new Goodie(this.manager.getCurrStage().world, this.device, this.config, width, height, imgName);
         g.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         g.setCollisionsEnabled(false);
-        this.stageManager.getCurrStage().world.addActor(g, 0);
+        this.manager.getCurrStage().world.addActor(g, 0);
         return g;
     }
 
@@ -411,18 +397,18 @@ export class WorldApi {
      * @param yGravityMax Max Y force that the accelerometer can produce
      */
     public enableTilt(xGravityMax: number, yGravityMax: number) {
-        this.stageManager.getCurrStage().world.tiltMax.x = xGravityMax;
-        this.stageManager.getCurrStage().world.tiltMax.y = yGravityMax;
-        if (!this.stageManager.device.getAccelerometer().getSupported()) {
-            this.hud.setUpKeyAction(JetLagKeys.UP, () => { this.stageManager.device.getAccelerometer().setY(0); });
-            this.hud.setUpKeyAction(JetLagKeys.DOWN, () => { this.stageManager.device.getAccelerometer().setY(0); });
-            this.hud.setUpKeyAction(JetLagKeys.LEFT, () => { this.stageManager.device.getAccelerometer().setX(0); });
-            this.hud.setUpKeyAction(JetLagKeys.RIGHT, () => { this.stageManager.device.getAccelerometer().setX(0); });
+        this.manager.getCurrStage().world.tiltMax.x = xGravityMax;
+        this.manager.getCurrStage().world.tiltMax.y = yGravityMax;
+        if (!this.device.getAccelerometer().getSupported()) {
+            this.hud.setUpKeyAction(JetLagKeys.UP, () => { this.device.getAccelerometer().setY(0); });
+            this.hud.setUpKeyAction(JetLagKeys.DOWN, () => { this.device.getAccelerometer().setY(0); });
+            this.hud.setUpKeyAction(JetLagKeys.LEFT, () => { this.device.getAccelerometer().setX(0); });
+            this.hud.setUpKeyAction(JetLagKeys.RIGHT, () => { this.device.getAccelerometer().setX(0); });
 
-            this.hud.setDownKeyAction(JetLagKeys.UP, () => { this.stageManager.device.getAccelerometer().setY(-5); });
-            this.hud.setDownKeyAction(JetLagKeys.DOWN, () => { this.stageManager.device.getAccelerometer().setY(5); });
-            this.hud.setDownKeyAction(JetLagKeys.LEFT, () => { this.stageManager.device.getAccelerometer().setX(-5); });
-            this.hud.setDownKeyAction(JetLagKeys.RIGHT, () => { this.stageManager.device.getAccelerometer().setX(5); });
+            this.hud.setDownKeyAction(JetLagKeys.UP, () => { this.device.getAccelerometer().setY(-5); });
+            this.hud.setDownKeyAction(JetLagKeys.DOWN, () => { this.device.getAccelerometer().setY(5); });
+            this.hud.setDownKeyAction(JetLagKeys.LEFT, () => { this.device.getAccelerometer().setX(-5); });
+            this.hud.setDownKeyAction(JetLagKeys.RIGHT, () => { this.device.getAccelerometer().setX(5); });
         }
     }
 
@@ -463,7 +449,7 @@ export class WorldApi {
      * @param height height of the camera
      */
     public setCameraBounds(width: number, height: number): void {
-        this.stageManager.getCurrStage().world.camera.setBounds(width, height);
+        this.manager.getCurrStage().world.camera.setBounds(width, height);
     }
 
     /**
@@ -472,7 +458,7 @@ export class WorldApi {
      * @param actor The actor the camera should chase
      */
     public setCameraChase(actor: WorldActor) {
-        this.stageManager.getCurrStage().world.cameraChaseActor = actor;
+        this.manager.getCurrStage().world.cameraChaseActor = actor;
     }
 
     /**
@@ -484,7 +470,7 @@ export class WorldApi {
      * @param zoom The new zoom level
      */
     public setZoom(zoom: number): void {
-        this.stageManager.getCurrStage().world.camera.setScale(zoom);
+        this.manager.getCurrStage().world.camera.setScale(zoom);
     }
 
     /**
@@ -492,7 +478,7 @@ export class WorldApi {
      * about the meaning of this number (it's a pixel/meter ratio)
      */
     public getZoom(): number {
-        return this.stageManager.getCurrStage().world.camera.getScale();
+        return this.manager.getCurrStage().world.camera.getScale();
     }
 
     /**
@@ -503,7 +489,7 @@ export class WorldApi {
      * @param action The action to perform when the timer expires
      */
     public addTimer(interval: number, repeat: boolean, action: () => void) {
-        this.stageManager.getCurrStage().world.timer.addEvent(new TimedEvent(interval, repeat, action));
+        this.manager.getCurrStage().world.timer.addEvent(new TimedEvent(interval, repeat, action));
     }
 
     /**
@@ -513,7 +499,7 @@ export class WorldApi {
      * @param newYGravity The new Y gravity
      */
     public resetGravity(newXGravity: number, newYGravity: number): void {
-        this.stageManager.getCurrStage().world.world.SetGravity(new PhysicsType2d.Vector2(newXGravity, newYGravity));
+        this.manager.getCurrStage().world.world.SetGravity(new PhysicsType2d.Vector2(newXGravity, newYGravity));
     }
 
     /**
@@ -530,7 +516,7 @@ export class WorldApi {
     */
     public configureProjectiles(size: number, width: number, height: number, imgName: string,
         strength: number, zIndex: number, isCircle: boolean): void {
-        this.stageManager.getCurrStage().world.projectilePool = new ProjectilePool(this.stageManager, this.stageManager.getCurrStage().world,
+        this.manager.getCurrStage().world.projectilePool = new ProjectilePool(this.manager.getCurrStage().world, this.device, this.config,
             size, width, height, imgName, strength, zIndex, isCircle);
     }
 
@@ -549,8 +535,8 @@ export class WorldApi {
      * @param imgName The name of the image file to use as the background
      */
     public addHorizontalBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.stageManager);
-        this.stageManager.getCurrStage().background.layers.push(pl);
+        let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.config, this.device);
+        this.manager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -568,8 +554,8 @@ export class WorldApi {
      * @param imgName The name of the image file to use as the background
      */
     public addVerticalBackgroundLayer(x: number, y: number, width: number, height: number, ySpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, ySpeed, false, false, imgName, this.stageManager);
-        this.stageManager.getCurrStage().background.layers.push(pl);
+        let pl = new ParallaxLayer(x, y, width, height, ySpeed, false, false, imgName, this.config, this.device);
+        this.manager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -586,8 +572,8 @@ export class WorldApi {
      * @param imgName The name of the image file to use as the background
      */
     public addHorizontalForegroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.stageManager);
-        this.stageManager.getCurrStage().foreground.layers.push(pl);
+        let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.config, this.device);
+        this.manager.getCurrStage().foreground.layers.push(pl);
     }
 
     /**
@@ -604,8 +590,8 @@ export class WorldApi {
      * @param imgName The name of the image file to use as the background
      */
     public addHorizontalAutoBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, xSpeed / 1000, true, true, imgName, this.stageManager);
-        this.stageManager.getCurrStage().background.layers.push(pl);
+        let pl = new ParallaxLayer(x, y, width, height, xSpeed / 1000, true, true, imgName, this.config, this.device);
+        this.manager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -622,8 +608,8 @@ export class WorldApi {
      * @param imgName The name of the image file to use as the background
      */
     public addVerticalAutoBackgroundLayer(x: number, y: number, width: number, height: number, ySpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, ySpeed / 1000, false, true, imgName, this.stageManager);
-        this.stageManager.getCurrStage().background.layers.push(pl);
+        let pl = new ParallaxLayer(x, y, width, height, ySpeed / 1000, false, true, imgName, this.config, this.device);
+        this.manager.getCurrStage().background.layers.push(pl);
     }
 
     /**
@@ -633,7 +619,7 @@ export class WorldApi {
      * @param distance Maximum distance from the hero that a projectile can travel
      */
     public setProjectileRange(distance: number): void {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
+        for (let p of this.manager.getCurrStage().world.projectilePool.pool)
             p.range = distance;
     }
 
@@ -642,7 +628,7 @@ export class WorldApi {
      * or less) immune to gravitational forces.
      */
     public setProjectileGravityOn(): void {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
+        for (let p of this.manager.getCurrStage().world.projectilePool.pool)
             p.body.SetGravityScale(1);
     }
 
@@ -653,7 +639,7 @@ export class WorldApi {
     * @param factor The value to multiply against the projectile speed.
     */
     public setProjectileVectorDampeningFactor(factor: number): void {
-        this.stageManager.getCurrStage().world.projectilePool.directionalDamp = factor;
+        this.manager.getCurrStage().world.projectilePool.directionalDamp = factor;
     }
 
     /**
@@ -661,7 +647,7 @@ export class WorldApi {
      * they collide with other actors
      */
     public enableCollisionsForProjectiles(): void {
-        this.stageManager.getCurrStage().world.projectilePool.sensor = false;
+        this.manager.getCurrStage().world.projectilePool.sensor = false;
     }
 
     /**
@@ -671,8 +657,8 @@ export class WorldApi {
      * @param velocity The magnitude of the velocity for projectiles
      */
     public setFixedVectorThrowVelocityForProjectiles(velocity: number): void {
-        this.stageManager.getCurrStage().world.projectilePool.enableFixedVectorVelocity = true;
-        this.stageManager.getCurrStage().world.projectilePool.fixedVectorVelocity = velocity;
+        this.manager.getCurrStage().world.projectilePool.enableFixedVectorVelocity = true;
+        this.manager.getCurrStage().world.projectilePool.fixedVectorVelocity = velocity;
     }
 
     /**
@@ -680,14 +666,14 @@ export class WorldApi {
      * their direction or movement
      */
     public setRotateVectorThrowForProjectiles(): void {
-        this.stageManager.getCurrStage().world.projectilePool.mRotateVectorThrow = true;
+        this.manager.getCurrStage().world.projectilePool.mRotateVectorThrow = true;
     }
 
     /**
      * Indicate that when two projectiles collide, they should both remain on screen
      */
     public setCollisionOkForProjectiles(): void {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
+        for (let p of this.manager.getCurrStage().world.projectilePool.pool)
             p.disappearOnCollide = false;
     }
 
@@ -698,7 +684,7 @@ export class WorldApi {
      * @param factor The value to multiply against the projectile speed.
      */
     public setProjectileMultiplier(factor: number) {
-        this.stageManager.getCurrStage().world.projectilePool.directionalDamp = factor;
+        this.manager.getCurrStage().world.projectilePool.directionalDamp = factor;
     }
 
     /**
@@ -707,7 +693,7 @@ export class WorldApi {
      * @param number How many projectiles are available
      */
     public setNumberOfProjectiles(number: number): void {
-        this.stageManager.getCurrStage().world.projectilePool.remaining = number;
+        this.manager.getCurrStage().world.projectilePool.remaining = number;
     }
 
     /**
@@ -716,7 +702,7 @@ export class WorldApi {
      * @param soundName Name of the sound file to play
      */
     public setThrowSound(soundName: string): void {
-        this.stageManager.getCurrStage().world.projectilePool.mThrowSound = this.stageManager.device.getSpeaker().getSound(soundName);
+        this.manager.getCurrStage().world.projectilePool.mThrowSound = this.device.getSpeaker().getSound(soundName);
     }
 
     /**
@@ -725,8 +711,8 @@ export class WorldApi {
      * @param soundName the name of the sound file to play
      */
     public setProjectileDisappearSound(soundName: string): void {
-        this.stageManager.getCurrStage().world.projectilePool.mProjectileDisappearSound =
-            this.stageManager.device.getSpeaker().getSound(soundName);
+        this.manager.getCurrStage().world.projectilePool.mProjectileDisappearSound =
+            this.device.getSpeaker().getSound(soundName);
     }
 
     /**
@@ -747,7 +733,7 @@ export class WorldApi {
      * @return The animation
      */
     public makeComplexAnimation(repeat: boolean) {
-        return new Animation(repeat, this.stageManager.device.getRenderer());
+        return new Animation(repeat, this.device.getRenderer());
     }
 
     /**
@@ -759,7 +745,7 @@ export class WorldApi {
      * @return The animation
      */
     public makeAnimation(timePerFrame: number, repeat: boolean, imgNames: string[]) {
-        let a = new Animation(repeat, this.stageManager.device.getRenderer());
+        let a = new Animation(repeat, this.device.getRenderer());
         for (let i of imgNames)
             a.to(i, timePerFrame);
         return a;
@@ -771,7 +757,7 @@ export class WorldApi {
      * @param animation The animation object to use for each projectile that is thrown
      */
     public setProjectileAnimation(animation: Animation) {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
+        for (let p of this.manager.getCurrStage().world.projectilePool.pool)
             p.setDefaultAnimation(animation.clone());
     }
 
@@ -781,9 +767,9 @@ export class WorldApi {
      * @param imgName The file to use when picking images
      */
     public setProjectileImageSource(imgName: string) {
-        for (let p of this.stageManager.getCurrStage().world.projectilePool.pool)
-            p.mAnimator.updateImage(this.stageManager.device.getRenderer(), imgName);
-        this.stageManager.getCurrStage().world.projectilePool.mRandomizeImages = true;
+        for (let p of this.manager.getCurrStage().world.projectilePool.pool)
+            p.mAnimator.updateImage(this.device.getRenderer(), imgName);
+        this.manager.getCurrStage().world.projectilePool.mRandomizeImages = true;
     }
 
     /**
@@ -792,7 +778,7 @@ export class WorldApi {
      * @param color The color, formated as 0xRRGGBB
      */
     public setBackgroundColor(color: number) {
-        this.stageManager.getCurrStage().backgroundColor = color;
+        this.manager.getCurrStage().backgroundColor = color;
     }
 
     /**
@@ -808,6 +794,6 @@ export class WorldApi {
      */
     public drawSVG(filename: string, xTranslate: number, yTranslate: number, xStretch: number, yStretch: number, callback: (actor: WorldActor) => void) {
         let s = new Svg();
-        s.processFile(filename, xTranslate, yTranslate, xStretch, yStretch, this, this.stageManager.config, callback);
+        s.processFile(filename, xTranslate, yTranslate, xStretch, yStretch, this, this.config, callback);
     }
 }

@@ -1,8 +1,8 @@
 import { WorldActor } from "./WorldActor"
-import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
 import { Hero } from "./Hero"
-import { JetLagSound } from "../misc/JetLagDevice";
+import { JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * Destinations are actors that the Hero should try to reach. When a Hero reaches a destination, the
@@ -33,8 +33,8 @@ export class Destination extends WorldActor {
      * @param height The height, in meters, of the Destination
      * @param imgName The image to display for this destination
      */
-    constructor(manager: JetLagManager, scene: WorldScene, width: number, height: number, imgName: string) {
-        super(manager, scene, imgName, width, height);
+    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, width: number, height: number, imgName: string) {
+        super(scene, device, config, imgName, width, height);
         this.capacity = 1;
         this.holding = 0;
     }
@@ -90,6 +90,6 @@ export class Destination extends WorldActor {
      * @param soundName The name of the sound file that should play
      */
     public setArrivalSound(soundName: string): void {
-        this.arrivalSound = this.manager.device.getSpeaker().getSound(soundName);
+        this.arrivalSound = this.device.getSpeaker().getSound(soundName);
     }
 }

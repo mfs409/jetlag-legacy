@@ -1,7 +1,8 @@
 import { WorldActor } from "./WorldActor"
-import { JetLagManager } from "../JetLagManager"
 import { WorldScene } from "../stage/WorldScene"
 import { Hero } from "./Hero"
+import { JetLagDevice } from "../misc/JetLagDevice";
+import { JetLagConfig } from "../JetLagConfig";
 
 /**
  * Goodies are actors that a hero can collect.
@@ -32,9 +33,9 @@ export class Goodie extends WorldActor {
    * @param height  height of this Goodie
    * @param imgName image to use for this Goodie
    */
-  constructor(manager: JetLagManager, scene: WorldScene, width: number,
+  constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, width: number,
     height: number, imgName: string) {
-    super(manager, scene, imgName, width, height);
+    super(scene, device, config, imgName, width, height);
   }
 
   /**
