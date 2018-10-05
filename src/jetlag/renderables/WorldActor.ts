@@ -1,8 +1,5 @@
 import { BaseActor } from "./BaseActor"
 import { Hero } from "./Hero"
-import { WorldScene } from "../scenes/WorldScene"
-import { JetLagDevice } from "../misc/JetLagDevice";
-import { JetLagConfig } from "../JetLagConfig";
 import { JetLagStage } from "../JetLagStage";
 
 /**
@@ -64,8 +61,8 @@ export abstract class WorldActor extends BaseActor {
    * @param width   The width
    * @param height  The height
    */
-  constructor(scene: WorldScene, device: JetLagDevice, protected config: JetLagConfig, protected stage: JetLagStage, imgName: string, width: number, height: number) {
-    super(scene, device, imgName, width, height);
+  constructor(protected stage: JetLagStage, imgName: string, width: number, height: number) {
+    super(stage.getWorld(), stage.getDevice(), imgName, width, height);
   }
 
   /**
@@ -93,14 +90,14 @@ export abstract class WorldActor extends BaseActor {
    */
   public setMoveByTilting(): void {
     // If we've already added this to the set of tiltable objects, don't do it again
-    if ((this.scene as WorldScene).tiltActors.indexOf(this) >= 0) {
+    if (this.stage.getWorld().tiltActors.indexOf(this) >= 0) {
       return;
     }
     // make sure it is moveable, add it to the list of tilt actors
     if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC) {
       this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     }
-    (this.scene as WorldScene).tiltActors.push(this);
+    this.stage.getWorld().tiltActors.push(this);
     // turn off sensor behavior, so this collides with stuff...
     this.setCollisionsEnabled(true);
   }
@@ -131,7 +128,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setChaseSpeed(speed: number, target: WorldActor, chaseInX: boolean, chaseInY: boolean) {
     this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
-    this.scene.repeatEvents.push(() => {
+    this.stage.getWorld().repeatEvents.push(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -176,7 +173,7 @@ export abstract class WorldActor extends BaseActor {
   public setChaseFixedMagnitude(target: WorldActor, xMagnitude: number, yMagnitude: number, ignoreX: boolean, ignoreY: boolean): void {
     this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     let out_this = this;
-    this.scene.repeatEvents.push(() => {
+    this.stage.getWorld().repeatEvents.push(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -275,13 +272,13 @@ export abstract class WorldActor extends BaseActor {
    * @param y the Y coordinate (in pixels) where the actor should appear
    */
   public setHover(x: number, y: number) {
-    let pmr = this.config.pixelMeterRatio;
+    let pmr = this.stage.getConfig().pixelMeterRatio;
     this.hover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
-    this.scene.repeatEvents.push(() => {
+    this.stage.getWorld().repeatEvents.push(() => {
       if (this.hover == null)
         return;
       this.hover.Set(x * pmr, y * pmr);
-      let a = this.scene.camera.screenToMeters(this.hover.x, this.hover.y);
+      let a = this.stage.getWorld().camera.screenToMeters(this.hover.x, this.hover.y);
       this.hover.Set(a.x, a.y);
       this.body.SetTransform(this.hover, this.body.GetAngle());
     });
@@ -322,7 +319,7 @@ export abstract class WorldActor extends BaseActor {
     this.revJointDef.collideConnected = false;
     this.revJointDef.referenceAngle = 0;
     this.revJointDef.enableLimit = false;
-    this.revJoint = this.scene.createJoint(this.revJointDef);
+    this.revJoint = this.stage.getWorld().createJoint(this.revJointDef);
   }
 
   /**
@@ -333,11 +330,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.scene.destroyJoint(this.revJoint);
+    this.stage.getWorld().destroyJoint(this.revJoint);
     this.revJointDef.enableMotor = true;
     this.revJointDef.motorSpeed = motorSpeed;
     this.revJointDef.maxMotorTorque = motorTorque;
-    this.revJoint = this.scene.createJoint(this.revJointDef);
+    this.revJoint = this.stage.getWorld().createJoint(this.revJointDef);
   }
 
   /**
@@ -348,11 +345,11 @@ export abstract class WorldActor extends BaseActor {
    */
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create the joint
-    this.scene.destroyJoint(this.revJoint);
+    this.stage.getWorld().destroyJoint(this.revJoint);
     this.revJointDef.upperAngle = upper;
     this.revJointDef.lowerAngle = lower;
     this.revJointDef.enableLimit = true;
-    this.revJoint = this.scene.createJoint(this.revJointDef);
+    this.revJoint = this.stage.getWorld().createJoint(this.revJointDef);
   }
 
   /**
@@ -375,7 +372,7 @@ export abstract class WorldActor extends BaseActor {
     w.localAnchorB.Set(otherX, otherY);
     w.referenceAngle = angle;
     w.collideConnected = false;
-    this.scene.createJoint(w);
+    this.stage.getWorld().createJoint(w);
   }
 
   /**
@@ -401,7 +398,7 @@ export abstract class WorldActor extends BaseActor {
     mDistJointDef.dampingRatio = 0.1;
     mDistJointDef.frequencyHz = 2;
 
-    this.scene.createJoint(mDistJointDef);
+    this.stage.getWorld().createJoint(mDistJointDef);
   }
 
   /**
@@ -410,9 +407,9 @@ export abstract class WorldActor extends BaseActor {
   breakJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint != null) {
-      this.scene.destroyJoint(this.distJoint);
+      this.stage.getWorld().destroyJoint(this.distJoint);
       this.distJoint = null;
-      this.scene.destroyJoint(this.weldJoint);
+      this.stage.getWorld().destroyJoint(this.weldJoint);
       this.weldJoint = null;
     }
   }

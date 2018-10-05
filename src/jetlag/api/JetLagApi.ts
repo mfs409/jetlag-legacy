@@ -3,10 +3,8 @@ import { WorldApi } from "./WorldApi"
 import { OverlayApi } from "./OverlayApi"
 import { JetLagManager } from "../JetLagManager"
 import { NavigationApi } from "./NavigationApi"
-import { JetLagConfig } from "../JetLagConfig";
-import { JetLagDevice, JetLagKeys } from "../misc/JetLagDevice";
+import { JetLagKeys } from "../misc/JetLagDevice";
 import { JetLagStage } from "../JetLagStage";
-import { Score } from "../misc/Score";
 
 /**
  * JetLagApi provides a broad, public, declarative interface to the core
@@ -44,16 +42,16 @@ export class JetLagApi {
     readonly nav: NavigationApi;
 
     /** Construct the JetLag API from a manager object */
-    constructor(manager: JetLagManager, config: JetLagConfig, private device: JetLagDevice, stage: JetLagStage, score: Score) {
-        this.world = new WorldApi(device, config, stage, score);
-        this.hud = new OverlayApi(stage.getHud(), device, stage);
-        this.score = new ScoreApi(device, stage, score);
+    constructor(manager: JetLagManager, private stage: JetLagStage) {
+        this.world = new WorldApi(stage);
+        this.hud = new OverlayApi(stage, stage.getHud());
+        this.score = new ScoreApi(stage);
         this.nav = new NavigationApi(manager, stage);
     }
 
     /** Generate text indicating the current FPS */
     public getFPS(): number {
-        return this.device.getRenderer().getFPS();
+        return this.stage.getDevice().getRenderer().getFPS();
     }
 
     /**
@@ -62,7 +60,7 @@ export class JetLagApi {
      * @param soundName The name of the sound asset to play
      */
     public playSound(soundName: string) {
-        this.device.getSpeaker().getSound(soundName).play();
+        this.stage.getDevice().getSpeaker().getSound(soundName).play();
     }
 
     /**
@@ -70,15 +68,15 @@ export class JetLagApi {
      */
     public toggleMute() {
         // volume is either 1 or 0
-        if (this.device.getStorage().getPersistent("volume", "1") === "1") {
+        if (this.stage.getDevice().getStorage().getPersistent("volume", "1") === "1") {
             // set volume to 0, set image to 'unmute'
-            this.device.getStorage().setPersistent("volume", "0");
+            this.stage.getDevice().getStorage().setPersistent("volume", "0");
         } else {
             // set volume to 1, set image to 'mute'
-            this.device.getStorage().setPersistent("volume", "1");
+            this.stage.getDevice().getStorage().setPersistent("volume", "1");
         }
         // update all music
-        this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
+        this.stage.getDevice().getSpeaker().resetMusicVolume(parseInt(this.stage.getDevice().getStorage().getPersistent("volume", "1")));
     }
 
     /**
@@ -86,7 +84,7 @@ export class JetLagApi {
      * corresponds to muted.
      */
     public getVolume() {
-        return this.device.getStorage().getPersistent("volume", "1") === "1";
+        return this.stage.getDevice().getStorage().getPersistent("volume", "1") === "1";
     }
 
     /**
@@ -96,7 +94,7 @@ export class JetLagApi {
      * @param action The action to perform when the key is released
      */
     public setUpKeyAction(key: JetLagKeys, action: () => void) {
-        this.device.getKeyboard().setKeyUpHandler(key, action);
+        this.stage.getDevice().getKeyboard().setKeyUpHandler(key, action);
     }
 
     /**
@@ -106,7 +104,7 @@ export class JetLagApi {
      * @param action The action to perform when the key is released
      */
     public setDownKeyAction(key: JetLagKeys, action: () => void) {
-        this.device.getKeyboard().setKeyDownHandler(key, action);
+        this.stage.getDevice().getKeyboard().setKeyDownHandler(key, action);
     }
 
 }

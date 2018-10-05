@@ -1,11 +1,7 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../scenes/WorldScene"
 import { Hero } from "./Hero"
 import { Obstacle } from "./Obstacle"
 import { Projectile } from "./Projectile"
-import { JetLagConfig } from "../JetLagConfig";
-import { JetLagDevice } from "../misc/JetLagDevice";
-import { Score } from "../misc/Score";
 import { JetLagStage } from "../JetLagStage";
 
 /**
@@ -46,8 +42,8 @@ export class Enemy extends WorldActor {
      * @param height  Height of this enemy
      * @param imgName Image to display
      */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, private score: Score, stage: JetLagStage, width: number, height: number, imgName: string) {
-        super(scene, device, config, stage, imgName, width, height);
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string) {
+        super(stage, imgName, width, height);
         this.damage = 2;
     }
 
@@ -94,7 +90,7 @@ export class Enemy extends WorldActor {
 
         // possibly update score
         if (increaseScore) {
-            this.score.onEnemyDefeated();
+            this.stage.getScore().onEnemyDefeated();
         }
     }
 
@@ -168,7 +164,7 @@ export class Enemy extends WorldActor {
      */
     public setDisappearOnTouch() {
         this.setTapCallback(() => {
-            this.device.getVibration().vibrate(100);
+            this.stage.getDevice().getVibration().vibrate(100);
             this.defeat(true, null);
             this.setTapCallback(null);
             return true;

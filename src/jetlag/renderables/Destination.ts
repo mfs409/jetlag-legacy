@@ -1,8 +1,6 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../scenes/WorldScene"
 import { Hero } from "./Hero"
-import { JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
-import { JetLagConfig } from "../JetLagConfig";
+import { JetLagSound } from "../misc/JetLagDevice";
 import { JetLagStage } from "../JetLagStage";
 
 /**
@@ -34,8 +32,8 @@ export class Destination extends WorldActor {
      * @param height The height, in meters, of the Destination
      * @param imgName The image to display for this destination
      */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, stage: JetLagStage, width: number, height: number, imgName: string) {
-        super(scene, device, config, stage, imgName, width, height);
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string) {
+        super(stage, imgName, width, height);
         this.capacity = 1;
         this.holding = 0;
     }
@@ -91,6 +89,6 @@ export class Destination extends WorldActor {
      * @param soundName The name of the sound file that should play
      */
     public setArrivalSound(soundName: string): void {
-        this.arrivalSound = this.device.getSpeaker().getSound(soundName);
+        this.arrivalSound = this.stage.getDevice().getSpeaker().getSound(soundName);
     }
 }

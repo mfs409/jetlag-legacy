@@ -132,7 +132,7 @@ export class BaseActor implements Renderable {
      * @param width   The width of the actor's image and body, in meters
      * @param height  The height of the actor's image and body, in meters
      */
-    constructor(protected scene: Scene, protected device: JetLagDevice, imgName: string, width: number, height: number) {
+    constructor(private scene: Scene, private device: JetLagDevice, imgName: string, width: number, height: number) {
         this.animator = new AnimationDriver(device.getRenderer(), imgName);
         this.debug = device.getRenderer().makeDebugContext();
         this.disappearAnimateSize = new PhysicsType2d.Vector2(0, 0);

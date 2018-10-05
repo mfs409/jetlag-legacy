@@ -121,10 +121,13 @@ export class JetLagStage {
      *
      * @param manager The JetLagManager that navigates among stages
      */
-    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) { }
+    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) {
+        this.score = new Score(this);
+    }
 
-    /** Set the score object */
-    setScore(score: Score) { this.score = score; }
+    public getScore() { return this.score; }
+    public getConfig() { return this.config; }
+    public getDevice() { return this.device; }
 
     /** Set the music for the stage */
     setMusic(music: JetLagSound) { this.music = music; }
@@ -233,12 +236,12 @@ export class JetLagStage {
         // touches, and that win and lose scenes should come first.
         if (this.welcomeSceneBuilder) {
             this.overlay = new OverlayScene(this.config, this.device);
-            this.welcomeSceneBuilder(new OverlayApi(this.overlay, this.device, this));
+            this.welcomeSceneBuilder(new OverlayApi(this, this.overlay));
             this.welcomeSceneBuilder = null;
         }
         if (this.pauseSceneBuilder) {
             this.overlay = new OverlayScene(this.config, this.device);
-            this.pauseSceneBuilder(new OverlayApi(this.overlay, this.device, this));
+            this.pauseSceneBuilder(new OverlayApi(this, this.overlay));
             this.pauseSceneBuilder = null;
         }
         if (this.overlay) {
@@ -342,7 +345,7 @@ export class JetLagStage {
         if (win) {
             if (this.winSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
-                this.winSceneBuilder(new OverlayApi(this.overlay, this.device, this));
+                this.winSceneBuilder(new OverlayApi(this, this.overlay));
                 this.winSceneBuilder = null;
             }
             else {
@@ -352,7 +355,7 @@ export class JetLagStage {
         else {
             if (this.loseSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
-                this.loseSceneBuilder(new OverlayApi(this.overlay, this.device, this));
+                this.loseSceneBuilder(new OverlayApi(this, this.overlay));
                 this.loseSceneBuilder = null;
             }
             else {

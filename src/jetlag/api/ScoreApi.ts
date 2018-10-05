@@ -1,6 +1,4 @@
-import { JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagStage } from "../JetLagStage";
-import { Score } from "../misc/Score";
 
 /**
  * ScoreApi provides an interface for configuring everything related to the
@@ -12,7 +10,7 @@ export class ScoreApi {
      *
      * @param manager the JetLagManager for the game
      */
-    constructor(private device: JetLagDevice, private stage: JetLagStage, private score: Score) { }
+    constructor(private stage: JetLagStage) { }
 
     /**
      * Look up a fact that was stored for the current game session. If no such fact exists,
@@ -23,7 +21,7 @@ export class ScoreApi {
      * @return The string value corresponding to the last value stored
      */
     public getGameFact(factName: string, defaultVal: string): string {
-        return this.device.getStorage().getPersistent(factName, defaultVal);
+        return this.stage.getDevice().getStorage().getPersistent(factName, defaultVal);
     }
 
     /**
@@ -35,7 +33,7 @@ export class ScoreApi {
      * @return The integer value corresponding to the last value stored
      */
     public getLevelFact(factName: string, defaultVal: string): string {
-        return this.device.getStorage().getLevel(factName, defaultVal);
+        return this.stage.getDevice().getStorage().getLevel(factName, defaultVal);
     }
 
     /**
@@ -47,7 +45,7 @@ export class ScoreApi {
      * @return The integer value corresponding to the last value stored
      */
     public getSessionFact(factName: string, defaultVal: string) {
-        return this.device.getStorage().getSession(factName, defaultVal);
+        return this.stage.getDevice().getStorage().getSession(factName, defaultVal);
     }
 
     /**
@@ -58,7 +56,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setLevelFact(factName: string, factValue: string) {
-        this.device.getStorage().setLevel(factName, factValue);
+        this.stage.getDevice().getStorage().setLevel(factName, factValue);
     }
 
     /**
@@ -69,7 +67,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setSessionFact(factName: string, factValue: string) {
-        this.device.getStorage().setSession(factName, factValue);
+        this.stage.getDevice().getStorage().setSession(factName, factValue);
     }
 
 
@@ -81,7 +79,7 @@ export class ScoreApi {
      * @param factValue The integer value that is the fact being saved
      */
     public setGameFact(factName: string, factValue: string) {
-        this.device.getStorage().setPersistent(factName, factValue);
+        this.stage.getDevice().getStorage().setPersistent(factName, factValue);
     }
 
     /**
@@ -90,8 +88,8 @@ export class ScoreApi {
      * @param howMany Number of heroes that must reach destinations
      */
     public setVictoryDestination(howMany: number): void {
-        this.score.setWinDestination();
-        this.score.victoryHeroCount = howMany;
+        this.stage.getScore().setWinDestination();
+        this.stage.getScore().victoryHeroCount = howMany;
     }
 
     /**
@@ -103,7 +101,7 @@ export class ScoreApi {
      * @param howMany The number of enemies that must be defeated to win the level
      */
     public setVictoryEnemyCount(howMany?: number): void {
-        this.score.setVictoryEnemyCount(howMany);
+        this.stage.getScore().setVictoryEnemyCount(howMany);
     }
 
     /**
@@ -115,63 +113,63 @@ export class ScoreApi {
      * @param v4 Number of type-4 goodies that must be collected to win the level
      */
     public setVictoryGoodies(v1: number, v2: number, v3: number, v4: number) {
-        this.score.setVictoryGoodies(v1, v2, v3, v4);
+        this.stage.getScore().setVictoryGoodies(v1, v2, v3, v4);
     }
 
     /**
      * Return the number of type-1 goodies that have been collected in the current level
      */
     public getGoodies1(): number {
-        return this.score.goodiesCollected[0];
+        return this.stage.getScore().goodiesCollected[0];
     }
 
     /**
      * Return the number of type-2 goodies that have been collected in the current level
      */
     public getGoodies2(): number {
-        return this.score.goodiesCollected[1];
+        return this.stage.getScore().goodiesCollected[1];
     }
 
     /**
      * Return the number of type-3 goodies that have been collected in the current level
      */
     public getGoodies3(): number {
-        return this.score.goodiesCollected[2];
+        return this.stage.getScore().goodiesCollected[2];
     }
 
     /**
      * Return the number of type-4 goodies that have been collected in the current level
      */
     public getGoodies4(): number {
-        return this.score.goodiesCollected[3];
+        return this.stage.getScore().goodiesCollected[3];
     }
 
     /**
      * Manually increment the number of goodies of type 1 that have been collected.
      */
     public incrementGoodies1() {
-        this.score.goodiesCollected[0]++;
+        this.stage.getScore().goodiesCollected[0]++;
     }
 
     /**
      * Manually increment the number of goodies of type 2 that have been collected.
      */
     public incrementGoodies2() {
-        this.score.goodiesCollected[1]++;
+        this.stage.getScore().goodiesCollected[1]++;
     }
 
     /**
      * Manually increment the number of goodies of type 3 that have been collected.
      */
     public incrementGoodies3() {
-        this.score.goodiesCollected[2]++;
+        this.stage.getScore().goodiesCollected[2]++;
     }
 
     /**
      * Manually increment the number of goodies of type 4 that have been collected.
      */
     public incrementGoodies4() {
-        this.score.goodiesCollected[3]++;
+        this.stage.getScore().goodiesCollected[3]++;
     }
 
     /**
@@ -180,7 +178,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies1(value: number) {
-        this.score.goodiesCollected[0] = value;
+        this.stage.getScore().goodiesCollected[0] = value;
     }
 
     /**
@@ -189,7 +187,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies2(value: number) {
-        this.score.goodiesCollected[1] = value;
+        this.stage.getScore().goodiesCollected[1] = value;
     }
 
     /**
@@ -198,7 +196,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies3(value: number) {
-        this.score.goodiesCollected[2] = value;
+        this.stage.getScore().goodiesCollected[2] = value;
     }
 
     /**
@@ -207,14 +205,14 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies4(value: number) {
-        this.score.goodiesCollected[3] = value;
+        this.stage.getScore().goodiesCollected[3] = value;
     }
 
     /**
      * Return the remaining time until the level is lost
      */
     public getLoseCountdown(): number {
-        return this.score.loseCountDownRemaining;
+        return this.stage.getScore().loseCountDownRemaining;
     }
 
     /**
@@ -223,14 +221,14 @@ export class ScoreApi {
      * @param delta The amount of time to add before the timer expires
      */
     public updateTimerExpiration(delta: number): void {
-        this.score.loseCountDownRemaining += delta;
+        this.stage.getScore().loseCountDownRemaining += delta;
     }
 
     /**
      * Return the remaining time until the level is won
      */
     public getWinCountdown(): number {
-        return this.score.winCountRemaining;
+        return this.stage.getScore().winCountRemaining;
     }
 
     /**
@@ -240,7 +238,7 @@ export class ScoreApi {
      */
     public setLoseCountdown(timeout: number) {
         // Once the Lose CountDown is not -100, it will start counting down
-        this.score.loseCountDownRemaining = timeout;
+        this.stage.getScore().loseCountDownRemaining = timeout;
     }
 
     /**
@@ -250,7 +248,7 @@ export class ScoreApi {
      */
     public setWinCountdown(timeout: number) {
         // Once the Win CountDown is not -100, it will start counting down
-        this.score.winCountRemaining = timeout;
+        this.stage.getScore().winCountRemaining = timeout;
     }
 
     /**
@@ -260,7 +258,7 @@ export class ScoreApi {
      * @param newVal The new value of the stopwatch
      */
     public setStopwatch(newVal: number) {
-        this.score.stopWatchProgress = newVal;
+        this.stage.getScore().stopWatchProgress = newVal;
     }
 
     /**
@@ -268,16 +266,16 @@ export class ScoreApi {
      */
     public getStopwatch(): number {
         // Inactive stopwatch should return 0
-        if (this.score.stopWatchProgress == -100)
+        if (this.stage.getScore().stopWatchProgress == -100)
             return 0;
-        return this.score.stopWatchProgress;
+        return this.stage.getScore().stopWatchProgress;
     }
 
     /**
      * Return the total number of enemies that have been defeated so far
      */
     public getEnemiesDefeated(): number {
-        return this.score.getEnemiesDefeated();
+        return this.stage.getScore().getEnemiesDefeated();
     }
 
     /**

@@ -43,7 +43,6 @@ export class Score {
   /** Text to display when a Win Countdown completes */
   winCountdownText: string;
 
-
   /** 
    * In levels that have a lose-on-timer feature, we store the timer here, so 
    * that we can extend the time left to complete a game 

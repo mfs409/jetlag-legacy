@@ -5,7 +5,6 @@ import { Renderable } from "../renderables/Renderable"
 import { Hero } from "../renderables/Hero"
 import { Route } from "../misc/Route";
 import { BaseActor } from "../renderables/BaseActor";
-import { JetLagDevice } from "../misc/JetLagDevice";
 import { JetLagStage } from "../JetLagStage";
 
 /**
@@ -19,7 +18,7 @@ export class OverlayApi {
      *
      * @param overlay the StageManager for the game
      */
-    constructor(private overlay: OverlayScene, private device: JetLagDevice, private stage: JetLagStage) { }
+    constructor(private stage: JetLagStage, private overlay: OverlayScene) { }
 
     /**
      * Convert coordinates on the overlay to coordinates in the world
@@ -46,7 +45,7 @@ export class OverlayApi {
      * @param action  The action to run in response to a tap
      */
     public addTapControl(x: number, y: number, width: number, height: number, imgName: string, action: (hudX: number, hudY: number) => boolean): BaseActor {
-        let c = new BaseActor(this.overlay, this.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.getDevice(), imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         c.tapHandler = action;
         this.overlay.addActor(c, 0);
@@ -67,7 +66,7 @@ export class OverlayApi {
      * @param panStop The action to perform when the pan event stops
      */
     public addPanCallbackControl(x: number, y: number, width: number, height: number, imgName: string, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean): BaseActor {
-        let c = new BaseActor(this.overlay, this.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.getDevice(), imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         c.panStartHandler = panStart;
         c.panMoveHandler = panMove;
@@ -130,7 +129,7 @@ export class OverlayApi {
      * @param imgName The image to display for this zone (typically "")
      */
     public createSwipeZone(x: number, y: number, width: number, height: number, imgName: string) {
-        let c = new BaseActor(this.overlay, this.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.getDevice(), imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.overlay.addActor(c, 0);
         c.swipeHandler = (hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
@@ -294,7 +293,7 @@ export class OverlayApi {
      * @return The image that was created
      */
     public addImage(x: number, y: number, width: number, height: number, imgName: string): BaseActor {
-        let c = new BaseActor(this.overlay, this.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.getDevice(), imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.overlay.addActor(c, 0);
         return c;
@@ -358,7 +357,7 @@ export class OverlayApi {
      * @return The control, so we can do more with it as needed.
      */
     public addToggleButton(x: number, y: number, width: number, height: number, imgName: string, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
-        let c = new BaseActor(this.stage.getHud(), this.device, imgName, width, height);
+        let c = new BaseActor(this.stage.getHud(), this.stage.getDevice(), imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let active = false; // will be captured by lambdas below
         c.touchDownHandler = (hudX: number, hudY: number) => {
@@ -472,7 +471,7 @@ export class OverlayApi {
      * @return The button that was created
      */
     public addDirectionalThrowButton(x: number, y: number, width: number, height: number, imgName: string, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
-        let c = new BaseActor(this.stage.getHud(), this.device, imgName, width, height);
+        let c = new BaseActor(this.stage.getHud(), this.stage.getDevice(), imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let v = new PhysicsType2d.Vector2(0, 0);
         let isHolding = false;

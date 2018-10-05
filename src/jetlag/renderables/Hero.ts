@@ -1,15 +1,12 @@
 import { WorldActor } from "./WorldActor"
-import { WorldScene } from "../scenes/WorldScene"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"
 import { Obstacle } from "./Obstacle"
 import { Animation } from "./Animation"
 import { Camera } from "../misc/Camera"
-import { JetLagRenderer, JetLagSound, JetLagDevice } from "../misc/JetLagDevice";
-import { JetLagConfig } from "../JetLagConfig";
+import { JetLagRenderer, JetLagSound } from "../misc/JetLagDevice";
 import { JetLagStage } from "../JetLagStage";
-import { Score } from "../misc/Score";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -108,9 +105,9 @@ export class Hero extends WorldActor {
     * @param imgName The name of the file that has the default image for this
     *                hero
     */
-    constructor(scene: WorldScene, device: JetLagDevice, config: JetLagConfig, stage: JetLagStage, private score: Score, width: number,
+    constructor(stage: JetLagStage, width: number,
         height: number, imgName: string) {
-        super(scene, device, config, stage, imgName, width, height);
+        super(stage, imgName, width, height);
     }
 
     /**
@@ -173,7 +170,7 @@ export class Hero extends WorldActor {
         if (!this.getEnabled() || !destination.getEnabled())
             return;
         if (destination.receive(this)) {
-            this.score.onDestinationArrive();
+            this.stage.getScore().onDestinationArrive();
             // hide the hero quietly, since the destination might make a sound
             this.remove(true);
         }
@@ -189,7 +186,7 @@ export class Hero extends WorldActor {
         // hero
         if (enemy.alwaysDoesDamage) {
             this.remove(false);
-            this.score.onDefeatHero(enemy, this);
+            this.stage.getScore().onDefeatHero(enemy, this);
             if (this.mustSurvive) {
                 this.stage.endLevel(false);
             }
@@ -214,7 +211,7 @@ export class Hero extends WorldActor {
         // when we can't defeat it by losing strength, remove the hero
         else if (enemy.damage >= this.strength) {
             this.remove(false);
-            this.score.onDefeatHero(enemy, this);
+            this.stage.getScore().onDefeatHero(enemy, this);
             if (this.mustSurvive) {
                 this.stage.endLevel(false);
             }
@@ -283,7 +280,7 @@ export class Hero extends WorldActor {
         g.remove(false);
         if (g.onHeroCollect)
             g.onHeroCollect(g, this);
-        this.score.onGoodieCollected(g);
+        this.stage.getScore().onGoodieCollected(g);
     }
 
     /**
@@ -457,7 +454,7 @@ export class Hero extends WorldActor {
      * @param soundName The name of the sound file to use
      */
     public setJumpSound(soundName: string): void {
-        this.jumpSound = this.device.getSpeaker().getSound(soundName);
+        this.jumpSound = this.stage.getDevice().getSpeaker().getSound(soundName);
     }
 
     /**
