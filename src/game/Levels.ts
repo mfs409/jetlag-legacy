@@ -1,12 +1,12 @@
-import { JetLagApi } from "../jetlag/api/JetLagApi";
-import { Route } from "../jetlag/misc/Route";
-import { Goodie } from "../jetlag/renderables/Goodie";
-import { Hero } from "../jetlag/renderables/Hero";
-import { OverlayApi } from "../jetlag/api/OverlayApi";
-import { WorldActor } from "../jetlag/renderables/WorldActor";
-import { Enemy } from "../jetlag/renderables/Enemy";
-import { Obstacle } from "../jetlag/renderables/Obstacle";
-import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
+import {JetLagApi as JetLagApi } from "../jetlag/api/JetLag";
+import { Route } from "../jetlag/support/Route";
+import { Goodie } from "../jetlag/actor/Goodie";
+import { Hero } from "../jetlag/actor/Hero";
+import {OverlayApi as  OverlayApi } from "../jetlag/api/Overlay";
+import { WorldActor as WorldActor } from "../jetlag/actor/World";
+import { Enemy } from "../jetlag/actor/Enemy";
+import { Obstacle } from "../jetlag/actor/Obstacle";
+import { JetLagKeys } from "../jetlag/support/Interfaces";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game

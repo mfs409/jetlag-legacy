@@ -1,5 +1,5 @@
-import { JetLagApi } from "../jetlag/api/JetLagApi";
-import { JetLagKeys } from "../jetlag/misc/JetLagDevice";
+import { JetLagApi as JetLagApi } from "../jetlag/api/JetLag";
+import { JetLagKeys } from "../jetlag/support/Interfaces";
 
 /**
  * buildHelpScreen draws the help screens.  Technically, a help screen can be

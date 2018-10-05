@@ -1,13 +1,12 @@
 import { JetLagManager } from "./JetLagManager"
-import { WorldScene } from "./scenes/WorldScene"
-import { OverlayScene } from "./scenes/OverlayScene"
-import { OverlayApi } from "./api/OverlayApi"
-import { ParallaxScene } from "./scenes/ParallaxScene"
-import { Score } from "./misc/Score"
-import { Logger } from "./misc/Logger";
-import { JetLagRenderer, JetLagDevice, JetLagSound } from "./misc/JetLagDevice";
+import { WorldScene as WorldScene } from "./scene/World"
+import { Overlay as OverlayScene } from "./scene/Overlay"
+import { OverlayApi as OverlayApi } from "./api/Overlay"
+import { Parallax as ParallaxScene } from "./scene/Parallax"
+import { Score } from "./support/Score"
+import { JetLagRenderer, JetLagDevice, JetLagSound } from "./support/Interfaces";
 import { JetLagConfig } from "./JetLagConfig";
-import { ProjectilePool } from "./misc/ProjectilePool";
+import { ProjectilePool } from "./support/ProjectilePool";
 
 /**
  * JetLagStage is the container for all of the functionality for the playable
@@ -60,7 +59,7 @@ export class JetLagStage {
     private pauseSceneBuilder: (overlay: OverlayApi) => void = null;
 
     /** Track all the scores */
-    private score: Score;
+    public readonly score: Score;
 
     /** The background layers */
     private background: ParallaxScene;
@@ -121,13 +120,9 @@ export class JetLagStage {
      *
      * @param manager The JetLagManager that navigates among stages
      */
-    constructor(private manager: JetLagManager, private device: JetLagDevice, private config: JetLagConfig) {
+    constructor(private manager: JetLagManager, public readonly device: JetLagDevice, public readonly config: JetLagConfig) {
         this.score = new Score(this);
     }
-
-    public getScore() { return this.score; }
-    public getConfig() { return this.config; }
-    public getDevice() { return this.device; }
 
     /** Set the music for the stage */
     setMusic(music: JetLagSound) { this.music = music; }
@@ -148,8 +143,8 @@ export class JetLagStage {
         if (this.config.debugMode) {
             let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
             let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
-            Logger.info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
-            Logger.info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
+            this.device.getConsole().info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
+            this.device.getConsole().info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
         }
         if (this.gestureHudFirst) {
             if (this.hud.tap(screenX, screenY))

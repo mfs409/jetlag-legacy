@@ -1,4 +1,4 @@
-import { JetLagApi } from "../jetlag/api/JetLagApi";
+import { JetLagApi as JetLagApi } from "../jetlag/api/JetLag";
 
 /**
  * In games that have a store, there should be a button on the main screen (or

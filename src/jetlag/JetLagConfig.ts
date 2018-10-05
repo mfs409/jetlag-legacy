@@ -1,4 +1,4 @@
-import { JetLagApi } from "./api/JetLagApi"
+import { JetLagApi as JetLagApi } from "./api/JetLag"
 
 /**
  * Config stores game-specific configuration values.

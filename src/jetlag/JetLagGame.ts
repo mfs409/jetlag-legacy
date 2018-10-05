@@ -1,8 +1,7 @@
 import { JetLagManager } from "./JetLagManager"
 import { JetLagConfig } from "./JetLagConfig";
-import { Logger } from "./misc/Logger";
-import { HtmlDevice } from "./htmldevice/HtmlDevice"
-import { HtmlConsole } from "./htmldevice/HtmlConsole"
+import { HtmlDevice } from "./device/HtmlDevice"
+import { HtmlConsole } from "./device/HtmlConsole"
 
 /**
  * JetLagGame is the top-level wrapper for all of the functionality of JetLag.
@@ -34,12 +33,12 @@ export class JetLagGame {
         // singleton consistently, so we have to use it before checking the
         // configuration:
         let errs = cfg.check();
-        Logger.config(new HtmlConsole(cfg));
+        let logger = new HtmlConsole(cfg);
         if (errs.length > 0) {
-            Logger.urgent("Warning: the following errors were found in your " +
+            logger.urgent("Warning: the following errors were found in your " +
                 "configuration object.  Game behavior may not be as expected");
             for (let o of errs) {
-                Logger.urgent("  " + o);
+                logger.urgent("  " + o);
             }
         }
 
@@ -63,7 +62,7 @@ export class JetLagGame {
             cfg.pixelMeterRatio = cfg.pixelMeterRatio * cfg.screenWidth / old.x;
         }
 
-        let device = new HtmlDevice(cfg, domId);
+        let device = new HtmlDevice(cfg, domId, logger);
         let manager = new JetLagManager(cfg, device);
 
         // The renderer will load our assets asynchronously, after which the
