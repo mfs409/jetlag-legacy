@@ -9,7 +9,7 @@ import { JetLagRenderer } from "../support/Interfaces";
  * All this really adds to a Scene is a way to be rendered.  The interesting
  * stuff is what we attach to an OverlayScene via the OverlayApi.
  */
-export class Overlay extends BaseScene {
+export class OverlayScene extends BaseScene {
     /**
      * Draw the OverlayScene
      *

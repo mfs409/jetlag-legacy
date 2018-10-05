@@ -1,8 +1,8 @@
 import { JetLagManager } from "./JetLagManager"
-import { WorldScene as WorldScene } from "./scene/World"
-import { Overlay as OverlayScene } from "./scene/Overlay"
-import { OverlayApi as OverlayApi } from "./api/Overlay"
-import { Parallax as ParallaxScene } from "./scene/Parallax"
+import { WorldScene } from "./scene/World"
+import { OverlayScene } from "./scene/Overlay"
+import { OverlayApi } from "./api/Overlay"
+import { ParallaxScene } from "./scene/Parallax"
 import { Score } from "./support/Score"
 import { JetLagRenderer, JetLagDevice, JetLagSound } from "./support/Interfaces";
 import { JetLagConfig } from "./JetLagConfig";
@@ -40,12 +40,6 @@ export class JetLagStage {
     /** Any pause, win, or lose scene that supercedes the world and hud */
     private overlay: OverlayScene;
 
-    /** Should gestures route to the HUD first, or to the WORLD first? */
-    private gestureHudFirst = true;
-
-    /** Background color for the stage being drawn; defaults to black */
-    private backgroundColor = 0xFFFFFF;
-
     /** The function for creating this level's pre-scene */
     private welcomeSceneBuilder: (overlay: OverlayApi) => void = null;
 
@@ -58,14 +52,20 @@ export class JetLagStage {
     /** The function for creating this level's pause scene */
     private pauseSceneBuilder: (overlay: OverlayApi) => void = null;
 
-    /** Track all the scores */
-    public readonly score: Score;
+    /** 
+     * Background color for the stage being drawn when no overlay. defaults to
+     * black 
+     */
+    private backgroundColor = 0xFFFFFF;
 
     /** The background layers */
     private background: ParallaxScene;
 
     /** The foreground layers */
     private foreground: ParallaxScene;
+
+    /** Track all the scores */
+    public readonly score: Score;
 
     /** The music, if any */
     private music: JetLagSound = null;
@@ -76,56 +76,105 @@ export class JetLagStage {
     /** A pool of projectiles for use by the hero */
     private projectilePool: ProjectilePool;
 
-    /** Getter for the projectile pool */
-    public getProjectilePool() { return this.projectilePool; }
-
-    /** Getter for the WorldScene */
-    public getWorld() { return this.world; }
-
-    /** Getter for the HUD */
-    public getHud() { return this.hud; }
-
-    /** Getter for the background layers */
-    public getBackground() { return this.background; }
-
-    /** Getter for the foreground layers */
-    public getForeground() { return this.foreground; }
-
-    /** Set the code to run to build the welcome scene */
-    public setWelcomeSceneBuilder(builder: (overlay: OverlayApi) => void) { this.welcomeSceneBuilder = builder; }
-
-    /** Set the code to run to build the win scene */
-    public setWinSceneBuilder(builder: (overlay: OverlayApi) => void) { this.winSceneBuilder = builder; }
-
-    /** Set the code to run to build the lose scene */
-    public setLoseSceneBuilder(builder: (overlay: OverlayApi) => void) { this.loseSceneBuilder = builder; }
-
-    /** Set the code to run to build the pause scene */
-    public setPauseSceneBuilder(builder: (overlay: OverlayApi) => void) { this.pauseSceneBuilder = builder; }
-
-    /** Should gestures go to the HUD first (true), or to the world first (false) */
-    public setGestureHudFirst(val: boolean) { this.gestureHudFirst = val; }
-
-    /** Set the background color (i.e., #FFFFFF) */
-    public setBackgroundColor(color: number) { this.backgroundColor = color; }
-
-    /** Setter for the projectile pool */
-    public setProjectilePool(pool: ProjectilePool) { this.projectilePool = pool; }
+    /** Should gestures route to the HUD first, or to the WORLD first? */
+    private gestureHudFirst = true;
 
     /**
-     * Construct a basic stage.  Note that there is a mutual dependency between
-     * a stage and a score.  Do not use a stage until after calling setScore()
-     * with a non-null value.  Note, too, that a stage is not usable until
-     * onScreenChange() has been called.
+     * Construct the JetLagStage container, into which we inject any stage we
+     * ever have.
      *
-     * @param manager The JetLagManager that navigates among stages
+     * Note that a stage is not usable until onScreenChange() has been called.
+     *
+     * @param manager The JetLagManager object, which transitions among stages
+     * @param device  The JetLagDevice object, which abstracts away all device
+     *                details
+     * @param config  The JetLagConfig object, which stores all configuration
+     *                for this game
      */
-    constructor(private manager: JetLagManager, public readonly device: JetLagDevice, public readonly config: JetLagConfig) {
+    constructor(private manager: JetLagManager, readonly device: JetLagDevice, readonly config: JetLagConfig) {
         this.score = new Score(this);
     }
 
-    /** Set the music for the stage */
-    setMusic(music: JetLagSound) { this.music = music; }
+    /** Return the projectile pool for the current stage */
+    public getProjectilePool() { return this.projectilePool; }
+
+    /** Return the main world for the current stage */
+    public getWorld() { return this.world; }
+
+    /** Return the heads-up display for the current stage */
+    public getHud() { return this.hud; }
+
+    /** Return the background layers for the current stage */
+    public getBackground() { return this.background; }
+
+    /** Return the foreground layers for the current stage */
+    public getForeground() { return this.foreground; }
+
+    /** 
+     * Provide code that builds a "Welcome" overlay when the stage starts
+     * 
+     * @param builder A callback that builds the welcome scene
+     */
+    public setWelcomeSceneBuilder(builder: (overlay: OverlayApi) => void) {
+        this.welcomeSceneBuilder = builder;
+    }
+
+    /** 
+     * Provide code that builds a "Win" overlay when the stage is won
+     * 
+     * @param builder A callback that builds the win scene
+     */
+    public setWinSceneBuilder(builder: (overlay: OverlayApi) => void) {
+        this.winSceneBuilder = builder;
+    }
+
+    /** 
+     * Provide code that builds a "Lose" overlay when the stage is lost
+     * 
+     * @param builder A callback that builds the lose scene
+     */
+    public setLoseSceneBuilder(builder: (overlay: OverlayApi) => void) {
+        this.loseSceneBuilder = builder;
+    }
+
+    /** 
+     * Provide code that builds a "Pause" overlay on demand
+     * 
+     * @param builder A callback that builds the pause scene
+     */
+    public setPauseSceneBuilder(builder: (overlay: OverlayApi) => void) {
+        this.pauseSceneBuilder = builder;
+    }
+
+    /** 
+     * Control whether the HUD or World gets to process gestures first
+     *
+     * @param val True if the HUD should process gestures first, false if the
+     *            World should
+     */
+    public setGestureHudFirst(val: boolean) { this.gestureHudFirst = val; }
+
+    /** 
+     * Set the background color of the stage
+     *
+     * @param color The numerical ("hex") value for the background color.
+     *              #FFFFFF means white, #000000 means black, etc.
+     */
+    public setBackgroundColor(color: number) { this.backgroundColor = color; }
+
+    /** 
+     * Attach a projectile pool to the current stage
+     * 
+     * @param pool The projectile pool to assign to the stage
+     */
+    public setProjectilePool(pool: ProjectilePool) { this.projectilePool = pool; }
+
+    /** 
+     * Set the music for the stage
+     * 
+     * @param music The music to assign to the stage
+     */
+    public setMusic(music: JetLagSound) { this.music = music; }
 
     /**
      * Handle a TAP event
@@ -133,35 +182,39 @@ export class JetLagStage {
      * @param screenX The x coordinate of the tap, in pixels
      * @param screenY The y coordinate of the tap, in pixels
      */
-    tap(screenX: number, screenY: number) {
+    public tap(screenX: number, screenY: number) {
         // If we have an overlay scene right now, let it handle the tap
         if (this.overlay != null) {
             this.overlay.tap(screenX, screenY);
             return;
         }
-
+        // Log the event?
         if (this.config.debugMode) {
             let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
             let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
             this.device.getConsole().info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
             this.device.getConsole().info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
         }
+        // Handle in hud or world
         if (this.gestureHudFirst) {
             if (this.hud.tap(screenX, screenY))
                 return;
-            else
-                this.world.tap(screenX, screenY);
+            this.world.tap(screenX, screenY);
         }
         else {
             if (this.world.tap(screenX, screenY))
                 return;
-            else
-                this.hud.tap(screenX, screenY);
+            this.hud.tap(screenX, screenY);
         }
     }
 
-    /** Handle the start of a pan */
-    panStart(screenX: number, screenY: number) {
+    /**
+     * Handle a PAN START event
+     * 
+     * @param screenX The x coordinate where the pan started, in pixels
+     * @param screenY The y coordinate where the pan started, in pixels
+     */
+    public panStart(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.panStart(screenX, screenY);
             return;
@@ -169,10 +222,13 @@ export class JetLagStage {
         this.hud.panStart(screenX, screenY);
     }
 
-    /** 
-     * Handle pan move
+    /**
+     * Handle a PAN MOVE event
+     * 
+     * @param screenX The x coordinate where the pan moved, in pixels
+     * @param screenY The y coordinate where the pan moved, in pixels
      */
-    panMove(screenX: number, screenY: number) {
+    public panMove(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.panMove(screenX, screenY);
             return;
@@ -180,10 +236,13 @@ export class JetLagStage {
         this.hud.panMove(screenX, screenY);
     }
 
-    /** 
-     * Handle the end of a pan
+    /**
+     * Handle a PAN END event
+     * 
+     * @param screenX The x coordinate where the pan ended, in pixels
+     * @param screenY The y coordinate where the pan ended, in pixels
      */
-    panStop(screenX: number, screenY: number) {
+    public panStop(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.panStop(screenX, screenY);
             return;
@@ -191,10 +250,14 @@ export class JetLagStage {
         this.hud.panStop(screenX, screenY);
     }
 
-    /** 
-     * Handle a touch down event
+    /**
+     * Handle a TOUCH DOWN event.  This is a low-level event, but it's useful
+     * for detecting "hold" events.
+     *
+     * @param screenX The x coordinate of the touch down, in pixels
+     * @param screenY The y coordinate of the touch down, in pixels
      */
-    touchDown(screenX: number, screenY: number) {
+    public touchDown(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.touchDown(screenX, screenY);
             return;
@@ -202,8 +265,14 @@ export class JetLagStage {
         this.hud.touchDown(screenX, screenY);
     }
 
-    /** Handle when a touch ends (is released) */
-    touchUp(screenX: number, screenY: number) {
+    /**
+     * Handle a TOUCH UP event.  This is a low-level event, but it's useful
+     * for detecting "hold" events.
+     *
+     * @param screenX The x coordinate of the touch release, in pixels
+     * @param screenY The y coordinate of the touch release, in pixels
+     */
+    public touchUp(screenX: number, screenY: number) {
         if (this.overlay != null) {
             this.overlay.touchUp(screenX, screenY);
             return;
@@ -211,27 +280,39 @@ export class JetLagStage {
         this.hud.touchUp(screenX, screenY);
     }
 
-    /** Handle swipe events */
-    swipe(screenX0: number, screenY0: number, screenX1: number, screenY1: number, time: number) {
+    /**
+     * Handle a SWIPE event.  This is a blocking event.
+     * 
+     * @param screenX0 The x coordinate where the swipe started
+     * @param screenY0 The y coordinate where the swipe started
+     * @param screenX1 The x coordinate where the swipe ended
+     * @param screenY1 The y coordinate where the swipe ended
+     * @param time The duration (in milliseconds) of the swipe
+     */
+    public swipe(screenX0: number, screenY0: number, screenX1: number, screenY1: number, time: number) {
         this.hud.swipe(screenX0, screenY0, screenX1, screenY1, time);
     }
 
     /** Hide the current overlay scene that is showing */
-    clearOverlayScene() {
+    public clearOverlayScene() {
         this.overlay = null;
     }
 
     /**
-     * This code is called every 1/45th of a second to update the game state and re-draw the screen
-     * 
-     * @param elapsedTime The milliseconds since the previous render
+     * This code is called every 1/45th of a second to update the game state and
+     * re-draw the screen
+     *
+     * @param renderer      The renderer that is responsible for redrawing the
+     *                      stage
+     * @param elapsedMillis The time in milliseconds since the previous render
      */
-    render(renderer: JetLagRenderer, elapsedTime: number) {
-        // Handle pauses due to pre, pause, or post scenes.  Note that these handle their own screen
-        // touches, and that win and lose scenes should come first.
+    public render(renderer: JetLagRenderer, elapsedMillis: number) {
+        // Handle overlays due to pre, pause, win, or lose scenes.  Note that
+        // these handle their own screen touches.
         if (this.welcomeSceneBuilder) {
             this.overlay = new OverlayScene(this.config, this.device);
             this.welcomeSceneBuilder(new OverlayApi(this, this.overlay));
+            // null it out so it won't run again
             this.welcomeSceneBuilder = null;
         }
         if (this.pauseSceneBuilder) {
@@ -239,82 +320,76 @@ export class JetLagStage {
             this.pauseSceneBuilder(new OverlayApi(this, this.overlay));
             this.pauseSceneBuilder = null;
         }
+        // NB: win and lose scenes might already be showing :)
         if (this.overlay) {
-            this.overlay.render(renderer, elapsedTime);
+            this.overlay.render(renderer, elapsedMillis);
             return;
         }
 
+        // Only set the color and play music if we don't have an overlay showing
         renderer.setFrameColor(this.backgroundColor);
-
-        // Make sure the music is playing... Note that we start music before the PreScene shows
         this.playMusic();
 
-        // Update the win/lose timers
-        // Check the countdown timers
+        // Update the win/lose countdown timers and the stopwatch
         if (this.score.loseCountDownRemaining != -100) {
-            this.score.loseCountDownRemaining -= elapsedTime / 1000;
+            this.score.loseCountDownRemaining -= elapsedMillis / 1000;
             if (this.score.loseCountDownRemaining < 0) {
                 this.endLevel(false);
             }
         }
         if (this.score.winCountRemaining != -100) {
-            this.score.winCountRemaining -= elapsedTime / 1000;
+            this.score.winCountRemaining -= elapsedMillis / 1000;
             if (this.score.winCountRemaining < 0) {
-                // TODO:
                 this.endLevel(true);
             }
         }
         if (this.score.stopWatchProgress != -100) {
-            this.score.stopWatchProgress += elapsedTime / 1000;
+            this.score.stopWatchProgress += elapsedMillis / 1000;
         }
 
-        // handle accelerometer stuff... note that accelerometer is effectively disabled during a
-        // popup... we could change that by moving this to the top, but that's probably not going to
-        // produce logical behavior
-        this.world.handleTilt(this.device.getAccelerometer().get().x, this.device.getAccelerometer().get().y);
+        // handle accelerometer stuff... note that accelerometer is effectively
+        // disabled during a popup... we could change that by moving this to the
+        // top, but that's probably not going to produce logical behavior
+        let a = this.device.getAccelerometer().get();
+        this.world.handleTilt(a.x, a.y);
 
         // Advance the physics world by 1/45 of a second.
         //
-        // NB: in Box2d, This is the recommended rate for phones, though it seems like we should be
-        //     using /elapsedTime/ instead of 1/45f
+        // NB: in Box2d, This is the recommended rate for phones, though it
+        //     seems like we should be using /elapsedTime/ instead of 1/45f
         this.world.advanceWorld(1 / 45, 8, 3);
 
-        // Execute any one time events, then clear the list
-        for (let e of this.world.oneTimeEvents)
-            e();
+        // Run any pending events, and clear one-time events
+        for (let e of this.world.oneTimeEvents) { e(); }
+        for (let e of this.world.repeatEvents) { e(); }
         this.world.oneTimeEvents.length = 0;
-
-        // handle repeat events
-        for (let e of this.world.repeatEvents)
-            e();
 
         // Determine the center of the camera's focus
         this.world.adjustCamera();
 
         // The world is now static for this time step... we can display it!
-        // draw parallax backgrounds
-        this.background.render(renderer, this.world.camera, elapsedTime);
-        // draw the world
-        this.world.render(renderer, elapsedTime);
-        // draw parallax foregrounds
-        this.foreground.render(renderer, this.world.camera, elapsedTime);
-        // draw Controls
-        this.hud.render(renderer, elapsedTime);
+        // Order is background, world, foreground, hud
+        this.background.render(renderer, this.world.camera, elapsedMillis);
+        this.world.render(renderer, elapsedMillis);
+        this.foreground.render(renderer, this.world.camera, elapsedMillis);
+        this.hud.render(renderer, elapsedMillis);
     }
 
     /**
-     * Before we call programmer code to load a new scene, we call this to
+     * Before we call programmer code to load a new stage, we call this to
      * ensure that everything is in a clean state.
      */
-    onScreenChange(): void {
+    public onScreenChange() {
+        // reset music
         this.stopMusic();
         this.music = null;
-        this.projectilePool = null;
 
+        // reset score
         this.score.reset();
         this.device.getStorage().clearLevelFacts();
 
-        // Reset default values
+        // reset other fields to default values
+        this.projectilePool = null;
         this.gestureHudFirst = true;
         this.backgroundColor = 0xFFFFFF;
         this.welcomeSceneBuilder = null;
@@ -322,21 +397,20 @@ export class JetLagStage {
         this.loseSceneBuilder = null;
         this.pauseSceneBuilder = null;
 
-        // Create the main scene and hud
+        // Just re-make the scenes, instead of clearing the old ones
         this.world = new WorldScene(this.config, this.device);
         this.hud = new OverlayScene(this.config, this.device);
-        // Set up the parallax scenes
         this.background = new ParallaxScene(this.config);
         this.foreground = new ParallaxScene(this.config);
     }
 
     /**
-     * When a level ends, we run this code to shut it down, print a message, and
-     * then let the user resume play
+     * When a playable level ends, we run this code to shut it down, show an
+     * overlay, and then invoke the JetLagManager to choose the next stage
      *
      * @param win true if the level was won, false otherwise
      */
-    endLevel(win: boolean): void {
+    public endLevel(win: boolean) {
         if (win) {
             if (this.winSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
@@ -360,7 +434,7 @@ export class JetLagStage {
     }
 
     /** If the level has music attached to it, this starts playing it */
-    playMusic(): void {
+    public playMusic() {
         if (!this.musicPlaying && this.music) {
             this.musicPlaying = true;
             this.music.play();
@@ -368,7 +442,7 @@ export class JetLagStage {
     }
 
     /** If the level has music attached to it, this pauses it */
-    pauseMusic(): void {
+    public pauseMusic() {
         if (this.musicPlaying) {
             this.musicPlaying = false;
             this.music.stop();
@@ -376,7 +450,7 @@ export class JetLagStage {
     }
 
     /** If the level has music attached to it, this stops it */
-    stopMusic(): void {
+    public stopMusic() {
         if (this.musicPlaying) {
             console.log("stopping music");
             this.musicPlaying = false;

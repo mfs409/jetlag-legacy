@@ -120,6 +120,8 @@ export interface JetLagTouchReceiver {
  * TouchReceiver, we give it a TouchReceiverHolder.  The TouchReceiverHolder
  * can swap out TouchReceivers at any time, and route new gestures to the
  * new TouchReceiver, and everything works fine.
+ * 
+ * TODO: since stage isn't really changing, do we really need this complexity?
  */
 export interface JetLagTouchReceiverHolder {
     getTouchReceiver(): JetLagTouchReceiver;

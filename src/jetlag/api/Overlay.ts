@@ -1,4 +1,4 @@
-import { Overlay as OverlayScene } from "../scene/Overlay"
+import { OverlayScene as OverlayScene } from "../scene/Overlay"
 import { WorldActor as WorldActor } from "../actor/World"
 import { TimedEvent } from "../support/Timer"
 import { Renderable } from "../support/Interfaces"

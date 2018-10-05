@@ -9,12 +9,12 @@ enum StageTypes {
 }
 
 /**
- * JetLagManager choreographs the flow of the game by tracking which Stage is
- * currently active, and providing a means of navigating among Stages.
+ * JetLagManager choreographs the flow of the game by tracking which the
+ * JetLagStage is currently active, and providing a means of navigating among
+ * (virtual) Stages.
  *
  * By virtue of it being a JetLagTouchReceiverHolder, JetLagManager also routes
- * all Device input events to the currently active Stage (which is a
- * JetLagTouchReceiver).
+ * all Device input events to the JetLagStage (which is a JetLagTouchReceiver).
  */
 export class JetLagManager implements JetLagTouchReceiverHolder {
     /** The current type of stage that we are showing */
@@ -57,7 +57,9 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      */
     public onAssetsLoaded() {
         // Be sure to refresh the mute state from the persistent storage
-        this.device.getSpeaker().resetMusicVolume(parseInt(this.device.getStorage().getPersistent("volume", "1")));
+        let st = this.device.getStorage();
+        let sp = this.device.getSpeaker();
+        sp.resetMusicVolume(parseInt(st.getPersistent("volume", "1")));
         this.stage = new JetLagStage(this, this.device, this.config);
         this.doSplash(1);
         this.device.getRenderer().startRenderLoop(this);

@@ -12,7 +12,7 @@ import { JetLagConfig } from "../JetLagConfig";
  * - 0 means "doesn't move", which means "looks like a tiled background"
  * - in-between should be interesting
  */
-export class Parallax {
+export class ParallaxScene {
     /** All the layers to show as part of this scene */
     private layers: ParallaxLayer[] = [];
 
