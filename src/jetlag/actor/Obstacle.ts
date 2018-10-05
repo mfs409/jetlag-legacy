@@ -1,7 +1,7 @@
 import { WorldActor as WorldActor } from "./World"
 import { Enemy } from "./Enemy"
 import { Hero } from "./Hero"
-import { TimedEvent } from "../support/Timer"
+import { TimedEvent } from "../support/TimedEvent"
 import { JetLagStage } from "../JetLagStage";
 
 /**

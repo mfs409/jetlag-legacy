@@ -3,7 +3,9 @@ import { XY } from "../support/XY"
 import { JetLagText, JetLagRenderer, Renderable } from "../support/Interfaces";
 
 /**
- * RenderableText provides a way to generate text and put it onto the screen.
+ * JetLag's Text object provides a way to generate text and put it onto the
+ * screen.  The text that is displayed is controlled by a callback, so that it
+ * can change over time.
  */
 export class Text implements Renderable {
     /**
@@ -21,20 +23,20 @@ export class Text implements Renderable {
     /** Should we center at coord (true) or is it top-left? */
     private readonly center: boolean;
 
-    /** The thing that produces the string of text to display */
+    /** The code that produces the string of text to display */
     private readonly producer: () => string;
 
     /** 
      * Build some text that can be rendered
      * 
-     * @param manager The JetLag manager
+     * @param renderer   The renderer for the game
      * @param fontFamily The font to use
-     * @param fontSize  The font size
-     * @param fontColor The color, as an HTML hex code
-     * @param x The x coordinate of the top left (or center)
-     * @param y The y coordinate of the top left (or center)
-     * @param center True to center instead of placing at top right (x,y)
-     * @param producer The thing that produces text
+     * @param fontSize   The font size
+     * @param fontColor  The color, as an HTML hex code
+     * @param x          The x coordinate of the top left (or center)
+     * @param y          The y coordinate of the top left (or center)
+     * @param center     True to center instead of placing at top right (x,y)
+     * @param producer   The code that produces text
      */
     constructor(renderer: JetLagRenderer, fontFamily: string, fontSize: number, fontColor: string, x: number, y: number, center: boolean, producer: () => string) {
         this.coord.Set(x, y);
@@ -52,12 +54,12 @@ export class Text implements Renderable {
 
     /**
      * Render the text
-     * 
+     *
      * @param renderer The renderer to use when drawing this picture
-     * @param camera The camera that defines the bounds for the Scene where this
-     *               image should be drawn
+     * @param camera   The camera that defines the bounds for the Scene where
+     *                 this image should be drawn
      */
-    public render(renderer: JetLagRenderer, camera: Camera): void {
+    public render(renderer: JetLagRenderer, camera: Camera) {
         if (!this.visible)
             return;
         // Set the world position and the text, then let the renderer decide where to put it...

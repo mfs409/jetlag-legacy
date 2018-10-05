@@ -6,7 +6,7 @@ import { Goodie } from "../actor/Goodie"
 import { Enemy } from "../actor/Enemy"
 import { Destination } from "../actor/Destination"
 import { WorldActor as WorldActor } from "../actor/World";
-import { TimedEvent } from "../support/Timer";
+import { TimedEvent } from "../support/TimedEvent";
 import { ProjectilePool } from "../support/ProjectilePool";
 import { ParallaxLayer } from "../support/ParallaxLayer";
 import { Animation } from "../support/Animation";

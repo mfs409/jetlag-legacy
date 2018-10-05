@@ -2,11 +2,12 @@
 
 import { Renderable } from "../support/Interfaces"
 import { BaseScene as BaseScene } from "../scene/Base"
-import { RouteDriver, Route } from "../support/Route"
+import { Route } from "../support/Route"
+import { RouteDriver } from "../support/RouteDriver"
 import { AnimationDriver } from "../support/AnimationDriver"
 import { Animation } from "../support/Animation"
 import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../support/Interfaces"
-import { TimedEvent } from "../support/Timer"
+import { TimedEvent } from "../support/TimedEvent"
 import { Camera } from "../support/Camera"
 import { XY } from "../support/XY"
 

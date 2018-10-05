@@ -7,7 +7,7 @@ import { HtmlConsole } from "./HtmlConsole";
  */
 export class HtmlVibration implements JetLagVibration {
     /** Track whether the device supports vibration */
-    isSupported: boolean = false;
+    private isSupported: boolean = false;
 
     /**
      * Construct a Vibration object by checking if the device supports the HTML5

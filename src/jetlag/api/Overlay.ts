@@ -1,6 +1,6 @@
 import { OverlayScene as OverlayScene } from "../scene/Overlay"
 import { WorldActor as WorldActor } from "../actor/World"
-import { TimedEvent } from "../support/Timer"
+import { TimedEvent } from "../support/TimedEvent"
 import { Renderable } from "../support/Interfaces"
 import { Hero } from "../actor/Hero"
 import { Route } from "../support/Route";
