@@ -1,5 +1,5 @@
 import { MyConfig } from "./myconfig";
-import { JetLagGame } from "../jetlag/JetLagGame"
+import { runGameAsHtml } from "../jetlag/launcher"
 
 /** The purpose of this file is to call the function that kicks off the game */
-JetLagGame.runGameAsHtml('game-player', new MyConfig());
+runGameAsHtml('game-player', new MyConfig());

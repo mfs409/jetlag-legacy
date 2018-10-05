@@ -1,4 +1,4 @@
-import { JetLagConfig } from "../jetlag/JetLagConfig"
+import { JetLagConfig, JetLagVerbosity } from "../jetlag/JetLagConfig"
 import { buildChooserScreen } from "./Chooser"
 import { buildLevelScreen } from "./Levels";
 import { buildStoreScreen } from "./Store";
@@ -31,17 +31,12 @@ export class MyConfig extends JetLagConfig {
     this.canVibrate = true;
     this.debugMode = true;
     this.forceAccelerometerOff = true;
-    this.logLevel = 2;
+    this.verbosity = JetLagVerbosity.LOUD;
 
     // Chooser configuration
     this.numLevels = 92;
     this.enableChooser = true;
     this.storageKey = "com.me.myjetlaggame.prefs";
-
-    // Font configuration
-    this.defaultFontFace = "Arial";
-    this.defaultFontSize = 32;
-    this.defaultFontColor = "#FFFFFF";
 
     // Set up the resource prefix
     this.resourcePrefix = "/assets/";

@@ -1,5 +1,4 @@
 import { JetLagConfig } from "../JetLagConfig"
-import { JetLagManager } from "../JetLagManager"
 import { BaseActor as BaseActor } from "../actor/Base"
 import { BodyStyle } from "../actor/Base"
 import { Camera } from "../support/Camera"
@@ -9,6 +8,7 @@ import { HtmlSprite } from "./HtmlSprite"
 import { HtmlDebugSprite } from "./HtmlDebugSprite"
 import * as PIXI from 'pixi.js';
 import { HtmlConsole } from "./HtmlConsole";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * Renderer maintains a set of images, and can display them, along with text,
@@ -83,9 +83,9 @@ export class HtmlRenderer implements JetLagRenderer {
      * 
      * @param manager The top-level game manager
      */
-    public startRenderLoop(manager: JetLagManager) {
+    public startRenderLoop(stage: JetLagStage) {
         this.renderer.ticker.add(() => {
-            manager.render(this.renderer.ticker.elapsedMS)
+            stage.render(this, this.renderer.ticker.elapsedMS)
         });
     }
 

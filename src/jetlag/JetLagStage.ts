@@ -4,7 +4,7 @@ import { OverlayScene } from "./scene/Overlay"
 import { OverlayApi } from "./api/Overlay"
 import { ParallaxScene } from "./scene/Parallax"
 import { Score } from "./support/Score"
-import { JetLagRenderer, JetLagDevice, JetLagSound } from "./support/Interfaces";
+import { JetLagDevice, JetLagSound, JetLagRenderer } from "./support/Interfaces";
 import { JetLagConfig } from "./JetLagConfig";
 import { ProjectilePool } from "./support/ProjectilePool";
 
@@ -167,7 +167,9 @@ export class JetLagStage {
      * 
      * @param pool The projectile pool to assign to the stage
      */
-    public setProjectilePool(pool: ProjectilePool) { this.projectilePool = pool; }
+    public setProjectilePool(pool: ProjectilePool) {
+        this.projectilePool = pool;
+    }
 
     /** 
      * Set the music for the stage
@@ -192,8 +194,10 @@ export class JetLagStage {
         if (this.config.debugMode) {
             let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
             let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
-            this.device.getConsole().info("World Touch: (" + worldcoord.x + ", " + worldcoord.y + ")");
-            this.device.getConsole().info("HUD Touch: (" + hudcoord.x + ", " + hudcoord.y + ")");
+            this.device.getConsole().info("World Touch: (" + worldcoord.x + ", "
+                + worldcoord.y + ")");
+            this.device.getConsole().info("HUD Touch: (" + hudcoord.x + ", "
+                + hudcoord.y + ")");
         }
         // Handle in hud or world
         if (this.gestureHudFirst) {
@@ -302,11 +306,10 @@ export class JetLagStage {
      * This code is called every 1/45th of a second to update the game state and
      * re-draw the screen
      *
-     * @param renderer      The renderer that is responsible for redrawing the
-     *                      stage
      * @param elapsedMillis The time in milliseconds since the previous render
      */
     public render(renderer: JetLagRenderer, elapsedMillis: number) {
+        renderer.initFrame();
         // Handle overlays due to pre, pause, win, or lose scenes.  Note that
         // these handle their own screen touches.
         if (this.welcomeSceneBuilder) {
@@ -323,6 +326,7 @@ export class JetLagStage {
         // NB: win and lose scenes might already be showing :)
         if (this.overlay) {
             this.overlay.render(renderer, elapsedMillis);
+            renderer.showFrame();
             return;
         }
 
@@ -373,6 +377,7 @@ export class JetLagStage {
         this.world.render(renderer, elapsedMillis);
         this.foreground.render(renderer, this.world.camera, elapsedMillis);
         this.hud.render(renderer, elapsedMillis);
+        renderer.showFrame();
     }
 
     /**

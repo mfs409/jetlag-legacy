@@ -1,4 +1,4 @@
-import { JetLagTouchReceiverHolder, JetLagTouchScreen } from "../support/Interfaces";
+import { JetLagTouchReceiver, JetLagTouchScreen } from "../support/Interfaces";
 
 /**
  * TouchScreen abstracts away how gestures (pan, swipe, tap, rotate, pinch,
@@ -23,7 +23,7 @@ export class HtmlTouchScreen implements JetLagTouchScreen {
         this.elt = document.getElementById(domId);
     }
 
-    public setTouchReceiverHolder(holder: JetLagTouchReceiverHolder) {
+    public setTouchReceiver(receiver: JetLagTouchReceiver) {
         // Since we are using gestures, turn off left clicking of the whole page
         //
         // NB: only do this the first time a TouchReceiver is provided.
@@ -34,35 +34,35 @@ export class HtmlTouchScreen implements JetLagTouchScreen {
         // Set up handlers for all the Hammer events
         let hammer = new Hammer(this.elt);
         hammer.on('tap', (ev: HammerInput) => {
-            holder.getTouchReceiver().tap((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+            receiver.tap((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
         });
         hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
         hammer.on('panstart', (ev: HammerInput) => {
-            holder.getTouchReceiver().panStart((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+            receiver.panStart((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
         });
         hammer.on('panmove', (ev: HammerInput) => {
-            holder.getTouchReceiver().panMove((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+            receiver.panMove((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
         });
         hammer.on('panend', (ev: HammerInput) => {
-            holder.getTouchReceiver().panStop((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+            receiver.panStop((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
         });
         hammer.on('pancancel', (ev: HammerInput) => {
-            holder.getTouchReceiver().panStop((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+            receiver.panStop((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
         });
 
         // this gets us 'downpress' and 'release'.  See "input events" on http://hammerjs.github.io/api/
         hammer.on("hammer.input", (ev: HammerInput) => {
             if (ev.eventType == 1) {
-                holder.getTouchReceiver().touchDown((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+                receiver.touchDown((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
             }
             else if (ev.eventType == 4) {
-                holder.getTouchReceiver().touchUp((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
+                receiver.touchUp((ev.srcEvent as PointerEvent).offsetX, (ev.srcEvent as PointerEvent).offsetY);
             }
         });
         // NB: swipe also registers pans.
         // NB: there is swipeup, swipeleft, swiperight, swipedown
         hammer.on('swipe', (ev: HammerInput) => {
-            holder.getTouchReceiver().swipe(ev.center.x - ev.deltaX, ev.center.y - ev.deltaY, ev.center.x, ev.center.y, ev.deltaTime);
+            receiver.swipe(ev.center.x - ev.deltaX, ev.center.y - ev.deltaY, ev.center.x, ev.center.y, ev.deltaTime);
         });
         hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
     }

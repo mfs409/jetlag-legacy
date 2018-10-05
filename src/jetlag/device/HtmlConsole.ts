@@ -16,7 +16,7 @@ export class HtmlConsole implements JetLagConsole {
      * 
      * @param cfg The game-wide configuration object
      */
-    constructor(cfg: JetLagConfig) { this.level = cfg.logLevel; }
+    constructor(cfg: JetLagConfig) { this.level = cfg.verbosity; }
 
     /**
      * Display an urgent message ot the console

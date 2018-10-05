@@ -1,5 +1,5 @@
 import { JetLagConfig } from "./JetLagConfig"
-import { JetLagDevice, JetLagTouchReceiverHolder, JetLagTouchReceiver } from "./support/Interfaces"
+import { JetLagDevice } from "./support/Interfaces"
 import { JetLagApi as JetLagApi } from "./api/JetLag"
 import { JetLagStage } from "./JetLagStage"
 
@@ -9,14 +9,11 @@ enum StageTypes {
 }
 
 /**
- * JetLagManager choreographs the flow of the game by tracking which the
- * JetLagStage is currently active, and providing a means of navigating among
- * (virtual) Stages.
- *
- * By virtue of it being a JetLagTouchReceiverHolder, JetLagManager also routes
- * all Device input events to the JetLagStage (which is a JetLagTouchReceiver).
+ * JetLagManager choreographs the flow of the game by tracking what is being
+ * shown in the JetLagStage, and providing a structured way of switching what is
+ * shown in the JetLagStage.
  */
-export class JetLagManager implements JetLagTouchReceiverHolder {
+export class JetLagManager {
     /** The current type of stage that we are showing */
     private stageType = StageTypes.SPLASH;
 
@@ -28,27 +25,14 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
 
     /**
      * Create the JetLagManager.  Note that there are many steps to take before
-     * we can get the JetLagManager fully up and running.  In particular, a
+     * we can get the JetLagManager up and running.  In particular, a
      * constructed JetLagManager can't function until the device's renderer is
      * fully loaded.
      *
      * @param cfg    The game config object
      * @param device The abstract device (with touch, sound, etc)
      */
-    constructor(private readonly config: JetLagConfig, private readonly device: JetLagDevice) {
-        // Register the manager with the device's gesture handler, so that all
-        // gestures get routed through the manager to the stage.  See
-        // TouchReceiverHolder for more information.
-        this.device.getTouchScreen().setTouchReceiverHolder(this);
-    }
-
-    /**
-     * JetLagManager can't handle gestures itself, but its stage can.  The stage
-     * changes over time (e.g., Play vs. Help), so JetLagManager has to behave
-     * as a TouchReceiverHolder, not a TouchReceiver.  Note that the Stage is a
-     * TouchReceiver.
-     */
-    public getTouchReceiver(): JetLagTouchReceiver { return this.stage; }
+    constructor(private readonly config: JetLagConfig, private readonly device: JetLagDevice) { }
 
     /**
      * Once the renderer has finished loading all assets for the game, this will
@@ -57,12 +41,15 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      */
     public onAssetsLoaded() {
         // Be sure to refresh the mute state from the persistent storage
-        let st = this.device.getStorage();
-        let sp = this.device.getSpeaker();
-        sp.resetMusicVolume(parseInt(st.getPersistent("volume", "1")));
+        let storage = this.device.getStorage();
+        let speaker = this.device.getSpeaker();
+        speaker.resetMusicVolume(parseInt(storage.getPersistent("volume", "1")));
+        // Build the stage, wire it for touches
         this.stage = new JetLagStage(this, this.device, this.config);
+        this.device.getTouchScreen().setTouchReceiver(this.stage);
+        // Draw a splash scene, then we can actually start the render loop
         this.doSplash(1);
-        this.device.getRenderer().startRenderLoop(this);
+        this.device.getRenderer().startRenderLoop(this.stage);
     }
 
     /**
@@ -94,7 +81,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      *
      * @param index The index of the help level to load
      */
-    public doHelp(index: number): void {
+    public doHelp(index: number) {
         this.stageNum = index;
         this.stageType = StageTypes.HELP;
         this.stage.onScreenChange();
@@ -106,7 +93,7 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
      *
      * @param index The index of the help level to load
      */
-    public doStore(index: number): void {
+    public doStore(index: number) {
         this.stageNum = index;
         this.stageType = StageTypes.STORE;
         this.stage.onScreenChange();
@@ -116,9 +103,9 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
     /**
      * Load the level-chooser screen
      *
-     * @param index The chooser screen to create
+     * @param index The index of the chooser screen to create
      */
-    public doChooser(index: number): void {
+    public doChooser(index: number) {
         // if chooser disabled, then it's either Splash=>Play or Play=>Splash
         if (!this.config.enableChooser) {
             if (this.stageType == StageTypes.PLAY) {
@@ -155,17 +142,4 @@ export class JetLagManager implements JetLagTouchReceiverHolder {
 
     /** Start a level over again. */
     public repeatLevel() { this.doPlay(this.stageNum); }
-
-    /**
-     * This code is called at a fixed interval (i.e., every 1/45 of a second) to
-     * update the game state and re-draw the screen
-     *
-     * @param millis The number of milliseconds that have passed since the last
-     *               render
-     */
-    render(millis: number) {
-        this.device.getRenderer().initFrame();
-        this.stage.render(this.device.getRenderer(), millis);
-        this.device.getRenderer().showFrame();
-    }
 }

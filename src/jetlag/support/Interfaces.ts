@@ -1,7 +1,7 @@
 import { BaseActor as BaseActor } from "../actor/Base";
 import { Camera } from "./Camera";
 import { XY } from "./XY";
-import { JetLagManager } from "../JetLagManager";
+import { JetLagStage } from "../JetLagStage";
 
 /**
  * JetLagDevice abstracts away the differences between different device types
@@ -25,7 +25,7 @@ export interface JetLagDevice {
  * them to the current stage
  */
 export interface JetLagTouchScreen {
-    setTouchReceiverHolder(holder: JetLagTouchReceiver): void;
+    setTouchReceiver(receiver: JetLagTouchReceiver): void;
 }
 
 /**
@@ -55,7 +55,7 @@ export interface JetLagRenderer {
     setFrameColor(color: number): void;
     loadAssets(callback: () => void): void;
     addPictureToFrame(sprite: JetLagSprite, camera: Camera): void;
-    startRenderLoop(manager: JetLagManager): void;
+    startRenderLoop(stage: JetLagStage): void;
     initFrame(): void;
     showFrame(): void;
     addTextToFrame(text: JetLagText, camera: Camera, center: boolean): void;
@@ -109,23 +109,6 @@ export interface JetLagTouchReceiver {
     touchDown(screenX: number, screenY: number): void;
     touchUp(screenX: number, screenY: number): void;
     swipe(x0: number, y0: number, x1: number, y1: number, time: number): void;
-}
-
-/**
- * The TouchScreen portion of the device receives gestures from the screen,
- * and needs to route them to a TouchReceiver.  In JetLag, the Stage is the
- * appropriate thing to receive screen gestures, but it changes each time we
- * change levels or jump between modes.  It would be cumbersome to update
- * the device every time we change stages, so instead the TouchScreen embeds
- * a level of indirection in its API: rather than provide the device with a
- * TouchReceiver, we give it a TouchReceiverHolder.  The TouchReceiverHolder
- * can swap out TouchReceivers at any time, and route new gestures to the
- * new TouchReceiver, and everything works fine.
- * 
- * TODO: since stage isn't really changing, do we really need this complexity?
- */
-export interface JetLagTouchReceiverHolder {
-    getTouchReceiver(): JetLagTouchReceiver;
 }
 
 /**
