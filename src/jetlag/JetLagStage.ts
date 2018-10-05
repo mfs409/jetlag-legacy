@@ -388,6 +388,9 @@ export class JetLagStage {
         this.score.reset();
         this.device.getStorage().clearLevelFacts();
 
+        // reset keyboard handlers, since they aren't part of the world
+        this.device.getKeyboard().clearHandlers();
+
         // reset other fields to default values
         this.projectilePool = null;
         this.gestureHudFirst = true;

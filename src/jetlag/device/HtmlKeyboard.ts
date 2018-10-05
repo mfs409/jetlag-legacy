@@ -5,16 +5,21 @@ import { JetLagKeys, JetLagKeyboard } from "../support/Interfaces";
  */
 export class HtmlKeyboard implements JetLagKeyboard {
     /** handlers for when keys are pressed down */
-    downHandlers: (() => void)[] = [];
+    private downHandlers: (() => void)[] = [];
 
     /** handlers for when keys are released */
-    upHandlers: (() => void)[] = [];
+    private upHandlers: (() => void)[] = [];
 
     /** Set a handler to respond to some keydown event */
     public setKeyDownHandler(key: JetLagKeys, handler: () => void) { this.downHandlers[key.valueOf() as number] = handler; }
 
     /** Set a handler to respond to some keyup event */
     public setKeyUpHandler(key: JetLagKeys, handler: () => void) { this.upHandlers[key.valueOf() as number] = handler; }
+
+    public clearHandlers() {
+        this.downHandlers = [];
+        this.upHandlers = [];
+    }
 
     /**
      * Convert a key code to KEYS enum
@@ -40,7 +45,7 @@ export class HtmlKeyboard implements JetLagKeyboard {
         let idx = this.toCode(ev.keyCode);
         if (idx != -1) {
             let h = this.downHandlers[idx];
-            if (h !== null) {
+            if (h) {
                 h();
                 ev.preventDefault();
             }
@@ -54,7 +59,7 @@ export class HtmlKeyboard implements JetLagKeyboard {
         let idx = this.toCode(ev.keyCode);
         if (idx != -1) {
             let h = this.upHandlers[idx];
-            if (h !== null) {
+            if (h) {
                 h();
                 ev.preventDefault();
             }

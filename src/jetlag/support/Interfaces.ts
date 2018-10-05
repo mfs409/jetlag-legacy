@@ -25,7 +25,7 @@ export interface JetLagDevice {
  * them to the current stage
  */
 export interface JetLagTouchScreen {
-    setTouchReceiverHolder(holder: JetLagTouchReceiverHolder): void;
+    setTouchReceiverHolder(holder: JetLagTouchReceiver): void;
 }
 
 /**
@@ -35,6 +35,7 @@ export interface JetLagTouchScreen {
 export interface JetLagKeyboard {
     setKeyDownHandler(key: JetLagKeys, handler: () => void): void;
     setKeyUpHandler(key: JetLagKeys, handler: () => void): void;
+    clearHandlers(): void;
 }
 
 /**
