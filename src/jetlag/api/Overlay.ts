@@ -48,7 +48,7 @@ export class OverlayApi {
     public addTapControl(x: number, y: number, width: number, height: number, imgName: string, action: (hudX: number, hudY: number) => boolean): BaseActor {
         let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        c.tapHandler = action;
+        c.setTapHandler(action);
         this.overlay.addActor(c, 0);
         return c;
     }
@@ -69,9 +69,9 @@ export class OverlayApi {
     public addPanCallbackControl(x: number, y: number, width: number, height: number, imgName: string, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean): BaseActor {
         let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        c.panStartHandler = panStart;
-        c.panMoveHandler = panMove;
-        c.panStopHandler = panStop;
+        c.setPanStartHandler(panStart);
+        c.setPanMoveHandler(panMove);
+        c.setPanStopHandler(panStop);
         this.overlay.addActor(c, 0);
         return c;
     }
@@ -133,7 +133,7 @@ export class OverlayApi {
         let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.overlay.addActor(c, 0);
-        c.swipeHandler = (hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
+        c.setSwipeHandler((hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
             // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
             let pixels = this.overlay.camera.metersToScreen(hudX0, hudY0);
             // If worldactor with flickMultiplier, we're good
@@ -153,7 +153,7 @@ export class OverlayApi {
             actor.hover = null;
             actor.updateVelocity(dx, dy);
             return true;
-        };
+        });;
         return c;
     }
 
@@ -361,18 +361,18 @@ export class OverlayApi {
         let c = new BaseActor(this.stage.getHud(), this.stage.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let active = false; // will be captured by lambdas below
-        c.touchDownHandler = (hudX: number, hudY: number) => {
+        c.setTouchDownHandler((hudX: number, hudY: number) => {
             active = true;
             return true;
-        }
-        c.touchUpHandler = (hudX: number, hudY: number) => {
+        });
+        c.setTouchUpHandler((hudX: number, hudY: number) => {
             if (!active)
                 return false;
             active = false;
             if (onUpAction)
                 onUpAction(hudX, hudY);
             return true;
-        }
+        });
         // Put the control and events in the appropriate lists
         this.stage.getHud().addActor(c, 0);
         this.stage.getWorld().repeatEvents.push(() => { if (active) whileDownAction(); });
@@ -406,7 +406,7 @@ export class OverlayApi {
      * @return The action
      */
     public makeYMotionAction(actor: WorldActor, yRate: number) {
-        return () => { actor.updateVelocity(actor.body.GetLinearVelocity().x, yRate); };
+        return () => { actor.updateVelocity(actor.getXVelocity(), yRate); };
     }
 
     /**
@@ -431,7 +431,7 @@ export class OverlayApi {
     * @return The action
     */
     public makeXMotionAction(actor: WorldActor, xRate: number) {
-        return () => { actor.updateVelocity(xRate, actor.body.GetLinearVelocity().y); };
+        return () => { actor.updateVelocity(xRate, actor.getYVelocity()); };
     }
 
     /**
@@ -447,7 +447,10 @@ export class OverlayApi {
      * @return The action
      */
     public makeXYDampenedMotionAction(actor: WorldActor, xRate: number, yRate: number, dampening: number) {
-        return () => { actor.updateVelocity(xRate, yRate); actor.body.SetLinearDamping(dampening); }
+        return () => {
+            actor.updateVelocity(xRate, yRate);
+            actor.setDamping(dampening);
+        }
     }
 
     /**
@@ -476,25 +479,25 @@ export class OverlayApi {
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let v = new XY(0, 0);
         let isHolding = false;
-        c.touchDownHandler = (hudX: number, hudY: number) => {
+        c.setTouchDownHandler((hudX: number, hudY: number) => {
             isHolding = true;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
             let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             v.x = world.x;
             v.y = world.y;
             return true;
-        };
-        c.touchUpHandler = (hudX: number, hudY: number) => {
+        });
+        c.setTouchUpHandler((hudX: number, hudY: number) => {
             isHolding = false;
             return true;
-        }
-        c.panMoveHandler = (hudX: number, hudY: number) => {
+        });
+        c.setPanMoveHandler((hudX: number, hudY: number) => {
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
             let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
             v.x = world.x;
             v.y = world.y;
             return isHolding;
-        }
+        });
         this.stage.getHud().addActor(c, 0);
 
         let mLastThrow = 0;
@@ -503,8 +506,8 @@ export class OverlayApi {
                 let now = new Date().getTime();
                 if (mLastThrow + milliDelay < now) {
                     mLastThrow = now;
-                    this.stage.getProjectilePool().throwAt(h.body.GetPosition().x,
-                        h.body.GetPosition().y, v.x, v.y, h, offsetX, offsetY);
+                    this.stage.getProjectilePool().throwAt(h.getCenterX(),
+                        h.getCenterY(), v.x, v.y, h, offsetX, offsetY);
                 }
             }
         });
@@ -528,7 +531,7 @@ export class OverlayApi {
         return (hudX: number, hudY: number) => {
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
             let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
-            this.stage.getProjectilePool().throwAt(hero.body.GetPosition().x, hero.body.GetPosition().y, world.x, world.y, hero, offsetX, offsetY);
+            this.stage.getProjectilePool().throwAt(hero.getCenterX(), hero.getCenterY(), world.x, world.y, hero, offsetX, offsetY);
             return true;
         };
     }

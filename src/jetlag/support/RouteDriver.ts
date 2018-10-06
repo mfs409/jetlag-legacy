@@ -42,7 +42,7 @@ export class RouteDriver {
     private startRoute() {
         // move to the starting point
         let r = this.route.getPoint(0);
-        this.actor.body.SetTransform(new XY(r.x + this.actor.size.x / 2, r.y + this.actor.size.y / 2), 0);
+        this.actor.getBody().SetTransform(new XY(r.x + this.actor.getWidth() / 2, r.y + this.actor.getHeight() / 2), 0);
         // set up our next goal, start moving toward it
         this.nextIndex = 1;
         let p = this.route.getPoint(this.nextIndex)
@@ -50,7 +50,8 @@ export class RouteDriver {
         p.y -= this.actor.getYPosition();
         // normalize and scale the vector, then apply the velocity
         p.Normalize();
-        this.actor.body.SetLinearVelocity(p.Multiply(this.velocity));
+        p = p.Multiply(this.velocity);
+        this.actor.updateVelocity(p.x, p.y);
     }
 
     /** Figure out where we need to go next when driving a route */
@@ -80,7 +81,7 @@ export class RouteDriver {
                     this.startRoute();
                 } else {
                     this.done = true;
-                    this.actor.body.SetLinearVelocity(new XY(0, 0));
+                    this.actor.updateVelocity(0, 0);
                 }
             } else {
                 // advance to next point
@@ -88,7 +89,8 @@ export class RouteDriver {
                 p.x -= this.actor.getXPosition();
                 p.y -= this.actor.getYPosition();
                 p.Normalize();
-                this.actor.body.SetLinearVelocity(p.Multiply(this.velocity));
+                p = p.Multiply(this.velocity);
+                this.actor.updateVelocity(p.x, p.y);
             }
         }
         // NB: 'else keep going at current velocity'

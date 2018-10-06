@@ -206,7 +206,7 @@ export class Hero extends WorldActor {
             enemy.defeat(true, this);
         }
         // // defeat by jumping only if the hero's bottom is above the enemy's head
-        else if (this.inAir && enemy.defeatByJump && this.getYPosition() + this.size.y < enemy.getYPosition()) {
+        else if (this.inAir && enemy.defeatByJump && this.getYPosition() + this.getHeight() < enemy.getYPosition()) {
             enemy.defeat(true, this);
         }
         // when we can't defeat it by losing strength, remove the hero
@@ -410,17 +410,16 @@ export class Hero extends WorldActor {
      * @param y Velocity in Y dimension
      */
     public setTouchAndGo(x: number, y: number): void {
-        this.tapHandler = (worldX: number, worldY: number): boolean => {
+        this.setTapHandler((worldX: number, worldY: number): boolean => {
             // if it was hovering, its body type won't be Dynamic
             if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC)
                 this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
             this.setAbsoluteVelocity(x, y);
             // turn off isTouchAndGo, so we can't double-touch
-            this.tapHandler = null;
+            this.setTapHandler(null);
             return true;
-        }
+        });
     }
-
 
     /**
      * Indicate that this hero can jump while it is in the air
@@ -433,12 +432,11 @@ export class Hero extends WorldActor {
      * Indicate that touching this hero should make it jump
      */
     public setTouchToJump(): void {
-        this.tapHandler = (worldX: number, worldY: number): boolean => {
+        this.setTapHandler((worldX: number, worldY: number): boolean => {
             this.jump();
             return true;
-        }
+        });
     }
-
 
     /**
      * Register an animation sequence for when the hero is jumping

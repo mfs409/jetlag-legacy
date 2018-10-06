@@ -131,7 +131,7 @@ export class HtmlRenderer implements JetLagRenderer {
         let h = s * (actor.getHeight());
         let r = actor.getRotation();
         // Configure the sprite (image) and put it on screen
-        let sprite = actor.animator.getCurrent();
+        let sprite = actor.getAnimator().getCurrent();
         sprite.setAnchoredPosition(.5, .5, x + w / 2, y + h / 2);
         sprite.setWidth(w);
         sprite.setHeight(h);
@@ -139,9 +139,9 @@ export class HtmlRenderer implements JetLagRenderer {
         this.mainContainer.addChild(sprite.getRenderObject());
         // Debug rendering is the hard part!
         if (this.debugContainer != null) {
-            if (actor.bodyStyle === BodyStyle.RECTANGLE) {
+            if (actor.getBodyStyle() === BodyStyle.RECTANGLE) {
                 // For rectangles, just use the PIXI rectangle
-                let rect = actor.debug.getShape() as PIXI.Graphics;
+                let rect = actor.getDebug().getShape() as PIXI.Graphics;
                 rect.clear();
                 rect.lineStyle(1, 0x00FF00);
                 rect.drawRect(x, y, w, h);
@@ -151,16 +151,16 @@ export class HtmlRenderer implements JetLagRenderer {
                 rect.rotation = r;
                 this.debugContainer.addChild(rect);
             }
-            else if (actor.bodyStyle === BodyStyle.CIRCLE) {
+            else if (actor.getBodyStyle() === BodyStyle.CIRCLE) {
                 // For circles, use the PIXI Circle
-                let circ = actor.debug.getShape() as PIXI.Graphics;
+                let circ = actor.getDebug().getShape() as PIXI.Graphics;
                 circ.clear();
                 let radius = Math.max(w, h) / 2;
                 circ.lineStyle(1, 0x0000FF);
                 circ.drawCircle(x + w / 2, y + w / 2, radius);
                 this.debugContainer.addChild(circ);
                 // Also draw a radius, to indicate rotation
-                let line = actor.debug.getLine() as PIXI.Graphics;
+                let line = actor.getDebug().getLine() as PIXI.Graphics;
                 line.clear();
                 line.position.set(x + w / 2, y + h / 2);
                 let xx = radius * Math.cos(r);
@@ -168,20 +168,20 @@ export class HtmlRenderer implements JetLagRenderer {
                 line.lineStyle(1, 0x0000FF).moveTo(0, 0).lineTo(xx, yy);
                 this.debugContainer.addChild(line);
             }
-            else if (actor.bodyStyle === BodyStyle.POLYGON) {
+            else if (actor.getBodyStyle() === BodyStyle.POLYGON) {
                 // For polygons, we need to translate the points (they are 
                 // 0-relative in Box2d)
-                let poly = actor.debug.getShape() as PIXI.Graphics;
+                let poly = actor.getDebug().getShape() as PIXI.Graphics;
                 poly.clear;
                 poly.lineStyle(1, 0xFFFF00);
                 let pts: number[] = [];
-                for (let vert of actor.verts) {
-                    pts.push(s * vert.x + x + w / 2);
-                    pts.push(s * vert.y + y + h / 2);
+                for (let i = 0; i < actor.getNumVerts(); ++i) {
+                    pts.push(s * actor.getVert(i).x + x + w / 2);
+                    pts.push(s * actor.getVert(i).y + y + h / 2);
                 }
                 // NB: must repeat start point of polygon in PIXI
-                pts.push(s * actor.verts[0].x + x + w / 2);
-                pts.push(s * actor.verts[0].y + y + h / 2);
+                pts.push(s * actor.getVert(0).x + x + w / 2);
+                pts.push(s * actor.getVert(0).y + y + h / 2);
                 poly.drawPolygon(pts);
                 // rotation
                 poly.position.set(x + w / 2, y + h / 2);

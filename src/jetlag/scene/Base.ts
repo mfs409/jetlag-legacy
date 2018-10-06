@@ -85,9 +85,9 @@ export abstract class BaseScene {
     let actor = this.actorAt(screenX, screenY);
     if (actor === null)
       return false;
-    if (actor.tapHandler !== null) {
+    if (actor.getTapHandler() !== null) {
       let worldCoords = this.camera.screenToMeters(screenX, screenY);
-      actor.tapHandler(worldCoords.x, worldCoords.y);
+      actor.getTapHandler()(worldCoords.x, worldCoords.y);
       return true;
     }
     return false;
@@ -100,10 +100,10 @@ export abstract class BaseScene {
     let actor = this.actorAt(screenX, screenY);
     if (actor === null)
       return false;
-    if (actor.panStartHandler === null)
+    if (actor.getPanStartHandler() === null)
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.panStartHandler(worldCoords.x, worldCoords.y);
+    return actor.getPanStartHandler()(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -113,10 +113,10 @@ export abstract class BaseScene {
     let actor = this.actorAt(screenX, screenY);
     if (actor === null)
       return false;
-    if (actor.panMoveHandler === null)
+    if (actor.getPanMoveHandler() === null)
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.panMoveHandler(worldCoords.x, worldCoords.y);
+    return actor.getPanMoveHandler()(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -126,10 +126,10 @@ export abstract class BaseScene {
     let actor = this.actorAt(screenX, screenY);
     if (actor === null)
       return false;
-    if (actor.panStopHandler === null)
+    if (actor.getPanStopHandler() === null)
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.panStopHandler(worldCoords.x, worldCoords.y);
+    return actor.getPanStopHandler()(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -139,10 +139,10 @@ export abstract class BaseScene {
     let actor = this.actorAt(screenX, screenY);
     if (actor === null)
       return false;
-    if (actor.touchDownHandler === null)
+    if (actor.getTouchDownHandler() === null)
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.touchDownHandler(worldCoords.x, worldCoords.y);
+    return actor.getTouchDownHandler()(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -152,10 +152,10 @@ export abstract class BaseScene {
     let actor = this.actorAt(screenX, screenY);
     if (actor === null)
       return false;
-    if (actor.touchUpHandler === null)
+    if (actor.getTouchUpHandler() === null)
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.touchUpHandler(worldCoords.x, worldCoords.y);
+    return actor.getTouchUpHandler()(worldCoords.x, worldCoords.y);
   }
 
   /** 
@@ -168,11 +168,11 @@ export abstract class BaseScene {
       return false;
     if (sActor !== eActor)
       return false;
-    if (sActor.swipeHandler === null)
+    if (sActor.getSwipeHandler() === null)
       return false;
     let wc1 = this.camera.screenToMeters(screenX0, screenY0);
     let wc2 = this.camera.screenToMeters(screenX1, screenY1);
-    return sActor.swipeHandler(wc1.x, wc1.y, wc2.x, wc2.y, time);
+    return sActor.getSwipeHandler()(wc1.x, wc1.y, wc2.x, wc2.y, time);
   }
 
   /**

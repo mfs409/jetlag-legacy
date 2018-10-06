@@ -289,7 +289,7 @@ export class Svg {
         let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         // Make an obstacle and rotate it
         let o = this.world.makeObstacleAsBox(x1, y1, len, .05, "");
-        o.body.SetTransform(new XY(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
+        o.getBody().SetTransform(new XY(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
         // let the game code modify this line segment
         this.callback(o);
     }

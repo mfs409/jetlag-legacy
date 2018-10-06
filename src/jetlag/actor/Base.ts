@@ -33,13 +33,15 @@ export class BaseActor implements Renderable {
     private enabled: boolean = true;
 
     /**
-     * Specify whether this Renderable object is enabled or disabled.  When it is disabled, it
-     * effectively does not exist in the game.
+     * Specify whether this actor is enabled or disabled.  When it is disabled,
+     * it effectively does not exist in the game: it won't be drawn, and its
+     * physics body will not be active.
      *
      * @param val The new state (true for enabled, false for disabled)
      */
     public setEnabled(val: boolean) {
         this.enabled = val;
+        this.body.SetActive(val);
     }
 
     /**
@@ -47,24 +49,22 @@ export class BaseActor implements Renderable {
      *
      * @return The state of the renderable
      */
-    public getEnabled() {
-        return this.enabled;
-    }
+    public getEnabled() { return this.enabled; }
 
     /** Physics body for this WorldActor */
-    body: PhysicsType2d.Dynamics.Body;
+    protected body: PhysicsType2d.Dynamics.Body;
 
     /** The type of body for this actor */
-    bodyStyle: BodyStyle;
+    private bodyStyle: BodyStyle;
 
     /** The dimensions of the WorldActor... x is width, y is height */
-    size: { x: number, y: number };
+    private size: { w: number, h: number };
 
     /** The vertices, if this is a polygon */
-    verts: XY[];
+    private verts: XY[];
 
-    /** A temp vector to help us avoid allocation */
-    tmp = new XY(0, 0);
+    public getNumVerts() { return this.verts.length; }
+    public getVert(index: number) { return this.verts[index].Clone(); }
 
     /** The z index of this actor. Valid range is [-2, 2] */
     private zIndex: number;
@@ -73,43 +73,59 @@ export class BaseActor implements Renderable {
      * Does this WorldActor follow a route? If so, the Driver will be used to
      * advance the  actor along its route.
      */
-    route: RouteDriver = null;
+    private route: RouteDriver = null;
 
     /** Sound to play when the actor disappears */
-    disappearSound: JetLagSound;
+    private disappearSound: JetLagSound;
 
     /** A debug render context */
-    debug: JetLagDebugSprite;
+    private debug: JetLagDebugSprite;
+    public getDebug() { return this.debug; }
 
     /** Code to run when this actor is tapped */
-    tapHandler: (hudX: number, hudY: number) => boolean = null;
+    private tapHandler: (worldX: number, worldY: number) => boolean = null;
+    public getTapHandler() { return this.tapHandler; }
+    public setTapHandler(handler: (worldX: number, worldY: number) => boolean) { this.tapHandler = handler; }
 
     /** handler for pan start event */
-    panStartHandler: (worldX: number, worldY: number) => boolean = null;
+    private panStartHandler: (worldX: number, worldY: number) => boolean = null;
+    public getPanStartHandler() { return this.panStartHandler; }
+    public setPanStartHandler(handler: (worldX: number, worldY: number) => boolean) { this.panStartHandler = handler; }
 
     /** handler for pan move event */
-    panMoveHandler: (worldX: number, worldY: number) => boolean = null;
+    private panMoveHandler: (worldX: number, worldY: number) => boolean = null;
+    public getPanMoveHandler() { return this.panMoveHandler; }
+    public setPanMoveHandler(handler: (worldX: number, worldY: number) => boolean) { this.panMoveHandler = handler; }
 
     /** handler for pan stop event */
-    panStopHandler: (worldX: number, worldY: number) => boolean = null;
+    private panStopHandler: (worldX: number, worldY: number) => boolean = null;
+    public getPanStopHandler() { return this.panStopHandler; }
+    public setPanStopHandler(handler: (worldX: number, worldY: number) => boolean) { this.panStopHandler = handler; }
 
     /** handler for downpress event */
-    touchDownHandler: (worldX: number, worldY: number) => boolean = null;
+    private touchDownHandler: (worldX: number, worldY: number) => boolean = null;
+    public getTouchDownHandler() { return this.touchDownHandler; }
+    public setTouchDownHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchDownHandler = handler; }
 
     /** handler for release event */
-    touchUpHandler: (worldX: number, worldY: number) => boolean = null;
+    private touchUpHandler: (worldX: number, worldY: number) => boolean = null;
+    public getTouchUpHandler() { return this.touchUpHandler; }
+    public setTouchUpHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchUpHandler = handler; }
 
     /** handler for swipe event */
-    swipeHandler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean = null;
+    private swipeHandler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean = null;
+    public getSwipeHandler() { return this.swipeHandler; }
+    public setSwipeHandler(handler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean) { this.swipeHandler = handler; }
 
     /** Animation support: this tracks the current state of the active animation (if any) */
-    animator: AnimationDriver;
+    protected animator: AnimationDriver;
+    public getAnimator() { return this.animator; }
 
     /** Animation support: the cells of the default animation */
-    defaultAnimation: Animation;
+    protected defaultAnimation: Animation;
 
     /** Animation support: the cells of the animation to use when moving backwards */
-    defaultReverseAnimation: Animation;
+    protected defaultReverseAnimation: Animation;
 
     /** Animation support: the cells of the disappearance animation */
     private disapperAnimation: Animation;
@@ -122,6 +138,9 @@ export class BaseActor implements Renderable {
 
     /** Extra data for the game designer to attach to the actor */
     private extra: any = {};
+
+    public getBodyStyle() { return this.bodyStyle; }
+    public getBody() { return this.body; }
 
     /**
      * Create a new BaseActor by creating an image that can be rendered to the screen
@@ -137,7 +156,7 @@ export class BaseActor implements Renderable {
         this.disappearAnimateSize = new XY(0, 0);
         this.disappearAnimateOffset = new XY(0, 0);
         this.scene = scene;
-        this.size = new XY(width, height);
+        this.size = { w: width, h: height };
         this.zIndex = 0;
     }
 
@@ -150,11 +169,11 @@ export class BaseActor implements Renderable {
      */
     setBoxPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number): void {
         let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
-        shape.SetAsBoxAtOrigin(this.size.x / 2, this.size.y / 2);
+        shape.SetAsBoxAtOrigin(this.size.w / 2, this.size.h / 2);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.size.x / 2;
-        boxBodyDef.position.y = y + this.size.y / 2;
+        boxBodyDef.position.x = x + this.size.w / 2;
+        boxBodyDef.position.y = y + this.size.h / 2;
         this.body = this.scene.createBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
@@ -192,8 +211,8 @@ export class BaseActor implements Renderable {
         shape.Set(this.verts);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.size.x / 2;
-        boxBodyDef.position.y = y + this.size.y / 2;
+        boxBodyDef.position.x = x + this.size.w / 2;
+        boxBodyDef.position.y = y + this.size.h / 2;
         this.body = this.scene.createBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
@@ -222,8 +241,8 @@ export class BaseActor implements Renderable {
 
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
         boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.size.x / 2;
-        boxBodyDef.position.y = y + this.size.y / 2;
+        boxBodyDef.position.x = x + this.size.w / 2;
+        boxBodyDef.position.y = y + this.size.h / 2;
         this.body = this.scene.createBody(boxBodyDef);
 
         let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
@@ -278,10 +297,10 @@ export class BaseActor implements Renderable {
 
         // Flip the animation?
         if (this.defaultReverseAnimation != null && this.body.GetLinearVelocity().x < 0) {
-            if (this.animator.currentAnimation != this.defaultReverseAnimation)
+            if (this.animator.getCurrentAnimation() != this.defaultReverseAnimation)
                 this.animator.setCurrentAnimation(this.defaultReverseAnimation);
         } else if (this.defaultReverseAnimation != null && this.body.GetLinearVelocity().x > 0) {
-            if (this.animator.currentAnimation == this.defaultReverseAnimation)
+            if (this.animator.getCurrentAnimation() == this.defaultReverseAnimation)
                 if (this.defaultAnimation != null)
                     this.animator.setCurrentAnimation(this.defaultAnimation);
         }
@@ -303,6 +322,17 @@ export class BaseActor implements Renderable {
         fixtures.Reset();
     }
 
+    getCollisionsEnabled() {
+        let f = this.body.GetFixtures();
+        while (f.MoveNext()) {
+            if (f.Current().IsSensor()) {
+                f.Reset();
+                return true;
+            }
+        }
+        f.Reset();
+        return false;
+    }
 
     /**
      * Adjust the default physics settings (density, elasticity, friction) for this actor
@@ -329,7 +359,7 @@ export class BaseActor implements Renderable {
      * @return x coordinate of top left corner, in pixels
      */
     public getXPosition() {
-        return this.body.GetPosition().x - this.size.x / 2;
+        return this.body.GetPosition().x - this.size.w / 2;
     }
 
     /**
@@ -337,21 +367,24 @@ export class BaseActor implements Renderable {
      *
      * @return y coordinate of top left corner, in pixels
      */
-    public getYPosition() { return this.body.GetPosition().y - this.size.y / 2; }
+    public getYPosition() { return this.body.GetPosition().y - this.size.h / 2; }
+
+    public getCenterX() { return this.body.GetPosition().x; }
+    public getCenterY() { return this.body.GetPosition().y; }
 
     /**
      * Returns the width of this actor
      *
      * @return the actor's width, in pixels
      */
-    public getWidth() { return this.size.x; }
+    public getWidth() { return this.size.w; }
 
     /**
      * Return the height of this actor
      *
      * @return the actor's height, in pixels
      */
-    public getHeight() { return this.size.y; }
+    public getHeight() { return this.size.h; }
 
     /**
      * Use this to find the current rotation of an actor
@@ -388,7 +421,6 @@ export class BaseActor implements Renderable {
     public remove(quiet: boolean): void {
         // set it invisible immediately, so that future calls know to ignore this actor
         this.setEnabled(false);
-        this.body.SetActive(false);
 
         // play a sound when we remove this actor?
         if (this.disappearSound && !quiet)
@@ -401,7 +433,7 @@ export class BaseActor implements Renderable {
             let o = new BaseActor(this.scene, this.device, "", this.disappearAnimateSize.x, this.disappearAnimateSize.y);
             o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
             this.scene.addActor(o, 0);
-            o.body.SetActive(false);
+            o.setCollisionsEnabled(false);
             o.setDefaultAnimation(this.disapperAnimation);
         }
     }
@@ -480,8 +512,7 @@ export class BaseActor implements Renderable {
      * @param y The new Y position, in pixels
      */
     public setPosition(x: number, y: number): void {
-        this.tmp.Set(x + this.size.x / 2, y + this.size.y / 2);
-        this.body.SetTransform(this.tmp, this.body.GetAngle());
+        this.body.SetTransform(new XY(x + this.size.w / 2, y + this.size.h / 2), this.body.GetAngle());
     }
 
     /**
@@ -560,10 +591,8 @@ export class BaseActor implements Renderable {
      */
     public setAppearDelay(delay: number): void {
         this.setEnabled(false);
-        this.body.SetActive(false);
         this.scene.timer.addEvent(new TimedEvent(delay, false, () => {
             this.setEnabled(true);
-            this.body.SetActive(true);
         }));
     }
 
@@ -641,8 +670,8 @@ export class BaseActor implements Renderable {
                 x = this.getXPosition();
                 y = this.getYPosition();
             }
-            let w = this.size.x - shrinkX / 20;
-            let h = this.size.y - shrinkY / 20;
+            let w = this.size.w - shrinkX / 20;
+            let h = this.size.h - shrinkY / 20;
             // if the area remains >0, resize it and schedule a timer to run again
             if ((w > 0.05) && (h > 0.05)) {
                 this.resize(x, y, w, h);
@@ -724,8 +753,8 @@ export class BaseActor implements Renderable {
             this.setBoxPhysics(oldBody.GetType(), x, y);
         } else if (this.bodyStyle === BodyStyle.POLYGON) {
             // we need to manually scale all the vertices
-            let xScale = height / this.size.y;
-            let yScale = width / this.size.x;
+            let xScale = height / this.size.h;
+            let yScale = width / this.size.w;
             let ps = oldFix.GetShape() as PhysicsType2d.Collision.Shapes.PolygonShape;
             let verts: number[] = [];
             for (let i = 0; i < ps.m_vertices.length; ++i) {
@@ -736,8 +765,8 @@ export class BaseActor implements Renderable {
             this.setPolygonPhysics(oldBody.GetType(), x, y, verts);
         }
         // set new height and width of the image
-        this.size.x = width;
-        this.size.y = height;
+        this.size.w = width;
+        this.size.h = height;
         // Update the user-visible physics values
         this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
         this.setFastMoving(oldBody.IsBullet());
@@ -749,6 +778,7 @@ export class BaseActor implements Renderable {
         this.body.SetLinearVelocity(oldBody.GetLinearVelocity());
         // disable the old body
         oldBody.SetActive(false);
+        // TODO: did we forget sensor?
     }
 
     /**

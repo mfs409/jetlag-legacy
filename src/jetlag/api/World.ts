@@ -613,8 +613,7 @@ export class WorldApi {
      * @param distance Maximum distance from the hero that a projectile can travel
      */
     public setProjectileRange(distance: number): void {
-        for (let p of this.stage.getProjectilePool().pool)
-            p.range = distance;
+        this.stage.getProjectilePool().setProjectileRange(distance);
     }
 
     /**
@@ -622,8 +621,7 @@ export class WorldApi {
      * or less) immune to gravitational forces.
      */
     public setProjectileGravityOn(): void {
-        for (let p of this.stage.getProjectilePool().pool)
-            p.body.SetGravityScale(1);
+        this.stage.getProjectilePool().setProjectileGravityOn();
     }
 
     /**
@@ -633,7 +631,7 @@ export class WorldApi {
     * @param factor The value to multiply against the projectile speed.
     */
     public setProjectileVectorDampeningFactor(factor: number): void {
-        this.stage.getProjectilePool().directionalDamp = factor;
+        this.stage.getProjectilePool().setProjectileVectorDampeningFactor(factor);
     }
 
     /**
@@ -641,7 +639,7 @@ export class WorldApi {
      * they collide with other actors
      */
     public enableCollisionsForProjectiles(): void {
-        this.stage.getProjectilePool().sensor = false;
+        this.stage.getProjectilePool().enableCollisionsForProjectiles();
     }
 
     /**
@@ -651,8 +649,7 @@ export class WorldApi {
      * @param velocity The magnitude of the velocity for projectiles
      */
     public setFixedVectorThrowVelocityForProjectiles(velocity: number): void {
-        this.stage.getProjectilePool().enableFixedVectorVelocity = true;
-        this.stage.getProjectilePool().fixedVectorVelocity = velocity;
+        this.stage.getProjectilePool().setFixedVectorThrowVelocityForProjectiles(velocity);
     }
 
     /**
@@ -660,15 +657,14 @@ export class WorldApi {
      * their direction or movement
      */
     public setRotateVectorThrowForProjectiles(): void {
-        this.stage.getProjectilePool().rotateVectorThrow = true;
+        this.stage.getProjectilePool().setRotateVectorThrowForProjectiles();
     }
 
     /**
      * Indicate that when two projectiles collide, they should both remain on screen
      */
     public setCollisionOkForProjectiles(): void {
-        for (let p of this.stage.getProjectilePool().pool)
-            p.disappearOnCollide = false;
+        this.stage.getProjectilePool().setCollisionOkForProjectiles();
     }
 
     /**
@@ -678,7 +674,7 @@ export class WorldApi {
      * @param factor The value to multiply against the projectile speed.
      */
     public setProjectileMultiplier(factor: number) {
-        this.stage.getProjectilePool().directionalDamp = factor;
+        this.stage.getProjectilePool().setProjectileMultiplier(factor);
     }
 
     /**
@@ -686,8 +682,8 @@ export class WorldApi {
      *
      * @param number How many projectiles are available
      */
-    public setNumberOfProjectiles(number: number): void {
-        this.stage.getProjectilePool().remaining = number;
+    public setNumberOfProjectiles(num: number): void {
+        this.stage.getProjectilePool().setNumberOfProjectiles(num);
     }
 
     /**
@@ -696,7 +692,7 @@ export class WorldApi {
      * @param soundName Name of the sound file to play
      */
     public setThrowSound(soundName: string): void {
-        this.stage.getProjectilePool().throwSound = this.stage.device.getSpeaker().getSound(soundName);
+        this.stage.getProjectilePool().setThrowSound(soundName);
     }
 
     /**
@@ -705,8 +701,7 @@ export class WorldApi {
      * @param soundName the name of the sound file to play
      */
     public setProjectileDisappearSound(soundName: string): void {
-        this.stage.getProjectilePool().projectileDisappearSound =
-            this.stage.device.getSpeaker().getSound(soundName);
+        this.stage.getProjectilePool().setProjectileDisappearSound(soundName);
     }
 
     /**
@@ -751,8 +746,7 @@ export class WorldApi {
      * @param animation The animation object to use for each projectile that is thrown
      */
     public setProjectileAnimation(animation: Animation) {
-        for (let p of this.stage.getProjectilePool().pool)
-            p.setDefaultAnimation(animation.clone());
+        this.stage.getProjectilePool().setProjectileAnimation(animation);
     }
 
     /**
@@ -761,9 +755,7 @@ export class WorldApi {
      * @param imgName The file to use when picking images
      */
     public setProjectileImageSource(imgName: string) {
-        for (let p of this.stage.getProjectilePool().pool)
-            p.animator.updateImage(this.stage.device.getRenderer(), imgName);
-        this.stage.getProjectilePool().randomizeImages = true;
+        this.stage.getProjectilePool().setProjectileImageSource(imgName);
     }
 
     /**

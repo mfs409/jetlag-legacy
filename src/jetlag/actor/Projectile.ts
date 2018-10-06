@@ -80,14 +80,9 @@ export class Projectile extends WorldActor {
                 return;
         }
         // only disappear if other is not a sensor
-        let f = other.body.GetFixtures();
-        f.MoveNext();
-        if (f.Current().IsSensor()) {
-            // TODO: why reset?
-            f.Reset();
-            return;
+        if (!other.getCollisionsEnabled()) {
+            this.remove(false);
         }
-        this.remove(false);
     }
 
     /**
@@ -102,9 +97,12 @@ export class Projectile extends WorldActor {
         let dy = Math.abs(this.body.GetPosition().y - this.rangeFrom.y);
         if (dx * dx + dy * dy > this.range * this.range) {
             this.remove(true);
-            this.body.SetActive(false);
             return;
         }
         super.render(renderer, camera, elapsedMillis);
+    }
+
+    public setGravityScale(val: number) {
+        this.body.SetGravityScale(val);
     }
 }

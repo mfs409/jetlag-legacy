@@ -112,14 +112,14 @@ export class Obstacle extends WorldActor {
         // register a callback to change the hero's speed
         this.heroCollision = (self: Obstacle, h: Hero, c: PhysicsType2d.Dynamics.Contacts.Contact) => {
             // boost the speed
-            let v = h.body.GetLinearVelocity();
+            let v = h.getBody().GetLinearVelocity();
             v.x += boostAmountX;
             v.y += boostAmountY;
             h.updateVelocity(v.x, v.y);
             // now set a timer to un-boost the speed
             if (boostDuration > 0) {
                 this.stage.getWorld().timer.addEvent(new TimedEvent(boostDuration, false, () => {
-                    let v = h.body.GetLinearVelocity();
+                    let v = h.getBody().GetLinearVelocity();
                     v.x -= boostAmountX;
                     v.y -= boostAmountY;
                     h.updateVelocity(v.x, v.y);

@@ -1,3 +1,4 @@
+import { Animation } from "../support/Animation";
 import { Projectile } from "../actor/Projectile"
 import { Hero } from "../actor/Hero"
 import { JetLagSound } from "./Interfaces";
@@ -10,40 +11,40 @@ import { JetLagStage } from "../JetLagStage";
 */
 export class ProjectilePool {
     /** A collection of all the available projectiles */
-    readonly pool: Projectile[];
+    private readonly pool: Projectile[];
 
     /** The number of projectiles in the pool */
     private readonly poolSize: number;
 
     /** For limiting the number of projectiles that can be thrown */
-    remaining: number;
+    private remaining: number;
 
     /** A dampening factor to apply to projectiles thrown via "directional" mechanism */
-    directionalDamp: number;
+    private directionalDamp: number;
 
     /** Indicates that projectiles should be sensors */
-    sensor: boolean;
+    private sensor: boolean;
 
     /** Indicates that vector projectiles should have a fixed velocity */
-    enableFixedVectorVelocity: boolean;
+    private enableFixedVectorVelocity: boolean;
 
     /** The magnitude of the velocity for vector projectiles thrown with a fixed velocity */
-    fixedVectorVelocity: number;
+    private fixedVectorVelocity: number;
 
     /** Indicate that projectiles should face in the direction they are initially thrown */
-    rotateVectorThrow: boolean;
+    private rotateVectorThrow: boolean;
 
     /** Index of next available projectile in the pool */
     private nextIndex: number;
 
     /** Sound to play when projectiles are thrown */
-    throwSound: JetLagSound;
+    private throwSound: JetLagSound;
 
     /** The sound to play when a projectile disappears */
-    projectileDisappearSound: JetLagSound;
+    private projectileDisappearSound: string;
 
     /** For choosing random images for the projectiles */
-    randomizeImages = false;
+    private randomizeImages = false;
 
     /**
      * Create a pool of projectiles, and set the way they are thrown.
@@ -58,15 +59,13 @@ export class ProjectilePool {
      * @param zIndex   The z plane on which the projectiles should be drawn
      * @param isCircle Should projectiles have an underlying circle or box shape?
      */
-    constructor(stage: JetLagStage, size: number, width: number, height: number, imgName: string, strength: number, zIndex: number, isCircle: boolean) {
+    constructor(private stage: JetLagStage, size: number, width: number, height: number, imgName: string, strength: number, zIndex: number, isCircle: boolean) {
         // set up the pool
         this.pool = [];
         // don't draw all projectiles in same place...
         for (let i = 0; i < size; ++i) {
             let p = new Projectile(stage, width, height, imgName, -100 - i * width, -100 - i * height, zIndex, isCircle);
             p.setEnabled(false);
-            p.body.SetBullet(true);
-            p.body.SetActive(false);
             p.damage = strength;
             this.pool.push(p);
         }
@@ -78,6 +77,9 @@ export class ProjectilePool {
         this.remaining = -1;
         this.sensor = true;
     }
+
+    /** Return the number of projectiles remaining */
+    public getRemaining() { return this.remaining; }
 
     /**
      * Throw a projectile. This is for throwing in a single, predetermined direction
@@ -107,23 +109,22 @@ export class ProjectilePool {
         let b: Projectile = this.pool[this.nextIndex];
         this.nextIndex = (this.nextIndex + 1) % this.poolSize;
         b.setCollisionsEnabled(!this.sensor);
-        b.animator.resetCurrentAnimation();
+        b.getAnimator().resetCurrentAnimation();
 
         if (this.randomizeImages)
-            b.animator.switchToRandomIndex();
+            b.getAnimator().switchToRandomIndex();
 
         // calculate offset for starting position of projectile, put it on screen
         b.rangeFrom.x = h.getXPosition() + offsetX;
         b.rangeFrom.y = h.getYPosition() + offsetY;
-        b.body.SetActive(true);
-        b.body.SetTransform(b.rangeFrom, 0);
+        b.getBody().SetTransform(b.rangeFrom, 0);
 
         // give the projectile velocity, show it, and play sound
         b.updateVelocity(velocityX, velocityY);
         b.setEnabled(true);
         if (this.throwSound)
             this.throwSound.play();
-        b.disappearSound = this.projectileDisappearSound;
+        b.setDisappearSound(this.projectileDisappearSound);
         h.doThrowAnimation();
     }
 
@@ -157,13 +158,12 @@ export class ProjectilePool {
         let b: Projectile = this.pool[this.nextIndex];
         this.nextIndex = (this.nextIndex + 1) % this.poolSize;
         b.setCollisionsEnabled(!this.sensor);
-        b.animator.resetCurrentAnimation();
+        b.getAnimator().resetCurrentAnimation();
 
         // calculate offset for starting position of projectile, put it on screen
         b.rangeFrom.x = heroX + offsetX;
         b.rangeFrom.y = heroY + offsetY;
-        b.body.SetActive(true);
-        b.body.SetTransform(b.rangeFrom, 0);
+        b.getBody().SetTransform(b.rangeFrom, 0);
 
         // give the projectile velocity
         if (this.enableFixedVectorVelocity) {
@@ -189,14 +189,137 @@ export class ProjectilePool {
         // rotate the projectile
         if (this.rotateVectorThrow) {
             let angle = Math.atan2(toY - heroY - offsetY, toX - heroX - offsetX) - Math.atan2(-1, 0);
-            b.body.SetTransform(b.body.GetPosition(), angle);
+            b.setRotation(angle);
         }
 
         // show the projectile, play sound, and animate the hero
         b.setEnabled(true);
         if (this.throwSound)
             this.throwSound.play();
-        b.disappearSound = this.projectileDisappearSound;
+        b.setDisappearSound(this.projectileDisappearSound);
         h.doThrowAnimation();
+    }
+
+    /**
+     * Specify a limit on how far away from the Hero a projectile can go.  Without this, projectiles
+     * could keep on traveling forever.
+     *
+     * @param distance Maximum distance from the hero that a projectile can travel
+     */
+    public setProjectileRange(distance: number): void {
+        for (let p of this.pool)
+            p.range = distance;
+    }
+
+    /**
+     * Indicate that projectiles should feel the effects of gravity. Otherwise, they will be (more
+     * or less) immune to gravitational forces.
+     */
+    public setProjectileGravityOn(): void {
+        for (let p of this.pool)
+            p.setGravityScale(1);
+    }
+
+    /**
+    * The "directional projectile" mechanism might lead to the projectiles moving too fast. This
+    * will cause the speed to be multiplied by a factor
+    *
+    * @param factor The value to multiply against the projectile speed.
+    */
+    public setProjectileVectorDampeningFactor(factor: number): void {
+        this.directionalDamp = factor;
+    }
+
+    /**
+     * Indicate that all projectiles should participate in collisions, rather than disappearing when
+     * they collide with other actors
+     */
+    public enableCollisionsForProjectiles(): void {
+        this.sensor = false;
+    }
+
+    /**
+     * Indicate that projectiles thrown with the "directional" mechanism should have a fixed
+     * velocity
+     *
+     * @param velocity The magnitude of the velocity for projectiles
+     */
+    public setFixedVectorThrowVelocityForProjectiles(velocity: number): void {
+        this.enableFixedVectorVelocity = true;
+        this.fixedVectorVelocity = velocity;
+    }
+
+    /**
+     * Indicate that projectiles thrown via the "directional" mechanism should be rotated to face in
+     * their direction or movement
+     */
+    public setRotateVectorThrowForProjectiles(): void {
+        this.rotateVectorThrow = true;
+    }
+
+    /**
+     * Indicate that when two projectiles collide, they should both remain on screen
+     */
+    public setCollisionOkForProjectiles(): void {
+        for (let p of this.pool)
+            p.disappearOnCollide = false;
+    }
+
+    /**
+     * The "directional projectile" mechanism might lead to the projectiles moving too fast or too
+     * slow. This will cause the speed to be multiplied by a factor
+     *
+     * @param factor The value to multiply against the projectile speed.
+     */
+    public setProjectileMultiplier(factor: number) {
+        this.directionalDamp = factor;
+    }
+
+    /**
+     * Set a limit on the total number of projectiles that can be thrown
+     *
+     * @param number How many projectiles are available
+     */
+    public setNumberOfProjectiles(number: number): void {
+        this.remaining = number;
+    }
+
+    /**
+     * Specify a sound to play when the projectile is thrown
+     *
+     * @param soundName Name of the sound file to play
+     */
+    public setThrowSound(soundName: string): void {
+        this.throwSound = this.stage.device.getSpeaker().getSound(soundName);
+    }
+
+    /**
+     * Specify the sound to play when a projectile disappears
+     *
+     * @param soundName the name of the sound file to play
+     */
+    public setProjectileDisappearSound(soundName: string): void {
+        this.projectileDisappearSound = soundName;
+    }
+
+    /**
+     * Specify how projectiles should be animated
+     *
+     * @param animation The animation object to use for each projectile that is thrown
+     */
+    public setProjectileAnimation(animation: Animation) {
+        for (let p of this.pool)
+            p.setDefaultAnimation(animation.clone());
+    }
+
+    /**
+     * Specify the image file from which to randomly choose projectile images
+     *
+     * @param imgName The file to use when picking images
+     */
+    public setProjectileImageSource(imgName: string) {
+        for (let p of this.pool)
+            p.getAnimator().updateImage(this.stage.device.getRenderer(), imgName);
+        this.randomizeImages = true;
     }
 }
