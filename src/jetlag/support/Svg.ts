@@ -1,6 +1,7 @@
 import { WorldActor as WorldActor } from "../actor/World";
 import { WorldApi as WorldApi } from "../api/World";
 import { JetLagConfig } from "../JetLagConfig";
+import { XY } from "./XY";
 
 // TODO: need to make the placement of the SVG a little bit nicer...  Consider a
 // TOPLEFT strategy to the placement, instead of translation.
@@ -27,13 +28,13 @@ export class Svg {
     world: WorldApi;
 
     /** Coordinate of the last point we drew */
-    private last = new PhysicsType2d.Vector2(0, 0);
+    private last = new XY(0, 0);
 
     /** Coordinate of the first point we drew */
-    private first = new PhysicsType2d.Vector2(0, 0);
+    private first = new XY(0, 0);
 
     /** Coordinate of the current point being drawn */
-    private curr = new PhysicsType2d.Vector2(0, 0);
+    private curr = new XY(0, 0);
 
     /** The requested stretch factor */
     private userStretch = { x: 1, y: 1 };
@@ -242,7 +243,7 @@ export class Svg {
      * @param start The point from which the line originates
      * @param stop  The point to which the line extends
      */
-    private addLine(start: PhysicsType2d.Vector2, stop: PhysicsType2d.Vector2) {
+    private addLine(start: XY, stop: XY) {
         // Get the pixel coordinates of the SVG line
         let x1 = start.x, x2 = stop.x, y1 = start.y, y2 = stop.y;
 
@@ -288,7 +289,7 @@ export class Svg {
         let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         // Make an obstacle and rotate it
         let o = this.world.makeObstacleAsBox(x1, y1, len, .05, "");
-        o.body.SetTransform(new PhysicsType2d.Vector2(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
+        o.body.SetTransform(new XY(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
         // let the game code modify this line segment
         this.callback(o);
     }

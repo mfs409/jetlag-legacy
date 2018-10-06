@@ -7,6 +7,7 @@ import { Animation } from "../support/Animation"
 import { Camera } from "../support/Camera"
 import { JetLagRenderer, JetLagSound } from "../support/Interfaces";
 import { JetLagStage } from "../JetLagStage";
+import { XY } from "../support/XY";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -314,7 +315,7 @@ export class Hero extends WorldActor {
      * @param y Velocity in Y direction
      */
     public setJumpImpulses(x: number, y: number): void {
-        this.jumpImpulses = new PhysicsType2d.Vector2(x, -y);
+        this.jumpImpulses = new XY(x, -y);
     }
 
     /**

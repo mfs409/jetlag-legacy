@@ -6,6 +6,7 @@ import { Hero } from "../actor/Hero"
 import { Route } from "../support/Route";
 import { BaseActor as BaseActor } from "../actor/Base";
 import { JetLagStage } from "../JetLagStage";
+import { XY } from "../support/XY";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
@@ -235,7 +236,7 @@ export class OverlayApi {
             let dx = this.activeActor.getXPosition() - (meters.x - this.activeActor.getWidth() / 2);
             let dy = this.activeActor.getYPosition() - (meters.y - this.activeActor.getHeight() / 2);
             let hy = Math.sqrt(dx * dx + dy * dy) / velocity;
-            let v = new PhysicsType2d.Vector2(dx / hy, dy / hy);
+            let v = new XY(dx / hy, dy / hy);
             this.activeActor.setRotationSpeed(0);
             this.activeActor.setAbsoluteVelocity(-v.x, -v.y);
             if (clear)
@@ -473,7 +474,7 @@ export class OverlayApi {
     public addDirectionalThrowButton(x: number, y: number, width: number, height: number, imgName: string, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
         let c = new BaseActor(this.stage.getHud(), this.stage.device, imgName, width, height);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        let v = new PhysicsType2d.Vector2(0, 0);
+        let v = new XY(0, 0);
         let isHolding = false;
         c.touchDownHandler = (hudX: number, hudY: number) => {
             isHolding = true;

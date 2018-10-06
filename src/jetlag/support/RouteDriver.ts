@@ -80,7 +80,7 @@ export class RouteDriver {
                     this.startRoute();
                 } else {
                     this.done = true;
-                    this.actor.body.SetLinearVelocity(new PhysicsType2d.Vector2(0, 0));
+                    this.actor.body.SetLinearVelocity(new XY(0, 0));
                 }
             } else {
                 // advance to next point

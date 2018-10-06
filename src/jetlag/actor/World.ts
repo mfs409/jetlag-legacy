@@ -1,6 +1,7 @@
 import { BaseActor as BaseActor } from "./Base"
 import { Hero } from "./Hero"
 import { JetLagStage } from "../JetLagStage";
+import { XY } from "../support/XY";
 
 /**
  * World is the base class upon which every actor in the main game is
@@ -13,13 +14,13 @@ import { JetLagStage } from "../JetLagStage";
  */
 export abstract class WorldActor extends BaseActor {
   /** When the camera follows the actor without centering on it, this gives us the difference between the actor and camera */
-  cameraOffset: PhysicsType2d.Vector2 = new PhysicsType2d.Vector2(0, 0);
+  cameraOffset = new XY(0, 0);
 
   /** By default, actors can't be dragged on screen */
   draggable = false;
 
   /** A vector for computing hover placement */
-  hover: PhysicsType2d.Vector2 | null;
+  hover: XY | null;
 
   /** 
    * Disable 3 of 4 sides of a Actors, to allow walking through walls. The value
@@ -273,7 +274,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setHover(x: number, y: number) {
     let pmr = this.stage.config.pixelMeterRatio;
-    this.hover = new PhysicsType2d.Vector2(x * pmr, y * pmr);
+    this.hover = new XY(x * pmr, y * pmr);
     this.stage.getWorld().repeatEvents.push(() => {
       if (this.hover == null)
         return;

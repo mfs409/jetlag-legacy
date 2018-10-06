@@ -115,10 +115,10 @@ export class BaseActor implements Renderable {
     private disapperAnimation: Animation;
 
     /** Animation support: the dimensions of the disappearance animation */
-    private disappearAnimateSize: PhysicsType2d.Vector2;
+    private disappearAnimateSize: XY;
 
     /** Animation support: the offset for placing the disappearance animation relative to the disappearing actor */
-    private disappearAnimateOffset: PhysicsType2d.Vector2;
+    private disappearAnimateOffset: XY;
 
     /** Extra data for the game designer to attach to the actor */
     private extra: any = {};
@@ -134,10 +134,10 @@ export class BaseActor implements Renderable {
     constructor(private scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number) {
         this.animator = new AnimationDriver(device.getRenderer(), imgName);
         this.debug = device.getRenderer().makeDebugContext();
-        this.disappearAnimateSize = new PhysicsType2d.Vector2(0, 0);
-        this.disappearAnimateOffset = new PhysicsType2d.Vector2(0, 0);
+        this.disappearAnimateSize = new XY(0, 0);
+        this.disappearAnimateOffset = new XY(0, 0);
         this.scene = scene;
-        this.size = new PhysicsType2d.Vector2(width, height);
+        this.size = new XY(width, height);
         this.zIndex = 0;
     }
 
@@ -185,7 +185,7 @@ export class BaseActor implements Renderable {
         let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
         this.verts = [];
         for (let i = 0; i < vertices.length; i += 2)
-            this.verts[i / 2] = new PhysicsType2d.Vector2(vertices[i], vertices[i + 1]);
+            this.verts[i / 2] = new XY(vertices[i], vertices[i + 1]);
         // print some debug info, since vertices are tricky
         for (let vert of this.verts)
             this.device.getConsole().info("vert at " + vert.x + "," + vert.y);
@@ -254,7 +254,7 @@ export class BaseActor implements Renderable {
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
         }
         this.breakJoints();
-        this.body.SetLinearVelocity(new PhysicsType2d.Vector2(x, y));
+        this.body.SetLinearVelocity(new XY(x, y));
     }
 
     /**

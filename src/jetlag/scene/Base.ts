@@ -6,6 +6,7 @@ import { Camera } from "../support/Camera"
 import { PointToActorCallback } from "../support/PointToActorCallback"
 import { JetLagRenderer, JetLagDevice, Renderable } from "../support/Interfaces";
 import { JetLagConfig } from "../JetLagConfig";
+import { XY } from "../support/XY";
 
 /**
  * BaseScene represents an interactive, dynamic, visible portion of a game.
@@ -56,7 +57,7 @@ export abstract class BaseScene {
     this.camera = new Camera(w, h, this.config.pixelMeterRatio, config, device.getConsole());
 
     // create a world with no default gravitational forces
-    this.world = new PhysicsType2d.Dynamics.World(new PhysicsType2d.Vector2(0, 0));
+    this.world = new PhysicsType2d.Dynamics.World(new XY(0, 0));
 
     // set up the containers for holding anything we can render
     this.renderables = new Array<Array<Renderable>>(5);
@@ -217,7 +218,7 @@ export abstract class BaseScene {
   }
 
   public setGravity(newXGravity: number, newYGravity: number): void {
-    this.world.SetGravity(new PhysicsType2d.Vector2(newXGravity, newYGravity));
+    this.world.SetGravity(new XY(newXGravity, newYGravity));
   }
 
   public createBody(def: PhysicsType2d.Dynamics.BodyDefinition) {

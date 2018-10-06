@@ -1,4 +1,5 @@
 import { BaseActor as BaseActor } from "../actor/Base"
+import { XY } from "./XY";
 
 /**
  * PointToActorCallback is a QueryCallback for PhysicsType2d, which determines
@@ -9,7 +10,7 @@ export class PointToActorCallback implements PhysicsType2d.Dynamics.IQueryCallba
     private foundActor: BaseActor = null;
 
     /** A helper vector for tracking the location that is being queried */
-    private touchVector = new PhysicsType2d.Vector2(0, 0);
+    private touchVector = new XY(0, 0);
 
     /** The tolerance when looking in a region around a point */
     private readonly delta = .1;
