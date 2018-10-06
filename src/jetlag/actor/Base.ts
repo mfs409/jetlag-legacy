@@ -608,7 +608,7 @@ export class BaseActor implements Renderable {
      *
      * @param animation The animation to display
      * @param offsetX   Distance between the animation and the left side of the actor
-     * @param offsetY   Distance between the animation and the bottom of the actor
+     * @param offsetY   Distance between the animation and the top of the actor
      * @param width     The width of the animation, in case it's not the same as the actor width
      * @param height    The height of the animation, in case it's not the same as the actor height
      */
@@ -625,7 +625,7 @@ export class BaseActor implements Renderable {
      * @param shrinkX      The number of meters by which the X dimension should shrink each second
      * @param shrinkY      The number of meters by which the Y dimension should shrink each second
      * @param keepCentered Should the actor's center point stay the same as it shrinks, or should
-     *                     its bottom left corner stay in the same position
+     *                     its top left corner stay in the same position
      */
     public setShrinkOverTime(shrinkX: number, shrinkY: number, keepCentered: boolean) {
         let done = false;

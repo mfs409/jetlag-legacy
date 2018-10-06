@@ -512,17 +512,20 @@ export class WorldApi {
     }
 
     /**
-     * Add a background image that auto-repeats in X, and that moves in relation to the hero
-     * movement
+     * Add a background image that auto-repeats in X, and that moves in relation
+     * to the hero movement
      *
-     * @param x       The X of the bottom left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the bottom left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
+     * @param x       The X of the top left corner of one instance of the image.
+     *                The image will be tiled from that point onward, in all
+     *                directions.
+     * @param y       The Y of the top left corner of one instance of the image.
+     *                The image will be tiled from that point onward, in all
+     *                directions.
      * @param width   The width of the image being used as a background layer
      * @param height  The height of the image being used as a background layer
-     * @param xSpeed  Speed that the picture seems to move in the X direction. "1" is the same speed
-     *                as the camera; "0" is not at all; ".5f" is at half the camera's speed
+     * @param xSpeed  Speed that the picture seems to move in the X direction.
+     *                "1" is the same speed as the camera; "0" is not at all;
+     *                ".5f" is at half the camera's speed
      * @param imgName The name of the image file to use as the background
      */
     public addHorizontalBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
@@ -534,9 +537,9 @@ export class WorldApi {
      * Add a background image that auto-repeats in Y, and that moves in relation to the hero
      * movement
      *
-     * @param x       The X of the bottom left corner of one instance of the image.  The image will
+     * @param x       The X of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the bottom left corner of one instance of the image.  The image will
+     * @param y       The Y of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
      * @param width   The width of the image being used as a background layer
      * @param height  The height of the image being used as a background layer
@@ -552,9 +555,9 @@ export class WorldApi {
     /**
      * Add a foreground image that auto-repeats, and that moves in relation to the hero movement
      *
-     * @param x       The X of the bottom left corner of one instance of the image.  The image will
+     * @param x       The X of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the bottom left corner of one instance of the image.  The image will
+     * @param y       The Y of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
      * @param width   The width of the image being used as a background layer
      * @param height  The height of the image being used as a background layer
@@ -570,9 +573,9 @@ export class WorldApi {
     /**
      * Add a background image that auto-repeats, and that moves at a fixed X velocity
      *
-     * @param x       The X of the bottom left corner of one instance of the image.  The image will
+     * @param x       The X of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the bottom left corner of one instance of the image.  The image will
+     * @param y       The Y of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
      * @param width   The width of the image being used as a background layer
      * @param height  The height of the image being used as a background layer
@@ -588,9 +591,9 @@ export class WorldApi {
     /**
      * Add a background image that auto-repeats, and that moves at a fixed Y velocity
      *
-     * @param x       The X of the bottom left corner of one instance of the image.  The image will
+     * @param x       The X of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the bottom left corner of one instance of the image.  The image will
+     * @param y       The Y of the top left corner of one instance of the image.  The image will
      *                be tiled from that point onward, in all directions.
      * @param width   The width of the image being used as a background layer
      * @param height  The height of the image being used as a background layer

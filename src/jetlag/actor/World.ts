@@ -194,10 +194,10 @@ export abstract class WorldActor extends BaseActor {
    * Indicate that touching this actor should make a hero throw a projectile
    *
    * @param h         The hero who should throw a projectile when this is touched
-   * @param offsetX   specifies the x distance between the bottom left of the projectile and the
-   *                  bottom left of the hero throwing the projectile
-   * @param offsetY   specifies the y distance between the bottom left of the projectile and the
-   *                  bottom left of the hero throwing the projectile
+   * @param offsetX   specifies the x distance between the top left of the projectile and the
+   *                  top left of the hero throwing the projectile
+   * @param offsetY   specifies the y distance between the top left of the projectile and the
+   *                  top left of the hero throwing the projectile
    * @param velocityX The X velocity of the projectile when it is thrown
    * @param velocityY The Y velocity of the projectile when it is thrown
    */

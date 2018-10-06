@@ -32,7 +32,7 @@ export class ParallaxScene {
      * @param sb          The SpriteBatch to use while rendering
      * @param elapsed     The time since the last render
      */
-    render(sb: JetLagRenderer, worldCamera: Camera, elapsed: number) {
+    public render(sb: JetLagRenderer, worldCamera: Camera, elapsed: number) {
         for (let pl of this.layers) {
             if (pl.isAuto) {
                 this.renderAuto(sb, pl, elapsed, worldCamera);

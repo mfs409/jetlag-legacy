@@ -29,9 +29,9 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
         jl.world.setMusic("tune.ogg");
         jl.world.drawPicture(0, 0, 16, 9, "chooser.png", 0);
 
-        // We'll have margins of 1.25 on the left and right, a margin of 1 on the bottom, and
-        // three rows of eight buttons each, with each button 1.25x1.25 meters, and .5 meters
-        // between them
+        // We'll have margins of 1.25 on the left and right, a margin of 1 on
+        // the bottom, and three rows of eight buttons each, with each button
+        // 1.25x1.25 meters, and .5 meters between them
         drawLevelButton(jl, 1.25, 3.25, 1.25, 1.25, 1);
         drawLevelButton(jl, 3.00, 3.25, 1.25, 1.25, 2);
         drawLevelButton(jl, 4.75, 3.25, 1.25, 1.25, 3);
@@ -156,8 +156,8 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
  * locked, the button isn't playable. Otherwise, the player can tap the
  * button to start a level.
  *
- * @param x      X coordinate of the bottom left corner of the button
- * @param y      Y coordinate of the bottom left corner of the button
+ * @param x      X coordinate of the top left corner of the button
+ * @param y      Y coordinate of the top left corner of the button
  * @param width  width of the button
  * @param height height of the button
  * @param whichLevel  which level to play when the button is tapped
@@ -174,8 +174,8 @@ function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, hei
 /**
  * This helper function is for drawing the button that takes us to the previous chooser screen
  *
- * @param x            X coordinate of bottom left corner of the button
- * @param y            Y coordinate of bottom left corner of the button
+ * @param x            X coordinate of top left corner of the button
+ * @param y            Y coordinate of top left corner of the button
  * @param width        width of the button
  * @param height       height of the button
  * @param chooserLevel The chooser screen to create
@@ -188,8 +188,8 @@ function drawPrevButton(jl: JetLagApi, x: number, y: number, width: number, heig
 /**
  * This helper function is for drawing the button that takes us to the next chooser screen
  *
- * @param x            X coordinate of bottom left corner of the button
- * @param y            Y coordinate of bottom left corner of the button
+ * @param x            X coordinate of top left corner of the button
+ * @param y            Y coordinate of top left corner of the button
  * @param width        width of the button
  * @param height       height of the button
  * @param chooserLevel The chooser screen to create
@@ -202,8 +202,8 @@ function drawNextButton(jl: JetLagApi, x: number, y: number, width: number, heig
 /**
  * This helper function is for drawing the button that takes us back to the splash screen
  *
- * @param x      X coordinate of bottom left corner of the button
- * @param y      Y coordinate of bottom left corner of the button
+ * @param x      X coordinate of top left corner of the button
+ * @param y      Y coordinate of top left corner of the button
  * @param width  width of the button
  * @param height height of the button
  */
