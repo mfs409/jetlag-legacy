@@ -48,7 +48,7 @@ export class HtmlRenderer implements JetLagRenderer {
      * @param cfg The game-wide configuration object
      * @param domId The ID of the DOM element into which we will render
      */
-    constructor(cfg: JetLagConfig, domId: string, private console: HtmlConsole) {
+    constructor(private cfg: JetLagConfig, domId: string, private console: HtmlConsole) {
         // Create a rendering context and attach it to the appropriate place in
         // the DOM
         PIXI.utils.skipHello();
@@ -276,6 +276,8 @@ export class HtmlRenderer implements JetLagRenderer {
      * Create some text
      */
     public makeText(txt: string, opts: any) {
+        opts.fontSize = Math.floor(opts.fontSize * this.cfg.fontScaling);
+        console.log(opts.fontSize)
         return new HtmlText(new PIXI.Text(txt, opts));
     }
 

@@ -16,6 +16,12 @@ export class JetLagConfig {
   /** How many pixels are equivalent to a meter in the game? */
   public pixelMeterRatio = -1;
 
+  /** 
+   * Amount by which fonts need to be scaled to make everything fit on the
+   * screen.  This is used internally by JetLag... you should leave it as 1.
+   */
+  public fontScaling = 1;
+
   /** The default game screen width, in pixels */
   public screenWidth = -1;
 

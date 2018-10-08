@@ -28,7 +28,7 @@ export enum BodyStyle { CIRCLE, RECTANGLE, POLYGON }
 export class BaseActor implements Renderable {
     /**
      * Track if the object is currently allowed to be rendered.  When it is
-     * false, we don't run any updates on the object
+     * false, we don't run any updates on the object's physics body
      */
     private enabled: boolean = true;
 

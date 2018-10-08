@@ -40,8 +40,9 @@ export function runGameAsHtml(domId: string, config: JetLagConfig) {
             config.screenWidth = screen.x;
             config.screenHeight = screen.x / targetRatio;
         }
-        config.pixelMeterRatio =
-            config.pixelMeterRatio * config.screenWidth / old.x;
+        config.pixelMeterRatio *= config.screenWidth / old.x;
+        // NB: the ratio above is also the font scaling ratio
+        config.fontScaling = config.screenWidth / old.x;
     }
 
     let device = new HtmlDevice(config, domId, logger);
