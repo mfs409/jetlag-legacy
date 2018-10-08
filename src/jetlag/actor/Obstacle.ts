@@ -3,6 +3,7 @@ import { Enemy } from "./Enemy"
 import { Hero } from "./Hero"
 import { TimedEvent } from "../support/TimedEvent"
 import { JetLagStage } from "../JetLagStage";
+import { Projectile } from "./Projectile";
 
 /**
  * Obstacles are usually walls, except they can move, and can be used to run all sorts of arbitrary
@@ -12,16 +13,26 @@ import { JetLagStage } from "../JetLagStage";
  */
 export class Obstacle extends WorldActor {
     /** One of the main uses of obstacles is to use hero/obstacle collisions as a way to run custom code. This callback defines what code to run when a hero collides with this obstacle. */
-    heroCollision: (thisActor: Obstacle, collideActor: Hero, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null;
+    private heroCollision: (thisActor: Obstacle, collideActor: Hero, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null;
+    getHeroCollisionCallback() { return this.heroCollision; }
+    setHeroCollisionCallback(callback: (thisActor: Obstacle, collideActor: Hero, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+        this.heroCollision = callback;
+    }
 
     /** This callback is for when a projectile collides with an obstacle */
-    projectileCollision: (thisActor: WorldActor, collideActor: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+    private projectileCollision: (thisActor: Obstacle, collideActor: Projectile, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+    getProjectileCollisionCallback() { return this.projectileCollision; }
 
     /** This callback is for when an enemy collides with an obstacle */
-    enemyCollision: (thisActor: Obstacle, collideActor: Enemy, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+    private enemyCollision: (thisActor: Obstacle, collideActor: Enemy, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+    getEnemyCollisionCallback() { return this.enemyCollision; }
+    setEnemyCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Enemy, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+        this.enemyCollision = callback;
+    }
 
     /** Indicate that this obstacle does not re-enableTilt jumping for the hero */
-    noJumpReenable: boolean = false;
+    private noJumpReenable = false;
+    getNoNumpReenable() { return this.noJumpReenable; }
 
     /** a sound to play when the obstacle is hit by a hero */
     private collideSound: Howl;
@@ -79,7 +90,7 @@ export class Obstacle extends WorldActor {
      *
      * @param callback The code to run on a collision
      */
-    public setProjectileCollisionCallback(callback: (self: WorldActor, h: WorldActor, c: PhysicsType2d.Dynamics.Contacts.Contact) => void): void {
+    public setProjectileCollisionCallback(callback: (self: Obstacle, h: Projectile, c: PhysicsType2d.Dynamics.Contacts.Contact) => void): void {
         this.projectileCollision = callback;
     }
 

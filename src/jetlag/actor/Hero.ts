@@ -43,7 +43,7 @@ export class Hero extends WorldActor {
     getMustSurvive() { return this.mustSurvive; }
 
     /** Code to run when the hero's strength changes */
-    strengthChangeCallback: (h: Hero) => void;
+    private strengthChangeCallback: (h: Hero) => void;
 
     /** cells involved in animation for invincibility */
     private invincibleAnimation: Animation = null;
@@ -255,13 +255,13 @@ export class Hero extends WorldActor {
 
         // if there is code attached to the obstacle for modifying the hero's
         // behavior, run it
-        if (o.heroCollision != null)
-            o.heroCollision(o, this, contact);
+        if (o.getHeroCollisionCallback() != null)
+            o.getHeroCollisionCallback()(o, this, contact);
 
         // If this is a wall, then mark us not in the air so we can do more
         // jumps. Note that sensors should not enable jumps for the hero.
         if ((this.inAir || this.allowMultiJump) && !sensor
-            && !o.noJumpReenable) {
+            && !o.getNoNumpReenable()) {
             this.stopJump();
         }
     }
@@ -486,5 +486,14 @@ export class Hero extends WorldActor {
      */
     public setMustSurvive(): void {
         this.mustSurvive = true;
+    }
+
+    /**
+     * Provide some code to run any time this hero's strength changes
+     * 
+     * @callback The code to run
+     */
+    public setStrengthChangeCallback(callback: (h: Hero) => void) {
+        this.strengthChangeCallback = callback;
     }
 }

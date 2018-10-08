@@ -102,8 +102,8 @@ export class Enemy extends WorldActor {
      */
     private onCollideWithObstacle(obstacle: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
         // handle any callbacks the obstacle has
-        if (obstacle.enemyCollision != null)
-            obstacle.enemyCollision(obstacle, this, contact);
+        if (obstacle.getEnemyCollisionCallback() != null)
+            obstacle.getEnemyCollisionCallback()(obstacle, this, contact);
     }
 
     /**

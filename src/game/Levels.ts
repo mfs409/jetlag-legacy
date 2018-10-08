@@ -5,8 +5,8 @@ import { Hero } from "../jetlag/actor/Hero";
 import { OverlayApi as OverlayApi } from "../jetlag/api/Overlay";
 import { WorldActor as WorldActor } from "../jetlag/actor/World";
 import { Enemy } from "../jetlag/actor/Enemy";
-import { Obstacle } from "../jetlag/actor/Obstacle";
 import { JetLagKeys } from "../jetlag/support/Interfaces";
+import { Obstacle } from "../jetlag/actor/Obstacle";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game
@@ -932,7 +932,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let o = jl.world.makeObstacleAsCircle(5, 5, .75, .75, "purpleball.png");
         o.setPhysics(1, 0, 1);
         o.setTapCallback(() => { jl.playSound("lowpitch.ogg"); return true; });
-        o.heroCollision = () => { jl.playSound("hipitch.ogg"); };
+        o.setHeroCollisionCallback(() => { jl.playSound("hipitch.ogg"); });
 
         welcomeMessage(jl, "Touch the purple ball or collide with it, and a " + "sound will play");
         winMessage(jl, "Great Job");
@@ -1966,14 +1966,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, true);
 
         // provide some code to run when the hero's strength changes
-        h.strengthChangeCallback = (actor: Hero) => {
+        h.setStrengthChangeCallback((actor: Hero) => {
             // get the hero's strength. Since the hero isn't dead, the
             // strength is at least 1. Since there are 7 strength
             // booster goodies, the strength is at most 8.
             let s = actor.getStrength();
             // set the hero's image according to the strength
             actor.setImage("colorstar" + s + ".png");
-        };
+        });
     }
 
     // We can use obstacles to defeat enemies, and we can control which enemies the obstacle
@@ -1995,20 +1995,20 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setMoveByTilting();
         // when this obstacle collides with any enemy, it checks the enemy's "extra".  If it
         // matches "big", then this obstacle defeats the enemy, and the obstacle disappears.
-        o.enemyCollision = (thisActor: Obstacle, collideActor: Enemy) => {
+        o.setEnemyCollisionCallback((thisActor: Obstacle, collideActor: Enemy) => {
             if (collideActor.getExtra() === "big") {
                 collideActor.defeat(true, null);
                 thisActor.remove(true);
             }
-        };
+        });
 
         // make a small obstacle that can defeat any enemy, and doesn't disappear
         let o2 = jl.world.makeObstacleAsCircle(.5, .5, .5, .5, "blueball.png");
         o2.setPhysics(5, 0, 0.6);
         o2.setMoveByTilting();
-        o2.enemyCollision = (thisActor: WorldActor, collideActor: Enemy) => {
+        o2.setEnemyCollisionCallback((thisActor: Obstacle, collideActor: Enemy) => {
             collideActor.defeat(true, null);
-        };
+        });
         // make four enemies.  Mark the big one, so we can defeat it with the big obstacle
         jl.world.makeEnemyAsCircle(10, 2, .5, .5, "redball.png");
         jl.world.makeEnemyAsCircle(10, 4, .5, .5, "redball.png");
@@ -2304,7 +2304,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setLevelFact("crossings", "0");
         // the callback id is 0, there is no delay, and no goodies are
         // needed before it works
-        o.heroCollision = (thisActor: WorldActor, collideActor: WorldActor) => {
+        o.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
             // get rid of the obstacle we just collided with
             thisActor.remove(false);
             // make a goodie
@@ -2316,7 +2316,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // we're going to chain a bunch of callbacks together, and
             // the best way to do that is to make a single callback that
             // behaves differently based on the value of some information we save as part of the level (a "LevelFact")
-            let sc2 = (thisActor: WorldActor, collideActor: WorldActor) => {
+            let sc2 = (thisActor: Obstacle, collideActor: Hero) => {
                 let crossings = parseInt(jl.score.getLevelFact("crossings", "0"));
                 // The second callback works the same way
                 if (crossings == 0) {
@@ -2324,7 +2324,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     jl.world.makeGoodieAsCircle(46, 8, 1, 1, "blueball.png");
 
                     let oo = jl.world.makeObstacleAsBox(50, 0, 1, 9, "purpleball.png");
-                    oo.heroCollision = sc2; // missing check for goodies 2 (2, 0, 0, 0, 0, sc2);
+                    oo.setHeroCollisionCallback(sc2); // missing check for goodies 2 (2, 0, 0, 0, 0, sc2);
                     jl.score.setLevelFact("crossings", "1");
                 }
                 // same for the third callback
@@ -2333,7 +2333,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     jl.world.makeGoodieAsCircle(58, 8, 1, 1, "blueball.png");
 
                     let oo = jl.world.makeObstacleAsBox(60, 0, 1, 9, "purpleball.png");
-                    oo.heroCollision = sc2; // missing check for goodies 3 (3, 0, 0, 0, 0, sc2);
+                    oo.setHeroCollisionCallback(sc2); // missing check for goodies 3 (3, 0, 0, 0, 0, sc2);
                     jl.score.setLevelFact("crossings", "2");
                 }
                 // The fourth callback draws the destination
@@ -2350,9 +2350,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     });
                 }
             };
-            oo.heroCollision = sc2;
+            oo.setHeroCollisionCallback(sc2);
             oo.setDisappearSound("hipitch.ogg");
-        };
+        });
     }
 
     // this level demonstrates callbacks that happen when we touch an
@@ -2424,11 +2424,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setPhysics(1000, 0, 0);
         o.setDraggable(false);
         jl.hud.createDragZone(0, 0, 16, 9, "");
-        o.enemyCollision = (thisActor: WorldActor, collideActor: Enemy) => {
+        o.setEnemyCollisionCallback((thisActor: Obstacle, collideActor: Enemy) => {
             if (collideActor.getExtra() === "weak") {
                 collideActor.defeat(true, null);
             }
-        };
+        });
 
         // now draw our enemies... we need enough to be able to test that
         // all four defeat mechanisms work. Note that we attach defeat
@@ -2494,7 +2494,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Colliding with this star will make the hero into a star
         let o = jl.world.makeObstacleAsBox(15, 8, 1, 1, "legstar1.png");
         o.setPhysics(1, 0, 1);
-        o.heroCollision = (thisActor: WorldActor, collideActor: WorldActor) => {
+        o.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
             // here's a simple way to increment a goodie count
             jl.score.incrementGoodies2();
             // here's a way to set a goodie count
@@ -2506,7 +2506,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // resize the hero, and change its image
             collideActor.resize(collideActor.getXPosition(), collideActor.getYPosition(), .75, .75);
             collideActor.setImage("legstar1.png");
-        };
+        });
     }
 
 
@@ -2799,12 +2799,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // When the hero collides with this obstacle, we'll increase the
         // time remaining
         let o = jl.world.makeObstacleAsBox(14, 8, 1, 1, "red.png");
-        o.heroCollision = //(1, 1, 1, 0, 0, 
-            (thisActor: WorldActor, collideActor: WorldActor) => {
-                // add 15 seconds to the timer
-                jl.score.updateTimerExpiration(15);
-                thisActor.remove(true);
-            };
+        o.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
+            // add 15 seconds to the timer
+            jl.score.updateTimerExpiration(15);
+            thisActor.remove(true);
+        });
     }
 
     // this level shows passthrough objects and chase again, to help
@@ -2918,9 +2917,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // create a platform that we can jump through from below
         let platform = jl.world.makeObstacleAsBox(3, 7.5, 2, .2, "red.png");
         // Set a callback, then re-enable the platform's collision effect.
-        platform.heroCollision = (thisActor: WorldActor, collideActor: WorldActor) => {
+        platform.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
             collideActor.setAbsoluteVelocity(collideActor.getXVelocity(), -5);
-        };
+        });
         platform.setCollisionsEnabled(true);
         platform.setOneSided(0);
 
@@ -3304,14 +3303,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
             // and a new obstacle on the screen.  We'll randomize their placement just a bit.
             // Also move the obstacle forward, so we can hit it again.
-            (thisActor: WorldActor, collideActor: WorldActor) => {
+            (thisActor: Obstacle, collideActor: Hero) => {
                 // make a random enemy and a random goodie.  Put them in X coordinates relative to the trigger
                 jl.world.makeEnemyAsCircle(trigger.getXPosition() + 8 + jl.world.getRandom(10), jl.world.getRandom(8), .5, .5, "redball.png");
                 jl.world.makeGoodieAsCircle(trigger.getXPosition() + 9 + jl.world.getRandom(10), jl.world.getRandom(8), .5, .5, "blueball.png");
                 // move the trigger so we can hit it again
                 trigger.setPosition(trigger.getXPosition() + 16, trigger.getYPosition());
             };
-        trigger.heroCollision = lc;
+        trigger.setHeroCollisionCallback(lc);
         // No transfer of momeuntum when the hero collides with the trigger
         trigger.setCollisionsEnabled(false);
     }
