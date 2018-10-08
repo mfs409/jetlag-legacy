@@ -5,8 +5,8 @@ import { JetLagSprite, JetLagRenderer } from "./Interfaces";
 /**
  * Picture is a lightweight alternative to BaseActor and its descendents.  Its
  * purpose is exclusively for the situations in which we need to draw something
- * to the screen at a fixed location, and we never intend to move, resize, or
- * rotate it.
+ * to the screen at a fixed location, and we never intend to move, resize,
+ * animate, or rotate it.
  */
 export class Picture implements Renderable {
     /** Determine whether this Picture can be seen or not */
@@ -22,13 +22,14 @@ export class Picture implements Renderable {
     private sprite: JetLagSprite = null;
 
     /**
-     * Place an image at a fixed position in the world
+     * Create a picture and put it at a fixed position in the world
      * 
      * @param x The X coordinate of the top left corner, in meters
      * @param y The Y coordinate of the top left corner, in meters
      * @param w The width of the image, in meters
      * @param h The height of the image, in meters
      * @param imgName The name of the image to display
+     * @param renderer The renderer for the game (for getting images)
      */
     constructor(x: number, y: number, w: number, h: number, imgName: string, renderer: JetLagRenderer) {
         this.dims = { x: x, y: y, w: w, h: h };

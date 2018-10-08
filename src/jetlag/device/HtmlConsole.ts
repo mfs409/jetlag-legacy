@@ -19,7 +19,7 @@ export class HtmlConsole implements JetLagConsole {
     constructor(cfg: JetLagConfig) { this.level = cfg.verbosity; }
 
     /**
-     * Display an urgent message ot the console
+     * Display an urgent message to the console
      * 
      * @param msg The message to display
      */
