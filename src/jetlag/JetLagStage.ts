@@ -335,20 +335,12 @@ export class JetLagStage {
         this.playMusic();
 
         // Update the win/lose countdown timers and the stopwatch
-        if (this.score.loseCountDownRemaining != -100) {
-            this.score.loseCountDownRemaining -= elapsedMillis / 1000;
-            if (this.score.loseCountDownRemaining < 0) {
-                this.endLevel(false);
-            }
+        let t = this.score.onClockTick(elapsedMillis);
+        if (t == -1) {
+            this.endLevel(false);
         }
-        if (this.score.winCountRemaining != -100) {
-            this.score.winCountRemaining -= elapsedMillis / 1000;
-            if (this.score.winCountRemaining < 0) {
-                this.endLevel(true);
-            }
-        }
-        if (this.score.stopWatchProgress != -100) {
-            this.score.stopWatchProgress += elapsedMillis / 1000;
+        if (t == 1) {
+            this.endLevel(true);
         }
 
         // handle accelerometer stuff... note that accelerometer is effectively

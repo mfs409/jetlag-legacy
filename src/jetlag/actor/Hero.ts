@@ -40,6 +40,7 @@ export class Hero extends WorldActor {
      * defeated 
      */
     private mustSurvive: boolean;
+    getMustSurvive() { return this.mustSurvive; }
 
     /** Code to run when the hero's strength changes */
     strengthChangeCallback: (h: Hero) => void;
@@ -188,9 +189,6 @@ export class Hero extends WorldActor {
         if (enemy.alwaysDoesDamage) {
             this.remove(false);
             this.stage.score.onDefeatHero(enemy, this);
-            if (this.mustSurvive) {
-                this.stage.endLevel(false);
-            }
             return;
         }
         // handle hero invincibility
@@ -213,9 +211,6 @@ export class Hero extends WorldActor {
         else if (enemy.damage >= this.strength) {
             this.remove(false);
             this.stage.score.onDefeatHero(enemy, this);
-            if (this.mustSurvive) {
-                this.stage.endLevel(false);
-            }
         }
         // when we can defeat it by losing strength
         else {

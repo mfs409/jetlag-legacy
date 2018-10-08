@@ -165,7 +165,7 @@ export class WorldApi {
     public makeHeroAsCircle(x: number, y: number, width: number, height: number, imgName: string): Hero {
         let radius: number = Math.max(width, height);
         let h: Hero = new Hero(this.stage, radius, radius, imgName);
-        this.stage.score.heroesCreated++;
+        this.stage.score.onHeroCreated();
         h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);
         this.stage.getWorld().addActor(h, 0);
         return h;
@@ -183,7 +183,7 @@ export class WorldApi {
      */
     public makeHeroAsBox(x: number, y: number, width: number, height: number, imgName: string): Hero {
         let h: Hero = new Hero(this.stage, width, height, imgName);
-        this.stage.score.heroesCreated++;
+        this.stage.score.onHeroCreated();
         h.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y);
         this.stage.getWorld().addActor(h, 0);
         return h;
@@ -204,7 +204,7 @@ export class WorldApi {
      */
     public makeHeroAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Hero {
         let h: Hero = new Hero(this.stage, width, height, imgName);
-        this.stage.score.heroesCreated++;
+        this.stage.score.onHeroCreated();
         h.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         this.stage.getWorld().addActor(h, 0);
         return h;
@@ -223,7 +223,7 @@ export class WorldApi {
     public makeEnemyAsCircle(x: number, y: number, width: number, height: number, imgName: string): Enemy {
         let radius = Math.max(width, height);
         let e = new Enemy(this.stage, radius, radius, imgName);
-        this.stage.score.enemiesCreated++;
+        this.stage.score.onEnemyCreated();
         e.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
         this.stage.getWorld().addActor(e, 0);
         return e;
@@ -241,7 +241,7 @@ export class WorldApi {
      */
     public makeEnemyAsBox(x: number, y: number, width: number, height: number, imgName: string): Enemy {
         let e: Enemy = new Enemy(this.stage, width, height, imgName);
-        this.stage.score.enemiesCreated++;
+        this.stage.score.onEnemyCreated();
         e.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.stage.getWorld().addActor(e, 0);
         return e;
@@ -261,7 +261,7 @@ export class WorldApi {
      */
     public makeEnemyAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Enemy {
         let e: Enemy = new Enemy(this.stage, width, height, imgName);
-        this.stage.score.enemiesCreated++;
+        this.stage.score.onEnemyCreated();
         e.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         this.stage.getWorld().addActor(e, 0);
         return e;

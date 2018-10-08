@@ -88,8 +88,7 @@ export class ScoreApi {
      * @param howMany Number of heroes that must reach destinations
      */
     public setVictoryDestination(howMany: number): void {
-        this.stage.score.setWinDestination();
-        this.stage.score.victoryHeroCount = howMany;
+        this.stage.score.setWinDestination(howMany);
     }
 
     /**
@@ -119,58 +118,42 @@ export class ScoreApi {
     /**
      * Return the number of type-1 goodies that have been collected in the current level
      */
-    public getGoodies1(): number {
-        return this.stage.score.goodiesCollected[0];
-    }
+    public getGoodies1() { return this.stage.score.getGoodieCount(0); }
 
     /**
      * Return the number of type-2 goodies that have been collected in the current level
      */
-    public getGoodies2(): number {
-        return this.stage.score.goodiesCollected[1];
-    }
+    public getGoodies2() { return this.stage.score.getGoodieCount(1); }
 
     /**
      * Return the number of type-3 goodies that have been collected in the current level
      */
-    public getGoodies3(): number {
-        return this.stage.score.goodiesCollected[2];
-    }
+    public getGoodies3() { return this.stage.score.getGoodieCount(2); }
 
     /**
      * Return the number of type-4 goodies that have been collected in the current level
      */
-    public getGoodies4(): number {
-        return this.stage.score.goodiesCollected[3];
-    }
+    public getGoodies4() { return this.stage.score.getGoodieCount(3); }
 
     /**
      * Manually increment the number of goodies of type 1 that have been collected.
      */
-    public incrementGoodies1() {
-        this.stage.score.goodiesCollected[0]++;
-    }
+    public incrementGoodies1() { this.stage.score.incGoodieCount(0); }
 
     /**
      * Manually increment the number of goodies of type 2 that have been collected.
      */
-    public incrementGoodies2() {
-        this.stage.score.goodiesCollected[1]++;
-    }
+    public incrementGoodies2() { this.stage.score.incGoodieCount(1); }
 
     /**
      * Manually increment the number of goodies of type 3 that have been collected.
      */
-    public incrementGoodies3() {
-        this.stage.score.goodiesCollected[2]++;
-    }
+    public incrementGoodies3() { this.stage.score.incGoodieCount(2); }
 
     /**
      * Manually increment the number of goodies of type 4 that have been collected.
      */
-    public incrementGoodies4() {
-        this.stage.score.goodiesCollected[3]++;
-    }
+    public incrementGoodies4() { this.stage.score.incGoodieCount(3); }
 
     /**
      * Manually set the number of goodies of type 1 that have been collected.
@@ -178,7 +161,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies1(value: number) {
-        this.stage.score.goodiesCollected[0] = value;
+        this.stage.score.setGoodieCount(0, value);
     }
 
     /**
@@ -187,7 +170,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies2(value: number) {
-        this.stage.score.goodiesCollected[1] = value;
+        this.stage.score.setGoodieCount(1, value);
     }
 
     /**
@@ -196,7 +179,7 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies3(value: number) {
-        this.stage.score.goodiesCollected[2] = value;
+        this.stage.score.setGoodieCount(2, value);
     }
 
     /**
@@ -205,31 +188,28 @@ export class ScoreApi {
      * @param value The new value
      */
     public setGoodies4(value: number) {
-        this.stage.score.goodiesCollected[3] = value;
+        this.stage.score.setGoodieCount(3, value);
     }
 
     /**
      * Return the remaining time until the level is lost
      */
-    public getLoseCountdown(): number {
-        return this.stage.score.loseCountDownRemaining;
-    }
+    public getLoseCountdown() { return this.stage.score.getLoseCountdown() }
+
 
     /**
      * Change the amount of time left in a countdown timer
      *
      * @param delta The amount of time to add before the timer expires
      */
-    public updateTimerExpiration(delta: number): void {
-        this.stage.score.loseCountDownRemaining += delta;
+    public updateTimerExpiration(delta: number) {
+        this.stage.score.extendLoseCountdown(delta);
     }
 
     /**
      * Return the remaining time until the level is won
      */
-    public getWinCountdown(): number {
-        return this.stage.score.winCountRemaining;
-    }
+    public getWinCountdown() { return this.stage.score.getWinCountdown(); }
 
     /**
      * Indicate that the level will end in defeat if it is not completed in a given amount of time.
@@ -238,7 +218,7 @@ export class ScoreApi {
      */
     public setLoseCountdown(timeout: number) {
         // Once the Lose CountDown is not -100, it will start counting down
-        this.stage.score.loseCountDownRemaining = timeout;
+        this.stage.score.setLoseCountdown(timeout);
     }
 
     /**
@@ -248,28 +228,21 @@ export class ScoreApi {
      */
     public setWinCountdown(timeout: number) {
         // Once the Win CountDown is not -100, it will start counting down
-        this.stage.score.winCountRemaining = timeout;
+        this.stage.score.setWinCountdown(timeout);
     }
 
     /**
      * Set the current value of the stopwatch.  Use -100 to disable the stopwatch, otherwise it will
      * start counting immediately.
      *
-     * @param newVal The new value of the stopwatch
+     * @param val The new value of the stopwatch
      */
-    public setStopwatch(newVal: number) {
-        this.stage.score.stopWatchProgress = newVal;
-    }
+    public setStopwatch(val: number) { this.stage.score.setStopwatch(val); }
 
     /**
      * Report the stopwatch value
      */
-    public getStopwatch(): number {
-        // Inactive stopwatch should return 0
-        if (this.stage.score.stopWatchProgress == -100)
-            return 0;
-        return this.stage.score.stopWatchProgress;
-    }
+    public getStopwatch() { return this.stage.score.getStopwatch(); }
 
     /**
      * Return the total number of enemies that have been defeated so far
