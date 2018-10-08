@@ -274,8 +274,8 @@ export class Hero extends WorldActor {
     private onCollideWithGoodie(g: Goodie): void {
         // hide the goodie, count it, and update strength
         g.remove(false);
-        if (g.onHeroCollect)
-            g.onHeroCollect(g, this);
+        if (g.getCollectCallback())
+            g.getCollectCallback()(g, this);
         this.stage.score.onGoodieCollected(g);
     }
 

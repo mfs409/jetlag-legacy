@@ -5,16 +5,16 @@ import { JetLagSound } from "./Interfaces";
 import { JetLagStage } from "../JetLagStage";
 
 /**
-* ProjectilePool stores a set of projectiles.  We can get into lots of
-* trouble with Box2d if we make too many actors, so the projectile pool is a
-* useful mechanism for re-using projectiles after they become defunct.
-*/
+ * ProjectilePool stores a set of projectiles.  We can get into lots of
+ * trouble with Box2d if we make too many actors, so the projectile pool is a
+ * useful mechanism for re-using projectiles after they become defunct.
+ */
 export class ProjectilePool {
     /** A collection of all the available projectiles */
-    private readonly pool: Projectile[];
+    private pool: Projectile[];
 
     /** The number of projectiles in the pool */
-    private readonly poolSize: number;
+    private poolSize: number;
 
     /** For limiting the number of projectiles that can be thrown */
     private remaining: number;
@@ -49,7 +49,7 @@ export class ProjectilePool {
     /**
      * Create a pool of projectiles, and set the way they are thrown.
      *
-     * @param game    The currently active game
+     * @param game     The currently active game
      * @param size     number of projectiles that can be thrown at once
      * @param width    width of a projectile
      * @param height   height of a projectile

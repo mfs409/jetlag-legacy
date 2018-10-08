@@ -739,7 +739,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // this goodie gives an extra "2" units of strength:
         let g = jl.world.makeGoodieAsCircle(14, 7, .5, .5, "blueball.png");
-        g.onHeroCollect = (g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); };
+        g.setCollectCallback((g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); });
 
         // Display the hero's strength
         jl.hud.addText(.1, 8.5, "Arial", "#000000", 32, () => h.getStrength() + " Strength", 2);
@@ -771,7 +771,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // this goodie makes us invincible
         let g = jl.world.makeGoodieAsCircle(15, 8, .5, .5, "blueball.png");
-        g.onHeroCollect = (g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); };
+        g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setRoute(new Route().to(15, 8).to(10, 3).to(15, 8), 5, true);
         g.setRotationSpeed(0.25);
 
@@ -1879,7 +1879,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // add a goodie that makes the hero invincible
         let g = jl.world.makeGoodieAsCircle(15, 7, .5, .5, "blueball.png");
-        g.onHeroCollect = (g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); };
+        g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setRoute(new Route().to(15, 7).to(5, 2).to(15, 7), 1, true);
         g.setRotationSpeed(0.25);
         jl.hud.addText(.1, 8.5, "Arial", "#3C46FF", 12, () => jl.score.getGoodies1() + " Goodies", 2);
@@ -1948,7 +1948,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // create 7 goodies, each of which adds 1 to the hero's strength
         for (let i = 0; i < 7; ++i) {
             let g = jl.world.makeGoodieAsCircle(1 + i, 1 + i, .5, .5, "blueball.png");
-            g.onHeroCollect = (g: Goodie, h: Hero) => { h.setStrength(1 + h.getStrength()) };
+            g.setCollectCallback((g: Goodie, h: Hero) => { h.setStrength(1 + h.getStrength()) });
         }
 
         jl.world.makeDestinationAsCircle(15, 8, .75, .75, "mustardball.png");
@@ -2390,7 +2390,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setDisappearSound("hipitch.ogg");
 
         let g = jl.world.makeGoodieAsCircle(0, 0, 2, 2, "blueball.png");
-        g.onHeroCollect = (g: Goodie, h: Hero) => jl.playSound("lowpitch.ogg");
+        g.setCollectCallback((g: Goodie, h: Hero) => jl.playSound("lowpitch.ogg"));
     }
 
 
@@ -2411,7 +2411,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // a goodie, so we can do defeat by invincibility
         let g1 = jl.world.makeGoodieAsCircle(10, 5, .5, .5, "purpleball.png");
-        g1.onHeroCollect = (g: Goodie, h: Hero) => { h.setInvincibleRemaining(15); };
+        g1.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(15); });
 
         // enable throwing projectiles, so that we can test enemy callbacks
         // again

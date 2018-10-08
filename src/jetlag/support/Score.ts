@@ -100,7 +100,7 @@ export class Score {
   onGoodieCollected(goodie: Goodie) {
     // Update goodie counts
     for (let i = 0; i < 4; i++) {
-      this.goodiesCollected[i] += goodie.score[i];
+      this.goodiesCollected[i] += goodie.getScore(i);
     }
     // possibly win the level, but only if we win on goodie count and all
     // four counts are high enough
