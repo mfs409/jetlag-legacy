@@ -1,6 +1,5 @@
 import { JetLagConfig } from "../JetLagConfig"
 import { BaseActor as BaseActor } from "../actor/Base"
-import { BodyStyle } from "../actor/Base"
 import { Camera } from "../support/Camera"
 import { JetLagRenderer, JetLagText, JetLagSprite } from "../support/Interfaces"
 import { HtmlText } from "./HtmlText"
@@ -139,7 +138,7 @@ export class HtmlRenderer implements JetLagRenderer {
         this.mainContainer.addChild(sprite.getRenderObject());
         // Debug rendering is the hard part!
         if (this.debugContainer != null) {
-            if (actor.getBodyStyle() === BodyStyle.RECTANGLE) {
+            if (actor.isBox()) {
                 // For rectangles, just use the PIXI rectangle
                 let rect = actor.getDebug().getShape() as PIXI.Graphics;
                 rect.clear();
@@ -151,7 +150,7 @@ export class HtmlRenderer implements JetLagRenderer {
                 rect.rotation = r;
                 this.debugContainer.addChild(rect);
             }
-            else if (actor.getBodyStyle() === BodyStyle.CIRCLE) {
+            else if (actor.isCircle()) {
                 // For circles, use the PIXI Circle
                 let circ = actor.getDebug().getShape() as PIXI.Graphics;
                 circ.clear();
@@ -168,7 +167,7 @@ export class HtmlRenderer implements JetLagRenderer {
                 line.lineStyle(1, 0x0000FF).moveTo(0, 0).lineTo(xx, yy);
                 this.debugContainer.addChild(line);
             }
-            else if (actor.getBodyStyle() === BodyStyle.POLYGON) {
+            else if (actor.isPoly()) {
                 // For polygons, we need to translate the points (they are 
                 // 0-relative in Box2d)
                 let poly = actor.getDebug().getShape() as PIXI.Graphics;

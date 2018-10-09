@@ -15,7 +15,7 @@ import { XY } from "../support/XY"
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
  * render actors, by letting us know the underlying PhysicsType2d body type
  */
-export enum BodyStyle { CIRCLE, RECTANGLE, POLYGON }
+enum BodyStyle { CIRCLE, RECTANGLE, POLYGON }
 
 /**
  * BaseActor is the parent of all Actor types.
@@ -139,7 +139,10 @@ export class BaseActor implements Renderable {
     /** Extra data for the game designer to attach to the actor */
     private extra: any = {};
 
-    public getBodyStyle() { return this.bodyStyle; }
+    public isPoly() { return this.bodyStyle === BodyStyle.POLYGON; }
+    public isBox() { return this.bodyStyle == BodyStyle.RECTANGLE; }
+    public isCircle() { return this.bodyStyle == BodyStyle.CIRCLE; }
+
     public getBody() { return this.body; }
 
     /**
