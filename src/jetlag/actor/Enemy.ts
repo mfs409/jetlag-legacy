@@ -10,28 +10,28 @@ import { JetLagStage } from "../JetLagStage";
  */
 export class Enemy extends WorldActor {
     /** A callback to run when this enemy defeats a hero */
-    onDefeatHero: (e: Enemy, h: Hero) => void = null;
+    private onDefeatHero: (e: Enemy, h: Hero) => void = null;
 
     /** A callback to run when an actor defeats this enemy */
-    onDefeated: (e: Enemy, a: WorldActor) => void = null;
+    private onDefeated: (e: Enemy, a: WorldActor) => void = null;
 
     /** 
      * Amount of damage this enemy does to a hero on a collision. The default is
      * 2, so that an enemy will defeat a hero and not disappear.
      */
-    damage: number;
+    private damage: number;
 
     /** Does a crawling hero automatically defeat this enemy? */
-    defeatByCrawl: boolean;
+    private defeatByCrawl: boolean;
 
     /** Does an in-air hero automatically defeat this enemy */
-    defeatByJump: boolean;
+    private defeatByJump: boolean;
 
     /** When the enemy collides with an invincible hero, does the enemy stay alive? */
-    immuneToInvincibility: boolean;
+    private immuneToInvincibility: boolean;
 
     /** When the enemy collides with an invincible hero, does it stay alive and damage the hero? */
-    alwaysDoesDamage: boolean;
+    private alwaysDoesDamage: boolean;
 
     /**
      * Create a basic Enemy.  The enemy won't yet have any physics attached to it.
@@ -42,11 +42,25 @@ export class Enemy extends WorldActor {
      * @param height  Height of this enemy
      * @param imgName Image to display
      */
-    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z:number) {
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
         super(stage, imgName, width, height, z);
         this.damage = 2;
     }
 
+    public getOnDefeatHero() { return this.onDefeatHero; }
+    public setOnDefeatHero(callback: (e: Enemy, h: Hero) => void) {
+        this.onDefeatHero = callback;
+    }
+
+    public setOnDefeated(callback: (e: Enemy, a: WorldActor) => void) {
+        this.onDefeated = callback;
+    }
+
+    public getAlwaysDoesDamage() { return this.alwaysDoesDamage; }
+    public getImmuneToInvincibility() { return this.immuneToInvincibility; }
+    public getDefeatByCrawl() { return this.defeatByCrawl; }
+    public getDefeatByJump() { return this.defeatByJump; }
+    public getDamage() { return this.damage; }
     /**
      * Code to run when an Enemy collides with a WorldActor.
      * 
@@ -56,7 +70,7 @@ export class Enemy extends WorldActor {
      * @param other   Other actor involved in this collision
      * @param contact A description of the collision
      */
-    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
+    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // collision with obstacles
         if (other instanceof Obstacle)
             this.onCollideWithObstacle(other as Obstacle, contact);
@@ -71,7 +85,7 @@ export class Enemy extends WorldActor {
      * @param amount Amount of damage. The default is 2, since heroes have a default strength of 1,
      *               so that the enemy defeats the hero but does not disappear.
      */
-    public setDamage(amount: number): void {
+    public setDamage(amount: number) {
         this.damage = amount;
     }
 
@@ -81,7 +95,7 @@ export class Enemy extends WorldActor {
      * @param increaseScore Indicate if we should increase the score when this enemy is defeated
      * @param h The hero who defeated this enemy, if it was a hero defeat
      */
-    public defeat(increaseScore: boolean, h: Hero): void {
+    public defeat(increaseScore: boolean, h: Hero) {
         if (this.onDefeated && h)
             this.onDefeated(this, h);
 
@@ -100,7 +114,7 @@ export class Enemy extends WorldActor {
      * @param obstacle The obstacle with which this Enemy collided
      * @param contact A description of the collision
      */
-    private onCollideWithObstacle(obstacle: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
+    private onCollideWithObstacle(obstacle: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // handle any callbacks the obstacle has
         if (obstacle.getEnemyCollisionCallback() != null)
             obstacle.getEnemyCollisionCallback()(obstacle, this, contact);
@@ -111,7 +125,7 @@ export class Enemy extends WorldActor {
      *
      * @param projectile The projectile with which this Enemy collided
      */
-    private onCollideWithProjectile(projectile: Projectile): void {
+    private onCollideWithProjectile(projectile: Projectile) {
         // ignore inactive projectiles
         if (!projectile.getEnabled())
             return;
@@ -141,21 +155,21 @@ export class Enemy extends WorldActor {
     /**
      * Mark this enemy as one that can be defeated by jumping
      */
-    public setDefeatByJump(): void {
+    public setDefeatByJump() {
         this.defeatByJump = true;
     }
 
     /**
      * Make this enemy resist invincibility
      */
-    public setResistInvincibility(): void {
+    public setResistInvincibility() {
         this.immuneToInvincibility = true;
     }
 
     /**
      * Make this enemy damage the hero even when the hero is invincible
      */
-    public setImmuneToInvincibility(): void {
+    public setImmuneToInvincibility() {
         this.alwaysDoesDamage = true;
     }
 

@@ -30,7 +30,7 @@ export class Goodie extends WorldActor {
    * @param height  height of this Goodie
    * @param imgName image to use for this Goodie
    */
-  constructor(stage: JetLagStage, width: number, height: number, imgName: string, z:number) {
+  constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
     super(stage, imgName, width, height, z);
   }
 
@@ -39,17 +39,17 @@ export class Goodie extends WorldActor {
    * 
    * @param which The goodie score to return (0-3)
    */
-  getScore(which: number) { return this.score[which]; }
+  public getScore(which: number) { return this.score[which]; }
 
   /** Return the code to run when a hero collects this goodie */
-  getCollectCallback() { return this.collectCallback; }
+  public getCollectCallback() { return this.collectCallback; }
 
   /**
    * Provide code to run when the hero collects this goodie
    * 
    * @param callback The code to run
    */
-  setCollectCallback(callback: (g: Goodie, h: Hero) => void) {
+  public setCollectCallback(callback: (g: Goodie, h: Hero) => void) {
     this.collectCallback = callback;
   }
 
@@ -63,8 +63,7 @@ export class Goodie extends WorldActor {
    * @param other   Other object involved in this collision
    * @param contact A description of the contact that caused this collision
    */
-  onCollide(other: WorldActor,
-    contact: PhysicsType2d.Dynamics.Contacts.Contact) { }
+  onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) { }
 
   /**
    * Set the score of this goodie.

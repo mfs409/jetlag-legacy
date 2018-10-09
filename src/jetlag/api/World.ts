@@ -5,57 +5,58 @@ import { Goodie } from "../actor/Goodie"
 import { Enemy } from "../actor/Enemy"
 import { Destination } from "../actor/Destination"
 import { WorldActor as WorldActor } from "../actor/World";
-import { TimedEvent } from "../support/TimedEvent";
 import { ParallaxLayer } from "../support/ParallaxLayer";
-import { Animation } from "../support/Animation";
 import { Svg } from "../support/Svg";
 import { JetLagStage } from "../JetLagStage";
+import { ImageConfig, checkImageConfig, TextConfig, checkTextConfig } from "./JetLag";
 
 /**
- * Draw a hero with an underlying polygon shape
+ * ActorConfig wraps all of the basic configuration for an actor.  It consists
+ * of the following mandatory fields:
+ * - x and y: for the coordinates of the top-left corner
+ * - width and height: for the dimensions of the actor
  *
- * @param x       X coordinate of the top left corner
- * @param y       Y coordinate of the top left corner
- * @param width   Width of the obstacle
- * @param height  Height of the obstacle
- * @param imgName Name of image file to use
- * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
- *                x0,y0,x1,y1,x2,y2,...
- * @return The hero, so that it can be further modified
+ * It also provides the following optional fields
+ * - img: the name of the image file to use for this actor.  If none is
+ *   provided, the actor will be invisible.
+ * - z: the z index of the actor (-2, -1, 0, 1, or 2).  If none is provided, 0
+ *   will be used.
+ *
+ * Finally, the ActorConfig describes if the actor should be a circle, a
+ * rectangle, or a polygon.  
+ * - To make a polygon, set the 'verts' to an array with up to 16 coordinates,
+ *   representing the vertices of a polygon as [x0, y0, x1, y1, x2, y2, ...].
+ *   Note that these points should be relative to the center of the actor, not
+ *   its top-left corner.
+ * - To make a rectangle, don't set 'verts', and set 'box' to true
+ * - To make a circle, don't set 'verts' or 'box'
+ *
+ * Note: a circle will have radius equal to the larger of width and height.
  */
-
-
 export class ActorConfig {
+    /** X coordinate of the top left corner */
     x = 0;
+    /** Y coordinate of the top left corner */
     y = 0;
+    /** Width of the actor */
     width = 0;
+    /** Height of the actor */
     height = 0;
+    /** The name of the image file to use for this actor */
     img?= "";
+    /** Is the actor a box? */
     box?= false;
+    /** Vertices of the actor, if the actor is a polygon */
     verts?: number[] = null;
+    /** Z index of the actor */
     z?= 0;
 }
 
-export class ImageConfig {
-    x = 0;
-    y = 0;
-    width = 0;
-    height = 0;
-    img = "";
-    z?= 0;
-}
-
-export class TextConfig {
-    x = 0;
-    y = 0;
-    center?= false;
-    face = "Arial";
-    color = "#FFFFFF";
-    size = 22;
-    producer: () => string = () => { return "" };
-    z?= 0;
-}
-
+/**
+ * Check an ActorConfig object, and set default values for optional fields
+ * 
+ * @param c The ActorConfig object to check
+ */
 function checkActorConfig(c: ActorConfig) {
     if (!c.img) c.img = "";
     if (!c.box) c.box = false;
@@ -65,55 +66,28 @@ function checkActorConfig(c: ActorConfig) {
     if (c.z > 2) c.z = 2;
 }
 
-function checkImageConfig(c: ImageConfig) {
-    if (!c.z) c.z = 0;
-    if (c.z < -2) c.z = -2;
-    if (c.z > 2) c.z = 2;
-}
-
-function checkTextConfig(c: TextConfig) {
-    if (!c.center) c.center = false;
-    if (!c.z) c.z = 0;
-    if (c.z < -2) c.z = -2;
-    if (c.z > 2) c.z = 2;
-}
-
 /**
- * WorldApi provides the functionality needed for putting things into the world
- * (the main part of the game)
+ * WorldApi provides all of the features needed for creating actors and
+ * backgrounds, and for manipulating gravity and tilt.
  */
 export class WorldApi {
     /**
-     * Construct a level.  Since Level is merely a facade, this method need only store references to
-     * the actual game objects.
-     *
-     * @param manager the StageManager for the game
+     * Construct the World API
+     * 
+     * @param stage   The JetLagStage, for interacting with a level
      */
     constructor(private stage: JetLagStage) { }
 
     /**
-     * Set the background music for this level
+     * Draw a picture in the current level
      *
-     * @param musicName Name of the music file to play.  Remember: this file must
-     *                  have been registered as Music, not as a Sound
-     */
-    public setMusic(musicName: string): void {
-        this.stage.setMusic(this.stage.device.getSpeaker().getMusic(musicName));
-    }
-
-    /**
-     * Draw a picture on the current level
+     * Note: the order in which this is called relative to other actors will
+     * determine whether they go under or over this picture (within the Z
+     * plane).
      *
-     * Note: the order in which this is called relative to other actors will determine whether they
-     * go under or over this picture (within the Z plane).
+     * @param cfg An ImageConfig object, which will specify how to draw the
+     *            image
      *
-     * @param x       X coordinate of top left corner, in meters
-     * @param y       Y coordinate of top left corner, in meters
-     * @param width   Width of the picture, in meters
-     * @param height  Height of this picture, in meters
-     * @param imgName Name of the picture to display
-     * @param zIndex  The z index of the image. There are 5 planes: -2, -2, 0, 1, and 2. By default,
-     *                everything goes to plane 0
      * @returns The picture, so that it can be shown and hidden in the future.
      */
     public drawPicture(cfg: ImageConfig) {
@@ -122,27 +96,58 @@ export class WorldApi {
     }
 
     /**
-     * This method lets us change the behavior of tilt, so that instead of applying a force, we
-     * directly set the velocity of objects using the accelerometer data.
+     * Turn on accelerometer support, so that tilt can control actors in this
+     * level.  Note that if the accelerometer is disabled, this code will set
+     * the arrow keys to simulate tilt.
      *
-     * @param toggle This should usually be false. Setting it to true means that tilt does not cause
-     *               forces upon objects, but instead the tilt of the phone directly sets velocities
+     * @param xGravityMax Max X force that the accelerometer can produce
+     * @param yGravityMax Max Y force that the accelerometer can produce
+     */
+    public enableTilt(xGravityMax: number, yGravityMax: number) {
+        this.stage.getWorld().tiltMax.x = xGravityMax;
+        this.stage.getWorld().tiltMax.y = yGravityMax;
+        if (!this.stage.device.getAccelerometer().getSupported()) {
+            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.UP, () => { this.stage.device.getAccelerometer().setY(0); });
+            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.DOWN, () => { this.stage.device.getAccelerometer().setY(0); });
+            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.LEFT, () => { this.stage.device.getAccelerometer().setX(0); });
+            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.RIGHT, () => { this.stage.device.getAccelerometer().setX(0); });
+
+            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.UP, () => { this.stage.device.getAccelerometer().setY(-5); });
+            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.DOWN, () => { this.stage.device.getAccelerometer().setY(5); });
+            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.LEFT, () => { this.stage.device.getAccelerometer().setX(-5); });
+            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.RIGHT, () => { this.stage.device.getAccelerometer().setX(5); });
+        }
+    }
+
+    /**
+     * This method lets us change the behavior of tilt, so that instead of
+     * applying a force, we directly set the velocity of objects using the
+     * accelerometer data.
+     *
+     * @param toggle This should usually be false. Setting it to true means that
+     *               tilt does not cause forces upon objects, but instead the
+     *               tilt of the phone directly sets velocities
      */
     public setTiltAsVelocity(toggle: boolean) {
         this.stage.getWorld().setTiltVelocityOverride(toggle);
     }
 
     /**
+     * Change the gravity in a running level
+     *
+     * @param newXGravity The new X gravity
+     * @param newYGravity The new Y gravity
+     */
+    public resetGravity(newXGravity: number, newYGravity: number) {
+        this.stage.getWorld().setGravity(newXGravity, newYGravity);
+    }
+
+    /**
      * Draw some text in the scene, centering it on a specific point
      *
-     * @param centerX   The x coordinate of the center
-     * @param centerY   The y coordinate of the center
-     * @param fontName  The name of the font to use
-     * @param fontColor The color of the font
-     * @param fontSize  The size of the font
-     * @param tp        A TextProducer that will generate the text to display
-     * @param zIndex    The z index of the text
-     * @return A Renderable of the text, so it can be enabled/disabled by program code
+     * @param cfg A TextConfig object, which will specify how to draw the text
+     *
+     * @return The text, so it can be shown and hidden in the future
      */
     public addText(cfg: TextConfig): Renderable {
         checkTextConfig(cfg);
@@ -155,13 +160,11 @@ export class WorldApi {
     }
 
     /**
-     * Draw an obstacle with an underlying circle shape
+     * Draw an obstacle in the world
      *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
+     * @param cfg An ActorConfig object, which will specify how to draw the
+     *            obstacle
+     *
      * @return The obstacle, so that it can be further modified
      */
     public makeObstacle(cfg: ActorConfig) {
@@ -185,14 +188,12 @@ export class WorldApi {
     }
 
     /**
-     * Make a Hero with an underlying circular shape
+     * Draw a hero in the world
      *
-     * @param x       X coordinate of the hero
-     * @param y       Y coordinate of the hero
-     * @param width   width of the hero
-     * @param height  height of the hero
-     * @param imgName File name of the default image to display
-     * @return The hero that was created
+     * @param cfg An ActorConfig object, which will specify how to draw the
+     *            hero
+     *
+     * @return The hero, so that it can be further modified
      */
     public makeHero(cfg: ActorConfig) {
         checkActorConfig(cfg);
@@ -216,14 +217,12 @@ export class WorldApi {
     }
 
     /**
-     * Make an enemy that has an underlying circular shape.
+     * Draw an enemy in the world
      *
-     * @param x       The X coordinate of the top left corner
-     * @param y       The Y coordinate of the top right corner
-     * @param width   The width of the enemy
-     * @param height  The height of the enemy
-     * @param imgName The name of the image to display
-     * @return The enemy, so that it can be modified further
+     * @param cfg An ActorConfig object, which will specify how to draw the
+     *            enemy
+     *
+     * @return The enemy, so that it can be further modified
      */
     public makeEnemy(cfg: ActorConfig) {
         checkActorConfig(cfg);
@@ -247,14 +246,12 @@ export class WorldApi {
     }
 
     /**
-     * Make a destination that has an underlying circular shape.
+     * Draw a destination in the world
      *
-     * @param x       The X coordinate of the top left corner
-     * @param y       The Y coordinate of the top right corner
-     * @param width   The width of the destination
-     * @param height  The height of the destination
-     * @param imgName The name of the image to display
-     * @return The destination, so that it can be modified further
+     * @param cfg An ActorConfig object, which will specify how to draw the
+     *            destination
+     *
+     * @return The destination, so that it can be further modified
      */
     public makeDestination(cfg: ActorConfig) {
         checkActorConfig(cfg);
@@ -278,13 +275,11 @@ export class WorldApi {
     }
 
     /**
-     * Draw a goodie with an underlying circle shape, and a default score of [1,0,0,0]
+     * Draw a goodie in the world
      *
-     * @param x       X coordinate of top left corner
-     * @param y       Y coordinate of top left corner
-     * @param width   Width of the image
-     * @param height  Height of the image
-     * @param imgName Name of image file to use
+     * @param cfg An ActorConfig object, which will specify how to draw the
+     *            goodie
+     *
      * @return The goodie, so that it can be further modified
      */
     public makeGoodie(cfg: ActorConfig) {
@@ -309,37 +304,16 @@ export class WorldApi {
     }
 
     /**
-     * Turn on accelerometer support so that tilt can control actors in this level
-     *
-     * @param xGravityMax Max X force that the accelerometer can produce
-     * @param yGravityMax Max Y force that the accelerometer can produce
-     */
-    public enableTilt(xGravityMax: number, yGravityMax: number) {
-        this.stage.getWorld().tiltMax.x = xGravityMax;
-        this.stage.getWorld().tiltMax.y = yGravityMax;
-        if (!this.stage.device.getAccelerometer().getSupported()) {
-            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.UP, () => { this.stage.device.getAccelerometer().setY(0); });
-            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.DOWN, () => { this.stage.device.getAccelerometer().setY(0); });
-            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.LEFT, () => { this.stage.device.getAccelerometer().setX(0); });
-            this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.RIGHT, () => { this.stage.device.getAccelerometer().setX(0); });
-
-            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.UP, () => { this.stage.device.getAccelerometer().setY(-5); });
-            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.DOWN, () => { this.stage.device.getAccelerometer().setY(5); });
-            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.LEFT, () => { this.stage.device.getAccelerometer().setX(-5); });
-            this.stage.device.getKeyboard().setKeyDownHandler(JetLagKeys.RIGHT, () => { this.stage.device.getAccelerometer().setX(5); });
-        }
-    }
-
-    /**
      * Draw a box on the scene
-     * 
+     *
      * Note: the box is actually four narrow rectangles
      *
      * @param x0         X coordinate of left side
      * @param y0         Y coordinate of top
      * @param x1         X coordinate of right side
      * @param y1         Y coordinate of bottom
-     * @param imgName    name of the image file to use when drawing the rectangles
+     * @param imgName    name of the image file to use when drawing the
+     *                   rectangles
      * @param density    Density of the rectangle. When in doubt, use 1
      * @param elasticity Elasticity of the rectangle. When in doubt, use 0
      * @param friction   Friction of the rectangle. When in doubt, use 1
@@ -359,9 +333,7 @@ export class WorldApi {
     }
 
     /**
-     * Configure the camera bounds for a level
-     *
-     * NB: we should set upper and lower bounds, instead of assuming a lower bound of (0, 0)
+     * Configure the camera bounds for a level, starting from (0, 0)
      *
      * @param width  width of the camera
      * @param height height of the camera
@@ -371,7 +343,8 @@ export class WorldApi {
     }
 
     /**
-     * Identify the actor that the camera should try to keep on screen at all times
+     * Identify the actor that the camera should try to keep on screen at all
+     * times
      *
      * @param actor The actor the camera should chase
      */
@@ -380,14 +353,14 @@ export class WorldApi {
     }
 
     /**
-     * Manually set the zoom level of the game.  A zoom is actually a 
+     * Manually set the zoom level of the game.  A zoom is actually a
      * pixel/meter ratio, so bigger numbers mean zooming in, and smaller ones
      * mean zooming out.  The base value to consider is whatever you have set in
      * your game's configuration.
      *
      * @param zoom The new zoom level
      */
-    public setZoom(zoom: number): void {
+    public setZoom(zoom: number) {
         this.stage.getWorld().camera.setScale(zoom);
     }
 
@@ -395,160 +368,80 @@ export class WorldApi {
      * Get the current zoom level of the game.  See setZoom() for more info
      * about the meaning of this number (it's a pixel/meter ratio)
      */
-    public getZoom(): number {
-        return this.stage.getWorld().camera.getScale();
-    }
-
-    /**
-     * Indicate that some code should run after a fixed amount of time passes
-     * 
-     * @param interval The time until the event happens (or happens again)
-     * @param repeat Should the event repeat?
-     * @param action The action to perform when the timer expires
-     */
-    public addTimer(interval: number, repeat: boolean, action: () => void) {
-        this.stage.getWorld().timer.addEvent(new TimedEvent(interval, repeat, action));
-    }
-
-    /**
-     * Change the gravity in a running level
-     *
-     * @param newXGravity The new X gravity
-     * @param newYGravity The new Y gravity
-     */
-    public resetGravity(newXGravity: number, newYGravity: number): void {
-        this.stage.getWorld().setGravity(newXGravity, newYGravity);
-    }
+    public getZoom() { return this.stage.getWorld().camera.getScale(); }
 
     /**
      * Add a background image that auto-repeats in X, and that moves in relation
      * to the hero movement
      *
-     * @param x       The X of the top left corner of one instance of the image.
-     *                The image will be tiled from that point onward, in all
-     *                directions.
-     * @param y       The Y of the top left corner of one instance of the image.
-     *                The image will be tiled from that point onward, in all
-     *                directions.
-     * @param width   The width of the image being used as a background layer
-     * @param height  The height of the image being used as a background layer
+     * @param cfg     An ImageConfig object, which will specify how to draw the
+     *                image 
      * @param xSpeed  Speed that the picture seems to move in the X direction.
      *                "1" is the same speed as the camera; "0" is not at all;
      *                ".5f" is at half the camera's speed
-     * @param imgName The name of the image file to use as the background
      */
-    public addHorizontalBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.stage.config, this.stage.device);
+    public addHorizontalBackgroundLayer(cfg: ImageConfig, xSpeed: number) {
+        checkImageConfig(cfg);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed, true, false, cfg.img, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 
     /**
-     * Add a background image that auto-repeats in Y, and that moves in relation to the hero
-     * movement
+     * Add a background image that auto-repeats in Y, and that moves in relation
+     * to the hero movement
      *
-     * @param x       The X of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param width   The width of the image being used as a background layer
-     * @param height  The height of the image being used as a background layer
-     * @param ySpeed  Speed that the picture seems to move in the Y direction. "1" is the same speed
-     *                as the camera; "0" is not at all; ".5f" is at half the camera's speed
-     * @param imgName The name of the image file to use as the background
+     * @param cfg     An ImageConfig object, which will specify how to draw the
+     *                image 
+     * @param ySpeed  Speed that the picture seems to move in the Y direction.
+     *                "1" is the same speed as the camera; "0" is not at all;
+     *                ".5f" is at half the camera's speed
      */
-    public addVerticalBackgroundLayer(x: number, y: number, width: number, height: number, ySpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, ySpeed, false, false, imgName, this.stage.config, this.stage.device);
+    public addVerticalBackgroundLayer(cfg: ImageConfig, ySpeed: number) {
+        checkImageConfig(cfg);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, ySpeed, false, false, cfg.img, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 
     /**
      * Add a foreground image that auto-repeats, and that moves in relation to the hero movement
      *
-     * @param x       The X of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param width   The width of the image being used as a background layer
-     * @param height  The height of the image being used as a background layer
+     * @param cfg     An ImageConfig object, which will specify how to draw the
+     *                image 
      * @param xSpeed  Speed that the picture seems to move in the X direction. "1" is the same speed
      *                as the camera; "0" is not at all; ".5f" is at half the camera's speed
-     * @param imgName The name of the image file to use as the background
      */
-    public addHorizontalForegroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, xSpeed, true, false, imgName, this.stage.config, this.stage.device);
+    public addHorizontalForegroundLayer(cfg: ImageConfig, xSpeed: number) {
+        checkImageConfig(cfg);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed, true, false, cfg.img, this.stage.config, this.stage.device);
         this.stage.getForeground().addLayer(pl);
     }
 
     /**
      * Add a background image that auto-repeats, and that moves at a fixed X velocity
      *
-     * @param x       The X of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param width   The width of the image being used as a background layer
-     * @param height  The height of the image being used as a background layer
+     * @param cfg     An ImageConfig object, which will specify how to draw the
+     *                image 
      * @param xSpeed  Speed that the picture seems to move in the X direction. "1" is the same speed
      *                as the camera; "0" is not at all; ".5f" is at half the camera's speed
-     * @param imgName The name of the image file to use as the background
      */
-    public addHorizontalAutoBackgroundLayer(x: number, y: number, width: number, height: number, xSpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, xSpeed / 1000, true, true, imgName, this.stage.config, this.stage.device);
+    public addHorizontalAutoBackgroundLayer(cfg: ImageConfig, xSpeed: number) {
+        checkImageConfig(cfg);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed / 1000, true, true, cfg.img, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 
     /**
      * Add a background image that auto-repeats, and that moves at a fixed Y velocity
      *
-     * @param x       The X of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param y       The Y of the top left corner of one instance of the image.  The image will
-     *                be tiled from that point onward, in all directions.
-     * @param width   The width of the image being used as a background layer
-     * @param height  The height of the image being used as a background layer
+     * @param cfg     An ImageConfig object, which will specify how to draw the
+     *                image 
      * @param ySpeed  Speed that the picture seems to move in the Y direction. "1" is the same speed
      *                as the camera; "0" is not at all; ".5f" is at half the camera's speed
-     * @param imgName The name of the image file to use as the background
      */
-    public addVerticalAutoBackgroundLayer(x: number, y: number, width: number, height: number, ySpeed: number, imgName: string) {
-        let pl = new ParallaxLayer(x, y, width, height, ySpeed / 1000, false, true, imgName, this.stage.config, this.stage.device);
+    public addVerticalAutoBackgroundLayer(cfg: ImageConfig, ySpeed: number) {
+        checkImageConfig(cfg);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, ySpeed / 1000, false, true, cfg.img, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
-    }
-
-    /**
-     * Generate a random number x in the range [0,max)
-     *
-     * @param max The largest number returned will be one less than max
-     * @return a random integer
-     */
-    public getRandom(max: number) {
-        return Math.floor(Math.random() * max);
-    }
-
-    /**
-     * Create a new animation that can be populated via the "to" function
-     *
-     * @param sequenceCount The number of frames in the animation
-     * @param repeat        True if the animation should repeat when it reaches the end
-     * @return The animation
-     */
-    public makeComplexAnimation(repeat: boolean) {
-        return new Animation(repeat, this.stage.device.getRenderer());
-    }
-
-    /**
-     * Create a new animation that shows a set of images for the same amount of time
-     *
-     * @param timePerFrame The time to show each image
-     * @param repeat       True if the animation should repeat when it reaches the end
-     * @param imgNames     The names of the images that comprise the animation
-     * @return The animation
-     */
-    public makeAnimation(timePerFrame: number, repeat: boolean, imgNames: string[]) {
-        let a = new Animation(repeat, this.stage.device.getRenderer());
-        for (let i of imgNames)
-            a.to(i, timePerFrame);
-        return a;
     }
 
     /**

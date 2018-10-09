@@ -24,7 +24,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     // individually place each button exactly where you want it.
     if (index == 1) {
         // set up background and music
-        jl.world.setMusic("tune.ogg");
+        jl.setMusic("tune.ogg");
         jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
 
         // We'll have margins of 1.25 on the left and right, a margin of 1 on
@@ -64,7 +64,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
 
     else {
         // set up background and music
-        jl.world.setMusic("tune.ogg");
+        jl.setMusic("tune.ogg");
         jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
         for (let row = 0, y = 3.25, l = 24 * (index - 1) + 1; row < 3; ++row, y += 1.75) {
             let x = 1.25;

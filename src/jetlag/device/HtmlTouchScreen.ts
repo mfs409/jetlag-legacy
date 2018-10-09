@@ -32,7 +32,7 @@ export class HtmlTouchScreen implements JetLagTouchScreen {
     public setTouchReceiver(receiver: JetLagTouchReceiver) {
         // Since we are using gestures, turn off left clicking of the whole page
         this.elt.oncontextmenu =
-            function (this: HTMLElement, ev: PointerEvent) { return false; }
+            function (this: HTMLElement, ev: PointerEvent) { return false; } as any;
 
         // Set up handlers for all the Hammer events
         let hammer = new Hammer(this.elt);

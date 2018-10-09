@@ -12,9 +12,8 @@ import { HtmlStorage } from "./HtmlStorage"
 import { HtmlConsole } from "./HtmlConsole";
 
 /**
- * Device bundles the abstractions of the parts of a game device.  This lets the
- * rest of JetLag use Device, instead of needing to have references to the
- * various subsystems' abstractions.
+ * HtmlDevice is an implementation of JetLagDevice for desktop/laptop browsers.
+ * It has only been tested on Chrome
  */
 export class HtmlDevice implements JetLagDevice {
     /** touch controller, providing gesture inputs */
@@ -72,10 +71,11 @@ export class HtmlDevice implements JetLagDevice {
     getConsole() { return this.console; }
 
     /**
-     * Create a device context to abstract away browser features
-     * 
-     * @param cfg The game-wide configuration object
-     * @param domId The Id of the DOM element where the game exists
+     * Create an HtmlDevice context to abstract away browser features
+     *
+     * @param cfg     The game-wide configuration object
+     * @param domId   The Id of the DOM element where the game exists
+     * @param console A console device, for debug messages
      */
     constructor(cfg: JetLagConfig, domId: string, private readonly console: HtmlConsole) {
         this.storage = new HtmlStorage(this.console);

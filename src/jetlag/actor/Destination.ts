@@ -21,7 +21,7 @@ export class Destination extends WorldActor {
      * A custom, optional check to decide if the Destination is "ready" to
      * accept a Hero 
      */
-    onAttemptArrival: (h: Hero) => boolean = null;
+    private onAttemptArrival: (h: Hero) => boolean = null;
 
     /**
      * Create a basic Destination.  The destination won't yet have any physics attached to it.
@@ -37,6 +37,9 @@ export class Destination extends WorldActor {
         this.capacity = 1;
         this.holding = 0;
     }
+
+    public getOnAttemptArrival() { return this.onAttemptArrival; }
+    public setOnAttemptArrival(callback: (h: Hero) => boolean) { this.onAttemptArrival = callback; }
 
     /**
      * Decide if a hero can be received by the destination.  This allows us to

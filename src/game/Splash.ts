@@ -18,7 +18,7 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     // 1600x900 pixels (16x9 meters), with no default gravitational forces
 
     // start the music
-    jl.world.setMusic("tune.ogg");
+    jl.setMusic("tune.ogg");
 
     // draw the background. Note that "Play", "Help", and "Quit" are part of the
     // image.

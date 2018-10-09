@@ -7,35 +7,33 @@ import { Route } from "../support/Route";
 import { BaseActor as BaseActor } from "../actor/Base";
 import { JetLagStage } from "../JetLagStage";
 import { XY } from "../support/XY";
-
-export class ControlConfig {
-    x = 0;
-    y = 0;
-    width = 0;
-    height = 0;
-    img?= "";
-    z?= 0;
-}
-
-function checkControlConfig(c: ControlConfig) {
-    if (!c.img) c.img = "";
-    if (!c.z) c.z = 0;
-    if (c.z < -2) c.z = -2;
-    if (c.z > 2) c.z = 2;
-}
+import { ImageConfig, checkImageConfig, TextConfig } from "./JetLag";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
  * HUD, the win and lose screens, the pause screen, and the welcome screen.
  */
 export class OverlayApi {
+    /** keep track of the "active" actor, if any */
+    private activeActor: WorldActor = null;
+
     /**
-     * Construct a level.  Since Level is merely a facade, this method need only store references to
-     * the actual game objects.
+     * Construct the Overlay API
      *
-     * @param overlay the StageManager for the game
+     * @param stage   The JetLagStage, for interacting with a level
+     * @param overlay The overlay screen (hud, welcome, etc)
      */
     constructor(private stage: JetLagStage, private overlay: OverlayScene) { }
+
+    /** Return the current "active" actor, if any */
+    public getActiveActor() { return this.activeActor; }
+
+    /**
+     * Set the current "active" actor
+     * 
+     * @param actor The actor to treat as "active"
+     */
+    public setActiveActor(actor: WorldActor) { this.activeActor = actor; }
 
     /**
      * Convert coordinates on the overlay to coordinates in the world
@@ -45,7 +43,7 @@ export class OverlayApi {
      * 
      * @returns a pair {x,y} that represents the world coordinates, in meters
      */
-    public overlayToMeters(x: number, y: number) {
+    public overlayToWorldCoords(x: number, y: number) {
         let pixels1 = this.overlay.camera.metersToScreen(x, y);
         let pixels2 = this.stage.getWorld().camera.screenToMeters(pixels1.x, pixels1.y);
         return pixels2;
@@ -54,15 +52,12 @@ export class OverlayApi {
     /**
      * Add a button that performs an action when clicked.
      *
-     * @param x       The X coordinate of the top left corner (in pixels)
-     * @param y       The Y coordinate of the top left corner (in pixels)
-     * @param width   The width of the image
-     * @param height  The height of the image
-     * @param imgName The name of the image to display. Use "" for an invisible button
-     * @param action  The action to run in response to a tap
+     * @param cfg    An ImageConfig object, which will specify how to draw the
+     *               button
+     * @param action The action to run in response to a tap
      */
-    public addTapControl(cfg: ControlConfig, action: (hudX: number, hudY: number) => boolean): BaseActor {
-        checkControlConfig(cfg);
+    public addTapControl(cfg: ImageConfig, action: (hudX: number, hudY: number) => boolean) {
+        checkImageConfig(cfg);
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, cfg.z);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         c.setTapHandler(action);
@@ -74,18 +69,15 @@ export class OverlayApi {
      * Add a control that runs custom code when depressed, on any finger
      * movement, and when released
      * 
-     * @param x The X coordinate of the top left corner (in meters)
-     * @param y The Y coordinate of the top left corner (in meters)
-     * @param width The width of the image to display (in meters)
-     * @param height The height of the image to display (in meters)
-     * @param imgName The name of the image to display
+     * @param cfg      An ImageConfig object, which will specify how to draw the
+     *                 pan control
      * @param panStart The action to perform when the pan event starts
-     * @param panMove The action to perform when the finger moves
-     * @param panStop The action to perform when the pan event stops
+     * @param panMove  The action to perform when the finger moves
+     * @param panStop  The action to perform when the pan event stops
      */
-    public addPanCallbackControl(x: number, y: number, width: number, height: number, imgName: string, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean): BaseActor {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+    public addPanCallbackControl(cfg: ImageConfig, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean) {
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         c.setPanStartHandler(panStart);
         c.setPanMoveHandler(panMove);
         c.setPanStopHandler(panStop);
@@ -97,17 +89,16 @@ export class OverlayApi {
      * Create a region on screen, such that any Actor inside of that region that
      * has been marked draggable can be dragged anywhere within that region.
      * 
-     * @param x The X coordinate (in meters) of the top left of the zone
-     * @param y The Y coordinate (in meters) of the top left of the zone
-     * @param width The width of the zone
-     * @param height The height of the zone
-     * @param imgName The image to display for this zone (typically "")
+     * @param cfg      An ImageConfig object, which will specify how to draw the
+     *                 drag zone
      */
-    public createDragZone(x: number, y: number, width: number, height: number, imgName: string) {
+    public createDragZone(cfg: ImageConfig) {
         let foundActor: WorldActor = null;
-        // pan start behavior is to update foundActor if there is an actor where the touch began
+        // pan start behavior is to update foundActor if there is an actor where
+        // the touch began
         let panstart = (hudX: number, hudY: number) => {
-            // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
+            // Need to turn the meters of the hud into screen pixels, so that
+            // world can convert to its meters
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
             // If worldactor with draggable, we're good
             let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
@@ -115,12 +106,13 @@ export class OverlayApi {
                 return false;
             if (!(actor instanceof WorldActor))
                 return false;
-            if (!actor.draggable)
+            if (!actor.getDraggable())
                 return false;
             foundActor = actor;
             return true;
         }
-        // pan move behavior is to change the actor position based on the new coord
+        // pan move behavior is to change the actor position based on the new
+        // coord
         let panmove = (hudX: number, hudY: number) => {
             // need an actor, and need coords in pixels
             if (foundActor == null)
@@ -134,21 +126,18 @@ export class OverlayApi {
         let panstop = (hudX: number, hudY: number) => {
             foundActor = null; return false;
         }
-        this.addPanCallbackControl(x, y, width, height, imgName, panstart, panmove, panstop);
+        this.addPanCallbackControl(cfg, panstart, panmove, panstop);
     }
 
     /**
      * Create a region on screen that is able to receive swipe gestures
      * 
-     * @param x The X coordinate (in meters) of the top left of the zone
-     * @param y The Y coordinate (in meters) of the top left of the zone
-     * @param width The width of the zone
-     * @param height The height of the zone
-     * @param imgName The image to display for this zone (typically "")
+     * @param cfg      An ImageConfig object, which will specify how to draw the
+     *                 swipe region
      */
-    public createSwipeZone(x: number, y: number, width: number, height: number, imgName: string) {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+    public createSwipeZone(cfg: ImageConfig) {
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         this.overlay.addActor(c, 0);
         c.setSwipeHandler((hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
             // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
@@ -159,15 +148,15 @@ export class OverlayApi {
                 return false;
             if (!(actor instanceof WorldActor))
                 return false;
-            if (actor.flickMultiplier === 0)
+            if (actor.getFlickMultiplier() === 0)
                 return false;
             // Figure out the velocity to apply
             let p2 = this.overlay.camera.metersToScreen(hudX1, hudY1);
             let w = this.stage.getWorld().camera.screenToMeters(p2.x, p2.y);
-            let dx = (w.x - actor.getXPosition()) * actor.flickMultiplier * 1000 / time;
-            let dy = w.y - actor.getYPosition() * actor.flickMultiplier * 1000 / time;
+            let dx = (w.x - actor.getXPosition()) * actor.getFlickMultiplier() * 1000 / time;
+            let dy = w.y - actor.getYPosition() * actor.getFlickMultiplier() * 1000 / time;
             // prep the actor and flick it
-            actor.hover = null;
+            actor.clearHover();
             actor.updateVelocity(dx, dy);
             return true;
         });;
@@ -175,23 +164,15 @@ export class OverlayApi {
     }
 
     /**
-     * keep track of the "active" actor, if any
-     */
-    activeActor: WorldActor = null;
-
-    /**
      * Create a region on an overlay, such that touching the region will cause
      * the current active actor to immediately relocate to that place.
-     * 
-     * @param x The top left X of the region
-     * @param y The top left Y of the region
-     * @param width The width of the region
-     * @param height The height of the region
-     * @param imgName The background image for the region, if any
+     *
+     * @param cfg An ImageConfig object, which will specify how to draw the
+     *            poke-to-place region
      */
-    public createPokeToPlaceZone(x: number, y: number, width: number, height: number, imgName: string) {
+    public createPokeToPlaceZone(cfg: ImageConfig) {
         this.stage.setGestureHudFirst(false);
-        this.addTapControl({ x: x, y: y, width: width, height: height, img: imgName }, (hudX: number, hudY: number) => {
+        this.addTapControl(cfg, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
@@ -205,18 +186,16 @@ export class OverlayApi {
     /**
      * Create a region on an overlay, such that touching the region will cause
      * the current active actor to move to that place.
-     * 
-     * @param x The top left X of the region
-     * @param y The top left Y of the region
-     * @param width The width of the region
-     * @param height The height of the region
+     *
+     * @param cfg      An ImageConfig object, which will specify how to draw the
+     *                 poke-to-move region
      * @param velocity The speed at which the actor should move
-     * @param imgName The background image for the region, if any
-     * @param clear Should the active actor be cleared (so that subsequent touches won't change its trajectory)
+     * @param clear    Should the active actor be cleared (so that subsequent
+     *                 touches won't change its trajectory)
      */
-    public createPokeToMoveZone(x: number, y: number, width: number, height: number, velocity: number, imgName: string, clear: boolean) {
+    public createPokeToMoveZone(cfg: ImageConfig, velocity: number, clear: boolean) {
         this.stage.setGestureHudFirst(false);
-        this.addTapControl({ x: x, y: y, width: width, height: height, img: imgName }, (hudX: number, hudY: number) => {
+        this.addTapControl(cfg, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
@@ -233,19 +212,18 @@ export class OverlayApi {
 
     /**
      * Create a region on an overlay, such that touching the region will cause
-     * the current active actor to move toward that place (but not stop when it gets there).
-     * 
-     * @param x The top left X of the region
-     * @param y The top left Y of the region
-     * @param width The width of the region
-     * @param height The height of the region
+     * the current active actor to move toward that place (but not stop when it
+     * gets there).
+     *
+     * @param cfg      An ImageConfig object, which will specify how to draw the
+     *                 poke-to-run region
      * @param velocity The speed at which the actor should move
-     * @param imgName The background image for the region, if any
-     * @param clear Should the active actor be cleared (so that subsequent touches won't change its trajectory)
+     * @param clear    Should the active actor be cleared (so that subsequent
+     *                 touches won't change its trajectory)
      */
-    public createPokeToRunZone(x: number, y: number, width: number, height: number, velocity: number, imgName: string, clear: boolean) {
+    public createPokeToRunZone(cfg: ImageConfig, velocity: number, clear: boolean) {
         this.stage.setGestureHudFirst(false);
-        this.addTapControl({ x: x, y: y, width: width, height: height, img: imgName }, (hudX: number, hudY: number) => {
+        this.addTapControl(cfg, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
@@ -263,39 +241,36 @@ export class OverlayApi {
     }
 
     /**
-     * Draw a touchable region of the screen that acts as a joystick.  As the user performs Pan
-     * actions within the region, the actor's velocity should change accordingly.
+     * Draw a touchable region of the screen that acts as a joystick.  As the
+     * user performs Pan actions within the region, the actor's velocity should
+     * change accordingly.
      *
-     * @param x The X coordinate of the top left corner (in meters)
-     * @param y The Y coordinate of the top left corner (in meters)
-     * @param width The width of the image to display (in meters)
-     * @param height The height of the image to display (in meters)
-     * @param imgName The name of the image to display
+     * @param cfg      An ImageConfig object, which will specify how to draw the
+     *                 joystick
      * @param actor    The actor to move with this joystick
-     * @param scale    A value to use to scale the velocity produced by the joystick
+     * @param scale    A value to use to scale the velocity produced by the
+     *                 joystick
      * @param stopOnUp Should the actor stop when the joystick is released?
      * @return The control, so it can be modified further.
      */
-    public addJoystickControl(x: number, y: number, width: number, height: number, imgName: string, actor: WorldActor, scale: number, stopOnUp: boolean): BaseActor {
+    public addJoystickControl(cfg: ImageConfig, actor: WorldActor, scale: number, stopOnUp: boolean) {
         let moving = false;
         function doMove(hudX: number, hudY: number) {
             moving = true;
-            actor.setAbsoluteVelocity(scale * (hudX - (x + width / 2)), scale * (hudY - (y + height / 2)));
+            actor.setAbsoluteVelocity(scale * (hudX - (cfg.x + cfg.width / 2)), scale * (hudY - (cfg.y + cfg.height / 2)));
+            return true;
         }
         function doStop() {
             if (!moving)
-                return;
+                return true;
             moving = false;
             if (stopOnUp) {
                 actor.setAbsoluteVelocity(0, 0);
                 actor.setRotationSpeed(0);
             }
+            return true;
         }
-        return this.addPanCallbackControl(x, y, width, height, imgName,
-            (hudX: number, hudY: number): boolean => { doMove(hudX, hudY); return true; },
-            (hudX: number, hudY: number): boolean => { doMove(hudX, hudY); return true; },
-            (hudX: number, hudY: number): boolean => { doStop(); return true; }
-        );
+        return this.addPanCallbackControl(cfg, doMove, doMove, doStop);
     }
 
     /**
@@ -303,52 +278,31 @@ export class OverlayApi {
      * Note that the image is represented by an "Actor", which means we are able
      * to animate it, move it, etc.
      *
-     * @param x       The X coordinate of the top left corner (in pixels)
-     * @param y       The Y coordinate of the top left corner (in pixels)
-     * @param width   The width of the image
-     * @param height  The height of the image
-     * @param imgName The name of the image to display. Use "" for an invisible button
+     * @param cfg An ImageConfig object, which will specify how to draw the
+     *            image
      * @return The image that was created
      */
-    public addImage(x: number, y: number, width: number, height: number, imgName: string): BaseActor {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+    public addImage(cfg: ImageConfig) {
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         this.overlay.addActor(c, 0);
         return c;
     }
 
     /**
-     * Place some text on the screen.  The text will be generated by tp, which is called on every
-     * screen render
+     * Place some text on the screen.  See the definition of TextConfig for more
+     * information on how to configure text.
      *
-     * @param x         The X coordinate of the top left corner (in pixels)
-     * @param y         The Y coordinate of the top left corner (in pixels)
-     * @param fontName  The name of the font to use
-     * @param fontColor The color to use for the text
-     * @param size      The font size
-     * @param tp        The TextProducer
-     * @param zIndex    The z index where the text should go
+     * @param cfg A TextConfig object, which will specify how to draw the text
      * @return The display, so that it can be controlled further if needed
      */
-    public addText(x: number, y: number, fontName: string, fontColor: string, size: number, tp: () => string, zIndex: number): Renderable {
-        return this.overlay.addText(x, y, fontName, fontColor, size, tp, zIndex);
-    }
-
-    /**
-     * Place some text on the screen.  The text will be generated by tp, which is called on every
-     * screen render
-     *
-     * @param x         The X coordinate of the top left corner (in pixels)
-     * @param y         The Y coordinate of the top left corner (in pixels)
-     * @param fontName  The name of the font to use
-     * @param fontColor The color to use for the text
-     * @param size      The font size
-     * @param tp        The TextProducer
-     * @param zIndex    The z index where the text should go
-     * @return The display, so that it can be controlled further if needed
-     */
-    public addTextCentered(x: number, y: number, fontName: string, fontColor: string, size: number, tp: () => string, zIndex: number): Renderable {
-        return this.overlay.addTextCentered(x, y, fontName, fontColor, size, tp, zIndex);
+    public addText(cfg: TextConfig): Renderable {
+        if (cfg.center) {
+            return this.overlay.addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+        }
+        else {
+            return this.overlay.addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+        }
     }
 
     /**
@@ -363,20 +317,20 @@ export class OverlayApi {
     }
 
     /**
-     * Add a button that has one behavior while it is being pressed, and another when it is released
+     * Add a button that has one behavior while it is being pressed, and another
+     * when it is released
      *
-     * @param x               The X coordinate of the top left corner
-     * @param y               The Y coordinate of the top left corner
-     * @param width           The width of the image
-     * @param height          The height of the image
-     * @param imgName         The name of the image to display.  Use "" for an invisible button
-     * @param whileDownAction The action to execute, repeatedly, whenever the button is pressed
-     * @param onUpAction      The action to execute once any time the button is released
+     * @param cfg An ImageConfig object, which will specify how to draw the
+     *            button
+     * @param whileDownAction The action to execute, repeatedly, whenever the
+     *                        button is pressed
+     * @param onUpAction      The action to execute once any time the button is
+     *                        released
      * @return The control, so we can do more with it as needed.
      */
-    public addToggleButton(x: number, y: number, width: number, height: number, imgName: string, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+    public addToggleButton(cfg: ImageConfig, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         let active = false; // will be captured by lambdas below
         c.setTouchDownHandler((hudX: number, hudY: number) => {
             active = true;
@@ -397,103 +351,29 @@ export class OverlayApi {
     }
 
     /**
-     * Create an action that makes a hero throw a projectile
+     * The default behavior for throwing is to throw in a straight line. If we
+     * instead desire that the projectiles have some sort of aiming to them, we
+     * need to use this method, which throws toward where the screen was pressed
      *
-     * @param hero      The hero who should throw the projectile
-     * @param offsetX   specifies the x distance between the top left of the projectile and the
-     *                  top left of the hero throwing the projectile
-     * @param offsetY   specifies the y distance between the top left of the projectile and the
-     *                  top left of the hero throwing the projectile
-     * @param velocityX The X velocity of the projectile when it is thrown
-     * @param velocityY The Y velocity of the projectile when it is thrown
-     * @return The action object
-     */
-    public ThrowFixedAction(hero: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): (hudX: number, hudY: number) => boolean {
-        return (hudX: number, hudY: number) => {
-            this.stage.getProjectilePool().throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
-            return true;
-        }
-    }
-
-    /**
-     * Create an action for moving an actor in the Y direction.  This action can be used by a Control.
+     * Note: you probably want to use an invisible button that covers the
+     * screen...
      *
-     * @param actor The actor to move
-     * @param yRate The rate at which the actor should move in the Y direction (negative values are allowed)
-     * @return The action
-     */
-    public makeYMotionAction(actor: WorldActor, yRate: number) {
-        return () => { actor.updateVelocity(actor.getXVelocity(), yRate); };
-    }
-
-    /**
-     * Create an action for moving an actor in the X and Y directions.  This action can be used by a Control.
-     *
-     * @param actor The actor to move
-     * @param xRate The rate at which the actor should move in the X direction (negative values are allowed)
-     * @param yRate The rate at which the actor should move in the Y direction (negative values are allowed)
-     * @return The action
-     */
-    public makeXYMotionAction(actor: WorldActor, xRate: number, yRate: number) {
-        return () => { actor.updateVelocity(xRate, yRate); };
-    }
-
-    /**
-    * Create an action for moving an actor in the X direction.  This action can be used by a
-    * Control.
-    *
-    * @param actor The actor to move
-    * @param xRate The rate at which the actor should move in the X direction (negative values are
-    *              allowed)
-    * @return The action
-    */
-    public makeXMotionAction(actor: WorldActor, xRate: number) {
-        return () => { actor.updateVelocity(xRate, actor.getYVelocity()); };
-    }
-
-    /**
-     * Create an action for moving an actor in the X and Y directions, with dampening on release.
-     * This action can be used by a Control.
-     *
-     * @param actor     The actor to move
-     * @param xRate     The rate at which the actor should move in the X direction (negative values
-     *                  are allowed)
-     * @param yRate     The rate at which the actor should move in the Y direction (negative values
-     *                  are allowed)
-     * @param dampening The dampening factor
-     * @return The action
-     */
-    public makeXYDampenedMotionAction(actor: WorldActor, xRate: number, yRate: number, dampening: number) {
-        return () => {
-            actor.updateVelocity(xRate, yRate);
-            actor.setDamping(dampening);
-        }
-    }
-
-    /**
-     * The default behavior for throwing is to throw in a straight line. If we instead desire that
-     * the projectiles have some sort of aiming to them, we need to use this method, which throws
-     * toward where the screen was pressed
-     * <p>
-     * Note: you probably want to use an invisible button that covers the screen...
-     *
-     * @param x          The X coordinate of the top left corner (in pixels)
-     * @param y          The Y coordinate of the top left corner (in pixels)
-     * @param width      The width of the image
-     * @param height     The height of the image
-     * @param imgName    The name of the image to display. Use "" for an invisible button
+     * @param cfg An ImageConfig object, which will specify how to draw the
+     *            poke-to-place region
      * @param h          The hero who should throw the projectile
-     * @param milliDelay A delay between throws, so that holding doesn't lead to too many throws at
-     *                   once
-     * @param offsetX    specifies the x distance between the top left of the projectile and the
-     *                   top left of the hero throwing the projectile
-     * @param offsetY    specifies the y distance between the top left of the projectile and the
-     *                   top left of the hero throwing the projectile
+     * @param milliDelay A delay between throws, so that holding doesn't lead to
+     *                   too many throws at once
+     * @param offsetX    specifies the x distance between the top left of the
+     *                   projectile and the top left of the hero throwing the
+     *                   projectile
+     * @param offsetY    specifies the y distance between the top left of the
+     *                   projectile and the top left of the hero throwing the
+     *                   projectile
      * @return The button that was created
      */
-    public addDirectionalThrowButton(x: number, y: number, width: number, height: number, imgName: string, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+    public addDirectionalThrowButton(cfg: ImageConfig, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         let v = new XY(0, 0);
         let isHolding = false;
         c.setTouchDownHandler((hudX: number, hudY: number) => {
@@ -530,6 +410,88 @@ export class OverlayApi {
         });
         return c;
     }
+
+    /**
+     * Create an action that makes a hero throw a projectile
+     *
+     * @param hero      The hero who should throw the projectile
+     * @param offsetX   specifies the x distance between the top left of the
+     *                  projectile and the top left of the hero throwing the
+     *                  projectile
+     * @param offsetY   specifies the y distance between the top left of the
+     *                  projectile and the top left of the hero throwing the
+     *                  projectile
+     * @param velocityX The X velocity of the projectile when it is thrown
+     * @param velocityY The Y velocity of the projectile when it is thrown
+     * @return The action object
+     */
+    public ThrowFixedAction(hero: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): (hudX: number, hudY: number) => boolean {
+        return (hudX: number, hudY: number) => {
+            this.stage.getProjectilePool().throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
+            return true;
+        }
+    }
+
+    /**
+     * Create an action for moving an actor in the Y direction.  This action can
+     * be used by a Control.
+     *
+     * @param actor The actor to move
+     * @param yRate The rate at which the actor should move in the Y direction
+     *              (negative values are allowed)
+     * @return The action
+     */
+    public makeYMotionAction(actor: WorldActor, yRate: number) {
+        return () => { actor.updateVelocity(actor.getXVelocity(), yRate); };
+    }
+
+    /**
+     * Create an action for moving an actor in the X and Y directions.  This
+     * action can be used by a Control.
+     *
+     * @param actor The actor to move
+     * @param xRate The rate at which the actor should move in the X direction
+     *              (negative values are allowed)
+     * @param yRate The rate at which the actor should move in the Y direction
+     *              (negative values are allowed)
+     * @return The action
+     */
+    public makeXYMotionAction(actor: WorldActor, xRate: number, yRate: number) {
+        return () => { actor.updateVelocity(xRate, yRate); };
+    }
+
+    /**
+    * Create an action for moving an actor in the X direction.  This action can
+    * be used by a Control.
+    *
+    * @param actor The actor to move
+    * @param xRate The rate at which the actor should move in the X direction
+    *              (negative values are allowed)
+    * @return The action
+    */
+    public makeXMotionAction(actor: WorldActor, xRate: number) {
+        return () => { actor.updateVelocity(xRate, actor.getYVelocity()); };
+    }
+
+    /**
+     * Create an action for moving an actor in the X and Y directions, with
+     * dampening on release. This action can be used by a Control.
+     *
+     * @param actor     The actor to move
+     * @param xRate     The rate at which the actor should move in the X
+     *                  direction (negative values are allowed)
+     * @param yRate     The rate at which the actor should move in the Y
+     *                  direction (negative values are allowed)
+     * @param dampening The dampening factor
+     * @return The action
+     */
+    public makeXYDampenedMotionAction(actor: WorldActor, xRate: number, yRate: number, dampening: number) {
+        return () => {
+            actor.updateVelocity(xRate, yRate);
+            actor.setDamping(dampening);
+        }
+    }
+
 
     /**
      * Create an action that makes a hero throw a projectile in a direction that
@@ -570,12 +532,14 @@ export class OverlayApi {
     * Create an action for making a hero throw a projectile
     *
     * @param hero       The hero who should throw the projectile
-    * @param milliDelay A delay between throws, so that holding doesn't lead to too many throws at
-    *                   once
-    * @param offsetX    specifies the x distance between the top left of the projectile and the
-    *                   top left of the hero throwing the projectile
-    * @param offsetY    specifies the y distance between the top left of the projectile and the
-    *                   top left of the hero throwing the projectile
+    * @param milliDelay A delay between throws, so that holding doesn't lead to
+    *                   too many throws at once
+    * @param offsetX    specifies the x distance between the top left of the
+    *                   projectile and the top left of the hero throwing the
+    *                   projectile
+    * @param offsetY    specifies the y distance between the top left of the
+    *                   projectile and the top left of the hero throwing the
+    *                   projectile
     * @param velocityX  The X velocity of the projectile when it is thrown
     * @param velocityY  The Y velocity of the projectile when it is thrown
     * @return The action object
@@ -616,7 +580,8 @@ export class OverlayApi {
      *
      * @param hero       The hero to control
      * @param crawlState True to start crawling, false to stop
-     * @param rotate     The amount (in radians) to rotate the hero when crawling
+     * @param rotate     The amount (in radians) to rotate the hero when
+     *                   crawling
      * @return The action
      */
     public makeCrawlToggle(hero: Hero, crawlState: boolean, rotate: number) {

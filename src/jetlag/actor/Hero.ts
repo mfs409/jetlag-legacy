@@ -107,7 +107,7 @@ export class Hero extends WorldActor {
     * @param imgName The name of the file that has the default image for this
     *                hero
     */
-    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z:number) {
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
         super(stage, imgName, width, height, z);
     }
 
@@ -185,7 +185,7 @@ export class Hero extends WorldActor {
     private onCollideWithEnemy(enemy: Enemy): void {
         // if the enemy always defeats the hero, no matter what, then defeat the
         // hero
-        if (enemy.alwaysDoesDamage) {
+        if (enemy.getAlwaysDoesDamage()) {
             this.remove(false);
             this.stage.score.onDefeatHero(enemy, this);
             return;
@@ -193,27 +193,27 @@ export class Hero extends WorldActor {
         // handle hero invincibility
         if (this.invincibleRemaining > 0) {
             // if the enemy is immune to invincibility, do nothing
-            if (enemy.immuneToInvincibility) {
+            if (enemy.getImmuneToInvincibility()) {
                 return;
             }
             enemy.defeat(true, this);
         }
         // defeat by crawling?
-        else if (this.crawling && enemy.defeatByCrawl) {
+        else if (this.crawling && enemy.getDefeatByCrawl()) {
             enemy.defeat(true, this);
         }
         // // defeat by jumping only if the hero's bottom is above the enemy's head
-        else if (this.inAir && enemy.defeatByJump && this.getYPosition() + this.getHeight() < enemy.getYPosition()) {
+        else if (this.inAir && enemy.getDefeatByJump() && this.getYPosition() + this.getHeight() < enemy.getYPosition()) {
             enemy.defeat(true, this);
         }
         // when we can't defeat it by losing strength, remove the hero
-        else if (enemy.damage >= this.strength) {
+        else if (enemy.getDamage() >= this.strength) {
             this.remove(false);
             this.stage.score.onDefeatHero(enemy, this);
         }
         // when we can defeat it by losing strength
         else {
-            this.addStrength(-enemy.damage);
+            this.addStrength(-enemy.getDamage());
             enemy.defeat(true, this);
         }
     }
@@ -334,7 +334,7 @@ export class Hero extends WorldActor {
             this.jumpSound.play();
         }
         // suspend creation of sticky joints, so the hero can actually move
-        this.stickyDelay = window.performance.now() + 10;
+        this.setStickyDelay(window.performance.now() + 10);
     }
 
     /**

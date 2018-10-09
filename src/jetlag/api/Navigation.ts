@@ -3,21 +3,20 @@ import { OverlayApi as OverlayApi } from "./Overlay"
 import { JetLagStage } from "../JetLagStage";
 
 /**
- * NavigationApi is the "kitchen sink".  It has everything for moving between
- * levels, moving between chooser, store, levels, etc., and also a few 
- * miscellaneous things, like sounds.
+ * NavigationApi provides all of the features needed for transitioning among
+ * levels, and for moving between levels, chooser, help, store, and splash
  */
 export class NavigationApi {
     /**
-     * Construct a level.  Since Level is merely a facade, this method need only
-     * store references to the actual game objects.
+     * Construct the NavigationAPI
      *
-     * @param manager the JetLagManager for the game
+     * @param manager The JetLagManager, for navigation
+     * @param stage   The JetLagStage, for interacting with a level
      */
     constructor(private manager: JetLagManager, private stage: JetLagStage) { }
 
     /**
-     * load the level-chooser screen. Note that when the chooser is disabled, we
+     * Load the level-chooser screen. Note that when the chooser is disabled, we
      * jump straight to level 1.
      *
      * @param whichChooser The chooser screen to create
@@ -27,7 +26,7 @@ export class NavigationApi {
     }
 
     /**
-     * load a help level.
+     * Load a help level.
      *
      * @param which The index of the help level to load
      */
@@ -36,25 +35,21 @@ export class NavigationApi {
     /** quit the game */
     public doQuit() { this.manager.doQuit(); }
 
-    /**
-     * Cause Jetlag to advance to the next level
-     */
+    /** Cause Jetlag to advance to the next level */
     nextLevel() {
         this.stage.clearOverlayScene();
         this.manager.advanceLevel();
     }
 
-    /**
-     * Cause Jetlag to repeat the current level
-     */
+    /** Cause Jetlag to repeat the current level */
     repeatLevel() {
         this.stage.clearOverlayScene();
         this.manager.repeatLevel();
     }
 
     /**
-     * Explicitly dismiss any overlay scene.  Only use this when a PreScene or
-     * PauseScene is showing.
+     * Explicitly dismiss any overlay scene.  This is most useful for clearing
+     * Welcome, Win, and Lose scenes
      */
     dismissOverlayScene() { this.stage.clearOverlayScene(); }
 
@@ -67,6 +62,8 @@ export class NavigationApi {
 
     /**
      * load the splash screen
+     * 
+     * @param which The index of the splash level to load
      */
     public doSplash(index: number) { this.manager.doSplash(index); }
 
@@ -92,7 +89,7 @@ export class NavigationApi {
 
     /**
      * Provide code that can be used to create a quick "lose" scene any time
-     * that the corresponding level is won
+     * that the corresponding level is lost
      * 
      * @param builder The code to run to create the lose scene
      */

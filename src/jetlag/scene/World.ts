@@ -200,47 +200,47 @@ export class WorldScene extends BaseScene {
                 // is either one-sided?
                 let oneSided: WorldActor = null;
                 let other: WorldActor = null;
-                if (gfoA.isOneSided > -1) {
+                if (gfoA.getOneSided() > -1) {
                     oneSided = gfoA;
                     other = gfoB;
-                } else if (gfoB.isOneSided > -1) {
+                } else if (gfoB.getOneSided() > -1) {
                     oneSided = gfoB;
                     other = gfoA;
                 }
-                if (oneSided != null && other != null && !oneSided.distJoint && !other.distJoint) {
+                if (oneSided != null && other != null && !oneSided.getDistJoint() && !other.getDistJoint()) {
                     // if we're here, see if we should be disabling a one-sided obstacle collision
                     let worldManiFold = contact.GetWorldManifold();
                     let numPoints = worldManiFold.points.length;
                     for (let i = 0; i < numPoints; i++) {
                         let xy = other.getBody().GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
                         // disable based on the value of isOneSided and the vector between the actors
-                        if (oneSided.isOneSided == 0 && xy.y < 0) {
+                        if (oneSided.getOneSided() == 0 && xy.y < 0) {
                             contact.SetEnabled(false);
                         }
-                        else if (oneSided.isOneSided == 2 && xy.y > 0) {
+                        else if (oneSided.getOneSided() == 2 && xy.y > 0) {
                             contact.SetEnabled(false);
                         }
-                        else if (oneSided.isOneSided == 1 && xy.x > 0) {
+                        else if (oneSided.getOneSided() == 1 && xy.x > 0) {
                             contact.SetEnabled(false);
                         }
-                        else if (oneSided.isOneSided == 3 && xy.x < 0) {
+                        else if (oneSided.getOneSided() == 3 && xy.x < 0) {
                             contact.SetEnabled(false);
                         }
                     }
                 }
 
                 // handle sticky obstacles... only do something if at least one actor is a sticky actor
-                if (gfoA.isSticky[0] || gfoA.isSticky[1] || gfoA.isSticky[2] || gfoA.isSticky[3]) {
+                if (gfoA.getStickyState(0) || gfoA.getStickyState(1) || gfoA.getStickyState(2) || gfoA.getStickyState(3)) {
                     this.scene.handleSticky(gfoA, gfoB, contact);
                     return;
-                } else if (gfoB.isSticky[0] || gfoB.isSticky[1] || gfoB.isSticky[2] || gfoB.isSticky[3]) {
+                } else if (gfoB.getStickyState(0) || gfoB.getStickyState(1) || gfoB.getStickyState(2) || gfoB.getStickyState(3)) {
                     this.scene.handleSticky(gfoB, gfoA, contact);
                     return;
                 }
 
                 // if the actors have the same passthrough ID, and it's not zero, then disable the
                 // contact
-                if (gfoA.passThroughId != 0 && gfoA.passThroughId == gfoB.passThroughId) {
+                if (gfoA.getPassThroughId() != 0 && gfoA.getPassThroughId() == gfoB.getPassThroughId()) {
                     contact.SetEnabled(false);
                     return;
                 }
@@ -271,8 +271,8 @@ export class WorldScene extends BaseScene {
 
         // figure out the actor's position + the offset
         let a = this.cameraChaseActor;
-        let x = a.getBody().GetWorldCenter().x + a.cameraOffset.x;
-        let y = a.getBody().GetWorldCenter().y + a.cameraOffset.y;
+        let x = a.getBody().GetWorldCenter().x + a.getCameraOffsetX();
+        let y = a.getBody().GetWorldCenter().y + a.getCameraOffsetY();
 
         // request that the camera center on that point
         this.camera.setCenter(x, y);
@@ -298,17 +298,17 @@ export class WorldScene extends BaseScene {
      */
     private handleSticky(sticky: WorldActor, other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // don't create a joint if we've already got one
-        if (other.distJoint != null)
+        if (other.getDistJoint() != null)
             return;
         // don't create a joint if we're supposed to wait
-        if (window.performance.now() < other.stickyDelay)
+        if (window.performance.now() < other.getStickyDelay())
             return;
         // handle sticky obstacles... only do something if we're hitting the
         // obstacle from the correct direction
-        if ((sticky.isSticky[0] && other.getYPosition() >= sticky.getYPosition() + sticky.getHeight())
-            || (sticky.isSticky[1] && other.getXPosition() + other.getWidth() <= sticky.getXPosition())
-            || (sticky.isSticky[3] && other.getXPosition() >= sticky.getXPosition() + sticky.getWidth())
-            || (sticky.isSticky[2] && other.getYPosition() + other.getHeight() <= sticky.getYPosition())) {
+        if ((sticky.getStickyState(0) && other.getYPosition() >= sticky.getYPosition() + sticky.getHeight())
+            || (sticky.getStickyState(1) && other.getXPosition() + other.getWidth() <= sticky.getXPosition())
+            || (sticky.getStickyState(3) && other.getXPosition() >= sticky.getXPosition() + sticky.getWidth())
+            || (sticky.getStickyState(2) && other.getYPosition() + other.getHeight() <= sticky.getYPosition())) {
             // create distance and weld joints... somehow, the combination is needed to get this to
             // work. Note that this function runs during the box2d step, so we need to make the
             // joint in a callback that runs later
@@ -318,11 +318,11 @@ export class WorldScene extends BaseScene {
                 let d = new PhysicsType2d.Dynamics.Joints.DistanceJointDefinition();
                 d.Initialize(sticky.getBody(), other.getBody(), v, v);
                 d.collideConnected = true;
-                other.distJoint = this.world.CreateJoint(d) as PhysicsType2d.Dynamics.Joints.DistanceJoint;
+                other.setImplicitDistJoint(this.world.CreateJoint(d) as PhysicsType2d.Dynamics.Joints.DistanceJoint);
                 let w = new PhysicsType2d.Dynamics.Joints.WeldJointDefinition();
                 w.Initialize(sticky.getBody(), other.getBody(), v);
                 w.collideConnected = true;
-                other.weldJoint = this.world.CreateJoint(w) as PhysicsType2d.Dynamics.Joints.WeldJoint;
+                other.setImplicitWeldJoint(this.world.CreateJoint(w) as PhysicsType2d.Dynamics.Joints.WeldJoint);
             });
         }
     }

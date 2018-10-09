@@ -14,23 +14,23 @@ import { XY } from "../support/XY";
  */
 export abstract class WorldActor extends BaseActor {
   /** When the camera follows the actor without centering on it, this gives us the difference between the actor and camera */
-  cameraOffset = new XY(0, 0);
+  private cameraOffset = new XY(0, 0);
 
   /** By default, actors can't be dragged on screen */
-  draggable = false;
+  private draggable = false;
 
   /** A vector for computing hover placement */
-  hover: XY | null;
+  private hover: XY | null;
 
   /** 
    * Disable 3 of 4 sides of a Actors, to allow walking through walls. The value
    * reflects the side that remains active. 0 is top, 1 is right, 2 is bottom, 3
    * is left
    */
-  isOneSided: number = -1;
+  private isOneSided: number = -1;
 
   /** Actors with a matching nonzero Id don't collide with each other */
-  passThroughId: number = 0;
+  private passThroughId: number = 0;
 
   /** A definition for when we attach a revolute joint to this actor */
   private revJointDef: PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition;
@@ -39,19 +39,19 @@ export abstract class WorldActor extends BaseActor {
   private revJoint: PhysicsType2d.Dynamics.Joints.Joint;
 
   /** Sometimes an actor collides with another actor, and should stick to it. In that case, we create two joints to connect the two actors. This is the Distance joint that connects them */
-  distJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
+  private distJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
 
   /** Sometimes an actor collides with another actor, and should stick to it.  In that case, we create two joints to connect the two actors. This is the Weld joint that connects them */
-  weldJoint: PhysicsType2d.Dynamics.Joints.WeldJoint;
+  private weldJoint: PhysicsType2d.Dynamics.Joints.WeldJoint;
 
   /** When we have actors stuck together, we might want to set a brief delay before they can re-join. This field represents that delay time, in milliseconds. */
-  stickyDelay: number;
+  private stickyDelay: number;
 
   /** Track if Heros stick to this World. The array has 4 positions, corresponding to top, right, bottom, left */
-  isSticky: boolean[] = [false, false, false, false];
+  private isSticky: boolean[] = [false, false, false, false];
 
   /** A multiplier for flicking, to control how fast it goes */
-  flickMultiplier: number = 0;
+  private flickMultiplier: number = 0;
 
   /**
    * Create a new actor that does not yet have physics, but that has a renderable picture
@@ -62,8 +62,45 @@ export abstract class WorldActor extends BaseActor {
    * @param width   The width
    * @param height  The height
    */
-  constructor(protected stage: JetLagStage, imgName: string, width: number, height: number, z:number) {
+  constructor(protected stage: JetLagStage, imgName: string, width: number, height: number, z: number) {
     super(stage.getWorld(), stage.device, imgName, width, height, z);
+  }
+
+  /** Return whether this actor is draggable or not */
+  public getDraggable() { return this.draggable; }
+
+  /** Return the flick multiplier for this actor */
+  public getFlickMultiplier() { return this.flickMultiplier; }
+
+  /** Make the actor stop hovering */
+  public clearHover() { this.hover = null; }
+
+  public getOneSided() { return this.isOneSided; }
+
+  public getDistJoint() { return this.distJoint; }
+
+  /**
+   * Set a delay before the actor will stick to things again
+   *
+   * @param millis The milliseconds before stickiness works again
+   */
+  public setStickyDelay(millis: number) { this.stickyDelay = millis; }
+
+  public getStickyDelay() { return this.stickyDelay; }
+
+  public getStickyState(side: number) { return this.isSticky[side]; }
+
+  public getPassThroughId() { return this.passThroughId; }
+
+  public getCameraOffsetX() { return this.cameraOffset.x; }
+  public getCameraOffsetY() { return this.cameraOffset.y; }
+
+  public setImplicitDistJoint(joint: PhysicsType2d.Dynamics.Joints.DistanceJoint) {
+    this.distJoint = joint;
+  }
+
+  public setImplicitWeldJoint(joint: PhysicsType2d.Dynamics.Joints.WeldJoint) {
+    this.weldJoint = joint;
   }
 
   /**
@@ -405,7 +442,7 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Break any implicit joints connecting this actor
    */
-  breakJoints() {
+  public breakJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint != null) {
       this.stage.getWorld().destroyJoint(this.distJoint);

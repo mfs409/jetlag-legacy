@@ -219,8 +219,8 @@ export class Score {
   onDefeatHero(enemy: Enemy, hero: Hero) {
     // Lose if all enemies defeated, or if this hero had to survive
     this.heroesDefeated++;
-    if (enemy.onDefeatHero) {
-      enemy.onDefeatHero(enemy, hero);
+    if (enemy.getOnDefeatHero()) {
+      enemy.getOnDefeatHero()(enemy, hero);
     }
     if (hero.getMustSurvive()) {
       this.stage.endLevel(false);
