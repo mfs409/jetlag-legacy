@@ -11,7 +11,7 @@ import { JetLagKeys } from "../jetlag/support/Interfaces";
  * way, we can show how to move from one to the next.
  *
  * @param index Which help screen should be displayed
- * @param level The level to configure
+ * @param jl    The JetLag object, for putting stuff into the level
  */
 export function buildHelpScreen(index: number, jl: JetLagApi): void {
     // This line ensures that, no matter what level we draw, the ESCAPE key is

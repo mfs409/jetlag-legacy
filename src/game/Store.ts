@@ -12,6 +12,6 @@ import { JetLagApi as JetLagApi } from "../jetlag/api/JetLag";
  * Note: Our demo doesn't use a store, so this function doesn't do anything.
  *
  * @param index Which store screen should be displayed
- * @param level The level to configure
+ * @param jl    The JetLag object, for putting stuff into the level
  */
 export function buildStoreScreen(index: number, jl: JetLagApi): void { }

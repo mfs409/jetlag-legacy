@@ -452,7 +452,6 @@ export class JetLagStage {
     /** If the level has music attached to it, this stops it */
     public stopMusic() {
         if (this.musicPlaying) {
-            console.log("stopping music");
             this.musicPlaying = false;
             this.music.stop();
         }

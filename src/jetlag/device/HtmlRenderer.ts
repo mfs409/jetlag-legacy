@@ -276,7 +276,6 @@ export class HtmlRenderer implements JetLagRenderer {
      */
     public makeText(txt: string, opts: any) {
         opts.fontSize = Math.floor(opts.fontSize * this.cfg.fontScaling);
-        console.log(opts.fontSize)
         return new HtmlText(new PIXI.Text(txt, opts));
     }
 

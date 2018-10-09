@@ -1,7 +1,7 @@
 import { JetLagConfig } from "../JetLagConfig";
 import { JetLagConsole } from "../support/Interfaces"
 
-/** HtmlConsole is the HTML5 way of outputting debug messages */
+/** HtmlConsole provides debug messages for HTML devices */
 export class HtmlConsole implements JetLagConsole {
     /**
      * Track the level of messages that is allowed
@@ -9,7 +9,7 @@ export class HtmlConsole implements JetLagConsole {
      * - 1: display urgent messages
      * - 2: display urgent and informative messages
      */
-    private level = 2; // TODO: make enum
+    private level = 2;
 
     /**
      * Create an output console based on the game config object
@@ -24,8 +24,9 @@ export class HtmlConsole implements JetLagConsole {
      * @param msg The message to display
      */
     urgent(msg: string) {
-        if (this.level > 0)
+        if (this.level > 0) {
             console.log(msg);
+        }
     }
 
     /**
@@ -34,7 +35,8 @@ export class HtmlConsole implements JetLagConsole {
      * @param msg The message to display
      */
     info(msg: string) {
-        if (this.level == 2)
+        if (this.level == 2) {
             console.log(msg);
+        }
     }
 }

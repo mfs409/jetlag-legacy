@@ -10,11 +10,12 @@ import { Obstacle } from "../jetlag/actor/Obstacle";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game
- * 
- * We currently have 90 levels, each of which is described in part of the following function.
  *
- * @param index The index for the level to make
- * @param jl The reference to JetLag, which allows us to access functions for making things in the world and on the hud
+ * We currently have 90 levels, each of which is described in part of the
+ * following function.
+ *
+ * @param index Which level should be displayed
+ * @param jl    The JetLag object, for putting stuff into the level
  */
 export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
