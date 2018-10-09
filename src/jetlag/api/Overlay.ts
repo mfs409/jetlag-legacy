@@ -8,6 +8,22 @@ import { BaseActor as BaseActor } from "../actor/Base";
 import { JetLagStage } from "../JetLagStage";
 import { XY } from "../support/XY";
 
+export class ControlConfig {
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+    img?= "";
+    z?= 0;
+}
+
+function checkControlConfig(c: ControlConfig) {
+    if (!c.img) c.img = "";
+    if (!c.z) c.z = 0;
+    if (c.z < -2) c.z = -2;
+    if (c.z > 2) c.z = 2;
+}
+
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
  * HUD, the win and lose screens, the pause screen, and the welcome screen.
@@ -45,11 +61,12 @@ export class OverlayApi {
      * @param imgName The name of the image to display. Use "" for an invisible button
      * @param action  The action to run in response to a tap
      */
-    public addTapControl(x: number, y: number, width: number, height: number, imgName: string, action: (hudX: number, hudY: number) => boolean): BaseActor {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+    public addTapControl(cfg: ControlConfig, action: (hudX: number, hudY: number) => boolean): BaseActor {
+        checkControlConfig(cfg);
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, cfg.z);
+        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
         c.setTapHandler(action);
-        this.overlay.addActor(c, 0);
+        this.overlay.addActor(c, cfg.z);
         return c;
     }
 
@@ -174,7 +191,7 @@ export class OverlayApi {
      */
     public createPokeToPlaceZone(x: number, y: number, width: number, height: number, imgName: string) {
         this.stage.setGestureHudFirst(false);
-        this.addTapControl(x, y, width, height, imgName, (hudX: number, hudY: number) => {
+        this.addTapControl({ x: x, y: y, width: width, height: height, img: imgName }, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
@@ -199,7 +216,7 @@ export class OverlayApi {
      */
     public createPokeToMoveZone(x: number, y: number, width: number, height: number, velocity: number, imgName: string, clear: boolean) {
         this.stage.setGestureHudFirst(false);
-        this.addTapControl(x, y, width, height, imgName, (hudX: number, hudY: number) => {
+        this.addTapControl({ x: x, y: y, width: width, height: height, img: imgName }, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
@@ -228,7 +245,7 @@ export class OverlayApi {
      */
     public createPokeToRunZone(x: number, y: number, width: number, height: number, velocity: number, imgName: string, clear: boolean) {
         this.stage.setGestureHudFirst(false);
-        this.addTapControl(x, y, width, height, imgName, (hudX: number, hudY: number) => {
+        this.addTapControl({ x: x, y: y, width: width, height: height, img: imgName }, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
             let pixels = this.overlay.camera.metersToScreen(hudX, hudY);

@@ -305,12 +305,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // an outline of the two rectangles. You could also use images (that you registered,
         // of course), but if you did, you'd either need to make them small (maybe by drawing
         // some pictures in addition to Tap controls), or make them semi-transparent.
-        jl.hud.addTapControl(0, 0, 8, 9, "", () => {
+        jl.hud.addTapControl({x:0, y:0, width:8, height:9, img:""}, () => {
             if (jl.world.getZoom() > 50)
                 jl.world.setZoom(jl.world.getZoom() - 10);
             return true;
         });
-        jl.hud.addTapControl(8, 0, 16, 9, "", () => {
+        jl.hud.addTapControl({x:8, y:0, width:16, height:9, img:""}, () => {
             if (jl.world.getZoom() < 200)
                 jl.world.setZoom(jl.world.getZoom() + 20);
             return true;
@@ -395,7 +395,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
             // We are going to put a big black button over the whole screen.
             // Clicking it will get rid of this overlay
-            overlay.addTapControl(0, 0, 16, 9, "black.png", (hudX: number, hudY: number) => {
+            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudX: number, hudY: number) => {
                 jl.nav.dismissOverlayScene();
                 return true;
             });
@@ -483,7 +483,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Set up a win scene that also plays a sound.  This should look familiar.  And, as you can imagine, we can do lose scenes too.
         jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
                 jl.nav.nextLevel();
                 return true;
             });
@@ -558,9 +558,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // it's possible to draw a pause scene, it will draw it, so this will
         // cause the game to switch to a pause scene until the overlay gets
         // dismissed
-        jl.hud.addTapControl(15, 0, 1, 1, "red.png", (): boolean => {
+        jl.hud.addTapControl({x:15, y:0, width:1, height:1, img:"red.png"}, (): boolean => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -596,14 +596,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addText(.1, 8, "Arial", "#000000", 32, () => jl.score.getStopwatch().toFixed(0), 2);
 
         // Put a button on the HUD to pause the game
-        jl.hud.addTapControl(0.1, 8.5, .4, .4, "pause.png", () => {
+        jl.hud.addTapControl({x:0.1, y:8.5, width:.4, height:.4, img:"pause.png"}, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl(0, 0, 16, 9, "noise.png", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:"noise.png"}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
                 overlay.addTextCentered(8, 4.5, "Arial", "#000000", 32, () => "Game Paused", 0);
-                overlay.addTapControl(0.1, 8.5, .4, .4, "backarrow.png", () => {
+                overlay.addTapControl({x:0.1, y:8.5, width:.4, height:.4, img:"backarrow.png"}, () => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doSplash(1);
                     return true;
@@ -684,7 +684,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         welcomeMessage(jl, "The hero can defeat up to two enemies...");
         winMessage(jl, "Great Job");
         jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
                 jl.nav.repeatLevel();
                 return true;
             });
@@ -1187,7 +1187,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.setCameraChase(h);
         // set up support for jumping, and add a button that covers the whole screen
         h.setJumpImpulses(0, 10);
-        jl.hud.addTapControl(0, 0, 16, 9, "", jl.hud.jumpAction(h, 0));
+        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, jl.hud.jumpAction(h, 0));
         // set up the backgrounds
         jl.world.setBackgroundColor(0x17B4FF);
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
@@ -1226,7 +1226,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Now we'll say that the destination is as high as the screen, so reaching the end
         // means victory
-        jl.hud.addTapControl(0, 0, 16, 9, "", jl.hud.jumpAction(h, 0));
+        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, jl.hud.jumpAction(h, 0));
         jl.world.makeDestination({x:63.5, y:0, width:.5, height:15, img:"mustardball.png"});
         jl.score.setVictoryDestination(1);
 
@@ -1517,7 +1517,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set up our projectiles... note that now projectiles each do 2 units of damage
         jl.projectiles.configureProjectiles(3, .4, .1, "greyball.png", 2, 0, true);
         // this button only throws one projectile per press...
-        jl.hud.addTapControl(0, 0, 16, 9, "", jl.hud.ThrowFixedAction(h, .38, 0, 0, -10));
+        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, jl.hud.ThrowFixedAction(h, .38, 0, 0, -10));
 
         welcomeMessage(jl, "Defeat all enemies to win");
         winMessage(jl, "Great Job");
@@ -1585,7 +1585,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // cover "most" of the screen with a button for throwing projectiles.  This ensures that
         // we can still tap the hero to make it jump
-        jl.hud.addTapControl(1, 0, 15, 9, "", jl.hud.ThrowDirectionalAction(h, .5, 0));
+        jl.hud.addTapControl({x:1, y:0, width:15, height:9, img:""}, jl.hud.ThrowDirectionalAction(h, .5, 0));
         // Set up a projectile pool with 5 projectiles
         jl.projectiles.configureProjectiles(5, .5, .5, "greyball.png", 1, 0, true);
         // Make the projectiles move a little faster
@@ -1886,7 +1886,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // draw a picture when the level is won, and don't print text...
         // this particular picture isn't very useful
         jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl(0, 0, 16, 9, "fade.png", (hudx: number, hudY: number) => {
+            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"fade.png"}, (hudx: number, hudY: number) => {
                 jl.nav.nextLevel();
                 return true;
             });
@@ -1915,7 +1915,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // enable hero jumping and crawling
         h.setJumpImpulses(0, -8);
-        jl.hud.addTapControl(0, 0, 8, 9, "", jl.hud.jumpAction(h, 0));
+        jl.hud.addTapControl({x:0, y:0, width:8, height:9, img:""}, jl.hud.jumpAction(h, 0));
         jl.hud.addToggleButton(8, 0, 8, 9, "", jl.hud.makeCrawlToggle(h, true, Math.PI / 2), jl.hud.makeCrawlToggle(h, false, Math.PI / 2));
 
         // add an enemy we can defeat via crawling, just for fun. It should
@@ -1926,7 +1926,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // include a picture on the "try again" screen
         jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl(0, 0, 16, 9, "fade.png", (hudx: number, hudY: number) => {
+            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"fade.png"}, (hudx: number, hudY: number) => {
                 jl.nav.repeatLevel();
                 return true;
             });
@@ -2080,7 +2080,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.projectiles.setProjectileImageSource("colorstar1.png");
 
         // show how many shots are left
-        jl.hud.addText(.5, 8.5, "Arial", "#FF00FF", 12, () => jl.score.getRemainingProjectiles() + " projectiles left", 2);
+        jl.hud.addText(.5, 8.5, "Arial", "#FF00FF", 12, () => jl.projectiles.getRemainingProjectiles() + " projectiles left", 2);
 
         // draw a bunch of enemies to defeat
         let e = jl.world.makeEnemy({x:4, y:5, width:.5, height:.5, img:"redball.png"});
@@ -2210,7 +2210,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.addTimer(2, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFF00", 12, () => "Ooh... a draggable enemy", 0);
-                overlay.addTapControl(0, 0, 16, 9, "", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2228,7 +2228,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.addTimer(6, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FF00FF", 12, () => "Touch the enemy and it will go away", 0);
-                overlay.addTapControl(0, 0, 16, 9, "", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2245,7 +2245,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             // fixed velocities
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFF00", 12, () => "Now you can see the rest of the level", 0);
-                overlay.addTapControl(0, 0, 16, 9, "", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2340,7 +2340,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                     thisActor.remove(false);
                     // print a message and pause the game, via PauseScene
                     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                        overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+                        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
@@ -2436,7 +2436,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             // always reset the pausescene, in case it has something on it from before...
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#58E2A0", 16, () => "good job, here's a prize", 0);
-                overlay.addTapControl(0, 0, 16, 9, "", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2521,10 +2521,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // Here's a simple pause button and pause scene
 
-        jl.hud.addTapControl(0, 300, 20, 20, "red.png", (hudX: number, hudY: number) => {
+        jl.hud.addTapControl({x:0, y:300, width:20, height:20, img:"red.png"}, (hudX: number, hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFFFF", 32, () => "Game Paused", 0);
-                overlay.addTapControl(0, 0, 16, 9, "", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2953,15 +2953,15 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.hud.addText(.25, .75, "Arial", "#000000", 12, () => "Session: " + jl.score.getSessionFact("session test", "-1"), 2);
         jl.hud.addText(.25, 1, "Arial", "#000000", 12, () => "Game: " + jl.score.getGameFact("game test", "-1"), 2);
 
-        jl.hud.addTapControl(0, .5, .2, .25, "red.png", (x: number, y: number) => {
+        jl.hud.addTapControl({x:0, y:.5, width:.2, height:.25, img:"red.png"}, (x: number, y: number) => {
             jl.score.setLevelFact("level test", "" + (1 + parseInt(jl.score.getLevelFact("level test", "-1"))));
             return true;
         });
-        jl.hud.addTapControl(0, .75, .2, .25, "red.png", (x: number, y: number) => {
+        jl.hud.addTapControl({x:0, y:.75, width:.2, height:.25, img:"red.png"}, (x: number, y: number) => {
             jl.score.setSessionFact("session test", "" + (1 + parseInt(jl.score.getSessionFact("session test", "-1"))));
             return true;
         });
-        jl.hud.addTapControl(0, 1, .2, .25, "red.png", (x: number, y: number) => {
+        jl.hud.addTapControl({x:0, y:1, width:.2, height:.25, img:"red.png"}, (x: number, y: number) => {
             jl.score.setGameFact("game test", "" + (1 + parseInt(jl.score.getGameFact("game test", "-1"))));
             return true;
         });
@@ -3086,12 +3086,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // add a one-time callback control
         let hasPaused = false;
-        let w = jl.hud.addTapControl(.1, .1, .5, .5, "pause.png", (x: number, y: number) => {
+        let w = jl.hud.addTapControl({x:.1, y:.1, width:.5, height:.5, img:"pause.png"}, (x: number, y: number) => {
             if (hasPaused)
                 return false;
             hasPaused = true;
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+                overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -3140,31 +3140,31 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // Create a pause scene that has a back button on it, and a button
         // for pausing the level
-        jl.hud.addTapControl(0, 0, 1, 1, "red.png", (hudX: number, hudY: number) => {
+        jl.hud.addTapControl({x:0, y:0, width:1, height:1, img:"red.png"}, (hudX: number, hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFFFF", 32, () => "Game Paused", 0);
-                overlay.addTapControl(3, 1, 1, 1, "red.png", (eventPositionX: number, eventPositionY: number) => {
+                overlay.addTapControl({x:3, y:1, width:1, height:1, img:"red.png"}, (eventPositionX: number, eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doChooser(1);
                     return true;
                 });
 
-                overlay.addTapControl(1, 1, 1, 1, "red.png", (eventPositionX: number, eventPositionY: number) => {
+                overlay.addTapControl({x:1, y:1, width:1, height:1, img:"red.png"}, (eventPositionX: number, eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.score.winLevel();
                     return true;
                 });
-                overlay.addTapControl(5, 1, 1, 1, "red.png", () => {
+                overlay.addTapControl({x:5, y:1, width:1, height:1, img:"red.png"}, () => {
                     jl.nav.dismissOverlayScene();
                     jl.score.loseLevel();
                     return true;
                 });
 
-                overlay.addTapControl(7, 1, 1, 1, "red.png", () => {
+                overlay.addTapControl({x:7, y:1, width:1, height:1, img:"red.png"}, () => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                         // clear the pausescene, draw another one
-                        overlay.addTapControl(0, 0, 16, 9, "black.png", () => {
+                        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, () => {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
@@ -3229,7 +3229,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.makeDestination({x:7.5, y:.25, width:1, height:1, img:"mustardball.png"});
         jl.score.setVictoryDestination(1);
 
-        jl.hud.addTapControl(0, 0, 16, 9, "", (x: number, y: number) => {
+        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, (x: number, y: number) => {
             for (let h of heroes) {
                 h.setAbsoluteVelocity(5 - jl.world.getRandom(10), -3);
             }
@@ -3355,12 +3355,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // an outline of the two rectangles. You could also use images (that you registered,
         // of course), but if you did, you'd either need to make them small (maybe by drawing
         // some pictures in addition to Tap controls), or make them semi-transparent.
-        jl.hud.addTapControl(0, 0, 8, 9, "", () => {
+        jl.hud.addTapControl({x:0, y:0, width:8, height:9, img:""}, () => {
             if (jl.world.getZoom() > 50)
                 jl.world.setZoom(jl.world.getZoom() - 10);
             return true;
         });
-        jl.hud.addTapControl(8, 0, 16, 9, "", () => {
+        jl.hud.addTapControl({x:8, y:0, width:16, height:9, img:""}, () => {
             if (jl.world.getZoom() < 200)
                 jl.world.setZoom(jl.world.getZoom() + 20);
             return true;
@@ -3424,7 +3424,7 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
     //
     // Note: '\n' means insert a line break into the text.
     jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl(0, 0, 16, 9, "black.png", (hudX: number, hudY: number) => {
+        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudX: number, hudY: number) => {
             jl.nav.dismissOverlayScene();
             return true;
         });
@@ -3438,7 +3438,7 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
  */
 export function winMessage(jl: JetLagApi, message: string, callback: () => void = null) {
     jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
             jl.nav.nextLevel();
             return true;
         });
@@ -3454,7 +3454,7 @@ export function winMessage(jl: JetLagApi, message: string, callback: () => void 
  */
 export function loseMessage(jl: JetLagApi, message: string, callback: () => void = null) {
     jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl(0, 0, 16, 9, "black.png", (hudx: number, hudY: number) => {
+        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
             jl.nav.repeatLevel();
             return true;
         });

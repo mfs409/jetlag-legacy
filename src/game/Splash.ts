@@ -25,25 +25,25 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
 
     // Place an invisible button over the "Play" text on the background image, and set it up
     // so that pressing it switches to the first page of the level chooser.
-    jl.hud.addTapControl(6.75, 5, 2.5, 1.25, "", (x: number, y: number) => {
+    jl.hud.addTapControl({ x: 6.75, y: 5, width: 2.5, height: 1.25, img: "" }, () => {
         jl.nav.doChooser(1);
         return true;
     });
 
     // Do the same, but this button goes to the first help screen
-    jl.hud.addTapControl(2.3, 5.7, 1.8, .9, "", (x: number, y: number) => {
+    jl.hud.addTapControl({ x: 2.3, y: 5.7, width: 1.8, height: .9, img: "" }, () => {
         jl.nav.doHelp(1);
         return true;
     });
 
     // Set up the quit button
-    jl.hud.addTapControl(11.75, 5.75, 2, .9, "", (x: number, y: number) => {
+    jl.hud.addTapControl({ x: 11.75, y: 5.75, width: 2, height: .9, img: "" }, () => {
         jl.nav.doQuit();
         return true;
     });
 
     // Draw an obstacle that we can use as a mute button
-    let o = jl.world.makeObstacle({box:true, x: 15, y: 8, width: .75, height: .75, img: "audio_off.png" });
+    let o = jl.world.makeObstacle({ box: true, x: 15, y: 8, width: .75, height: .75, img: "audio_off.png" });
     // If the game is not muted, switch the obstacle's image
     if (jl.getVolume())
         o.setImage("audio_on.png");

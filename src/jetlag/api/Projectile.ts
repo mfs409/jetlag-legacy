@@ -144,4 +144,9 @@ export class ProjectileApi {
     public setProjectileImageSource(imgName: string) {
         this.stage.getProjectilePool().setProjectileImageSource(imgName);
     }
+
+    /** Return the number of remaining projectiles */
+    public getRemainingProjectiles() {
+        return this.stage.getProjectilePool().getRemaining();
+    }
 }
