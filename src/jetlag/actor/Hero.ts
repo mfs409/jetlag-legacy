@@ -107,9 +107,8 @@ export class Hero extends WorldActor {
     * @param imgName The name of the file that has the default image for this
     *                hero
     */
-    constructor(stage: JetLagStage, width: number,
-        height: number, imgName: string) {
-        super(stage, imgName, width, height);
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z:number) {
+        super(stage, imgName, width, height, z);
     }
 
     /**

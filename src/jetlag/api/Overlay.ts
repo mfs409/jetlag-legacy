@@ -46,7 +46,7 @@ export class OverlayApi {
      * @param action  The action to run in response to a tap
      */
     public addTapControl(x: number, y: number, width: number, height: number, imgName: string, action: (hudX: number, hudY: number) => boolean): BaseActor {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         c.setTapHandler(action);
         this.overlay.addActor(c, 0);
@@ -67,7 +67,7 @@ export class OverlayApi {
      * @param panStop The action to perform when the pan event stops
      */
     public addPanCallbackControl(x: number, y: number, width: number, height: number, imgName: string, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean): BaseActor {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         c.setPanStartHandler(panStart);
         c.setPanMoveHandler(panMove);
@@ -130,7 +130,7 @@ export class OverlayApi {
      * @param imgName The image to display for this zone (typically "")
      */
     public createSwipeZone(x: number, y: number, width: number, height: number, imgName: string) {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.overlay.addActor(c, 0);
         c.setSwipeHandler((hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
@@ -294,7 +294,7 @@ export class OverlayApi {
      * @return The image that was created
      */
     public addImage(x: number, y: number, width: number, height: number, imgName: string): BaseActor {
-        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         this.overlay.addActor(c, 0);
         return c;
@@ -358,7 +358,7 @@ export class OverlayApi {
      * @return The control, so we can do more with it as needed.
      */
     public addToggleButton(x: number, y: number, width: number, height: number, imgName: string, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
-        let c = new BaseActor(this.stage.getHud(), this.stage.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let active = false; // will be captured by lambdas below
         c.setTouchDownHandler((hudX: number, hudY: number) => {
@@ -374,7 +374,7 @@ export class OverlayApi {
             return true;
         });
         // Put the control and events in the appropriate lists
-        this.stage.getHud().addActor(c, 0);
+        this.overlay.addActor(c, 0);
         this.stage.getWorld().repeatEvents.push(() => { if (active) whileDownAction(); });
         return c;
     }
@@ -475,7 +475,7 @@ export class OverlayApi {
      * @return The button that was created
      */
     public addDirectionalThrowButton(x: number, y: number, width: number, height: number, imgName: string, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
-        let c = new BaseActor(this.stage.getHud(), this.stage.device, imgName, width, height);
+        let c = new BaseActor(this.overlay, this.stage.device, imgName, width, height, 0);
         c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
         let v = new XY(0, 0);
         let isHolding = false;
@@ -498,7 +498,7 @@ export class OverlayApi {
             v.y = world.y;
             return isHolding;
         });
-        this.stage.getHud().addActor(c, 0);
+        this.overlay.addActor(c, 0);
 
         let mLastThrow = 0;
         this.stage.getWorld().repeatEvents.push(() => {

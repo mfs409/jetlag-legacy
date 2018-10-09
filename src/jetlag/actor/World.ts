@@ -62,8 +62,8 @@ export abstract class WorldActor extends BaseActor {
    * @param width   The width
    * @param height  The height
    */
-  constructor(protected stage: JetLagStage, imgName: string, width: number, height: number) {
-    super(stage.getWorld(), stage.device, imgName, width, height);
+  constructor(protected stage: JetLagStage, imgName: string, width: number, height: number, z:number) {
+    super(stage.getWorld(), stage.device, imgName, width, height, z);
   }
 
   /**

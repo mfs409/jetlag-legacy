@@ -41,7 +41,7 @@ export class Projectile extends WorldActor {
      * @param isCircle True if it is a circle, false if it is a box
      */
     constructor(stage: JetLagStage, width: number, height: number, imgName: string, x: number, y: number, zIndex: number, isCircle: boolean) {
-        super(stage, imgName, width, height);
+        super(stage, imgName, width, height, zIndex);
         if (isCircle) {
             let radius = Math.max(width, height);
             this.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);

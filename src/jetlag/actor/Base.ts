@@ -150,14 +150,14 @@ export class BaseActor implements Renderable {
      * @param width   The width of the actor's image and body, in meters
      * @param height  The height of the actor's image and body, in meters
      */
-    constructor(private scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number) {
+    constructor(private scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number, z: number) {
         this.animator = new AnimationDriver(device.getRenderer(), imgName);
         this.debug = device.getRenderer().makeDebugContext();
         this.disappearAnimateSize = new XY(0, 0);
         this.disappearAnimateOffset = new XY(0, 0);
         this.scene = scene;
         this.size = { w: width, h: height };
-        this.zIndex = 0;
+        this.zIndex = z;
     }
 
     /**
@@ -430,7 +430,7 @@ export class BaseActor implements Renderable {
         if (this.disapperAnimation != null) {
             let x = this.getXPosition() + this.disappearAnimateOffset.x;
             let y = this.getYPosition() + this.disappearAnimateOffset.y;
-            let o = new BaseActor(this.scene, this.device, "", this.disappearAnimateSize.x, this.disappearAnimateSize.y);
+            let o = new BaseActor(this.scene, this.device, "", this.disappearAnimateSize.x, this.disappearAnimateSize.y, this.zIndex);
             o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
             this.scene.addActor(o, 0);
             o.setCollisionsEnabled(false);

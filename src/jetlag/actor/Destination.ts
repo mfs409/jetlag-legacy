@@ -32,8 +32,8 @@ export class Destination extends WorldActor {
      * @param height The height, in meters, of the Destination
      * @param imgName The image to display for this destination
      */
-    constructor(stage: JetLagStage, width: number, height: number, imgName: string) {
-        super(stage, imgName, width, height);
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
+        super(stage, imgName, width, height, z);
         this.capacity = 1;
         this.holding = 0;
     }

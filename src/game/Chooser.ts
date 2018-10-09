@@ -27,7 +27,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     if (index == 1) {
         // set up background and music
         jl.world.setMusic("tune.ogg");
-        jl.world.drawPicture(0, 0, 16, 9, "chooser.png", 0);
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
 
         // We'll have margins of 1.25 on the left and right, a margin of 1 on
         // the bottom, and three rows of eight buttons each, with each button
@@ -71,7 +71,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     else if (index == 2) {
         // set up background and music
         jl.world.setMusic("tune.ogg");
-        jl.world.drawPicture(0, 0, 16, 9, "chooser.png", 0);
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
 
         let x = 1.25; // this is the starting X position
         let l = 25;   // this is the starting level
@@ -108,7 +108,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     else if (index == 3) {
         // set up background and music
         jl.world.setMusic("tune.ogg");
-        jl.world.drawPicture(0, 0, 16, 9, "chooser.png", 0);
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
 
         let y = 3.25;       // this is the starting Y position
         let l = 49;         // this is the starting level
@@ -135,7 +135,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     else if (index == 4) {
         // set up background and music
         jl.world.setMusic("tune.ogg");
-        jl.world.drawPicture(0, 0, 16, 9, "chooser.png", 0);
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
         for (let row = 0, y = 3.25, l = 73; row < 3; ++row, y += 1.75) {
             let x = 1.25;
             for (let i = 0; i < 8; ++i, ++l, x += 1.75) {
@@ -164,11 +164,11 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
  */
 function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, height: number, whichLevel: number): void {
     // for each button, start by drawing an obstacle
-    let tile = jl.world.makeObstacleAsBox(x, y, width, height, "leveltile.png");
+    let tile = jl.world.makeObstacle({box:true, x:x, y:y, width:width, height:height, img:"leveltile.png"});
 
     // attach a callback and print the level number with a touchCallback, and then put text on top of it
     tile.setTapCallback(() => { jl.nav.doLevel(whichLevel); return true; });
-    jl.world.addTextCentered(x + width / 2, y + width / 2, "Arial", "#FFFFFF", 56, () => { return whichLevel + "" }, 0);
+    jl.world.addText({center: true, x:x + width / 2, y:y + width / 2, face:"Arial", color:"#FFFFFF", size:56, producer:() => { return whichLevel + "" }, z:0});
 }
 
 /**
@@ -181,7 +181,7 @@ function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, hei
  * @param chooserLevel The chooser screen to create
  */
 function drawPrevButton(jl: JetLagApi, x: number, y: number, width: number, height: number, chooserLevel: number) {
-    let btn = jl.world.makeObstacleAsBox(x, y, width, height, "leftarrow.png");
+    let btn = jl.world.makeObstacle({box:true, x:x, y:y, width:width, height:height, img:"leftarrow.png"});
     btn.setTapCallback(() => { jl.nav.doChooser(chooserLevel); return true; });
 }
 
@@ -195,7 +195,7 @@ function drawPrevButton(jl: JetLagApi, x: number, y: number, width: number, heig
  * @param chooserLevel The chooser screen to create
  */
 function drawNextButton(jl: JetLagApi, x: number, y: number, width: number, height: number, chooserLevel: number) {
-    let btn = jl.world.makeObstacleAsBox(x, y, width, height, "rightarrow.png");
+    let btn = jl.world.makeObstacle({box:true, x:x, y:y, width:width, height:height, img:"rightarrow.png"});
     btn.setTapCallback(() => { jl.nav.doChooser(chooserLevel); return true; });
 }
 
@@ -208,6 +208,6 @@ function drawNextButton(jl: JetLagApi, x: number, y: number, width: number, heig
  * @param height height of the button
  */
 function drawSplashButton(jl: JetLagApi, x: number, y: number, width: number, height: number) {
-    let btn = jl.world.makeObstacleAsBox(x, y, width, height, "backarrow.png");
+    let btn = jl.world.makeObstacle({box:true, x:x, y:y, width:width, height:height, img:"backarrow.png"});
     btn.setTapCallback(() => { jl.nav.doSplash(1); return true; });
 }

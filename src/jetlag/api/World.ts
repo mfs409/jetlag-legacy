@@ -1,4 +1,3 @@
-import { Picture } from "../support/Picture"
 import { Renderable, JetLagKeys } from "../support/Interfaces";
 import { Obstacle } from "../actor/Obstacle"
 import { Hero } from "../actor/Hero"
@@ -7,11 +6,77 @@ import { Enemy } from "../actor/Enemy"
 import { Destination } from "../actor/Destination"
 import { WorldActor as WorldActor } from "../actor/World";
 import { TimedEvent } from "../support/TimedEvent";
-import { ProjectilePool } from "../support/ProjectilePool";
 import { ParallaxLayer } from "../support/ParallaxLayer";
 import { Animation } from "../support/Animation";
 import { Svg } from "../support/Svg";
 import { JetLagStage } from "../JetLagStage";
+
+/**
+ * Draw a hero with an underlying polygon shape
+ *
+ * @param x       X coordinate of the top left corner
+ * @param y       Y coordinate of the top left corner
+ * @param width   Width of the obstacle
+ * @param height  Height of the obstacle
+ * @param imgName Name of image file to use
+ * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
+ *                x0,y0,x1,y1,x2,y2,...
+ * @return The hero, so that it can be further modified
+ */
+
+
+export class ActorConfig {
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+    img?= "";
+    box?= false;
+    verts?: number[] = null;
+    z?= 0;
+}
+
+export class ImageConfig {
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+    img = "";
+    z?= 0;
+}
+
+export class TextConfig {
+    x = 0;
+    y = 0;
+    center?= false;
+    face = "Arial";
+    color = "#FFFFFF";
+    size = 22;
+    producer: () => string = () => { return "" };
+    z?= 0;
+}
+
+function checkActorConfig(c: ActorConfig) {
+    if (!c.img) c.img = "";
+    if (!c.box) c.box = false;
+    if (!c.verts) c.verts = null;
+    if (!c.z) c.z = 0;
+    if (c.z < -2) c.z = -2;
+    if (c.z > 2) c.z = 2;
+}
+
+function checkImageConfig(c: ImageConfig) {
+    if (!c.z) c.z = 0;
+    if (c.z < -2) c.z = -2;
+    if (c.z > 2) c.z = 2;
+}
+
+function checkTextConfig(c: TextConfig) {
+    if (!c.center) c.center = false;
+    if (!c.z) c.z = 0;
+    if (c.z < -2) c.z = -2;
+    if (c.z > 2) c.z = 2;
+}
 
 /**
  * WorldApi provides the functionality needed for putting things into the world
@@ -51,8 +116,9 @@ export class WorldApi {
      *                everything goes to plane 0
      * @returns The picture, so that it can be shown and hidden in the future.
      */
-    public drawPicture(x: number, y: number, width: number, height: number, imgName: string, zIndex: number): Picture {
-        return this.stage.getWorld().makePicture(x, y, width, height, imgName, zIndex);
+    public drawPicture(cfg: ImageConfig) {
+        checkImageConfig(cfg);
+        return this.stage.getWorld().makePicture(cfg.x, cfg.y, cfg.width, cfg.height, cfg.img, cfg.z);
     }
 
     /**
@@ -78,24 +144,14 @@ export class WorldApi {
      * @param zIndex    The z index of the text
      * @return A Renderable of the text, so it can be enabled/disabled by program code
      */
-    public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, tp: () => string, zIndex: number): Renderable {
-        return this.stage.getWorld().addTextCentered(centerX, centerY, fontName, fontColor, fontSize, tp, zIndex);
-    }
-
-    /**
-     * Draw some text in the scene, using a top-left coordinate
-     *
-     * @param x         The x coordinate of the top left corner
-     * @param y         The y coordinate of the top left corner
-     * @param fontName  The name of the font to use
-     * @param fontColor The color of the font
-     * @param fontSize  The size of the font
-     * @param producer        A TextProducer that will generate the text to display
-     * @param zIndex    The z index of the text
-     * @return A Renderable of the text, so it can be enabled/disabled by program code
-     */
-    public addText(x: number, y: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number): Renderable {
-        return this.stage.getWorld().addText(x, y, fontName, fontColor, fontSize, producer, zIndex);
+    public addText(cfg: TextConfig): Renderable {
+        checkTextConfig(cfg);
+        if (cfg.center) {
+            return this.stage.getWorld().addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+        }
+        else {
+            return this.stage.getWorld().addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+        }
     }
 
     /**
@@ -108,47 +164,23 @@ export class WorldApi {
      * @param imgName Name of image file to use
      * @return The obstacle, so that it can be further modified
      */
-    public makeObstacleAsCircle(x: number, y: number, width: number, height: number, imgName: string): Obstacle {
-        let radius: number = Math.max(width, height);
-        let o: Obstacle = new Obstacle(this.stage, radius, radius, imgName);
-        o.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
-        this.stage.getWorld().addActor(o, 0);
-        return o;
-    }
-
-    /**
-     * Draw an obstacle with an underlying box shape
-     *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
-     * @return The obstacle, so that it can be further modified
-     */
-    public makeObstacleAsBox(x: number, y: number, width: number, height: number, imgName: string): Obstacle {
-        let o: Obstacle = new Obstacle(this.stage, width, height, imgName);
-        o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        this.stage.getWorld().addActor(o, 0);
-        return o;
-    }
-
-    /**
-     * Draw an obstacle with an underlying polygon shape
-     *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
-     * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
-     *                x0,y0,x1,y1,x2,y2,...
-     * @return The obstacle, so that it can be further modified
-     */
-    public makeObstacleAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Obstacle {
-        let o: Obstacle = new Obstacle(this.stage, width, height, imgName);
-        o.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
-        this.stage.getWorld().addActor(o, 0);
+    public makeObstacle(cfg: ActorConfig) {
+        checkActorConfig(cfg);
+        let o: Obstacle;
+        if (cfg.verts != null) {
+            o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            o.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+        }
+        else if (cfg.box) {
+            o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        }
+        else {
+            let radius: number = Math.max(cfg.width, cfg.height);
+            o = new Obstacle(this.stage, radius, radius, cfg.img, cfg.z);
+            o.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+        }
+        this.stage.getWorld().addActor(o, cfg.z);
         return o;
     }
 
@@ -162,50 +194,23 @@ export class WorldApi {
      * @param imgName File name of the default image to display
      * @return The hero that was created
      */
-    public makeHeroAsCircle(x: number, y: number, width: number, height: number, imgName: string): Hero {
-        let radius: number = Math.max(width, height);
-        let h: Hero = new Hero(this.stage, radius, radius, imgName);
+    public makeHero(cfg: ActorConfig) {
+        checkActorConfig(cfg);
+        let h: Hero;
+        if (cfg.verts != null) {
+            h = new Hero(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            h.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, cfg.x, cfg.y, cfg.verts);
+        }
+        else if (cfg.box) {
+            h = new Hero(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            h.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, cfg.x, cfg.y);
+        }
+        else {
+            let radius: number = Math.max(cfg.width, cfg.height);
+            h = new Hero(this.stage, radius, radius, cfg.img, cfg.z);
+            h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, cfg.x, cfg.y, radius / 2);
+        }
         this.stage.score.onHeroCreated();
-        h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);
-        this.stage.getWorld().addActor(h, 0);
-        return h;
-    }
-
-    /**
-     * Make a Hero with an underlying rectangular shape
-     *
-     * @param x       X coordinate of the hero
-     * @param y       Y coordinate of the hero
-     * @param width   width of the hero
-     * @param height  height of the hero
-     * @param imgName File name of the default image to display
-     * @return The hero that was created
-     */
-    public makeHeroAsBox(x: number, y: number, width: number, height: number, imgName: string): Hero {
-        let h: Hero = new Hero(this.stage, width, height, imgName);
-        this.stage.score.onHeroCreated();
-        h.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y);
-        this.stage.getWorld().addActor(h, 0);
-        return h;
-    }
-
-
-    /**
-     * Draw a hero with an underlying polygon shape
-     *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
-     * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
-     *                x0,y0,x1,y1,x2,y2,...
-     * @return The hero, so that it can be further modified
-     */
-    public makeHeroAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Hero {
-        let h: Hero = new Hero(this.stage, width, height, imgName);
-        this.stage.score.onHeroCreated();
-        h.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         this.stage.getWorld().addActor(h, 0);
         return h;
     }
@@ -220,49 +225,23 @@ export class WorldApi {
      * @param imgName The name of the image to display
      * @return The enemy, so that it can be modified further
      */
-    public makeEnemyAsCircle(x: number, y: number, width: number, height: number, imgName: string): Enemy {
-        let radius = Math.max(width, height);
-        let e = new Enemy(this.stage, radius, radius, imgName);
+    public makeEnemy(cfg: ActorConfig) {
+        checkActorConfig(cfg);
+        let e: Enemy;
+        if (cfg.verts != null) {
+            e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            e.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+        }
+        else if (cfg.box) {
+            e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            e.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        }
+        else {
+            let radius = Math.max(cfg.width, cfg.height);
+            e = new Enemy(this.stage, radius, radius, cfg.img, cfg.z);
+            e.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+        }
         this.stage.score.onEnemyCreated();
-        e.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
-        this.stage.getWorld().addActor(e, 0);
-        return e;
-    }
-
-    /**
-     * Make an enemy that has an underlying rectangular shape.
-     *
-     * @param x       The X coordinate of the top left corner
-     * @param y       The Y coordinate of the top right corner
-     * @param width   The width of the enemy
-     * @param height  The height of the enemy
-     * @param imgName The name of the image to display
-     * @return The enemy, so that it can be modified further
-     */
-    public makeEnemyAsBox(x: number, y: number, width: number, height: number, imgName: string): Enemy {
-        let e: Enemy = new Enemy(this.stage, width, height, imgName);
-        this.stage.score.onEnemyCreated();
-        e.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        this.stage.getWorld().addActor(e, 0);
-        return e;
-    }
-
-    /**
-     * Draw an enemy with an underlying polygon shape
-     *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
-     * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
-     *                x0,y0,x1,y1,x2,y2,...
-     * @return The enemy, so that it can be further modified
-     */
-    public makeEnemyAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Enemy {
-        let e: Enemy = new Enemy(this.stage, width, height, imgName);
-        this.stage.score.onEnemyCreated();
-        e.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
         this.stage.getWorld().addActor(e, 0);
         return e;
     }
@@ -277,48 +256,22 @@ export class WorldApi {
      * @param imgName The name of the image to display
      * @return The destination, so that it can be modified further
      */
-    public makeDestinationAsCircle(x: number, y: number, width: number, height: number, imgName: string): Destination {
-        let radius = Math.max(width, height);
-        let d: Destination = new Destination(this.stage, radius, radius, imgName);
-        d.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
-        d.setCollisionsEnabled(false);
-        this.stage.getWorld().addActor(d, 0);
-        return d;
-    }
-
-    /**
-     * Make a destination that has an underlying rectangular shape.
-     *
-     * @param x       The X coordinate of the top left corner
-     * @param y       The Y coordinate of the top right corner
-     * @param width   The width of the destination
-     * @param height  The height of the destination
-     * @param imgName The name of the image to display
-     * @return The destination, so that it can be modified further
-     */
-    public makeDestinationAsBox(x: number, y: number, width: number, height: number, imgName: string): Destination {
-        let d: Destination = new Destination(this.stage, width, height, imgName);
-        d.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        d.setCollisionsEnabled(false);
-        this.stage.getWorld().addActor(d, 0);
-        return d;
-    }
-
-    /**
-     * Draw a destination with an underlying polygon shape
-     *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
-     * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
-     *                x0,y0,x1,y1,x2,y2,...
-     * @return The destination, so that it can be further modified
-     */
-    public makeDestinationAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Destination {
-        let d: Destination = new Destination(this.stage, width, height, imgName);
-        d.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
+    public makeDestination(cfg: ActorConfig) {
+        checkActorConfig(cfg);
+        let d: Destination;
+        if (cfg.verts != null) {
+            d = new Destination(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            d.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+        }
+        else if (cfg.box) {
+            d = new Destination(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            d.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        }
+        else {
+            let radius = Math.max(cfg.width, cfg.height);
+            d = new Destination(this.stage, radius, radius, cfg.img, cfg.z);
+            d.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+        }
         d.setCollisionsEnabled(false);
         this.stage.getWorld().addActor(d, 0);
         return d;
@@ -334,48 +287,22 @@ export class WorldApi {
      * @param imgName Name of image file to use
      * @return The goodie, so that it can be further modified
      */
-    public makeGoodieAsCircle(x: number, y: number, width: number, height: number, imgName: string): Goodie {
-        let radius: number = Math.max(width, height);
-        let g: Goodie = new Goodie(this.stage, radius, radius, imgName);
-        g.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, radius / 2);
-        g.setCollisionsEnabled(false);
-        this.stage.getWorld().addActor(g, 0);
-        return g;
-    }
-
-    /**
-     * Draw a goodie with an underlying box shape, and a default score of [1,0,0,0]
-     *
-     * @param x       X coordinate of top left corner
-     * @param y       Y coordinate of top left corner
-     * @param width   Width of the image
-     * @param height  Height of the image
-     * @param imgName Name of image file to use
-     * @return The goodie, so that it can be further modified
-     */
-    public makeGoodieAsBox(x: number, y: number, width: number, height: number, imgName: string): Goodie {
-        let g: Goodie = new Goodie(this.stage, width, height, imgName);
-        g.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
-        g.setCollisionsEnabled(false);
-        this.stage.getWorld().addActor(g, 0);
-        return g;
-    }
-
-    /**
-     * Draw a goodie with an underlying polygon shape
-     *
-     * @param x       X coordinate of the top left corner
-     * @param y       Y coordinate of the top left corner
-     * @param width   Width of the obstacle
-     * @param height  Height of the obstacle
-     * @param imgName Name of image file to use
-     * @param verts   Up to 16 coordinates representing the vertexes of this polygon, listed as
-     *                x0,y0,x1,y1,x2,y2,...
-     * @return The goodie, so that it can be further modified
-     */
-    public makeGoodieAsPolygon(x: number, y: number, width: number, height: number, imgName: string, verts: number[]): Goodie {
-        let g: Goodie = new Goodie(this.stage, width, height, imgName);
-        g.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y, verts);
+    public makeGoodie(cfg: ActorConfig) {
+        checkActorConfig(cfg);
+        let g: Goodie;
+        if (cfg.verts != null) {
+            g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            g.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+        }
+        else if (cfg.box) {
+            g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            g.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        }
+        else {
+            let radius: number = Math.max(cfg.width, cfg.height);
+            g = new Goodie(this.stage, radius, radius, cfg.img, cfg.z);
+            g.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+        }
         g.setCollisionsEnabled(false);
         this.stage.getWorld().addActor(g, 0);
         return g;
@@ -418,16 +345,16 @@ export class WorldApi {
      * @param friction   Friction of the rectangle. When in doubt, use 1
      */
     public drawBoundingBox(x0: number, y0: number, x1: number, y1: number, imgName: string, density: number, elasticity: number, friction: number): void {
-        let bottom: Obstacle = this.makeObstacleAsBox(x0 - 1, y1, Math.abs(x0 - x1) + 2, 1, imgName);
+        let bottom = this.makeObstacle({ box: true, x: x0 - 1, y: y1, width: Math.abs(x0 - x1) + 2, height: 1, img: imgName });
         bottom.setPhysics(density, elasticity, friction);
 
-        let top: Obstacle = this.makeObstacleAsBox(x0 - 1, y0 - 1, Math.abs(x0 - x1) + 2, 1, imgName);
+        let top = this.makeObstacle({ box: true, x: x0 - 1, y: y0 - 1, width: Math.abs(x0 - x1) + 2, height: 1, img: imgName });
         top.setPhysics(density, elasticity, friction);
 
-        let left: Obstacle = this.makeObstacleAsBox(x0 - 1, y0 - 1, 1, Math.abs(y0 - y1) + 2, imgName);
+        let left = this.makeObstacle({ box: true, x: x0 - 1, y: y0 - 1, width: 1, height: Math.abs(y0 - y1) + 2, img: imgName });
         left.setPhysics(density, elasticity, friction);
 
-        let right: Obstacle = this.makeObstacleAsBox(x1, y0 - 1, 1, Math.abs(y0 - y1) + 2, imgName);
+        let right = this.makeObstacle({ box: true, x: x1, y: y0 - 1, width: 1, height: Math.abs(y0 - y1) + 2, img: imgName });
         right.setPhysics(density, elasticity, friction);
     }
 
@@ -491,24 +418,6 @@ export class WorldApi {
      */
     public resetGravity(newXGravity: number, newYGravity: number): void {
         this.stage.getWorld().setGravity(newXGravity, newYGravity);
-    }
-
-    /**
-    * Describe the behavior of projectiles in a scene. You must call this if you intend to use
-    * projectiles in your scene.
-    *
-    * @param size     number of projectiles that can be thrown at once
-    * @param width    width of a projectile
-    * @param height   height of a projectile
-    * @param imgName  image to use for projectiles
-    * @param strength specifies the amount of damage that a projectile does to an enemy
-    * @param zIndex   The z plane on which the projectiles should be drawn
-    * @param isCircle Should projectiles have an underlying circle or box shape?
-    */
-    public configureProjectiles(size: number, width: number, height: number, imgName: string,
-        strength: number, zIndex: number, isCircle: boolean): void {
-        this.stage.setProjectilePool(new ProjectilePool(this.stage,
-            size, width, height, imgName, strength, zIndex, isCircle));
     }
 
     /**
@@ -607,109 +516,11 @@ export class WorldApi {
     }
 
     /**
-     * Specify a limit on how far away from the Hero a projectile can go.  Without this, projectiles
-     * could keep on traveling forever.
+     * Generate a random number x in the range [0,max)
      *
-     * @param distance Maximum distance from the hero that a projectile can travel
+     * @param max The largest number returned will be one less than max
+     * @return a random integer
      */
-    public setProjectileRange(distance: number): void {
-        this.stage.getProjectilePool().setProjectileRange(distance);
-    }
-
-    /**
-     * Indicate that projectiles should feel the effects of gravity. Otherwise, they will be (more
-     * or less) immune to gravitational forces.
-     */
-    public setProjectileGravityOn(): void {
-        this.stage.getProjectilePool().setProjectileGravityOn();
-    }
-
-    /**
-    * The "directional projectile" mechanism might lead to the projectiles moving too fast. This
-    * will cause the speed to be multiplied by a factor
-    *
-    * @param factor The value to multiply against the projectile speed.
-    */
-    public setProjectileVectorDampeningFactor(factor: number): void {
-        this.stage.getProjectilePool().setProjectileVectorDampeningFactor(factor);
-    }
-
-    /**
-     * Indicate that all projectiles should participate in collisions, rather than disappearing when
-     * they collide with other actors
-     */
-    public enableCollisionsForProjectiles(): void {
-        this.stage.getProjectilePool().enableCollisionsForProjectiles();
-    }
-
-    /**
-     * Indicate that projectiles thrown with the "directional" mechanism should have a fixed
-     * velocity
-     *
-     * @param velocity The magnitude of the velocity for projectiles
-     */
-    public setFixedVectorThrowVelocityForProjectiles(velocity: number): void {
-        this.stage.getProjectilePool().setFixedVectorThrowVelocityForProjectiles(velocity);
-    }
-
-    /**
-     * Indicate that projectiles thrown via the "directional" mechanism should be rotated to face in
-     * their direction or movement
-     */
-    public setRotateVectorThrowForProjectiles(): void {
-        this.stage.getProjectilePool().setRotateVectorThrowForProjectiles();
-    }
-
-    /**
-     * Indicate that when two projectiles collide, they should both remain on screen
-     */
-    public setCollisionOkForProjectiles(): void {
-        this.stage.getProjectilePool().setCollisionOkForProjectiles();
-    }
-
-    /**
-     * The "directional projectile" mechanism might lead to the projectiles moving too fast or too
-     * slow. This will cause the speed to be multiplied by a factor
-     *
-     * @param factor The value to multiply against the projectile speed.
-     */
-    public setProjectileMultiplier(factor: number) {
-        this.stage.getProjectilePool().setProjectileMultiplier(factor);
-    }
-
-    /**
-     * Set a limit on the total number of projectiles that can be thrown
-     *
-     * @param number How many projectiles are available
-     */
-    public setNumberOfProjectiles(num: number): void {
-        this.stage.getProjectilePool().setNumberOfProjectiles(num);
-    }
-
-    /**
-     * Specify a sound to play when the projectile is thrown
-     *
-     * @param soundName Name of the sound file to play
-     */
-    public setThrowSound(soundName: string): void {
-        this.stage.getProjectilePool().setThrowSound(soundName);
-    }
-
-    /**
-     * Specify the sound to play when a projectile disappears
-     *
-     * @param soundName the name of the sound file to play
-     */
-    public setProjectileDisappearSound(soundName: string): void {
-        this.stage.getProjectilePool().setProjectileDisappearSound(soundName);
-    }
-
-    /**
-    * Generate a random number x in the range [0,max)
-    *
-    * @param max The largest number returned will be one less than max
-    * @return a random integer
-    */
     public getRandom(max: number) {
         return Math.floor(Math.random() * max);
     }
@@ -738,24 +549,6 @@ export class WorldApi {
         for (let i of imgNames)
             a.to(i, timePerFrame);
         return a;
-    }
-
-    /**
-     * Specify how projectiles should be animated
-     *
-     * @param animation The animation object to use for each projectile that is thrown
-     */
-    public setProjectileAnimation(animation: Animation) {
-        this.stage.getProjectilePool().setProjectileAnimation(animation);
-    }
-
-    /**
-     * Specify the image file from which to randomly choose projectile images
-     *
-     * @param imgName The file to use when picking images
-     */
-    public setProjectileImageSource(imgName: string) {
-        this.stage.getProjectilePool().setProjectileImageSource(imgName);
     }
 
     /**

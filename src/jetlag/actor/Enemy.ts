@@ -42,8 +42,8 @@ export class Enemy extends WorldActor {
      * @param height  Height of this enemy
      * @param imgName Image to display
      */
-    constructor(stage: JetLagStage, width: number, height: number, imgName: string) {
-        super(stage, imgName, width, height);
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z:number) {
+        super(stage, imgName, width, height, z);
         this.damage = 2;
     }
 

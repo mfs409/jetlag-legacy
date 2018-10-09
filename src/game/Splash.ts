@@ -20,7 +20,8 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     // start the music
     jl.world.setMusic("tune.ogg");
     // draw the background. Note that "Play", "Help", and "Quit" are part of the image.
-    jl.world.drawPicture(0, 0, 16, 9, "splash.png", -2); // NB: 16:9
+    jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "splash.png", z: -2 }); // NB: 16:9
+
 
     // Place an invisible button over the "Play" text on the background image, and set it up
     // so that pressing it switches to the first page of the level chooser.
@@ -42,7 +43,7 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     });
 
     // Draw an obstacle that we can use as a mute button
-    let o = jl.world.makeObstacleAsBox(15, 8, .75, .75, "audio_off.png");
+    let o = jl.world.makeObstacle({box:true, x: 15, y: 8, width: .75, height: .75, img: "audio_off.png" });
     // If the game is not muted, switch the obstacle's image
     if (jl.getVolume())
         o.setImage("audio_on.png");

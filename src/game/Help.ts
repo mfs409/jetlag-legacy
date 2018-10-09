@@ -25,27 +25,27 @@ export function buildHelpScreen(index: number, jl: JetLagApi): void {
         jl.world.setBackgroundColor(0x19698E);
 
         // put some information on the screen
-        jl.world.addTextCentered(8, 1, "Arial", "#FFFFFF", 56, () => "The levels of this game demonstrate JetLag features", 0);
+        jl.world.addText({center: true, x:8, y:1, face:"Arial", color:"#FFFFFF", size:56, producer:() => "The levels of this game demonstrate JetLag features", z:0});
 
-        jl.world.makeObstacleAsBox(.5, 2, .75, .75, "greenball.png");
-        jl.world.addText(1.5, 2.25, "Arial", "#000000", 24, () => "You control the hero", 0);
+        jl.world.makeObstacle({box:true, x:.5, y:2, width:.75, height:.75, img:"greenball.png"});
+        jl.world.addText({x:1.5, y:2.25, face:"Arial", color:"#000000", size:24, producer:() => "You control the hero", z:0});
 
-        jl.world.makeObstacleAsBox(.5, 3, .75, .75, "blueball.png");
-        jl.world.addText(1.5, 3.25, "Arial", "#000000", 24, () => "Collect these goodies", 0);
+        jl.world.makeObstacle({box:true, x:.5, y:3, width:.75, height:.75, img:"blueball.png"});
+        jl.world.addText({x:1.5, y:3.25, face:"Arial", color:"#000000", size:24, producer:() => "Collect these goodies", z:0});
 
-        jl.world.makeObstacleAsBox(.5, 4, .75, .75, "redball.png");
-        jl.world.addText(1.5, 4.25, "Arial", "#000000", 24, () => "Avoid or defeat enemies", 0);
+        jl.world.makeObstacle({box:true, x:.5, y:4, width:.75, height:.75, img:"redball.png"});
+        jl.world.addText({x:1.5, y:4.25, face:"Arial", color:"#000000", size:24, producer:() => "Avoid or defeat enemies", z:0});
 
-        jl.world.makeObstacleAsBox(.5, 5, .75, .75, "mustardball.png");
-        jl.world.addText(1.5, 5.25, "Arial", "#000000", 24, () => "Reach the destination", 0);
+        jl.world.makeObstacle({box:true, x:.5, y:5, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.addText({x:1.5, y:5.25, face:"Arial",color: "#000000", size:24, producer:() => "Reach the destination", z:0});
 
-        jl.world.makeObstacleAsBox(.5, 6, .75, .75, "purpleball.png");
-        jl.world.addText(1.5, 6.25, "Arial", "#000000", 24, () => "These are walls", 0);
+        jl.world.makeObstacle({box:true, x:.5, y:6, width:.75, height:.75, img:"purpleball.png"});
+        jl.world.addText({x:1.5, y:6.25, face:"Arial", color:"#000000", size:24, producer:() => "These are walls", z:0});
 
-        jl.world.makeObstacleAsBox(.5, 7, .75, .75, "greyball.png");
-        jl.world.addText(1.5, 7.25, "Arial", "#000000", 24, () => "Throw projectiles", 0);
+        jl.world.makeObstacle({box:true, x:.5, y:7, width:.75, height:.75, img:"greyball.png"});
+        jl.world.addText({x:1.5, y:7.25, face:"Arial", color:"#000000", size:24, producer:() => "Throw projectiles", z:0});
 
-        jl.world.addText(11, 8.5, "Arial", "#FFFFFF", 24, () => "(All image files are stored in the assets folder)", 0);
+        jl.world.addText({x:11, y:8.5, face:"Arial",color: "#FFFFFF", size:24, producer:() => "(All image files are stored in the assets folder)", z:0});
 
         // set up a control to go to the next help level on screen tap
         jl.hud.addTapControl(0, 0, 16, 9, "", () => {
@@ -58,9 +58,9 @@ export function buildHelpScreen(index: number, jl: JetLagApi): void {
     else if (index == 2) {
         // This is just like the previous screen, but with different text
         jl.world.setBackgroundColor(0x19698E);
-        jl.world.addTextCentered(8, 1, "Arial", "#FFFFFF", 56, () => "Read, Write, Play", 0);
-        jl.world.addTextCentered(8, 5, "Arial", "#FFFFFF", 32,
-            () => "As you play through the levels of the sample game, be sure to read the code that accompanies\n" +
+        jl.world.addText({center: true, x:8, y:1, face:"Arial", color:"#FFFFFF", size:56, producer:() => "Read, Write, Play", z:0});
+        jl.world.addText({center: true, x:8, y:5, face:"Arial", color:"#FFFFFF", size:32,
+            producer:() => "As you play through the levels of the sample game, be sure to read the code that accompanies\n" +
                 "each world.  The levels aren't meant to be \"hard\", or even really \"fun\".  They are meant to show\n" +
                 "you how to use the different features of JetLag, and to show you how the same features can\n" +
                 "be used in many different ways, to achieve very different styles of game play.  JetLag has been\n" +
@@ -70,7 +70,7 @@ export function buildHelpScreen(index: number, jl: JetLagApi): void {
                 "the numbers that are passed to different functions.\n\n" +
                 "Start with the \"Levels.ts\" file in the \"src/game\" folder, then move on to other files in that folder,\n" +
                 "until you have a plan for how to build your next game."
-            , 0);
+            , z:0});
 
         // set up a control to go to the splash screen on screen tap
         jl.hud.addTapControl(0, 0, 16, 9, "", () => {

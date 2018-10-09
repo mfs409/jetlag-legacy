@@ -5,6 +5,7 @@ import { JetLagManager } from "../JetLagManager"
 import { NavigationApi as NavigationApi } from "./Navigation"
 import { JetLagKeys } from "../support/Interfaces";
 import { JetLagStage } from "../JetLagStage";
+import { ProjectileApi } from "./Projectile"
 
 /**
  * JetLagApi provides a broad, public, declarative interface to the core
@@ -37,6 +38,9 @@ export class JetLagApi {
 
     /** An interface to everything related to the heads-up display */
     readonly hud: OverlayApi;
+
+    /** Projectiles are complex, so they get their own API */
+    readonly projectiles: ProjectileApi;
 
     /** Everything else */
     readonly nav: NavigationApi;

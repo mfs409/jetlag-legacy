@@ -30,9 +30,8 @@ export class Goodie extends WorldActor {
    * @param height  height of this Goodie
    * @param imgName image to use for this Goodie
    */
-  constructor(stage: JetLagStage, width: number,
-    height: number, imgName: string) {
-    super(stage, imgName, width, height);
+  constructor(stage: JetLagStage, width: number, height: number, imgName: string, z:number) {
+    super(stage, imgName, width, height, z);
   }
 
   /**
