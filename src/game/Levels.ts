@@ -33,7 +33,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Create a circular hero whose top left corner is at (2, 3), who is .75 meters wide, .75 meters high, and who
         // looks like a green ball.  Note that "greenball.png" is in the assets folder, and it is listed in the
         // myconfig.ts file
-        let h = jl.world.makeHero({x:2, y:3, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 3, width: .75, height: .75, img: "greenball.png" });
 
         // The hero moves via phone tilt
         h.setMoveByTilting();
@@ -42,7 +42,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //
         // Note: the parameters to makeDestinationAsCircle() are the same as the parameters for making heroes.  If you
         // aren't sure what something means, hover your mouse over it and you'll get pop-up help
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Specify a message to print when the level is won
@@ -58,9 +58,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 2) {
         // start by setting everything up just like in level 1
         jl.world.enableTilt(10, 10);
-        let h = jl.world.makeHero({x:2, y:3, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 3, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         winMessage(jl, "Great Job");
 
@@ -77,9 +77,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 3) {
         // start by setting everything up just like in level 2
         jl.world.enableTilt(10, 10);
-        let h = jl.world.makeHero({x:2, y:3, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 3, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         welcomeMessage(jl, "When the hero hits a wall at an angle, the hero should spin");
         winMessage(jl, "JetLag is FUN!");
@@ -107,18 +107,18 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Now let's draw two heroes who can both move by tilting, and who both
         // have density and friction. Note that we lower the density, so they
         // move faster than in the previous level
-        let h1 = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h1 = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h1.setPhysics(5, 0, 0.6);
         h1.setMoveByTilting();
-        let h2 = jl.world.makeHero({x:6, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h2 = jl.world.makeHero({ x: 6, y: 7, width: .75, height: .75, img: "greenball.png" });
         h2.setPhysics(5, 0, 0.6);
         h2.setMoveByTilting();
 
         // We will make two destinations, each of which defaults to only holding
         // ONE hero, but we still need to have two heroes reach destinations in
         // order to complete the level
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
-        jl.world.makeDestination({x:15, y:7, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
+        jl.world.makeDestination({ x: 15, y: 7, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(2);
 
         welcomeMessage(jl, "Each destination can hold one hero\n\nBoth heroes must reach a destination to win this level")
@@ -131,15 +131,15 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Configure things like in the previous level
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h1 = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h1 = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h1.setPhysics(5, 0, 0.6);
         h1.setMoveByTilting();
-        let h2 = jl.world.makeHero({x:6, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h2 = jl.world.makeHero({ x: 6, y: 7, width: .75, height: .75, img: "greenball.png" });
         h2.setPhysics(5, 0, 0.6);
         h2.setMoveByTilting();
 
         // Make ONE destination, but indicate that it can hold TWO heroes
-        let d = jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         d.setCapacity(2);
 
         // Let's also say that whenever a hero reaches the destination, a sound
@@ -162,10 +162,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // them in each new level
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         welcomeMessage(jl, "Tilt can change velocity, instead of\n" + "applying a force to actors.");
         winMessage(jl, "Great Job");
@@ -180,17 +180,17 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 7) {
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         welcomeMessage(jl, "Avoid the enemy and\nreach the destination");
         winMessage(jl, "Great Job");
 
         // draw an enemy... we don't need to give it physics for now because it
         // will be stationary
-        jl.world.makeEnemy({x:14, y:1.5, width:.75, height:.75, img:"redball.png"});
+        jl.world.makeEnemy({ x: 14, y: 1.5, width: .75, height: .75, img: "redball.png" });
 
         // When the level is lost, we will print a message.  Later on, we will
         // explore how the loseMessage() function really works.
@@ -203,9 +203,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 8) {
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         welcomeMessage(jl, "Avoid the enemy and\nreach the destination");
 
@@ -216,7 +216,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // never say "there is a third point that is the same as the start
         // point", so the enemy teleports back to the starting point after it
         // reaches (14, 0).
-        let e = jl.world.makeEnemy({x:14, y:1.5, width:.75, height:.75, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 14, y: 1.5, width: .75, height: .75, img: "redball.png" });
         e.setRoute(new Route().to(14, 8.25).to(14, 0), 4, true);
 
         // Note that if we don't explicitly call winMessage() and loseMessage(),
@@ -230,15 +230,15 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 9) {
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Notice how the Enemy Route has 3 points, so that it travels back and
         // forth.  Routes can be made extremely complex.  Be sure to try a lot
         // of variations.
-        let e = jl.world.makeEnemy({x:14, y:1.5, width:.75, height:.75, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 14, y: 1.5, width: .75, height: .75, img: "redball.png" });
         e.setRoute(new Route().to(14, 8.25).to(10, 0).to(14, 8.25), 4, true);
 
         welcomeMessage(jl, "Avoid the enemy and\nreach the destination");
@@ -253,16 +253,16 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 10) {
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:4, y:7, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 7, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
-        let d = jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Make the Destination do a complete rotation once per second
         d.setRotationSpeed(1);
 
         // Make an enemy who moves due to tilt
-        let e = jl.world.makeEnemy({x:14, y:1.5, width:.75, height:.75, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 14, y: 1.5, width: .75, height: .75, img: "redball.png" });
         e.setPhysics(5, 0.3, 0.6);
         e.setMoveByTilting();
 
@@ -288,10 +288,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.drawBoundingBox(0, 0, 64, 36, "", 0, 0, 0);
 
         // put the hero and destination far apart
-        let h = jl.world.makeHero({x:1, y:1, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 1, y: 1, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
         h.setPhysics(5, 0, 0.6);
-        jl.world.makeDestination({x:63, y:35, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 63, y: 35, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // By default, the camera is centered on the point 8, 4.5f.  We can instead have the
@@ -305,12 +305,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // an outline of the two rectangles. You could also use images (that you registered,
         // of course), but if you did, you'd either need to make them small (maybe by drawing
         // some pictures in addition to Tap controls), or make them semi-transparent.
-        jl.hud.addTapControl({x:0, y:0, width:8, height:9, img:""}, () => {
+        jl.hud.addTapControl({ x: 0, y: 0, width: 8, height: 9, img: "" }, () => {
             if (jl.world.getZoom() > 50)
                 jl.world.setZoom(jl.world.getZoom() - 10);
             return true;
         });
-        jl.hud.addTapControl({x:8, y:0, width:16, height:9, img:""}, () => {
+        jl.hud.addTapControl({ x: 8, y: 0, width: 16, height: 9, img: "" }, () => {
             if (jl.world.getZoom() < 200)
                 jl.world.setZoom(jl.world.getZoom() + 20);
             return true;
@@ -345,9 +345,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 12) {
         // Put a border around the level, and create a hero and destination
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:1, y:5, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 1, y: 5, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Draw a joystick on the HUD, and have the joystick control the hero.  This will appear
@@ -368,11 +368,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o4.setPhysics(1, 0, 1);
 
         // Oblong circles are not what you'd expect
-        jl.world.makeHero({x:13, y:2, width:2, height:1, img:"purpleball.png"});
-        jl.world.makeDestination({x:13, y:2, width:2, height:1, img:"purpleball.png"});
+        jl.world.makeHero({ x: 13, y: 2, width: 2, height: 1, img: "purpleball.png" });
+        jl.world.makeDestination({ x: 13, y: 2, width: 2, height: 1, img: "purpleball.png" });
         jl.world.makeObstacle({ x: 13, y: 2, width: 2, height: 1, img: "purpleball.png" });
-        jl.world.makeEnemy({x:13, y:2, width:2, height:1, img:"redball.png"});
-        jl.world.makeGoodie({x:13, y:2, width:2, height:1, img:"purpleball.png"});
+        jl.world.makeEnemy({ x: 13, y: 2, width: 2, height: 1, img: "redball.png" });
+        jl.world.makeGoodie({ x: 13, y: 2, width: 2, height: 1, img: "purpleball.png" });
 
         // Create a polygon obstacle
         jl.world.makeObstacle({ x: 2, y: 2, width: 2, height: 5, img: "blueball.png", verts: [-1, 2, -1, 0, 0, -3, 1, 0, 1, 1] });
@@ -395,7 +395,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
             // We are going to put a big black button over the whole screen.
             // Clicking it will get rid of this overlay
-            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudX: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudX: number, hudY: number) => {
                 jl.nav.dismissOverlayScene();
                 return true;
             });
@@ -417,9 +417,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Put a border around the level, and create a hero and destination.  Control the hero
         // with a joysitck
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:1, y:5, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 1, y: 5, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         // note: releasing the joystick no longer stops the hero
         jl.hud.addJoystickControl(0, 0, 1.5, 1.5, "greyball.png", h, 5, false);
@@ -451,9 +451,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 14) {
         // set up a hero, destination, bounding box, and joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:1, y:5, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 1, y: 5, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
-        let d = jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.hud.addJoystickControl(0, 0, 1.5, 1.5, "greyball.png", h, 5, false);
 
@@ -464,8 +464,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //
         // Note that JetLag tracks four different scores for goodies.  By default, collecting a
         // goodie increases the "type 1" score by 1.
-        jl.world.makeGoodie({x:0, y:8, width:.5, height:.5, img:"blueball.png"});
-        jl.world.makeGoodie({x:0, y:7, width:.5, height:.5, img:"blueball.png"});
+        jl.world.makeGoodie({ x: 0, y: 8, width: .5, height: .5, img: "blueball.png" });
+        jl.world.makeGoodie({ x: 0, y: 7, width: .5, height: .5, img: "blueball.png" });
 
         // Indicate that the destination won't accept heroes until the score is
         // at least 2,0,0,0.  We achieve this by adding a bit of code to the
@@ -483,7 +483,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Set up a win scene that also plays a sound.  This should look familiar.  And, as you can imagine, we can do lose scenes too.
         jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
                 jl.nav.nextLevel();
                 return true;
             });
@@ -497,13 +497,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 15) {
         // start with a hero who is controlled via Joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:1, y:8, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 1, y: 8, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // make a destination that moves, and that requires one goodie to be collected before it
         // works
-        let d = jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         d.onAttemptArrival = () => { return jl.score.getGoodies1() >= 1; }
         d.setRoute(new Route().to(15, 8).to(15, .25).to(15, 8), 4, true);
         jl.score.setVictoryDestination(1);
@@ -514,7 +514,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setRoute(new Route().to(0, 0).to(8, 8).to(0, 0), 2, true);
 
         // make a goodie that moves
-        let g = jl.world.makeGoodie({x:5, y:5, width:.5, height:.5, img:"blueball.png"});
+        let g = jl.world.makeGoodie({ x: 5, y: 5, width: .5, height: .5, img: "blueball.png" });
         g.setRoute(new Route().to(3, 3).to(6, 3).to(6, 6).to(3, 6).to(3, 3), 10, true);
 
         // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
@@ -530,13 +530,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 16) {
         // Set up a hero who is controlled by the joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:15, y:8, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 15, y: 8, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // draw 5 goodies
         for (let p = 0; p < 5; p++)
-            jl.world.makeGoodie({x:p, y:p + 4, width:.25, height:.25, img:"blueball.png"});
+            jl.world.makeGoodie({ x: p, y: p + 4, width: .25, height: .25, img: "blueball.png" });
 
         // indicate that we win by collecting enough goodies
         jl.score.setVictoryGoodies(5, 0, 0, 0);
@@ -558,9 +558,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // it's possible to draw a pause scene, it will draw it, so this will
         // cause the game to switch to a pause scene until the overlay gets
         // dismissed
-        jl.hud.addTapControl({x:15, y:0, width:1, height:1, img:"red.png"}, (): boolean => {
+        jl.hud.addTapControl({ x: 15, y: 0, width: 1, height: 1, img: "red.png" }, (): boolean => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -583,10 +583,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // start with a hero who is controlled via tilt, and a destination
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:3, y:3, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 3, y: 3, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Make the stopwatch start counting, by giving it an initial value of 0
@@ -596,14 +596,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addText(.1, 8, "Arial", "#000000", 32, () => jl.score.getStopwatch().toFixed(0), 2);
 
         // Put a button on the HUD to pause the game
-        jl.hud.addTapControl({x:0.1, y:8.5, width:.4, height:.4, img:"pause.png"}, () => {
+        jl.hud.addTapControl({ x: 0.1, y: 8.5, width: .4, height: .4, img: "pause.png" }, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:"noise.png"}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "noise.png" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
                 overlay.addTextCentered(8, 4.5, "Arial", "#000000", 32, () => "Game Paused", 0);
-                overlay.addTapControl({x:0.1, y:8.5, width:.4, height:.4, img:"backarrow.png"}, () => {
+                overlay.addTapControl({ x: 0.1, y: 8.5, width: .4, height: .4, img: "backarrow.png" }, () => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doSplash(1);
                     return true;
@@ -641,13 +641,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set up a basic jl.world.  Note that we will use tilt to control the hero and one enemy
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // draw a hero and give it strength of 10. The default is for enemies to have "2" units
         // of damage, and heroes to have "1" unit of strength, so that any collision defeats the
         // hero without removing the enemy.
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         h.setStrength(10);
@@ -657,7 +657,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, producer: () => h.getStrength() + " Strength", z: 2 });
 
         // our first enemy stands still:
-        let e = jl.world.makeEnemy({x:8, y:8, width:.5, height:.5, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 8, y: 8, width: .5, height: .5, img: "redball.png" });
         e.setPhysics(1.0, 0.3, 0.6);
         e.setRotationSpeed(1);
         e.setDamage(4);
@@ -666,14 +666,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         e.onDefeatHero = () => { endText = "How did you hit me?"; };
 
         // our second enemy moves along a path
-        e = jl.world.makeEnemy({x:7, y:7, width:.5, height:.5, img:"redball.png"});
+        e = jl.world.makeEnemy({ x: 7, y: 7, width: .5, height: .5, img: "redball.png" });
         e.setPhysics(1.0, 0.3, 0.6);
         e.setRoute(new Route().to(7, 7).to(7, 1).to(7, 7), 2, true);
         e.setDamage(4);
         e.onDefeatHero = () => { endText = "Stay out of my way!"; }
 
         // our third enemy moves with tilt, which makes it hardest to avoid
-        e = jl.world.makeEnemy({x:15, y:1, width:.5, height:.5, img:"redball.png"});
+        e = jl.world.makeEnemy({ x: 15, y: 1, width: .5, height: .5, img: "redball.png" });
         e.setPhysics(15, 0.3, 0.6);
         e.setMoveByTilting();
         e.setDamage(4);
@@ -684,7 +684,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         welcomeMessage(jl, "The hero can defeat up to two enemies...");
         winMessage(jl, "Great Job");
         jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
                 jl.nav.repeatLevel();
                 return true;
             });
@@ -697,13 +697,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 19) {
         // start with a hero who is controlled via Joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // draw two enemies.  Remember, each does 2 units of damage
-        jl.world.makeEnemy({x:6, y:6, width:.5, height:.5, img:"redball.png"});
-        jl.world.makeEnemy({x:15, y:1, width:.5, height:.5, img:"redball.png"});
+        jl.world.makeEnemy({ x: 6, y: 6, width: .5, height: .5, img: "redball.png" });
+        jl.world.makeEnemy({ x: 15, y: 1, width: .5, height: .5, img: "redball.png" });
 
         // Give the hero enough strength to beat the enemies
         h.setStrength(5);
@@ -725,20 +725,20 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 20) {
         // start with a hero who is controlled via Joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // draw an enemy.  It does 2 units of damage.  If it disappears, it will make a sound
-        let e = jl.world.makeEnemy({x:10, y:6, width:.5, height:.5, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 10, y: 6, width: .5, height: .5, img: "redball.png" });
         e.onDefeated = (e: Enemy, h: WorldActor) => { jl.playSound("slowdown.ogg"); };
 
         // draw another enemy.  It is too deadly for us to ever defeat.
-        let e2 = jl.world.makeEnemy({x:7, y:7, width:2, height:2, img:"redball.png"});
+        let e2 = jl.world.makeEnemy({ x: 7, y: 7, width: 2, height: 2, img: "redball.png" });
         e2.setDamage(100);
 
         // this goodie gives an extra "2" units of strength:
-        let g = jl.world.makeGoodie({x:14, y:7, width:.5, height:.5, img:"blueball.png"});
+        let g = jl.world.makeGoodie({ x: 14, y: 7, width: .5, height: .5, img: "blueball.png" });
         g.setCollectCallback((g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); });
 
         // Display the hero's strength
@@ -758,26 +758,26 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 21) {
         // start with a hero who is controlled via Joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // draw a few enemies, and make them rotate
         for (let i = 0; i < 5; ++i) {
-            let e = jl.world.makeEnemy({x:i + 4, y:6, width:.5, height:.5, img:"redball.png"});
+            let e = jl.world.makeEnemy({ x: i + 4, y: 6, width: .5, height: .5, img: "redball.png" });
             e.setPhysics(1.0, 0.3, 0.6);
             e.setRotationSpeed(1);
         }
 
         // this goodie makes us invincible
-        let g = jl.world.makeGoodie({x:15, y:8, width:.5, height:.5, img:"blueball.png"});
+        let g = jl.world.makeGoodie({ x: 15, y: 8, width: .5, height: .5, img: "blueball.png" });
         g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setRoute(new Route().to(15, 8).to(10, 3).to(15, 8), 5, true);
         g.setRotationSpeed(0.25);
 
         // we'll still say you win by reaching the Destination. Defeating
         // enemies is just for fun...
-        let d = jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         d.onAttemptArrival = () => { return jl.score.getEnemiesDefeated() >= 5; }
         jl.score.setVictoryDestination(1);
 
@@ -799,20 +799,20 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 22) {
         // start with a hero who is controlled via Joystick
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // Set up a destination that requires 7 type-1 goodies
-        let d = jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         d.onAttemptArrival = () => { return jl.score.getGoodies1() >= 7; }
         jl.score.setVictoryDestination(1);
 
         // create some goodies with special scores. Note that we're still only dealing with
         // type-1 scores
-        let g1 = jl.world.makeGoodie({x:9, y:0, width:.5, height:.5, img:"blueball.png"});
+        let g1 = jl.world.makeGoodie({ x: 9, y: 0, width: .5, height: .5, img: "blueball.png" });
         g1.setScore(-2, 0, 0, 0);
-        let g2 = jl.world.makeGoodie({x:9, y:6, width:.5, height:.5, img:"blueball.png"});
+        let g2 = jl.world.makeGoodie({ x: 9, y: 6, width: .5, height: .5, img: "blueball.png" });
         g2.setScore(9, 0, 0, 0);
 
         // print a goodie count to show how the count goes up and down
@@ -828,11 +828,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // start with a hero who is controlled via tilt, and a destination
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
         jl.world.enableTilt(10, 10);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // draw two obstacles that we can drag
@@ -859,10 +859,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 24) {
         // start with a hero who is controlled via Joystick, and a destination
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
 
-        jl.world.makeDestination({x:15, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // draw a picture on the -1 plane, so it is a background behind the hero and destination
@@ -891,15 +891,15 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 25) {
         // start with a hero who is controlled via Joystick, and a destination
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
-        jl.world.makeDestination({x:14, y:2, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 2, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // create an enemy who chases the hero
-        let e3 = jl.world.makeEnemy({x:15, y:1, width:.5, height:.5, img:"redball.png"});
+        let e3 = jl.world.makeEnemy({ x: 15, y: 1, width: .5, height: .5, img: "redball.png" });
         e3.setPhysics(.1, 0.3, 0.6);
         e3.setChaseSpeed(1, h, true, true);
 
@@ -921,11 +921,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 26) {
         // start with a hero who is controlled via Joystick, and a destination
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
-        jl.world.makeDestination({x:14, y:2, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 2, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // set up our obstacle so that collision and touch make it play sounds
@@ -943,7 +943,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // direction
     else if (index == 27) {
         // set up a hero who rotates in the direction of movement, and is controlled by joystick
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setPhysics(5, 0, 0.6);
         h.setRotationByDirection();
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
@@ -954,7 +954,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addText(.1, 8.5, "Arial", "#000000", 32, () => jl.score.getWinCountdown().toFixed(0), 2);
 
         // Let's have an enemy, too
-        jl.world.makeEnemy({x:7, y:3.5, width:2, height:2, img:"redball.png"});
+        jl.world.makeEnemy({ x: 7, y: 3.5, width: 2, height: 2, img: "redball.png" });
 
         welcomeMessage(jl, "The star rotates in the direction of movement");
         winMessage(jl, "You Survived!");
@@ -966,18 +966,18 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // paths can go off-screen.
     else if (index == 28) {
         // set up a hero who rotates in the direction of movement, and is controlled by joystick
-        let h = jl.world.makeHero({x:8, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: 8, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setPhysics(5, 0, 0.6);
         h.setRotationByDirection();
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, false);
 
         // destination is right below the hero
-        jl.world.makeDestination({x:8, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 8, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // this enemy starts from off-screen... you've got to be quick to survive!
-        let e = jl.world.makeEnemy({x:4, y:-16, width:8, height:8, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 4, y: -16, width: 8, height: 8, img: "redball.png" });
         e.setRoute(new Route().to(4, -16).to(4, 0).to(4, -16), 6, true);
 
         welcomeMessage(jl, "Reach the destination to win the level.");
@@ -991,12 +991,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // some event.  We use a callback to customize the obstacles that are drawn to the screen in response to scribbles.
     else if (index == 29) {
         // Set up a hero and destination, and turn on tilt
-        let h = jl.world.makeHero({x:8, y:8, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: 8, y: 8, width: .75, height: .75, img: "legstar1.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
         jl.world.enableTilt(10, 10);
-        jl.world.makeDestination({x:8, y:1, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 8, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // turn on 'scribble mode'... this says "draw a purple ball with a .25f radius at the
@@ -1029,11 +1029,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
         // draw a destination
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // create a hero and obstacle, both of which can be flicked
-        let h = jl.world.makeHero({x:1, y:1, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: 1, y: 1, width: .75, height: .75, img: "legstar1.png" });
         h.setPhysics(5, 0, 0.6);
         h.setFlickable(1);
         jl.hud.createSwipeZone(0, 0, 16, 9, "");
@@ -1060,10 +1060,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.enableTilt(10, 0);
         jl.world.drawBoundingBox(0, 0, 3 * 16, 9, "", 1, 0, 1);
         // Add a hero and destination
-        let h = jl.world.makeHero({x:.25, y:8, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 8, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:47, y:8.25, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 47, y: 8.25, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setCameraChase(h);
 
@@ -1081,10 +1081,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.resetGravity(0, 10);
         jl.world.enableTilt(10, 0);
         jl.world.drawBoundingBox(0, 0, 128, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:.25, y:7.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 7.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:127, y:8.25, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 127, y: 8.25, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setCameraChase(h);
 
@@ -1133,10 +1133,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.resetGravity(0, 10);
         jl.world.enableTilt(10, 0);
         jl.world.drawBoundingBox(0, 0, 128, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:127, y:8.25, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 127, y: 8.25, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setCameraChase(h);
 
@@ -1171,10 +1171,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.resetGravity(0, 10);
         jl.world.enableTilt(10, 0);
         jl.world.drawBoundingBox(0, 0, 128, 9, "", 1, 0, 0);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:124, y:8.25, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 124, y: 8.25, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setCameraChase(h);
 
@@ -1187,7 +1187,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.setCameraChase(h);
         // set up support for jumping, and add a button that covers the whole screen
         h.setJumpImpulses(0, 10);
-        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, jl.hud.jumpAction(h, 0));
+        jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, jl.hud.jumpAction(h, 0));
         // set up the backgrounds
         jl.world.setBackgroundColor(0x17B4FF);
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
@@ -1197,7 +1197,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // that if the hero misses the destination, it hits the enemy and we
         // can start over. Of course, we could just do the destination like
         // this instead, but this is more fun...
-        jl.world.makeEnemy({x:127, y:0, width:.5, height:9, img:""});
+        jl.world.makeEnemy({ x: 127, y: 0, width: .5, height: 9, img: "" });
 
         welcomeMessage(jl, "Press anywhere to jump");
         winMessage(jl, "Great Job");
@@ -1212,7 +1212,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.setCameraBounds(64, 15);
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 64, 15, "", 1, 0, 0);
-        let h = jl.world.makeHero({box:true, x:.25, y:10, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: .25, y: 10, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(1, 0, 0);
         h.addVelocity(2, 0);
@@ -1226,14 +1226,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Now we'll say that the destination is as high as the screen, so reaching the end
         // means victory
-        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, jl.hud.jumpAction(h, 0));
-        jl.world.makeDestination({x:63.5, y:0, width:.5, height:15, img:"mustardball.png"});
+        jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, jl.hud.jumpAction(h, 0));
+        jl.world.makeDestination({ x: 63.5, y: 0, width: .5, height: 15, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Draw some random scattered enemies.  They'll be between 10 and 60 in X, and between
         // 0 and 14 in the Y
         for (let i = 0; i < 30; ++i) {
-            jl.world.makeEnemy({x:10 + jl.world.getRandom(50), y:jl.world.getRandom(14), width:.5, height:.5, img:"redball.png"});
+            jl.world.makeEnemy({ x: 10 + jl.world.getRandom(50), y: jl.world.getRandom(14), width: .5, height: .5, img: "redball.png" });
         }
 
         welcomeMessage(jl, "Multi-jump is enabled");
@@ -1245,11 +1245,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 36) {
         jl.world.setCameraBounds(48, 9);
         jl.world.drawBoundingBox(0, 0, 48, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:0, y:0, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: 0, y: 0, width: .75, height: .75, img: "legstar1.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         jl.world.setCameraChase(h);
-        jl.world.makeDestination({x:47, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 47, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setBackgroundColor(0x17B4FF);
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
@@ -1260,7 +1260,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         h.setDefaultReverseAnimation(jl.world.makeAnimation(200, true, ["fliplegstar1.png", "fliplegstar1.png"]));
 
         // let's draw an enemy, just in case anyone wants to try to go to the top left corner
-        jl.world.makeEnemy({x:0, y:8, width:1, height:1, img:"redball.png"});
+        jl.world.makeEnemy({ x: 0, y: 8, width: 1, height: 1, img: "redball.png" });
 
         // draw some buttons for moving the hero
         jl.hud.addToggleButton(0, 2, 2, 5, "", jl.hud.makeXMotionAction(h, -5), jl.hud.makeXMotionAction(h, 0));
@@ -1278,19 +1278,19 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 37) {
         jl.world.setCameraBounds(48, 9);
         jl.world.drawBoundingBox(0, 0, 48, 9, "", 1, 0, 0);
-        jl.world.makeDestination({x:47, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 47, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setBackgroundColor(0x17B4FF);
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 0);
         h.addVelocity(5, 0);
         jl.world.setCameraChase(h);
 
         // draw an enemy to avoid, and one at the end
-        jl.world.makeEnemy({x:30, y:6, width:1, height:1, img:"redball.png"});
-        jl.world.makeEnemy({x:47.9, y:0, width:.1, height:9, img:""});
+        jl.world.makeEnemy({ x: 30, y: 6, width: 1, height: 1, img: "redball.png" });
+        jl.world.makeEnemy({ x: 47.9, y: 0, width: .1, height: 9, img: "" });
 
         // draw the up/down controls
         jl.hud.addToggleButton(0, 0, 16, 4.5, "", jl.hud.makeYMotionAction(h, -5), jl.hud.makeYMotionAction(h, 0));
@@ -1308,9 +1308,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.setCameraBounds(48, 9);
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 48, 9, "", 1, .3, 0);
-        jl.world.makeDestination({x:47, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 47, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
-        let h = jl.world.makeHero({box:true, x:0, y:7, width:.75, height:1.5, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 0, y: 7, width: .75, height: 1.5, img: "greenball.png" });
         h.setPhysics(5, 0, 0);
         h.addVelocity(5, 0);
         jl.world.setCameraChase(h);
@@ -1322,7 +1322,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addToggleButton(0, 0, 16, 9, "", jl.hud.makeCrawlToggle(h, true, Math.PI / 2), jl.hud.makeCrawlToggle(h, false, Math.PI / 2));
 
         // make an enemy who we can defeat by colliding with it while crawling
-        let e = jl.world.makeEnemy({x:40, y:8, width:1, height:1, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 40, y: 8, width: 1, height: 1, img: "redball.png" });
         e.setDefeatByCrawl();
 
         welcomeMessage(jl, "Press the screen\nto crawl");
@@ -1337,11 +1337,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 0);
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
-        jl.world.makeDestination({x:15, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make a hero who doesn't start moving until it is touched
-        let h = jl.world.makeHero({box:true, x:0, y:8.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 0, y: 8.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(1, 0, 0);
         h.setTouchAndGo(5, 0);
@@ -1361,13 +1361,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.enableTilt(10, 0);
         jl.world.setTiltAsVelocity(true);
         jl.world.drawBoundingBox(0, 0, 34, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setJumpImpulses(0, 20);
         h.setTouchToJump();
         h.setMoveByTilting();
         jl.world.setCameraChase(h);
-        jl.world.makeDestination({x:33, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 33, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         welcomeMessage(jl, "There's nothing interesting in this level.  Sorry.");
@@ -1381,12 +1381,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 41) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:0, y:0, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 0, y: 0, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.addVelocity(5, 0);
         jl.world.setCameraChase(h);
-        jl.world.makeDestination({x:159, y:0, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 159, y: 0, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         jl.world.setBackgroundColor(0x17B4FF);
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
@@ -1412,13 +1412,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.setCameraBounds(16, 36);
         jl.world.enableTilt(0, 10);
         jl.world.drawBoundingBox(0, 0, 16, 36, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:2, y:1, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 1, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         jl.world.setCameraChase(h);
 
         // Win by reaching the bottom
-        jl.world.makeDestination({x:0, y:35, width:16, height:1, img:"red.png"});
+        jl.world.makeDestination({ x: 0, y: 35, width: 16, height: 1, img: "red.png" });
         jl.score.setVictoryDestination(1);
 
         // set up vertical scrolling backgrounds
@@ -1442,13 +1442,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
         // When this hero is touched, a projectile will fly straight up out of its top
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.8, height:.8, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .8, height: .8, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setTouchToThrow(h, .4, 0, 10, 0);
         h.setMoveByTilting();
 
         // This enemy will slowly move toward the hero
-        let e = jl.world.makeEnemy({x:15, y:8, width:.75, height:.75, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 15, y: 8, width: .75, height: .75, img: "redball.png" });
         e.setChaseFixedMagnitude(h, .1, .1, false, false);
         jl.score.setVictoryEnemyCount(1);
 
@@ -1470,7 +1470,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.enableTilt(1, 0);
         jl.world.setTiltAsVelocity(true);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:7.5, y:0, width:1, height:1, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 7.5, y: 0, width: 1, height: 1, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
@@ -1478,9 +1478,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setVictoryEnemyCount();
 
         // draw two enemies, on either side of the screen
-        let e1 = jl.world.makeEnemy({x:0, y:0, width:.5, height:9, img:"redball.png"});
+        let e1 = jl.world.makeEnemy({ x: 0, y: 0, width: .5, height: 9, img: "redball.png" });
         e1.setDamage(10);
-        let e2 = jl.world.makeEnemy({x:15.5, y:0, width:.5, height:9, img:"redball.png"});
+        let e2 = jl.world.makeEnemy({ x: 15.5, y: 0, width: .5, height: 9, img: "redball.png" });
         e2.setDamage(10);
         // set up a pool of projectiles, but now once the projectiles travel more than 5 meters,
         // they disappear
@@ -1501,7 +1501,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 45) {
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:0, y:0, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 0, y: 0, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(1, 0, 0.6);
         h.setMoveByTilting();
         jl.score.setVictoryEnemyCount();
@@ -1509,7 +1509,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // draw a few enemies.  The damage of an enemy determines how many projectiles are
         // needed to defeat it
         for (let i = 1; i <= 6; i++) {
-            let e = jl.world.makeEnemy({x:2 * i, y:7 - i, width:1, height:1, img:"redball.png"});
+            let e = jl.world.makeEnemy({ x: 2 * i, y: 7 - i, width: 1, height: 1, img: "redball.png" });
             e.setPhysics(1.0, 0.3, 0.6);
             e.setDamage(2 * i);
         }
@@ -1517,7 +1517,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set up our projectiles... note that now projectiles each do 2 units of damage
         jl.projectiles.configureProjectiles(3, .4, .1, "greyball.png", 2, 0, true);
         // this button only throws one projectile per press...
-        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, jl.hud.ThrowFixedAction(h, .38, 0, 0, -10));
+        jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, jl.hud.ThrowFixedAction(h, .38, 0, 0, -10));
 
         welcomeMessage(jl, "Defeat all enemies to win");
         winMessage(jl, "Great Job");
@@ -1532,7 +1532,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Note: the height of the bounding box is set so that enemies can be drawn off screen
         // and then fall downward
         jl.world.drawBoundingBox(0, -2, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:8, y:0, width:1, height:1, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 8, y: 0, width: 1, height: 1, img: "greenball.png" });
         jl.score.setVictoryEnemyCount(20);
 
         // Draw a button for throwing projectiles in many directions.  Again, note that if we
@@ -1551,7 +1551,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // get a random number between 0.0 and 15.0
             let x = jl.world.getRandom(151);
             x = x / 10;
-            let e = jl.world.makeEnemy({x:x, y:-1, width:1, height:1, img:"redball.png"});
+            let e = jl.world.makeEnemy({ x: x, y: -1, width: 1, height: 1, img: "redball.png" });
             e.setCanFall();
         });
 
@@ -1567,7 +1567,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // In this level, there is no way to move the hero left and right, but it can jump
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:0, y:0, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 0, y: 0, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 1);
         h.setJumpImpulses(0, -10);
         h.setTouchToJump();
@@ -1578,14 +1578,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let bottomBucket = jl.world.makeObstacle({ box: true, x: 9, y: 4.9, width: 1.1, height: .1, img: "red.png" });
 
         // Place an enemy in the bucket, and require that it be defeated
-        let e = jl.world.makeEnemy({x:9.2, y:4.2, width:.75, height:.75, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 9.2, y: 4.2, width: .75, height: .75, img: "redball.png" });
         e.setCanFall();
         e.setDamage(4);
         jl.score.setVictoryEnemyCount();
 
         // cover "most" of the screen with a button for throwing projectiles.  This ensures that
         // we can still tap the hero to make it jump
-        jl.hud.addTapControl({x:1, y:0, width:15, height:9, img:""}, jl.hud.ThrowDirectionalAction(h, .5, 0));
+        jl.hud.addTapControl({ x: 1, y: 0, width: 15, height: 9, img: "" }, jl.hud.ThrowDirectionalAction(h, .5, 0));
         // Set up a projectile pool with 5 projectiles
         jl.projectiles.configureProjectiles(5, .5, .5, "greyball.png", 1, 0, true);
         // Make the projectiles move a little faster
@@ -1630,7 +1630,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     else if (index == 48) {
         // In this level, we can press the screen to move left and right
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: .25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
 
         // Touching will throw a projectile upward
@@ -1645,7 +1645,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.projectiles.setProjectileDisappearSound("slowdown.ogg");
 
         // draw an enemy that makes a sound when it disappears
-        let e = jl.world.makeEnemy({x:8, y:4, width:.5, height:.5, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 8, y: 4, width: .5, height: .5, img: "redball.png" });
         e.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg");
 
         // This variable is part of the callback, so we can access it from our go() method
@@ -1658,12 +1658,16 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 // Figure out the Y position for enemies we make in this round
                 let y = e.getYPosition() + counter;
                 // make an enemy to the left and up
-                let left = jl.world.makeEnemy({x:e.getXPosition() - counter,
-y:                 y, width:.5, height:.5, img:"redball.png"});
+                let left = jl.world.makeEnemy({
+                    x: e.getXPosition() - counter,
+                    y: y, width: .5, height: .5, img: "redball.png"
+                });
                 left.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg");
                 // make an enemy to the right and up
-                let right = jl.world.makeEnemy({x:e.getXPosition() + counter,
-y:                    y, width:.5, height:.5, img:"redball.png"});
+                let right = jl.world.makeEnemy({
+                    x: e.getXPosition() + counter,
+                    y: y, width: .5, height: .5, img: "redball.png"
+                });
                 right.onDefeated = (e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg");
                 counter += 1;
             }
@@ -1686,15 +1690,15 @@ y:                    y, width:.5, height:.5, img:"redball.png"});
         // Using tilt to control both the hero and the enemies makes this level really hard!
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         // Reach the destination to win
-        jl.world.makeDestination({x:10, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 10, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make our initial enemy
-        let e = jl.world.makeEnemy({x:14, y:7, width:.5, height:.5, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 14, y: 7, width: .5, height: .5, img: "redball.png" });
         e.setPhysics(5, 0.3, 0.6);
         e.setMoveByTilting();
 
@@ -1728,8 +1732,10 @@ y:                    y, width:.5, height:.5, img:"redball.png"});
                     e.setExtra(e.getExtra() - 1);
 
                     // reproduce the enemy
-                    let e2 = jl.world.makeEnemy({x:e.getXPosition() + .01, y:e.getYPosition() + .01,
-width:                        e.getWidth(), height:e.getHeight(), img:"redball.png"});
+                    let e2 = jl.world.makeEnemy({
+                        x: e.getXPosition() + .01, y: e.getYPosition() + .01,
+                        width: e.getWidth(), height: e.getHeight(), img: "redball.png"
+                    });
                     e2.setPhysics(5, 0.3, 0.6);
                     e2.setMoveByTilting();
 
@@ -1751,10 +1757,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
     // this level shows simple animation. Every entity can have a default animation.
     else if (index == 50) {
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         // this hero will be animated:
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, true);
 
@@ -1780,11 +1786,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.addHorizontalBackgroundLayer(0, 0, 16, 9, 0, "mid.png");
 
         // The hero must reach this destination
-        jl.world.makeDestination({x:15, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // The hero has one animation when it is not in the air, another when it is
-        let h = jl.world.makeHero({x:.25, y:7, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 7, width: .75, height: .75, img: "legstar1.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.setJumpImpulses(0, 5);
@@ -1803,7 +1809,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // size we want, but we need to offset it from the (defunct)
         // goodie's position. Note, too, that the final cell is blank, so
         // that we don't leave a residue on the screen.
-        let g = jl.world.makeGoodie({x:2, y:7.5, width:.5, height:.5, img:"starburst3.png"});
+        let g = jl.world.makeGoodie({ x: 2, y: 7.5, width: .5, height: .5, img: "starburst3.png" });
         g.setDisappearAnimation(jl.world.makeComplexAnimation(false).to("starburst3.png", 200).to("starburst2.png", 200).to("starburst1.png", 200).to("starburst4.png", 200), 0, 0, .5, .5);
 
         welcomeMessage(jl, "Press the hero to make it jump");
@@ -1816,11 +1822,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // set up our hero
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"colorstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "colorstar1.png" });
         h.setPhysics(5, 0, 0.6);
         h.setTouchToThrow(h, .375, .375, 0, -3);
         h.setMoveByTilting();
@@ -1844,11 +1850,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        jl.world.makeDestination({x:15, y:1, width:.5, height:.5, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: .5, height: .5, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make an animated hero, and give it an invincibility animation
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"colorstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "colorstar1.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         h.setDefaultAnimation(jl.world.makeComplexAnimation(true).to("colorstar1.png", 300).to("colorstar2.png", 300).to("colorstar3.png", 300).to("colorstar4.png", 300));
@@ -1856,7 +1862,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // make some enemies
         for (let i = 0; i < 5; ++i) {
-            let e = jl.world.makeEnemy({x:2 * i + 1, y:7, width:.75, height:.75, img:"redball.png"});
+            let e = jl.world.makeEnemy({ x: 2 * i + 1, y: 7, width: .75, height: .75, img: "redball.png" });
             e.setPhysics(1.0, 0.3, 0.6);
             e.setRotationSpeed(1);
             e.setDamage(4);
@@ -1871,13 +1877,13 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                 e.setResistInvincibility();
         }
         // neat trick: this enemy does zero damage, but slows the hero down.
-        let e = jl.world.makeEnemy({x:12, y:7, width:.75, height:.75, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 12, y: 7, width: .75, height: .75, img: "redball.png" });
         e.setPhysics(10, 0.3, 0.6);
         e.setMoveByTilting();
         e.setDamage(0);
 
         // add a goodie that makes the hero invincible
-        let g = jl.world.makeGoodie({x:15, y:7, width:.5, height:.5, img:"blueball.png"});
+        let g = jl.world.makeGoodie({ x: 15, y: 7, width: .5, height: .5, img: "blueball.png" });
         g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setRoute(new Route().to(15, 7).to(5, 2).to(15, 7), 1, true);
         g.setRotationSpeed(0.25);
@@ -1886,7 +1892,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // draw a picture when the level is won, and don't print text...
         // this particular picture isn't very useful
         jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"fade.png"}, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "fade.png" }, (hudx: number, hudY: number) => {
                 jl.nav.nextLevel();
                 return true;
             });
@@ -1901,12 +1907,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 0);
 
-        jl.world.makeDestination({x:15, y:8.5, width:.5, height:.5, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8.5, width: .5, height: .5, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make a hero with fixed velocity, and give it crawl and jump
         // animations
-        let h = jl.world.makeHero({box:true, x:0, y:8, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ box: true, x: 0, y: 8, width: .75, height: .75, img: "legstar1.png" });
         h.setPhysics(5, 0, 0);
         h.addVelocity(2, 0);
         h.setCrawlAnimation(jl.world.makeComplexAnimation(true).to("legstar1.png", 100).to("legstar2.png", 300).to("legstar3.png", 300).to("legstar4.png", 100));
@@ -1915,18 +1921,18 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // enable hero jumping and crawling
         h.setJumpImpulses(0, -8);
-        jl.hud.addTapControl({x:0, y:0, width:8, height:9, img:""}, jl.hud.jumpAction(h, 0));
+        jl.hud.addTapControl({ x: 0, y: 0, width: 8, height: 9, img: "" }, jl.hud.jumpAction(h, 0));
         jl.hud.addToggleButton(8, 0, 8, 9, "", jl.hud.makeCrawlToggle(h, true, Math.PI / 2), jl.hud.makeCrawlToggle(h, false, Math.PI / 2));
 
         // add an enemy we can defeat via crawling, just for fun. It should
         // be defeated even by a "jump crawl"
-        let e = jl.world.makeEnemy({x:13, y:4, width:1, height:5, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 13, y: 4, width: 1, height: 5, img: "redball.png" });
         e.setPhysics(5, 0.3, 0.6);
         e.setDefeatByCrawl();
 
         // include a picture on the "try again" screen
         jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({x:0, y:0, width:16, height:9, img:"fade.png"}, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "fade.png" }, (hudx: number, hudY: number) => {
                 jl.nav.repeatLevel();
                 return true;
             });
@@ -1946,21 +1952,21 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // create 7 goodies, each of which adds 1 to the hero's strength
         for (let i = 0; i < 7; ++i) {
-            let g = jl.world.makeGoodie({x:1 + i, y:1 + i, width:.5, height:.5, img:"blueball.png"});
+            let g = jl.world.makeGoodie({ x: 1 + i, y: 1 + i, width: .5, height: .5, img: "blueball.png" });
             g.setCollectCallback((g: Goodie, h: Hero) => { h.setStrength(1 + h.getStrength()) });
         }
 
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make 8 enemies, each with strength == 1, so we can test moving our strength all the
         // way up to 8 and back down again
         for (let i = 0; i < 8; ++i) {
-            let e = jl.world.makeEnemy({x:2 + i, y:1 + i, width:.5, height:.5, img:"redball.png"});
+            let e = jl.world.makeEnemy({ x: 2 + i, y: 1 + i, width: .5, height: .5, img: "redball.png" });
             e.setDamage(1);
         }
 
-        let h = jl.world.makeHero({x:0, y:0, width:.75, height:.75, img:"colorstar1.png"});
+        let h = jl.world.makeHero({ x: 0, y: 0, width: .75, height: .75, img: "colorstar1.png" });
         h.setPhysics(5, 0, 0.6);
         jl.hud.addJoystickControl(0, 7.5, 1.5, 1.5, "greyball.png", h, 5, true);
 
@@ -1981,7 +1987,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
@@ -2009,10 +2015,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             collideActor.defeat(true, null);
         });
         // make four enemies.  Mark the big one, so we can defeat it with the big obstacle
-        jl.world.makeEnemy({x:10, y:2, width:.5, height:.5, img:"redball.png"});
-        jl.world.makeEnemy({x:10, y:4, width:.5, height:.5, img:"redball.png"});
-        jl.world.makeEnemy({x:10, y:6, width:.5, height:.5, img:"redball.png"});
-        let e3 = jl.world.makeEnemy({x:10, y:7, width:2, height:2, img:"redball.png"});
+        jl.world.makeEnemy({ x: 10, y: 2, width: .5, height: .5, img: "redball.png" });
+        jl.world.makeEnemy({ x: 10, y: 4, width: .5, height: .5, img: "redball.png" });
+        jl.world.makeEnemy({ x: 10, y: 6, width: .5, height: .5, img: "redball.png" });
+        let e3 = jl.world.makeEnemy({ x: 10, y: 7, width: 2, height: 2, img: "redball.png" });
         e3.setExtra("big");
 
         // win by defeating enemies
@@ -2030,11 +2036,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.enableTilt(10, 0);
         // note: the floor has lots of friction
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 10);
-        jl.world.makeDestination({x:15, y:8.5, width:.5, height:.5, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8.5, width: .5, height: .5, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make a box hero with friction... it won't roll on the floor, so it's stuck!
-        let h = jl.world.makeHero({box:true, x:.25, y:.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ box: true, x: .25, y: .25, width: .75, height: .75, img: "legstar1.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 5);
         h.setMoveByTilting();
@@ -2061,7 +2067,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
         // put a hero on a shrinking wall
-        let h = jl.world.makeHero({x:2, y:2, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 2, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         let floor = jl.world.makeObstacle({ box: true, x: 1, y: 1, width: 8, height: 1, img: "red.png" });
@@ -2083,11 +2089,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.hud.addText(.5, 8.5, "Arial", "#FF00FF", 12, () => jl.projectiles.getRemainingProjectiles() + " projectiles left", 2);
 
         // draw a bunch of enemies to defeat
-        let e = jl.world.makeEnemy({x:4, y:5, width:.5, height:.5, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 4, y: 5, width: .5, height: .5, img: "redball.png" });
         e.setPhysics(1.0, 0.3, 0.6);
         e.setRotationSpeed(1);
         for (let i = 1; i < 20; i += 5)
-            jl.world.makeEnemy({x:1 + i / 2, y:7, width:1, height:1, img:"redball.png"});
+            jl.world.makeEnemy({ x: 1 + i / 2, y: 7, width: 1, height: 1, img: "redball.png" });
 
         // draw a few obstacles that shrink over time, to show that circles
         // and boxes work, we can shrink the X and Y rates independently,
@@ -2121,11 +2127,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
 
-        jl.world.makeDestination({x:15, y:4, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 4, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make the hero jumpable, so that we can see it spin in the air
-        let h = jl.world.makeHero({x:4, y:8, width:.5, height:.5, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: 4, y: 8, width: .5, height: .5, img: "legstar1.png" });
         h.setPhysics(1, 0, 0.6);
         h.setMoveByTilting();
         h.setJumpImpulses(0, 10);
@@ -2141,12 +2147,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
     else if (index == 60) {
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 0, 0, 0);
 
-        jl.world.makeDestination({x:14, y:1, width:.25, height:.25, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 1, width: .25, height: .25, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // make a hero who is always moving... note there is no friction,
         // anywhere, and the hero is elastic... it won't ever stop...
-        let h = jl.world.makeHero({x:4, y:4, width:.5, height:.5, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 4, width: .5, height: .5, img: "greenball.png" });
         h.setPhysics(0, 1, .1);
         h.addVelocity(0, 10);
 
@@ -2166,21 +2172,21 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // create an enemy that will quietly disappear after 2 seconds
-        let e1 = jl.world.makeEnemy({x:1, y:1, width:2, height:2, img:"redball.png"});
+        let e1 = jl.world.makeEnemy({ x: 1, y: 1, width: 2, height: 2, img: "redball.png" });
         e1.setPhysics(1.0, 0.3, 0.6);
         e1.setRotationSpeed(1);
         e1.setDisappearDelay(2, true);
 
         // create an enemy that will appear after 3 seconds
-        let e2 = jl.world.makeEnemy({x:5, y:5, width:2, height:2, img:"redball.png"});
+        let e2 = jl.world.makeEnemy({ x: 5, y: 5, width: 2, height: 2, img: "redball.png" });
         e2.setPhysics(1.0, 0.3, 0.6);
         e2.setRoute(new Route().to(5, 5).to(10, 7).to(5, 5), 3, true);
         e2.setAppearDelay(3);
@@ -2194,7 +2200,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         welcomeMessage(jl, "There's nothing to do... yet");
@@ -2210,13 +2216,13 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.addTimer(2, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFF00", 12, () => "Ooh... a draggable enemy", 0);
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
                 // make a draggable enemy
                 // don't forget drag zone
-                let e3 = jl.world.makeEnemy({x:8, y:7, width:2, height:2, img:"redball.png"});
+                let e3 = jl.world.makeEnemy({ x: 8, y: 7, width: 2, height: 2, img: "redball.png" });
                 e3.setPhysics(1.0, 0.3, 0.6);
                 e3.setDraggable(true);
                 jl.hud.createDragZone(0, 0, 16, 9, "");
@@ -2228,12 +2234,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.addTimer(6, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FF00FF", 12, () => "Touch the enemy and it will go away", 0);
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
                 // add an enemy that is touch-to-defeat
-                let e4 = jl.world.makeEnemy({x:9, y:5, width:1, height:1, img:"redball.png"});
+                let e4 = jl.world.makeEnemy({ x: 9, y: 5, width: 1, height: 1, img: "redball.png" });
                 e4.setPhysics(1.0, 0.3, 0.6);
                 e4.setDisappearOnTouch();
             });
@@ -2245,18 +2251,18 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             // fixed velocities
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFF00", 12, () => "Now you can see the rest of the level", 0);
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
-                let d = jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+                let d = jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
                 d.addVelocity(-.5, -1);
 
-                let e5 = jl.world.makeEnemy({x:3, y:3, width:1, height:1, img:"redball.png"});
+                let e5 = jl.world.makeEnemy({ x: 3, y: 3, width: 1, height: 1, img: "redball.png" });
                 e5.setPhysics(1.0, 0.3, 0.6);
                 e5.addVelocity(4, 4);
 
-                let gg = jl.world.makeGoodie({x:10, y:1, width:2, height:2, img:"blueball.png"});
+                let gg = jl.world.makeGoodie({ x: 10, y: 1, width: 2, height: 2, img: "blueball.png" });
                 gg.addVelocity(5, 5);
             });
         });
@@ -2285,7 +2291,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.drawBoundingBox(0, 0, 64, 9, "", 1, .3, 1);
         jl.world.setCameraBounds(64, 9);
 
-        let h = jl.world.makeHero({x:2, y:1, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 1, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         jl.world.setCameraChase(h);
@@ -2307,7 +2313,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             // get rid of the obstacle we just collided with
             thisActor.remove(false);
             // make a goodie
-            jl.world.makeGoodie({x:18, y:8, width:1, height:1, img:"blueball.png"});
+            jl.world.makeGoodie({ x: 18, y: 8, width: 1, height: 1, img: "blueball.png" });
             // make an obstacle that is a callback, but that doesn't
             // work until the goodie count is 1
             let oo = jl.world.makeObstacle({ box: true, x: 30, y: 0, width: 1, height: 9, img: "purpleball.png" });
@@ -2320,7 +2326,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                 // The second callback works the same way
                 if (crossings == 0) {
                     thisActor.remove(false);
-                    jl.world.makeGoodie({x:46, y:8, width:1, height:1, img:"blueball.png"});
+                    jl.world.makeGoodie({ x: 46, y: 8, width: 1, height: 1, img: "blueball.png" });
 
                     let oo = jl.world.makeObstacle({ box: true, x: 50, y: 0, width: 1, height: 9, img: "purpleball.png" });
                     oo.setHeroCollisionCallback(sc2); // missing check for goodies 2 (2, 0, 0, 0, 0, sc2);
@@ -2329,7 +2335,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                 // same for the third callback
                 else if (crossings == 1) {
                     thisActor.remove(false);
-                    jl.world.makeGoodie({x:58, y:8, width:1, height:1, img:"blueball.png"});
+                    jl.world.makeGoodie({ x: 58, y: 8, width: 1, height: 1, img: "blueball.png" });
 
                     let oo = jl.world.makeObstacle({ box: true, x: 60, y: 0, width: 1, height: 9, img: "purpleball.png" });
                     oo.setHeroCollisionCallback(sc2); // missing check for goodies 3 (3, 0, 0, 0, 0, sc2);
@@ -2340,12 +2346,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                     thisActor.remove(false);
                     // print a message and pause the game, via PauseScene
                     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
                         overlay.addTextCentered(8, 4.5, "Arial", "#FFFFFF", 32, () => "The destination is now available", 0);
-                        jl.world.makeDestination({x:63, y:8, width:1, height:1, img:"mustardball.png"});
+                        jl.world.makeDestination({ x: 63, y: 8, width: 1, height: 1, img: "mustardball.png" });
                     });
                 }
             };
@@ -2363,13 +2369,13 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
         // make a destination... notice that it needs a lot more goodies
         // than are on the screen...
-        let d = jl.world.makeDestination({x:15, y:1, width:1, height:1, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 1, width: 1, height: 1, img: "mustardball.png" });
         d.onAttemptArrival = () => { return jl.score.getGoodies1() >= 3; }
         jl.score.setVictoryDestination(1);
 
@@ -2384,11 +2390,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                 // final frame looks like an open treasure chest.
                 actor.remove(false);
                 for (let i = 0; i < 3; ++i)
-                    jl.world.makeGoodie({x:3 * i, y:9 - i, width:.5, height:.5, img:"blueball.png"});
+                    jl.world.makeGoodie({ x: 3 * i, y: 9 - i, width: .5, height: .5, img: "blueball.png" });
             });
         o.setDisappearSound("hipitch.ogg");
 
-        let g = jl.world.makeGoodie({x:0, y:0, width:2, height:2, img:"blueball.png"});
+        let g = jl.world.makeGoodie({ x: 0, y: 0, width: 2, height: 2, img: "blueball.png" });
         g.setCollectCallback((g: Goodie, h: Hero) => jl.playSound("lowpitch.ogg"));
     }
 
@@ -2403,13 +2409,13 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // give the hero strength, so that we can use it to defeat an enemy
         // as a test of enemy callbacks
-        let h = jl.world.makeHero({x:5, y:5, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 5, y: 5, width: .75, height: .75, img: "greenball.png" });
         h.setStrength(3);
         h.setMoveByTilting();
         h.setInvincibleAnimation(jl.world.makeComplexAnimation(true).to("colorstar5.png", 100).to("colorstar6.png", 100).to("colorstar7.png", 100).to("colorstar8.png", 100));
 
         // a goodie, so we can do defeat by invincibility
-        let g1 = jl.world.makeGoodie({x:10, y:5, width:.5, height:.5, img:"purpleball.png"});
+        let g1 = jl.world.makeGoodie({ x: 10, y: 5, width: .5, height: .5, img: "purpleball.png" });
         g1.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(15); });
 
         // enable throwing projectiles, so that we can test enemy callbacks
@@ -2436,7 +2442,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             // always reset the pausescene, in case it has something on it from before...
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#58E2A0", 16, () => "good job, here's a prize", 0);
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2444,24 +2450,24 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
                 // as a reward... picking in the range 0-8,0-15 ensures
                 // that with width and height of 1, the goodie stays on
                 // screen
-                jl.world.makeGoodie({x:jl.world.getRandom(15), y:jl.world.getRandom(8), width:1, height:1, img:"blueball.png"});
+                jl.world.makeGoodie({ x: jl.world.getRandom(15), y: jl.world.getRandom(8), width: 1, height: 1, img: "blueball.png" });
             });
         };
-        let e1 = jl.world.makeEnemy({x:1, y:1, width:1, height:1, img:"redball.png"});
+        let e1 = jl.world.makeEnemy({ x: 1, y: 1, width: 1, height: 1, img: "redball.png" });
         e1.onDefeated = sc;
 
-        let e2 = jl.world.makeEnemy({x:1, y:3, width:1, height:1, img:"redball.png"});
+        let e2 = jl.world.makeEnemy({ x: 1, y: 3, width: 1, height: 1, img: "redball.png" });
         e2.onDefeated = sc;
         e2.setExtra("weak");
 
-        let e3 = jl.world.makeEnemy({x:1, y:5, width:1, height:1, img:"redball.png"});
+        let e3 = jl.world.makeEnemy({ x: 1, y: 5, width: 1, height: 1, img: "redball.png" });
         e3.onDefeated = sc;
 
-        let e4 = jl.world.makeEnemy({x:1, y:7, width:1, height:1, img:"redball.png"});
+        let e4 = jl.world.makeEnemy({ x: 1, y: 7, width: 1, height: 1, img: "redball.png" });
         e4.onDefeated = sc;
         e4.setDisappearOnTouch();
 
-        let e5 = jl.world.makeEnemy({x:1, y:8, width:1, height:1, img:"redball.png"});
+        let e5 = jl.world.makeEnemy({ x: 1, y: 8, width: 1, height: 1, img: "redball.png" });
         e5.onDefeated = sc;
 
         // win by defeating enemies
@@ -2479,14 +2485,14 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:1, y:8, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 1, y: 8, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
         jl.hud.addText(.1, 8.5, "Arial", "#3C46FF", 12, () => jl.score.getGoodies1() + " Goodies", 2);
 
         // the destination won't work until some goodies are collected...
-        let d = jl.world.makeDestination({x:15, y:1, width:1, height:1, img:"colorstar1.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 1, width: 1, height: 1, img: "colorstar1.png" });
         d.onAttemptArrival = () => { return jl.score.getGoodies1() >= 4 && jl.score.getGoodies2() >= 1 && jl.score.getGoodies3() >= 3; }
         jl.score.setVictoryDestination(1);
 
@@ -2521,10 +2527,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // Here's a simple pause button and pause scene
 
-        jl.hud.addTapControl({x:0, y:300, width:20, height:20, img:"red.png"}, (hudX: number, hudY: number) => {
+        jl.hud.addTapControl({ x: 0, y: 300, width: 20, height: 20, img: "red.png" }, (hudX: number, hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFFFF", 32, () => "Game Paused", 0);
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:""}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2536,7 +2542,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // directions. Note that this is going to look like an "asteroids"
         // game, with a hero covering the bottom of the screen, so that
         // anything that falls to the bottom counts against the player
-        let h = jl.world.makeHero({box:true, x:0, y:8.5, width:16, height:.5, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 0, y: 8.5, width: 16, height: .5, img: "greenball.png" });
         jl.hud.addDirectionalThrowButton(0, 0, 16, 9, "", h, 100, 0, -.5);
 
         // set up our pool of projectiles, then set them to have a fixed
@@ -2569,16 +2575,16 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({box:true, x:1, y:7, width:1, height:1, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 1, y: 7, width: 1, height: 1, img: "greenball.png" });
         h.setHover(1, 7);
         h.setFlickable(0.7);
         jl.hud.createSwipeZone(0, 0, 16, 9, "");
 
         // place an enemy, let it fall
-        let e = jl.world.makeEnemy({x:15, y:1, width:1, height:1, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 15, y: 1, width: 1, height: 1, img: "redball.png" });
         e.setCanFall();
 
-        jl.world.makeDestination({x:4, y:0, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 4, y: 0, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
     }
 
@@ -2598,10 +2604,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
 
-        jl.world.makeDestination({x:15, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(.5, 0, 0.6);
         h.setMoveByTilting();
         h.setTouchToJump();
@@ -2628,10 +2634,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setMoveByTilting();
 
-        jl.world.makeDestination({x:14, y:2, width:2, height:2, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 2, width: 2, height: 2, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // These obstacles chase the hero, but only in one dimension
@@ -2665,13 +2671,13 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // This hero moves via poking. the "false" means that we don't have
         // to poke hero, poke location, poke hero, poke location, ...
         // Instead, we can poke hero, poke location, poke location. 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setDefaultAnimation(jl.world.makeAnimation(200, true, ["legstar1.png", "legstar1.png"]));
         h.setDefaultReverseAnimation(jl.world.makeAnimation(200, true, ["fliplegstar8.png", "fliplegstar8.png"]));
         h.setTapCallback(() => { jl.hud.activeActor = h; return true; })
         jl.hud.createPokeToMoveZone(0, 0, 16, 9, 5, "", false);
 
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // sometimes a control needs to have a large touchable area, but a
@@ -2692,7 +2698,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setJumpImpulses(0, 10);
         h.setTouchToJump();
@@ -2700,7 +2706,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         h.setPhysics(2, 0, .5);
 
         // create a destination
-        jl.world.makeDestination({x:14, y:4, width:2, height:2, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 4, width: 2, height: 2, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // This obstacle is sticky on top... Jump onto it and watch what
@@ -2730,12 +2736,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
-        jl.world.makeDestination({x:15.25, y:8.25, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15.25, y: 8.25, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // draw a button for throwing projectiles in many directions. It
@@ -2770,11 +2776,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:8.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 8.25, width: .75, height: .75, img: "legstar1.png" });
         h.setMoveByTilting();
 
         // the destination requires lots of goodies of different types
-        let d = jl.world.makeDestination({x:15.25, y:.75, width:.75, height:.75, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15.25, y: .75, width: .75, height: .75, img: "mustardball.png" });
         d.onAttemptArrival = () => { return jl.score.getGoodies1() >= 1 && jl.score.getGoodies2() >= 1 && jl.score.getGoodies3() >= 3; }
         jl.score.setVictoryDestination(1);
 
@@ -2787,11 +2793,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // draw the goodies
         for (let i = 0; i < 3; ++i) {
-            let b = jl.world.makeGoodie({x:1.5 * i, y:4, width:.25, height:.25, img:"blueball.png"});
+            let b = jl.world.makeGoodie({ x: 1.5 * i, y: 4, width: .25, height: .25, img: "blueball.png" });
             b.setScore(1, 0, 0, 0);
-            let g = jl.world.makeGoodie({x:1.5 * i + .5, y:4 - i / 2, width:.25, height:.25, img:"greenball.png"});
+            let g = jl.world.makeGoodie({ x: 1.5 * i + .5, y: 4 - i / 2, width: .25, height: .25, img: "greenball.png" });
             g.setScore(0, 1, 0, 0);
-            let r = jl.world.makeGoodie({x:1.5 * i + 2, y:4 - i, width:.25, height:.25, img:"redball.png"});
+            let r = jl.world.makeGoodie({ x: 1.5 * i + 2, y: 4 - i, width: .25, height: .25, img: "redball.png" });
             r.setScore(0, 0, 1, 0);
         }
 
@@ -2813,16 +2819,16 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setMoveByTilting();
 
-        jl.world.makeDestination({x:14, y:2, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 2, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         h.setPassThrough(7); // make sure obstacle has same value
 
         // the enemy chases the hero, but can't get through the wall
-        let e = jl.world.makeEnemy({x:14, y:2, width:.5, height:.5, img:"red.png"});
+        let e = jl.world.makeEnemy({ x: 14, y: 2, width: .5, height: .5, img: "red.png" });
         e.setChaseSpeed(1, h, true, true);
 
         let o = jl.world.makeObstacle({ box: true, x: 12, y: 1, width: .1, height: 7, img: "red.png" });
@@ -2839,10 +2845,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 64, 9, "", 1, 0, 0);
 
-        jl.world.makeDestination({x:63, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 63, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        let h = jl.world.makeHero({box:true, x:2, y:4, width:.75, height:1.5, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 2, y: 4, width: .75, height: 1.5, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(1, 0, 0);
         // give the hero a fixed velocity
@@ -2872,10 +2878,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 64, 9, "", 1, 0, 0);
 
-        jl.world.makeDestination({x:63, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 63, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        let h = jl.world.makeHero({box:true, x:2, y:4, width:.75, height:1.5, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 2, y: 4, width: .75, height: 1.5, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(1, 0, 0);
         h.setCameraOffset(5, 0);
@@ -2903,14 +2909,14 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(1, 0, .5);
         h.setMoveByTilting();
         h.setJumpImpulses(0, 10);
         h.setTouchToJump();
 
-        jl.world.makeDestination({x:15, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // create a platform that we can jump through from below
@@ -2939,29 +2945,29 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"legstar1.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setDefaultAnimation(jl.world.makeAnimation(200, true, ["legstar1.png", "legstar1.png"]));
         h.setDefaultReverseAnimation(jl.world.makeAnimation(200, true, ["fliplegstar8.png", "fliplegstar8.png"]));
         h.setTapCallback(() => { jl.hud.activeActor = h; return true; })
         h.setPhysics(1, 0, .5);
         jl.hud.createPokeToRunZone(0, 0, 16, 9, 5, "", true);
 
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         jl.hud.addText(.25, .5, "Arial", "#000000", 12, () => "Level: " + jl.score.getLevelFact("level test", "-1"), 2);
         jl.hud.addText(.25, .75, "Arial", "#000000", 12, () => "Session: " + jl.score.getSessionFact("session test", "-1"), 2);
         jl.hud.addText(.25, 1, "Arial", "#000000", 12, () => "Game: " + jl.score.getGameFact("game test", "-1"), 2);
 
-        jl.hud.addTapControl({x:0, y:.5, width:.2, height:.25, img:"red.png"}, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: .5, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
             jl.score.setLevelFact("level test", "" + (1 + parseInt(jl.score.getLevelFact("level test", "-1"))));
             return true;
         });
-        jl.hud.addTapControl({x:0, y:.75, width:.2, height:.25, img:"red.png"}, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: .75, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
             jl.score.setSessionFact("session test", "" + (1 + parseInt(jl.score.getSessionFact("session test", "-1"))));
             return true;
         });
-        jl.hud.addTapControl({x:0, y:1, width:.2, height:.25, img:"red.png"}, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: 1, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
             jl.score.setGameFact("game test", "" + (1 + parseInt(jl.score.getGameFact("game test", "-1"))));
             return true;
         });
@@ -2977,14 +2983,14 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setPhysics(1, 0, 0.6);
         h.setMoveByTilting();
         h.setJumpImpulses(0, 15);
         h.setTouchToJump();
 
-        let d = jl.world.makeDestination({x:15, y:4, width:1, height:1, img:"mustardball.png"});
+        let d = jl.world.makeDestination({ x: 15, y: 4, width: 1, height: 1, img: "mustardball.png" });
         // note: it must not be immune to physics (third parameter true), or
         // it will pass through the bounding box, but we do want it to move
         // and not fall downward
@@ -3002,11 +3008,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
 
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setMoveByTilting();
 
-        jl.world.makeDestination({x:15, y:4, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 4, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // create a polygon obstacle
@@ -3028,11 +3034,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 64, 9, "", 1, 0, 1);
         jl.world.setCameraBounds(64, 9)
-        jl.world.makeDestination({x:63, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 63, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // set up a simple jumping hero
-        let h = jl.world.makeHero({box:true, x:1, y:8, width:1, height:.5, img:"greenball.png"});
+        let h = jl.world.makeHero({ box: true, x: 1, y: 8, width: 1, height: .5, img: "greenball.png" });
         h.setJumpImpulses(0, 10);
         h.setTouchToJump();
         h.setMoveByTilting();
@@ -3043,7 +3049,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // won't defeat the enemy.  Also remember that the hero has to be in 
         // mid-jump.  If it fell off an obstacle, or if it hit an obstacle after
         // jumping, this won't defeat the enemy.
-        let e = jl.world.makeEnemy({x:15, y:7, width:1, height:1, img:"redball.png"});
+        let e = jl.world.makeEnemy({ x: 15, y: 7, width: 1, height: 1, img: "redball.png" });
         e.setDefeatByJump();
     }
 
@@ -3055,7 +3061,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
 
-        let h = jl.world.makeHero({x:5, y:8, width:1, height:1, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 5, y: 8, width: 1, height: 1, img: "greenball.png" });
         h.setMoveByTilting();
 
         // Note: you must give density to the revolving part...
@@ -3068,7 +3074,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // Note that we could add limits like this:
         revolving.setRevoluteJointLimits(1.7, -1.7);
         revolving.setRevoluteJointMotor(.5, Number.POSITIVE_INFINITY);
-        jl.world.makeDestination({x:15, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
     }
 
@@ -3076,9 +3082,9 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
     else if (index == 84) {
         // start by setting everything up just like in level 1
         jl.world.enableTilt(10, 10);
-        let h = jl.world.makeHero({x:2, y:3, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 2, y: 3, width: .75, height: .75, img: "greenball.png" });
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
         winMessage(jl, "Great Job");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 0, 0, 0);
@@ -3086,12 +3092,12 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // add a one-time callback control
         let hasPaused = false;
-        let w = jl.hud.addTapControl({x:.1, y:.1, width:.5, height:.5, img:"pause.png"}, (x: number, y: number) => {
+        let w = jl.hud.addTapControl({ x: .1, y: .1, width: .5, height: .5, img: "pause.png" }, (x: number, y: number) => {
             if (hasPaused)
                 return false;
             hasPaused = true;
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -3106,11 +3112,11 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
     else if (index == 85) {
         jl.world.enableTilt(10, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
-        jl.world.makeDestination({x:15, y:1, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 1, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // set up a hero and fuse an obstacle to it
-        let h = jl.world.makeHero({x:4, y:2, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: 4, y: 2, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
         let o = jl.world.makeObstacle({ x: 1, y: 1, width: 1, height: 1, img: "blueball.png" });
@@ -3126,10 +3132,10 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
-        jl.world.makeDestination({x:15, y:8, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // Demonstrate the ability to chase while keeping existing velocity
@@ -3140,31 +3146,31 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         // Create a pause scene that has a back button on it, and a button
         // for pausing the level
-        jl.hud.addTapControl({x:0, y:0, width:1, height:1, img:"red.png"}, (hudX: number, hudY: number) => {
+        jl.hud.addTapControl({ x: 0, y: 0, width: 1, height: 1, img: "red.png" }, (hudX: number, hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addTextCentered(8, 4.5, "Arial", "#FFFFFF", 32, () => "Game Paused", 0);
-                overlay.addTapControl({x:3, y:1, width:1, height:1, img:"red.png"}, (eventPositionX: number, eventPositionY: number) => {
+                overlay.addTapControl({ x: 3, y: 1, width: 1, height: 1, img: "red.png" }, (eventPositionX: number, eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doChooser(1);
                     return true;
                 });
 
-                overlay.addTapControl({x:1, y:1, width:1, height:1, img:"red.png"}, (eventPositionX: number, eventPositionY: number) => {
+                overlay.addTapControl({ x: 1, y: 1, width: 1, height: 1, img: "red.png" }, (eventPositionX: number, eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.score.winLevel();
                     return true;
                 });
-                overlay.addTapControl({x:5, y:1, width:1, height:1, img:"red.png"}, () => {
+                overlay.addTapControl({ x: 5, y: 1, width: 1, height: 1, img: "red.png" }, () => {
                     jl.nav.dismissOverlayScene();
                     jl.score.loseLevel();
                     return true;
                 });
 
-                overlay.addTapControl({x:7, y:1, width:1, height:1, img:"red.png"}, () => {
+                overlay.addTapControl({ x: 7, y: 1, width: 1, height: 1, img: "red.png" }, () => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                         // clear the pausescene, draw another one
-                        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, () => {
+                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
@@ -3191,22 +3197,22 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // now let's draw two heroes who can both move by tilting, and
         // who both have density and friction. Note that we lower the
         // density, so they move faster
-        let h1 = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h1 = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h1.setPhysics(1, 0, 0.6);
         h1.setMoveByTilting();
         h1.setJumpImpulses(0, 10);
         h1.setTouchToJump();
         h1.setMustSurvive();
 
-        let h2 = jl.world.makeHero({box:true, x:0, y:8.5, width:16, height:.5, img:"red.png"});
+        let h2 = jl.world.makeHero({ box: true, x: 0, y: 8.5, width: 16, height: .5, img: "red.png" });
         h2.setMustSurvive();
         h1.setPassThrough(1);
         h2.setPassThrough(1);
 
-        let e1 = jl.world.makeEnemy({x:15, y:0.1, width:1, height:1, img:"redball.png"});
+        let e1 = jl.world.makeEnemy({ x: 15, y: 0.1, width: 1, height: 1, img: "redball.png" });
         e1.setChaseSpeed(1, h1, true, true);
 
-        jl.world.makeDestination({x:15, y:7, width:.75, height:.75, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 7, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
     }
 
@@ -3221,15 +3227,15 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         let heroes: Hero[] = [];
         for (let i = 0; i < 16; ++i) {
-            let h = jl.world.makeHero({box:true, x:i + .2, y:8, width:.25, height:.25, img:"greenball.png"});
+            let h = jl.world.makeHero({ box: true, x: i + .2, y: 8, width: .25, height: .25, img: "greenball.png" });
             h.setPhysics(1, 1, 5);
             heroes.push(h);
         }
 
-        jl.world.makeDestination({x:7.5, y:.25, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 7.5, y: .25, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        jl.hud.addTapControl({x:0, y:0, width:16, height:9, img:""}, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (x: number, y: number) => {
             for (let h of heroes) {
                 h.setAbsoluteVelocity(5 - jl.world.getRandom(10), -3);
             }
@@ -3242,7 +3248,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.resetGravity(0, 10);
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
 
-        let truck = jl.world.makeHero({box:true, x:1, y:8, width:2, height:.5, img:"red.png"});
+        let truck = jl.world.makeHero({ box: true, x: 1, y: 8, width: 2, height: .5, img: "red.png" });
         truck.setPhysics(1, 0, 0);
         let head = jl.world.makeObstacle({ x: 1.75, y: 7.5, width: .5, height: .5, img: "blueball.png" });
         head.setPhysics(1, 0, 0);
@@ -3260,7 +3266,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // demo
         head.setDistanceJoint(truck, 0, -1, 0, 0);
 
-        jl.world.makeDestination({x:15, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 15, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
     }
 
@@ -3275,7 +3281,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         jl.world.drawBoundingBox(0, 0, 300000, 9, "", 0, 0, 0);
 
         // make a hero
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         jl.world.setCameraChase(h);
         h.setAbsoluteVelocity(5, 0);
         h.disableRotation();
@@ -3304,8 +3310,8 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
             // Also move the obstacle forward, so we can hit it again.
             (thisActor: Obstacle, collideActor: Hero) => {
                 // make a random enemy and a random goodie.  Put them in X coordinates relative to the trigger
-                jl.world.makeEnemy({x:trigger.getXPosition() + 8 + jl.world.getRandom(10), y:jl.world.getRandom(8), width:.5, height:.5, img:"redball.png"});
-                jl.world.makeGoodie({x:trigger.getXPosition() + 9 + jl.world.getRandom(10), y:jl.world.getRandom(8), width:.5, height:.5, img:"blueball.png"});
+                jl.world.makeEnemy({ x: trigger.getXPosition() + 8 + jl.world.getRandom(10), y: jl.world.getRandom(8), width: .5, height: .5, img: "redball.png" });
+                jl.world.makeGoodie({ x: trigger.getXPosition() + 9 + jl.world.getRandom(10), y: jl.world.getRandom(8), width: .5, height: .5, img: "blueball.png" });
                 // move the trigger so we can hit it again
                 trigger.setPosition(trigger.getXPosition() + 16, trigger.getYPosition());
             };
@@ -3329,13 +3335,13 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
 
         jl.world.setTiltAsVelocity(true);
         // jl.world.drawBoundingBox(0, 0, 34, 9, "", 1, .3, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.setPhysics(5, 0, 0.6);
         h.setJumpImpulses(0, 20);
         h.setTouchToJump();
         h.setMoveByTilting();
         jl.world.setCameraChase(h);
-        jl.world.makeDestination({x:33, y:8, width:1, height:1, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 33, y: 8, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // draw an obstacle from SVG.  We are stretching it in the X and Y dimensions, and also
@@ -3355,17 +3361,16 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         // an outline of the two rectangles. You could also use images (that you registered,
         // of course), but if you did, you'd either need to make them small (maybe by drawing
         // some pictures in addition to Tap controls), or make them semi-transparent.
-        jl.hud.addTapControl({x:0, y:0, width:8, height:9, img:""}, () => {
+        jl.hud.addTapControl({ x: 0, y: 0, width: 8, height: 9, img: "" }, () => {
             if (jl.world.getZoom() > 50)
                 jl.world.setZoom(jl.world.getZoom() - 10);
             return true;
         });
-        jl.hud.addTapControl({x:8, y:0, width:16, height:9, img:""}, () => {
+        jl.hud.addTapControl({ x: 8, y: 0, width: 16, height: 9, img: "" }, () => {
             if (jl.world.getZoom() < 200)
                 jl.world.setZoom(jl.world.getZoom() + 20);
             return true;
         });
-
 
         welcomeMessage(jl, "Obstacles can be drawn from SVG files");
         winMessage(jl, "Great Job");
@@ -3379,7 +3384,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({x:.25, y:5.25, width:.75, height:.75, img:"greenball.png"});
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
         h.disableRotation();
         h.setJumpImpulses(0, 10);
         h.setTouchToJump();
@@ -3387,7 +3392,7 @@ width:                        e.getWidth(), height:e.getHeight(), img:"redball.p
         h.setPhysics(2, 0, .5);
 
         // create a destination
-        jl.world.makeDestination({x:14, y:4, width:2, height:2, img:"mustardball.png"});
+        jl.world.makeDestination({ x: 14, y: 4, width: 2, height: 2, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
         // This obstacle is sticky on top... Jump onto it and watch what
@@ -3424,7 +3429,7 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
     //
     // Note: '\n' means insert a line break into the text.
     jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudX: number, hudY: number) => {
+        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
             jl.nav.dismissOverlayScene();
             return true;
         });
@@ -3438,7 +3443,7 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
  */
 export function winMessage(jl: JetLagApi, message: string, callback: () => void = null) {
     jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
             jl.nav.nextLevel();
             return true;
         });
@@ -3454,7 +3459,7 @@ export function winMessage(jl: JetLagApi, message: string, callback: () => void 
  */
 export function loseMessage(jl: JetLagApi, message: string, callback: () => void = null) {
     jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl({x:0, y:0, width:16, height:9, img:"black.png"}, (hudx: number, hudY: number) => {
+        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
             jl.nav.repeatLevel();
             return true;
         });
