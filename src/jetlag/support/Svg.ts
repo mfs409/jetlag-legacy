@@ -3,29 +3,29 @@ import { WorldApi as WorldApi } from "../api/World";
 import { JetLagConfig } from "../JetLagConfig";
 import { XY } from "./XY";
 
-// TODO: need to make the placement of the SVG a little bit nicer...  Consider a
-// TOPLEFT strategy to the placement, instead of translation.
-
 /**
  * The Svg infrastructure allows the game designer to load SVG line drawings
  * into a game. SVG line drawings can be made in InkScape. In JetLag, we do not
  * use line drawings to their full potential. We only use them to define a set
- * of invisible lines for a simple, stationary obstacle. You should draw a
- * picture on top of your line drawing, so that the player knows that there is
- * an actor on the screen.
+ * of lines for a simple, stationary obstacle. You should draw a picture on top
+ * of your line drawing, so that the player knows that there is an actor on the
+ * screen.
  */
 export class Svg {
     /** A copy of the configuration object for the game */
     private config: JetLagConfig;
 
-    /** The requested translation of the SVG */
-    private translate = { x: 0, y: 0 };
+    /** The user-specified top left corner */
+    private translate = new XY(0, 0);
+
+    /** The requested stretch factors */
+    private userStretch = { x: 1, y: 1 };
 
     /** The callback to run on each line once it is created */
     private callback: (actor: WorldActor) => void;
 
-    /** The world object... we need it */
-    world: WorldApi;
+    /** The world API, for creating obstacles */
+    private world: WorldApi;
 
     /** Coordinate of the last point we drew */
     private last = new XY(0, 0);
@@ -36,8 +36,8 @@ export class Svg {
     /** Coordinate of the current point being drawn */
     private curr = new XY(0, 0);
 
-    /** The requested stretch factor */
-    private userStretch = { x: 1, y: 1 };
+    /** The computed top and left boundaries of the SVG, in pixels */
+    private topleft: XY = null;
 
     /**
      * The parser is essentially a finite state machine. The states are 0 for 
@@ -45,9 +45,6 @@ export class Svg {
      * "read first y" 
      */
     private state = 0;
-
-    /** The SVG transform */
-    private transform = { x: 0, y: 0 };
 
     /**
      * We can't actually draw curves. When we encounter a curve, we use this
@@ -65,73 +62,80 @@ export class Svg {
 
     /**
      * Process an SVG file and go through all of the "path" elements in the
-     * file.  For each path, create a thin obstacle, and then run the provided 
+     * file.  For each path, create a thin obstacle, and then run the provided
      * callback on the obstacle.
+     *
+     * Note that we ignore SVG /translate/ directives... we let the programmer
+     * translate the drawing instead.
+     *
+     * @param file     The name of the file to load
+     * @param x        The X coordinate of the top left corner of the bounding 
+     *                 box for the SVG
+     * @param y        The Y coordinate of the top left corner of the bounding
+     *                 box for the SVG
+     * @param stretchX The factor by which to stretch in the X dimension
+     * @param stretchY The factor by which to stretch in the Y dimension
+     * @param world    The World API, for drawing obstacles
+     * @param cfg      The game-wide configuration
+     * @param cb       A callback to run on each line segment (Obstacle) that we
+     *                 make
      */
-    public processFile(file: string, dx: number, dy: number, sx: number, sy: number, world: WorldApi, cfg: JetLagConfig, cb: (actor: WorldActor) => void) {
-        this.translate.x = dx;
-        this.translate.y = dy;
+    public processFile(file: string, x: number, y: number, stretchX: number, stretchY: number, world: WorldApi, cfg: JetLagConfig, cb: (actor: WorldActor) => void) {
+        // save user-specified data
+        this.translate.x = x;
+        this.translate.y = y;
         this.callback = cb;
+        this.userStretch.x = stretchX;
+        this.userStretch.y = stretchY;
+        // save game vars
         this.world = world;
+        this.config = cfg;
+        // send the request.  On completion, we'll be in onFileLoaded
         let xhr = new XMLHttpRequest();
         xhr.addEventListener("load", (aa: ProgressEvent) => this.onFileLoaded(aa));
         xhr.open("GET", cfg.resourcePrefix + file, true);
         xhr.send();
-        this.config = cfg;
-        this.userStretch.x = sx;
-        this.userStretch.y = sy;
     }
 
     /**
-     * When processFile receives the file back, this runs.  Its job is to find
-     * all of the "g" elements in the received file, and operate on them
+     * When the SVG file is fetched from the server, it will run this to parse
+     * the result. The job of this code is to find all of the "g" elements in
+     * the received file, and operate on them
+     * 
+     * @param event The XHR event that fetched the file
      */
-    private onFileLoaded(aa: ProgressEvent) {
-        let filecontents = (aa.currentTarget as XMLHttpRequest).response;
+    private onFileLoaded(event: ProgressEvent) {
+        let filecontents = (event.currentTarget as XMLHttpRequest).response;
         let dp = new DOMParser();
         let doc = dp.parseFromString(filecontents, "text/xml"); // consider "image/svg+xml" to get an SVGDocument instead
         let gs = doc.getElementsByTagName("g");
         for (let i = 0; i < gs.length; ++i) {
             let g = gs[i];
-            // Get the g's transform attribute
-            let transform = g.getAttribute("transform");
-            if (transform)
-                this.processTransform(transform);
             let paths = g.getElementsByTagName("path");
             for (let j = 0; j < paths.length; ++j) {
                 let d = paths[j].getAttribute("d");
                 if (d) {
-                    this.processD(d);
+                    // We process it twice: first time is to get the top and
+                    // left, second time is to actually draw it
+                    this.processD(d, true);
+                    this.processD(d, false);
                 }
             }
         }
     }
 
     /**
-     * When we encounter a "transform" attribute, we use this code to parse it, in case it has a
-     * "translate" directive that we should go
+     * The root of an SVG drawing will have a g element, which will have some
+     * number of path elements. Each path will have a "d=" attribute, which
+     * stores the points and information about how to connect them. The "d" is a
+     * single string, which we parse in this function.
      *
-     * @param attribute The attribute being processed... we hope it's a valid translate directive
+     * @param d            The string that describes the path
+     * @param readonlymode Are we in read-only mode (true), where we are
+     *                     computing the top/left pixel boound, or are we in
+     *                     draw mode (false), where we actually draw the lines
      */
-    private processTransform(attribute: string) {
-        // if we get a valid "translate" attribute, split it into two floats and save them
-        let start = attribute.indexOf("translate(");
-        if (start == -1)
-            return;
-        let end = attribute.indexOf(")", start);
-        let xlate = attribute.slice(start + "translate(".length, end).split(",");
-        this.transform.x = parseFloat(xlate[0]);
-        this.transform.y = parseFloat(xlate[1]);
-    }
-
-    /**
-     * The root of an SVG drawing will have a g element, which will have some number of path
-     * elements. Each path will have a "d=" attribute, which stores the points and information about
-     * how to connect them. The "d" is a single string, which we parse in this function.
-     *
-     * @param d The string that describes the path
-     */
-    private processD(d: string) {
+    private processD(d: string, readonlymode: boolean) {
         // split the string into characters and floating point values
         // Note: we need to split on ' ' and ',', so we'll do a replace first
         let z = d.replace(/,/g, " ");
@@ -162,7 +166,10 @@ export class Svg {
                 // end of path, relative mode
                 case "z":
                     // draw a connecting line to complete the shape
-                    this.addLine(this.last, this.first);
+                    if (readonlymode)
+                        this.updateTL(this.last, this.first);
+                    else
+                        this.addLine(this.last, this.first);
                     break;
                 // beginning of a (set of) line definitions, relative mode
                 case "l":
@@ -176,7 +183,8 @@ export class Svg {
                     absolute = true;
                     this.swallow = 0;
                     break;
-                // floating point data that defines an endpoint of a line or curve
+                // floating point data that defines an endpoint of a line or
+                // curve
                 default:
                     // if it's a curve, we might need to swallow this value
                     if (this.swallow > 0) {
@@ -192,8 +200,8 @@ export class Svg {
                             this.last.x = val;
                             this.first.x = val;
                         }
-                        // if it's the initial y, save it... can't draw a line yet, because we
-                        // have one endpoint
+                        // if it's the initial y, save it... can't draw a line
+                        // yet, because we have one endpoint
                         else if (this.state == -1) {
                             this.state = 0;
                             this.last.y = val;
@@ -215,7 +223,10 @@ export class Svg {
                             else
                                 this.curr.y = this.last.y - val;
                             // draw the line
-                            this.addLine(this.last, this.curr);
+                            if (readonlymode)
+                                this.updateTL(this.last, this.first);
+                            else
+                                this.addLine(this.last, this.curr);
                             this.last.x = this.curr.x;
                             this.last.y = this.curr.y;
                             // if we are in curve mode, reinitialize the swallower
@@ -229,16 +240,18 @@ export class Svg {
     }
 
     /**
-     * This is a convenience method to separate the transformation and stretch logic from the logic
-     * for actually drawing lines
-     * <p>
-     * There are two challenges. The first is that an SVG deals with pixels, whereas we like to draw
-     * actors in meters. This matters because user translations will be in meters, but SVG points
-     * and SVG translations will be in pixels.
-     * <p>
-     * The second challenge is that SVGs appear to have a "down is plus" Y axis, whereas our system
-     * has a "down is minus" Y axis. To getLoseScene around this, we reflect every Y coordinate over
-     * the horizontal line that intersects with the first point drawn.
+     * This is a convenience method to separate the transformation and stretch
+     * logic from the logic for actually drawing lines
+     *
+     * There are two challenges. The first is that an SVG deals with pixels,
+     * whereas we like to draw actors in meters. This matters because user
+     * translations will be in meters, but SVG points and SVG translations will
+     * be in pixels.
+     *
+     * The second challenge is that SVGs appear to have a "down is minus" Y
+     * axis, whereas our system has a "down is plus" Y axis. To get around this,
+     * we reflect every Y coordinate over the horizontal line that intersects
+     * with the first point drawn.
      *
      * @param start The point from which the line originates
      * @param stop  The point to which the line extends
@@ -247,29 +260,33 @@ export class Svg {
         // Get the pixel coordinates of the SVG line
         let x1 = start.x, x2 = stop.x, y1 = start.y, y2 = stop.y;
 
-        // apply svg translation, since it is in pixels
-        x1 += this.transform.x;
-        x2 += this.transform.x;
-        y1 += this.transform.y;
-        y2 += this.transform.y;
-        // reflect through mFirst.y
+        // reflect through first.y
         y1 = this.first.y - y1;
         y2 = this.first.y - y2;
-        // convert the coordinates to meters
-        x1 /= this.config.pixelMeterRatio;
-        y1 /= this.config.pixelMeterRatio;
-        x2 /= this.config.pixelMeterRatio;
-        y2 /= this.config.pixelMeterRatio;
-        // add in the user transform in meters
-        x1 += this.translate.x;
-        y1 += this.translate.y;
-        x2 += this.translate.x;
-        y2 += this.translate.y;
+
         // multiply the coordinates by the stretch
         x1 *= this.userStretch.x;
         y1 *= this.userStretch.y;
         x2 *= this.userStretch.x;
         y2 *= this.userStretch.y;
+
+        // normalize by top left pixels (0,0)
+        x1 -= this.topleft.x;
+        x2 -= this.topleft.x;
+        y1 -= this.topleft.y;
+        y2 -= this.topleft.y;
+
+        // convert the coordinates to meters
+        x1 /= this.config.pixelMeterRatio;
+        y1 /= this.config.pixelMeterRatio;
+        x2 /= this.config.pixelMeterRatio;
+        y2 /= this.config.pixelMeterRatio;
+
+        // add in the user transform in meters and draw it
+        x1 += this.translate.x;
+        y1 += this.translate.y;
+        x2 += this.translate.x;
+        y2 += this.translate.y;
         this.drawLine(x1, y1, x2, y2);
     }
 
@@ -288,9 +305,44 @@ export class Svg {
         let centerY = (y1 + y2) / 2;
         let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         // Make an obstacle and rotate it
-        let o = this.world.makeObstacle({box:true, x:x1, y:y1, width: len, height:.05, img:""});
+        let o = this.world.makeObstacle({ box: true, x: x1, y: y1, width: len, height: .05, img: "" });
         o.getBody().SetTransform(new XY(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
         // let the game code modify this line segment
         this.callback(o);
+    }
+
+    /**
+     * During the first pass through a d element, we don't draw, we just compute
+     * the smallest X and Y values, so we know the top left of the bounding box.
+     * This is the code that takes each line that we would draw, and uses its
+     * endpoints to update the top/left estimates.
+     *
+     * @param start The point from which the line originates
+     * @param stop  The point to which the line extends
+     */
+    private updateTL(start: XY, stop: XY) {
+        // Get the pixel coordinates of the SVG line
+        let x1 = start.x, x2 = stop.x, y1 = start.y, y2 = stop.y;
+
+        // reflect through first.y
+        y1 = this.first.y - y1;
+        y2 = this.first.y - y2;
+
+        // multiply the coordinates by the stretch
+        x1 *= this.userStretch.x;
+        y1 *= this.userStretch.y;
+        x2 *= this.userStretch.x;
+        y2 *= this.userStretch.y;
+
+        // If this is the first line, we need to initialize our top/left storage
+        if (this.topleft == null) {
+            this.topleft = new XY(x1, y1);
+        }
+
+        // Update our estimtes of top/left
+        if (x1 < this.topleft.x) this.topleft.x = x1
+        if (y1 < this.topleft.y) this.topleft.y = y1
+        if (x2 < this.topleft.x) this.topleft.x = x2
+        if (y2 < this.topleft.y) this.topleft.y = y2
     }
 };

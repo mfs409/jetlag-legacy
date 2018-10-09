@@ -3346,7 +3346,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // draw an obstacle from SVG.  We are stretching it in the X and Y dimensions, and also
         // moving it rightward and upward
-        jl.world.drawSVG("shape.svg", 5, 5, 3, 3, (actor: WorldActor) => {
+        jl.world.drawSVG("shape.svg", 5, 5, 2, 2, (actor: WorldActor) => {
             // This code is run each time a line of the SVG is drawn.  When we draw a line,
             // we'll give it some density and friction.  Remember that the line is
             // actually a rotated obstacle.

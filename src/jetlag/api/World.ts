@@ -561,18 +561,20 @@ export class WorldApi {
     }
 
     /**
-     * From an SVG file that consists only of paths, produce a bunch of 
+     * From an SVG file that consists only of paths, produce a bunch of
      * obstacles that correspond to the line segments of those paths.
-     * 
+     *
      * @param filename The name of the SVG file to load
-     * @param xTranslate An amount to shift the SVG in the x dimension
-     * @param yTranslate An amount to shift the SVG in the y dimension
-     * @param xStretch A multiplier to stretch in the x dimension
-     * @param yStretch A multiplier to stretch in the y dimension
+     * @param x        The X coordinate of the top left corner of the bounding
+     *                 box for the SVG line
+     * @param y        The Y coordinate of the top left corner of the bounding
+     *                 box for the SVG line
+     * @param xStretch Factor by which to horizontally stretch the SVG line
+     * @param yStretch Factor by which to vertically stretch the SVG line
      * @param callback Code to run on each obstacle once it is made
      */
-    public drawSVG(filename: string, xTranslate: number, yTranslate: number, xStretch: number, yStretch: number, callback: (actor: WorldActor) => void) {
+    public drawSVG(filename: string, x: number, y: number, xStretch: number, yStretch: number, callback: (actor: WorldActor) => void) {
         let s = new Svg();
-        s.processFile(filename, xTranslate, yTranslate, xStretch, yStretch, this, this.stage.config, callback);
+        s.processFile(filename, x, y, xStretch, yStretch, this, this.stage.config, callback);
     }
 }
