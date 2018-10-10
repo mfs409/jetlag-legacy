@@ -14,15 +14,20 @@ import { JetLagConfig } from "../JetLagConfig";
  */
 export class WorldScene extends BaseScene {
     /** All actors whose behavior should change due to tilt */
-    readonly tiltActors: WorldActor[] = [];
+    private readonly tiltActors: WorldActor[] = [];
 
     /** Magnitude of the maximum gravity the accelerometer can create */
-    readonly tiltMax = { x: 0, y: 0 };
+    private readonly tiltMax = new XY(0, 0);
 
-    /** Track if we have an override for gravity to be translated into velocity */
+    /**
+     * Track if we have an override for gravity to be translated into velocity 
+     */
     private tiltVelocityOverride = false;
 
-    /** A multiplier to make gravity change faster or slower than the accelerometer default */
+    /** 
+     * A multiplier to make gravity change faster or slower than the
+     * accelerometer default 
+     */
     private tiltMultiplier: number = 1;
 
     /** This is the WorldActor that the camera chases, if any */
@@ -31,22 +36,13 @@ export class WorldScene extends BaseScene {
     /** A temp vector, to avoid allocation in the tilt code */
     private tiltVec = new XY(0, 0);
 
-    /** Setter for tilt velocity override */
-    public setTiltVelocityOverride(override: boolean) {
-        this.tiltVelocityOverride = override;
-    }
-
-    /** Set the actor who the camera should chase */
-    public setCameraChaseActor(actor: WorldActor) {
-        this.cameraChaseActor = actor;
-    }
-
     /**
      * Construct a World for the current level.  The World will have a camera,
      * a physics simulator, actors who exist within that physics simulator, and
      * the supporting infrastructure to make it all work.
      *
-     * @param manager: The game-wide Jetlag manager
+     * @param config The game-wide configuration
+     * @param device The abstract device on which the game is running
      */
     constructor(config: JetLagConfig, device: JetLagDevice) {
         super(config, device);
@@ -62,7 +58,7 @@ export class WorldScene extends BaseScene {
             return;
 
         // store the accelerometer forces we measure
-        let gravity = { x: x, y: y };
+        let gravity = new XY(x, y);
 
         // Apply the gravity multiplier
         gravity.x *= this.tiltMultiplier;
@@ -112,7 +108,7 @@ export class WorldScene extends BaseScene {
         }
     }
 
-    /** Configure physics for the current level */
+    /** Configure collision handling for the current level */
     private configureCollisionHandlers() {
         // set up the collision handlers
         this.world.SetContactListener(new (class myContactListener extends PhysicsType2d.Dynamics.ContactListener {
@@ -123,11 +119,12 @@ export class WorldScene extends BaseScene {
             }
 
             /**
-             * When two bodies start to collide, we can use this to forward to our onCollide methods
+             * When two bodies start to collide, we can use this to forward to
+             * our onCollide methods
              *
              * @param contact A description of the contact event
              */
-            public BeginContact(contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
+            public BeginContact(contact: PhysicsType2d.Dynamics.Contacts.Contact) {
                 // Get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData(); //any type
                 let b = contact.GetFixtureB().GetBody().GetUserData(); //any type
@@ -135,7 +132,8 @@ export class WorldScene extends BaseScene {
                     return;
                 }
 
-                // the order is Hero, Enemy, Goodie, Projectile, Obstacle, Destination
+                // the order is Hero, Enemy, Goodie, Projectile, Obstacle,
+                // Destination
                 //
                 // Of those, Hero, Enemy, and Projectile are the only ones with
                 // a non-empty onCollide
@@ -163,11 +161,13 @@ export class WorldScene extends BaseScene {
                     return;
                 }
 
-                // Schedule an event to run as soon as the physics world finishes its step.
+                // Schedule an event to run as soon as the physics world
+                // finishes its step.
                 //
-                // NB: this is called from render, while world is updating.  We can't modify the
-                // world or its actors until the update finishes, so we have to schedule
-                // collision-based updates to run after the world update.
+                // NB: this is called from render, while world is updating.  We
+                // can't modify the world or its actors until the update
+                // finishes, so we have to schedule collision-based updates to
+                // run after the world update.
                 this.scene.oneTimeEvents.push(() => {
                     c0.onCollide(c1, contact);
                 });
@@ -178,7 +178,7 @@ export class WorldScene extends BaseScene {
              *
              * @param contact A description of the contact event
              */
-            public EndContact(contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
+            public EndContact(contact: PhysicsType2d.Dynamics.Contacts.Contact) {
             }
 
             /**
@@ -188,7 +188,7 @@ export class WorldScene extends BaseScene {
              * @param contact A description of the contact event
              * @param oldManifold The manifold from the previous world step
              */
-            public PreSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, oldManifold: PhysicsType2d.Collision.Manifold): void {
+            public PreSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, oldManifold: PhysicsType2d.Collision.Manifold) {
                 // get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData();
                 let b = contact.GetFixtureB().GetBody().GetUserData();
@@ -208,12 +208,14 @@ export class WorldScene extends BaseScene {
                     other = gfoA;
                 }
                 if (oneSided != null && other != null && !oneSided.getDistJoint() && !other.getDistJoint()) {
-                    // if we're here, see if we should be disabling a one-sided obstacle collision
+                    // if we're here, see if we should be disabling a one-sided
+                    // obstacle collision
                     let worldManiFold = contact.GetWorldManifold();
                     let numPoints = worldManiFold.points.length;
                     for (let i = 0; i < numPoints; i++) {
                         let xy = other.getBody().GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
-                        // disable based on the value of isOneSided and the vector between the actors
+                        // disable based on the value of isOneSided and the
+                        // vector between the actors
                         if (oneSided.getOneSided() == 0 && xy.y < 0) {
                             contact.SetEnabled(false);
                         }
@@ -229,7 +231,8 @@ export class WorldScene extends BaseScene {
                     }
                 }
 
-                // handle sticky obstacles... only do something if at least one actor is a sticky actor
+                // handle sticky obstacles... only do something if at least one
+                // actor is a sticky actor
                 if (gfoA.getStickyState(0) || gfoA.getStickyState(1) || gfoA.getStickyState(2) || gfoA.getStickyState(3)) {
                     this.scene.handleSticky(gfoA, gfoB, contact);
                     return;
@@ -238,8 +241,8 @@ export class WorldScene extends BaseScene {
                     return;
                 }
 
-                // if the actors have the same passthrough ID, and it's not zero, then disable the
-                // contact
+                // if the actors have the same passthrough ID, and it's not
+                // zero, then disable the contact
                 if (gfoA.getPassThroughId() != 0 && gfoA.getPassThroughId() == gfoB.getPassThroughId()) {
                     contact.SetEnabled(false);
                     return;
@@ -252,7 +255,7 @@ export class WorldScene extends BaseScene {
              * @param contact A description of the contact event
              * @param impulse The impulse of the contact
              */
-            public PostSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, impulse: PhysicsType2d.Dynamics.ContactImpulse): void {
+            public PostSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, impulse: PhysicsType2d.Dynamics.ContactImpulse) {
             }
         })(this));
     }
@@ -265,7 +268,7 @@ export class WorldScene extends BaseScene {
      * NB: The camera may decide not to center on that point, depending on zoom
      *     and camera bounds.
      */
-    adjustCamera() {
+    public adjustCamera() {
         if (!this.cameraChaseActor)
             return;
 
@@ -278,8 +281,13 @@ export class WorldScene extends BaseScene {
         this.camera.setCenter(x, y);
     }
 
-    /** Draw the actors in this world */
-    render(renderer: JetLagRenderer, elapsedMillis: number): boolean {
+    /** 
+     * Draw the actors in this world 
+     * 
+     * @param renderer The renderer for the game
+     * @param elapsedMillis The milliseconds since the last render
+     */
+    public render(renderer: JetLagRenderer, elapsedMillis: number) {
         this.timer.advance(elapsedMillis);
         for (let zA of this.renderables) {
             for (let r of zA) {
@@ -290,9 +298,11 @@ export class WorldScene extends BaseScene {
     }
 
     /**
-     * When a hero collides with a "sticky" obstacle, this figures out what to do
+     * When a hero collides with a "sticky" obstacle, this figures out what to
+     * do
      *
-     * @param sticky  The sticky actor... it should always be an obstacle for now
+     * @param sticky  The sticky actor... it should always be an obstacle for
+     *                now
      * @param other   The other actor... it should always be a hero for now
      * @param contact A description of the contact event
      */
@@ -309,9 +319,10 @@ export class WorldScene extends BaseScene {
             || (sticky.getStickyState(1) && other.getXPosition() + other.getWidth() <= sticky.getXPosition())
             || (sticky.getStickyState(3) && other.getXPosition() >= sticky.getXPosition() + sticky.getWidth())
             || (sticky.getStickyState(2) && other.getYPosition() + other.getHeight() <= sticky.getYPosition())) {
-            // create distance and weld joints... somehow, the combination is needed to get this to
-            // work. Note that this function runs during the box2d step, so we need to make the
-            // joint in a callback that runs later
+            // create distance and weld joints... somehow, the combination is
+            // needed to get this to work. Note that this function runs during
+            // the box2d step, so we need to make the joint in a callback that
+            // runs later
             let v = contact.GetWorldManifold().points[0];
             this.oneTimeEvents.push(() => {
                 other.getBody().SetLinearVelocity(new XY(0, 0));
@@ -326,4 +337,54 @@ export class WorldScene extends BaseScene {
             });
         }
     }
+
+    /** Run any pending events that should happen during a render */
+    public runEvents() {
+        for (let e of this.oneTimeEvents) {
+            e();
+        }
+        this.oneTimeEvents.length = 0;
+        for (let e of this.repeatEvents) {
+            e();
+        }
+    }
+
+    /**
+     * Set the tilt velocity override 
+     * 
+     * @param override True to have tilt produce velocity instead of force
+     */
+    public setTiltVelocityOverride(override: boolean) {
+        this.tiltVelocityOverride = override;
+    }
+
+    /**
+     *  Set the actor who the camera should chase 
+     * 
+     * @param actor The actor the camera should follow
+     */
+    public setCameraChaseActor(actor: WorldActor) {
+        this.cameraChaseActor = actor;
+    }
+
+    /**
+     * Indicate that an actor should be controlled by tilt.
+     * 
+     * @param actor The actor to start controlling via tilt
+     */
+    public addTiltActor(actor: WorldActor) {
+        // If we've already added this to the set of tiltable objects, don't do it again
+        if (this.tiltActors.indexOf(actor) >= 0) {
+            return;
+        }
+        this.tiltActors.push(actor);
+    }
+
+    /**
+     * Set the maximum X and Y forces that tilt is allowed to produce
+     * 
+     * @param x The maximum absolute value for force in X
+     * @param y The maximum absolute value for force in Y
+     */
+    public setTiltMax(x:number, y:number) { this.tiltMax.Set(x,y); }
 }

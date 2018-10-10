@@ -117,7 +117,7 @@ export class Hero extends WorldActor {
      * NB:  We can't just use the basic renderer, because we might need to
      *      adjust a one-off animation (invincibility or throw) first
      */
-    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number): void {
+    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
         // determine when to turn off throw animations
         if (this.throwAnimationTimeRemaining > 0) {
             this.throwAnimationTimeRemaining -= elapsedMillis;
@@ -149,7 +149,7 @@ export class Hero extends WorldActor {
      * @param other   Other object involved in this collision
      * @param contact A description of the contact that caused this collision
      */
-    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
+    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // NB: we currently ignore Projectile and Hero
         if (other instanceof Enemy) {
             this.onCollideWithEnemy(other as Enemy);
@@ -167,7 +167,7 @@ export class Hero extends WorldActor {
      *
      * @param destination The destination with which this hero collided
      */
-    private onCollideWithDestination(destination: Destination): void {
+    private onCollideWithDestination(destination: Destination) {
         if (!this.getEnabled() || !destination.getEnabled())
             return;
         if (destination.receive(this)) {
@@ -182,7 +182,7 @@ export class Hero extends WorldActor {
      *
      * @param enemy The enemy with which this hero collided
      */
-    private onCollideWithEnemy(enemy: Enemy): void {
+    private onCollideWithEnemy(enemy: Enemy) {
         // if the enemy always defeats the hero, no matter what, then defeat the
         // hero
         if (enemy.getAlwaysDoesDamage()) {
@@ -202,7 +202,8 @@ export class Hero extends WorldActor {
         else if (this.crawling && enemy.getDefeatByCrawl()) {
             enemy.defeat(true, this);
         }
-        // // defeat by jumping only if the hero's bottom is above the enemy's head
+        // // defeat by jumping only if the hero's bottom is above the enemy's
+        // head
         else if (this.inAir && enemy.getDefeatByJump() && this.getYPosition() + this.getHeight() < enemy.getYPosition()) {
             enemy.defeat(true, this);
         }
@@ -219,12 +220,12 @@ export class Hero extends WorldActor {
     }
 
     /**
-      * Update the hero's strength, and then run the strength change callback (if
-      * any)
+      * Update the hero's strength, and then run the strength change callback
+      * (if any)
       *
       * @param amount The amount to add (use a negative value to subtract)
       */
-    private addStrength(amount: number): void {
+    private addStrength(amount: number) {
         this.strength += amount;
         if (this.strengthChangeCallback != null) {
             this.strengthChangeCallback(this);
@@ -236,7 +237,7 @@ export class Hero extends WorldActor {
      *
      * @param o The obstacle with which this hero collided
      */
-    private onCollideWithObstacle(o: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact): void {
+    private onCollideWithObstacle(o: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // do we need to play a sound?
         o.playCollideSound();
 
@@ -270,7 +271,7 @@ export class Hero extends WorldActor {
      *
      * @param g The goodie with which this hero collided
      */
-    private onCollideWithGoodie(g: Goodie): void {
+    private onCollideWithGoodie(g: Goodie) {
         // hide the goodie, count it, and update strength
         g.remove(false);
         if (g.getCollectCallback())
@@ -283,7 +284,7 @@ export class Hero extends WorldActor {
      *
      * @return The strength of the hero
      */
-    public getStrength(): number { return this.strength; }
+    public getStrength() { return this.strength; }
 
     /**
      * Change the hero's strength.
@@ -293,7 +294,7 @@ export class Hero extends WorldActor {
      *
      * @param amount The new strength of the hero
      */
-    public setStrength(amount: number): void {
+    public setStrength(amount: number) {
         let old = this.strength;
         this.strength = amount;
         if (old != amount && this.strengthChangeCallback != null) {
@@ -308,14 +309,14 @@ export class Hero extends WorldActor {
      * @param x Velocity in X direction
      * @param y Velocity in Y direction
      */
-    public setJumpImpulses(x: number, y: number): void {
+    public setJumpImpulses(x: number, y: number) {
         this.jumpImpulses = new XY(x, -y);
     }
 
     /**
      * Make the hero jump, unless it is in the air and not multi-jump
      */
-    jump(): void {
+    jump() {
         // NB: multi-jump prevents us from ever setting mInAir, so this is safe:
         if (this.inAir) {
             return;
@@ -340,7 +341,7 @@ export class Hero extends WorldActor {
     /**
      * Stop the jump animation for a hero, and make it eligible to jump again
      */
-    private stopJump(): void {
+    private stopJump() {
         if (this.inAir || this.allowMultiJump) {
             this.inAir = false;
             this.animator.setCurrentAnimation(this.defaultAnimation);
@@ -361,7 +362,7 @@ export class Hero extends WorldActor {
      * Put the hero in crawl mode. Note that we make the hero rotate when it is
      * crawling
      */
-    crawlOn(rotate: number): void {
+    crawlOn(rotate: number) {
         if (this.crawling) {
             return;
         }
@@ -374,7 +375,7 @@ export class Hero extends WorldActor {
     /**
     * Take the hero out of crawl mode
     */
-    crawlOff(rotate: number): void {
+    crawlOff(rotate: number) {
         if (!this.crawling) {
             return;
         }
@@ -388,7 +389,7 @@ export class Hero extends WorldActor {
      *
      * @param delta How much to add to the current rotation
      */
-    increaseRotation(delta: number): void {
+    increaseRotation(delta: number) {
         if (this.inAir) {
             this.currentRotation += delta;
             this.body.SetAngularVelocity(0);
@@ -403,8 +404,8 @@ export class Hero extends WorldActor {
      * @param x Velocity in X dimension
      * @param y Velocity in Y dimension
      */
-    public setTouchAndGo(x: number, y: number): void {
-        this.setTapHandler((worldX: number, worldY: number): boolean => {
+    public setTouchAndGo(x: number, y: number) {
+        this.setTapHandler((worldX: number, worldY: number) => {
             // if it was hovering, its body type won't be Dynamic
             if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC)
                 this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
@@ -415,18 +416,12 @@ export class Hero extends WorldActor {
         });
     }
 
-    /**
-     * Indicate that this hero can jump while it is in the air
-     */
-    public setMultiJumpOn(): void {
-        this.allowMultiJump = true;
-    }
+    /** Indicate that this hero can jump while it is in the air */
+    public setMultiJumpOn() { this.allowMultiJump = true; }
 
-    /**
-     * Indicate that touching this hero should make it jump
-     */
-    public setTouchToJump(): void {
-        this.setTapHandler((worldX: number, worldY: number): boolean => {
+    /** Indicate that touching this hero should make it jump */
+    public setTouchToJump() {
+        this.setTapHandler((worldX: number, worldY: number) => {
             this.jump();
             return true;
         });
@@ -446,7 +441,7 @@ export class Hero extends WorldActor {
      *
      * @param soundName The name of the sound file to use
      */
-    public setJumpSound(soundName: string): void {
+    public setJumpSound(soundName: string) {
         this.jumpSound = this.stage.device.getSpeaker().getSound(soundName);
     }
 
@@ -483,9 +478,7 @@ export class Hero extends WorldActor {
     /**
      * Indicate that the level should end immediately if this hero is defeated
      */
-    public setMustSurvive(): void {
-        this.mustSurvive = true;
-    }
+    public setMustSurvive() { this.mustSurvive = true; }
 
     /**
      * Provide some code to run any time this hero's strength changes

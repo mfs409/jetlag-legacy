@@ -19,7 +19,10 @@ export class ProjectilePool {
     /** For limiting the number of projectiles that can be thrown */
     private remaining: number;
 
-    /** A dampening factor to apply to projectiles thrown via "directional" mechanism */
+    /** 
+     * A dampening factor to apply to projectiles thrown via "directional"
+     * mechanism 
+     */
     private directionalDamp: number;
 
     /** Indicates that projectiles should be sensors */
@@ -28,10 +31,16 @@ export class ProjectilePool {
     /** Indicates that vector projectiles should have a fixed velocity */
     private enableFixedVectorVelocity: boolean;
 
-    /** The magnitude of the velocity for vector projectiles thrown with a fixed velocity */
+    /**
+     *  The magnitude of the velocity for vector projectiles thrown with a fixed
+     *  velocity 
+     */
     private fixedVectorVelocity: number;
 
-    /** Indicate that projectiles should face in the direction they are initially thrown */
+    /** 
+     * Indicate that projectiles should face in the direction they are initially
+     * thrown 
+     */
     private rotateVectorThrow: boolean;
 
     /** Index of next available projectile in the pool */
@@ -49,15 +58,16 @@ export class ProjectilePool {
     /**
      * Create a pool of projectiles, and set the way they are thrown.
      *
-     * @param game     The currently active game
+     * @param stage    The stage where gameplay happens
      * @param size     number of projectiles that can be thrown at once
      * @param width    width of a projectile
      * @param height   height of a projectile
      * @param imgName  image to use for projectiles
-     * @param strength specifies the amount of damage that a projectile does to an
-     *                 enemy
+     * @param strength specifies the amount of damage that a projectile does to
+     *                 an enemy
      * @param zIndex   The z plane on which the projectiles should be drawn
-     * @param isCircle Should projectiles have an underlying circle or box shape?
+     * @param isCircle Should projectiles have an underlying circle or box
+     *                 shape?
      */
     constructor(private stage: JetLagStage, size: number, width: number, height: number, imgName: string, strength: number, zIndex: number, isCircle: boolean) {
         // set up the pool
@@ -66,7 +76,7 @@ export class ProjectilePool {
         for (let i = 0; i < size; ++i) {
             let p = new Projectile(stage, width, height, imgName, -100 - i * width, -100 - i * height, zIndex, isCircle);
             p.setEnabled(false);
-            p.damage = strength;
+            p.setDamage(strength);
             this.pool.push(p);
         }
         this.nextIndex = 0;
@@ -82,7 +92,8 @@ export class ProjectilePool {
     public getRemaining() { return this.remaining; }
 
     /**
-     * Throw a projectile. This is for throwing in a single, predetermined direction
+     * Throw a projectile. This is for throwing in a single, predetermined
+     * direction
      *
      * @param h         The hero who is performing the throw
      * @param offsetX   specifies the x distance between the top left of the
@@ -94,7 +105,7 @@ export class ProjectilePool {
      * @param velocityX The X velocity of the projectile when it is thrown
      * @param velocityY The Y velocity of the projectile when it is thrown
      */
-    throwFixed(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): void {
+    throwFixed(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
         // have we reached our limit?
         if (this.remaining == 0)
             return;
@@ -114,10 +125,10 @@ export class ProjectilePool {
         if (this.randomizeImages)
             b.getAnimator().switchToRandomIndex();
 
-        // calculate offset for starting position of projectile, put it on screen
-        b.rangeFrom.x = h.getXPosition() + offsetX;
-        b.rangeFrom.y = h.getYPosition() + offsetY;
-        b.getBody().SetTransform(b.rangeFrom, 0);
+        // calculate offset for starting position of projectile, put it on
+        // screen
+        b.setRangeFrom(h.getXPosition() + offsetX, h.getYPosition() + offsetY);
+        b.getBody().SetTransform(b.getRangeFrom(), 0);
 
         // give the projectile velocity, show it, and play sound
         b.updateVelocity(velocityX, velocityY);
@@ -143,7 +154,7 @@ export class ProjectilePool {
      *                projectile and the top left of the hero throwing the
      *                projectile
      */
-    throwAt(heroX: number, heroY: number, toX: number, toY: number, h: Hero, offsetX: number, offsetY: number): void {
+    throwAt(heroX: number, heroY: number, toX: number, toY: number, h: Hero, offsetX: number, offsetY: number) {
         // have we reached our limit?
         if (this.remaining == 0)
             return;
@@ -160,10 +171,10 @@ export class ProjectilePool {
         b.setCollisionsEnabled(!this.sensor);
         b.getAnimator().resetCurrentAnimation();
 
-        // calculate offset for starting position of projectile, put it on screen
-        b.rangeFrom.x = heroX + offsetX;
-        b.rangeFrom.y = heroY + offsetY;
-        b.getBody().SetTransform(b.rangeFrom, 0);
+        // calculate offset for starting position of projectile, put it on
+        // screen
+        b.setRangeFrom(heroX + offsetX, heroY + offsetY);
+        b.getBody().SetTransform(b.getRangeFrom(), 0);
 
         // give the projectile velocity
         if (this.enableFixedVectorVelocity) {
@@ -177,7 +188,8 @@ export class ProjectilePool {
             tmpX *= this.fixedVectorVelocity;
             tmpY *= this.fixedVectorVelocity;
             b.updateVelocity(tmpX, tmpY);
-        } else {
+        }
+        else {
             let dX = toX - heroX - offsetX;
             let dY = toY - heroY - offsetY;
             // compute absolute vector, multiply by dampening factor
@@ -201,73 +213,74 @@ export class ProjectilePool {
     }
 
     /**
-     * Specify a limit on how far away from the Hero a projectile can go.  Without this, projectiles
-     * could keep on traveling forever.
+     * Specify a limit on how far away from the Hero a projectile can go.
+     * Without this, projectiles could keep on traveling forever.
      *
-     * @param distance Maximum distance from the hero that a projectile can travel
+     * @param distance Maximum distance from the hero that a projectile can
+     *                 travel
      */
-    public setProjectileRange(distance: number): void {
+    public setProjectileRange(distance: number) {
         for (let p of this.pool)
-            p.range = distance;
+            p.setRange(distance);
     }
 
     /**
-     * Indicate that projectiles should feel the effects of gravity. Otherwise, they will be (more
-     * or less) immune to gravitational forces.
+     * Indicate that projectiles should feel the effects of gravity. Otherwise,
+     * they will be (more or less) immune to gravitational forces.
      */
-    public setProjectileGravityOn(): void {
+    public setProjectileGravityOn() {
         for (let p of this.pool)
             p.setGravityScale(1);
     }
 
     /**
-    * The "directional projectile" mechanism might lead to the projectiles moving too fast. This
-    * will cause the speed to be multiplied by a factor
-    *
-    * @param factor The value to multiply against the projectile speed.
-    */
-    public setProjectileVectorDampeningFactor(factor: number): void {
+     * The "directional projectile" mechanism might lead to the projectiles
+     * moving too fast. This will cause the speed to be multiplied by a factor
+     *
+     * @param factor The value to multiply against the projectile speed.
+     */
+    public setProjectileVectorDampeningFactor(factor: number) {
         this.directionalDamp = factor;
     }
 
     /**
-     * Indicate that all projectiles should participate in collisions, rather than disappearing when
-     * they collide with other actors
+     * Indicate that all projectiles should participate in collisions, rather
+     * than disappearing when they collide with other actors
      */
-    public enableCollisionsForProjectiles(): void {
-        this.sensor = false;
-    }
+    public enableCollisionsForProjectiles() { this.sensor = false; }
 
     /**
-     * Indicate that projectiles thrown with the "directional" mechanism should have a fixed
-     * velocity
+     * Indicate that projectiles thrown with the "directional" mechanism should
+     * have a fixed velocity
      *
      * @param velocity The magnitude of the velocity for projectiles
      */
-    public setFixedVectorThrowVelocityForProjectiles(velocity: number): void {
+    public setFixedVectorThrowVelocityForProjectiles(velocity: number) {
         this.enableFixedVectorVelocity = true;
         this.fixedVectorVelocity = velocity;
     }
 
     /**
-     * Indicate that projectiles thrown via the "directional" mechanism should be rotated to face in
-     * their direction or movement
+     * Indicate that projectiles thrown via the "directional" mechanism should
+     * be rotated to face in their direction or movement
      */
-    public setRotateVectorThrowForProjectiles(): void {
+    public setRotateVectorThrowForProjectiles() {
         this.rotateVectorThrow = true;
     }
 
     /**
-     * Indicate that when two projectiles collide, they should both remain on screen
+     * Indicate that when two projectiles collide, they should both remain on
+     * screen
      */
-    public setCollisionOkForProjectiles(): void {
+    public setCollisionOkForProjectiles() {
         for (let p of this.pool)
-            p.disappearOnCollide = false;
+            p.setDisappearOnCollide(false);
     }
 
     /**
-     * The "directional projectile" mechanism might lead to the projectiles moving too fast or too
-     * slow. This will cause the speed to be multiplied by a factor
+     * The "directional projectile" mechanism might lead to the projectiles
+     * moving too fast or too slow. This will cause the speed to be multiplied
+     * by a factor
      *
      * @param factor The value to multiply against the projectile speed.
      */
@@ -280,16 +293,16 @@ export class ProjectilePool {
      *
      * @param number How many projectiles are available
      */
-    public setNumberOfProjectiles(number: number): void {
+    public setNumberOfProjectiles(number: number) {
         this.remaining = number;
     }
 
     /**
-     * Specify a sound to play when the projectile is thrown
+     * Specify a sound to play when a projectile is thrown
      *
      * @param soundName Name of the sound file to play
      */
-    public setThrowSound(soundName: string): void {
+    public setThrowSound(soundName: string) {
         this.throwSound = this.stage.device.getSpeaker().getSound(soundName);
     }
 
@@ -298,14 +311,14 @@ export class ProjectilePool {
      *
      * @param soundName the name of the sound file to play
      */
-    public setProjectileDisappearSound(soundName: string): void {
+    public setProjectileDisappearSound(soundName: string) {
         this.projectileDisappearSound = soundName;
     }
 
     /**
      * Specify how projectiles should be animated
      *
-     * @param animation The animation object to use for each projectile that is thrown
+     * @param animation The animation to use for each projectile that is thrown
      */
     public setProjectileAnimation(animation: Animation) {
         for (let p of this.pool)

@@ -104,8 +104,7 @@ export class WorldApi {
      * @param yGravityMax Max Y force that the accelerometer can produce
      */
     public enableTilt(xGravityMax: number, yGravityMax: number) {
-        this.stage.getWorld().tiltMax.x = xGravityMax;
-        this.stage.getWorld().tiltMax.y = yGravityMax;
+        this.stage.getWorld().setTiltMax(xGravityMax, yGravityMax);
         if (!this.stage.device.getAccelerometer().getSupported()) {
             this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.UP, () => { this.stage.device.getAccelerometer().setY(0); });
             this.stage.device.getKeyboard().setKeyUpHandler(JetLagKeys.DOWN, () => { this.stage.device.getAccelerometer().setY(0); });
@@ -339,7 +338,7 @@ export class WorldApi {
      * @param height height of the camera
      */
     public setCameraBounds(width: number, height: number): void {
-        this.stage.getWorld().camera.setBounds(width, height);
+        this.stage.getWorld().getCamera().setBounds(width, height);
     }
 
     /**
@@ -361,14 +360,14 @@ export class WorldApi {
      * @param zoom The new zoom level
      */
     public setZoom(zoom: number) {
-        this.stage.getWorld().camera.setScale(zoom);
+        this.stage.getWorld().getCamera().setScale(zoom);
     }
 
     /**
      * Get the current zoom level of the game.  See setZoom() for more info
      * about the meaning of this number (it's a pixel/meter ratio)
      */
-    public getZoom() { return this.stage.getWorld().camera.getScale(); }
+    public getZoom() { return this.stage.getWorld().getCamera().getScale(); }
 
     /**
      * Add a background image that auto-repeats in X, and that moves in relation

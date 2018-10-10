@@ -13,7 +13,10 @@ import { XY } from "../support/XY";
  * Hero, Goodie, Destination, Enemy, Obstacle, and Projectile objects.
  */
 export abstract class WorldActor extends BaseActor {
-  /** When the camera follows the actor without centering on it, this gives us the difference between the actor and camera */
+  /** 
+   * When the camera follows the actor without centering on it, this gives us
+   * the difference between the actor and camera 
+   */
   private cameraOffset = new XY(0, 0);
 
   /** By default, actors can't be dragged on screen */
@@ -38,23 +41,39 @@ export abstract class WorldActor extends BaseActor {
   /** A joint that allows this actor to revolve around another */
   private revJoint: PhysicsType2d.Dynamics.Joints.Joint;
 
-  /** Sometimes an actor collides with another actor, and should stick to it. In that case, we create two joints to connect the two actors. This is the Distance joint that connects them */
+  /** 
+   * Sometimes an actor collides with another actor, and should stick to it. In
+   * that case, we create two joints to connect the two actors. This is the
+   * Distance joint that connects them 
+   */
   private distJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
 
-  /** Sometimes an actor collides with another actor, and should stick to it.  In that case, we create two joints to connect the two actors. This is the Weld joint that connects them */
+  /**
+   * Sometimes an actor collides with another actor, and should stick to it.  In
+   * that case, we create two joints to connect the two actors. This is the Weld
+   * joint that connects them 
+   */
   private weldJoint: PhysicsType2d.Dynamics.Joints.WeldJoint;
 
-  /** When we have actors stuck together, we might want to set a brief delay before they can re-join. This field represents that delay time, in milliseconds. */
+  /** 
+   * When we have actors stuck together, we might want to set a brief delay
+   * before they can re-join. This field represents that delay time, in
+   * milliseconds. 
+   */
   private stickyDelay: number;
 
-  /** Track if Heros stick to this World. The array has 4 positions, corresponding to top, right, bottom, left */
+  /** 
+   * Track if Heros stick to this World. The array has 4 positions,
+   * corresponding to top, right, bottom, left 
+   */
   private isSticky: boolean[] = [false, false, false, false];
 
   /** A multiplier for flicking, to control how fast it goes */
   private flickMultiplier: number = 0;
 
   /**
-   * Create a new actor that does not yet have physics, but that has a renderable picture
+   * Create a new actor that does not yet have physics, but that has a
+   * renderable picture
    *
    * @param game    The currently active game
    * @param scene   The scene into which the actor is being placed
@@ -104,8 +123,8 @@ export abstract class WorldActor extends BaseActor {
   }
 
   /**
-   * Each descendant defines this to address any custom logic that we need to deal with on a
-   * collision
+   * Each descendant defines this to address any custom logic that we need to
+   * deal with on a collision
    *
    * @param other   Other object involved in this collision
    * @param contact A description of the contact that caused this collision
@@ -113,12 +132,13 @@ export abstract class WorldActor extends BaseActor {
   abstract onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void;
 
   /**
-   * Make the camera follow the actor, but without centering the actor on the screen
+   * Make the camera follow the actor, but without centering the actor on the
+   * screen
    *
    * @param x Amount of x distance between actor and center
    * @param y Amount of y distance between actor and center
    */
-  public setCameraOffset(x: number, y: number): void {
+  public setCameraOffset(x: number, y: number) {
     this.cameraOffset.x = x;
     this.cameraOffset.y = y;
   }
@@ -126,26 +146,22 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Indicate that the actor should move with the tilt of the phone
    */
-  public setMoveByTilting(): void {
-    // If we've already added this to the set of tiltable objects, don't do it again
-    if (this.stage.getWorld().tiltActors.indexOf(this) >= 0) {
-      return;
-    }
+  public setMoveByTilting() {
     // make sure it is moveable, add it to the list of tilt actors
     if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC) {
       this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     }
-    this.stage.getWorld().tiltActors.push(this);
+    this.stage.getWorld().addTiltActor(this);
     // turn off sensor behavior, so this collides with stuff...
     this.setCollisionsEnabled(true);
   }
 
   /**
-   * Call this on an actor to make it draggable. Be careful when dragging things. If they are
-   * small, they will be hard to touch.
+   * Call this on an actor to make it draggable. Be careful when dragging
+   * things. If they are small, they will be hard to touch.
    *
-   * @param immuneToPhysics Indicate whether the actor should pass through other objects or
-   *                        collide with them
+   * @param immuneToPhysics Indicate whether the actor should pass through other
+   *                        objects or collide with them
    */
   public setDraggable(immuneToPhysics: boolean) {
     // If the current body is static, we must change it!
@@ -166,7 +182,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setChaseSpeed(speed: number, target: WorldActor, chaseInX: boolean, chaseInY: boolean) {
     this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
-    this.stage.getWorld().repeatEvents.push(() => {
+    this.stage.getWorld().addRepeatEvent(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -198,20 +214,21 @@ export abstract class WorldActor extends BaseActor {
   }
 
   /**
-   * Specify that this actor is supposed to chase another actor, but using fixed X/Y velocities
+   * Specify that this actor is supposed to chase another actor, but using fixed
+   * X/Y velocities
    *
    * @param target     The actor to chase
    * @param xMagnitude The magnitude in the x direction, if ignoreX is false
    * @param yMagnitude The magnitude in the y direction, if ignoreY is false
-   * @param ignoreX    False if we should apply xMagnitude, true if we should keep the hero's
-   *                   existing X velocity
-   * @param ignoreY    False if we should apply yMagnitude, true if we should keep the hero's
-   *                   existing Y velocity
+   * @param ignoreX    False if we should apply xMagnitude, true if we should
+   *                   keep the hero's existing X velocity
+   * @param ignoreY    False if we should apply yMagnitude, true if we should
+   *                   keep the hero's existing Y velocity
    */
-  public setChaseFixedMagnitude(target: WorldActor, xMagnitude: number, yMagnitude: number, ignoreX: boolean, ignoreY: boolean): void {
+  public setChaseFixedMagnitude(target: WorldActor, xMagnitude: number, yMagnitude: number, ignoreX: boolean, ignoreY: boolean) {
     this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     let out_this = this;
-    this.stage.getWorld().repeatEvents.push(() => {
+    this.stage.getWorld().addRepeatEvent(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
         return;
@@ -231,11 +248,14 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Indicate that touching this actor should make a hero throw a projectile
    *
-   * @param h         The hero who should throw a projectile when this is touched
-   * @param offsetX   specifies the x distance between the top left of the projectile and the
-   *                  top left of the hero throwing the projectile
-   * @param offsetY   specifies the y distance between the top left of the projectile and the
-   *                  top left of the hero throwing the projectile
+   * @param h         The hero who should throw a projectile when this is
+   *                  touched
+   * @param offsetX   specifies the x distance between the top left of the
+   *                  projectile and the top left of the hero throwing the
+   *                  projectile
+   * @param offsetY   specifies the y distance between the top left of the
+   *                  projectile and the top left of the hero throwing the
+   *                  projectile
    * @param velocityX The X velocity of the projectile when it is thrown
    * @param velocityY The Y velocity of the projectile when it is thrown
    */
@@ -249,11 +269,16 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Indicate that touching this object will cause some special code to run
    *
-   * @param activationGoodies1 Number of type-1 goodies that must be collected before it works
-   * @param activationGoodies2 Number of type-2 goodies that must be collected before it works
-   * @param activationGoodies3 Number of type-3 goodies that must be collected before it works
-   * @param activationGoodies4 Number of type-4 goodies that must be collected before it works
-   * @param disappear          True if the actor should disappear when the callback runs
+   * @param activationGoodies1 Number of type-1 goodies that must be collected
+   *                           before it works
+   * @param activationGoodies2 Number of type-2 goodies that must be collected
+   *                           before it works
+   * @param activationGoodies3 Number of type-3 goodies that must be collected
+   *                           before it works
+   * @param activationGoodies4 Number of type-4 goodies that must be collected
+   *                           before it works
+   * @param disappear          True if the actor should disappear when the
+   *                           callback runs
    * @param callback           The callback to run when the actor is touched
    */
   public setTouchCallback(activation: () => boolean, disappear: boolean, callback: (actor: WorldActor) => void) {
@@ -271,40 +296,44 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Indicate that this obstacle only registers collisions on one side.
    *
-   * @param side The side that registers collisions. 0 is bottom, 1 is right, 2 is top, 3 is left,
-   *             -1 means "none"
+   * @param side The side that registers collisions. 0 is bottom, 1 is right, 2
+   *             is top, 3 is left, -1 means "none"
    */
-  public setOneSided(side: number): void {
+  public setOneSided(side: number) {
     this.isOneSided = side;
   }
 
   /**
-   * Indicate that this actor should not have collisions with any other actor that has the same ID
+   * Indicate that this actor should not have collisions with any other actor
+   * that has the same ID
    *
    * @param id The number for this class of non-interacting actors
    */
-  public setPassThrough(id: number): void {
+  public setPassThrough(id: number) {
     this.passThroughId = id;
   }
 
   /**
    * Indicate that this actor can be flicked on the screen
    *
-   * @param dampFactor A value that is multiplied by the vector for the flick, to affect speed
+   * @param dampFactor A value that is multiplied by the vector for the flick,
+   *                   to affect speed
    */
   public setFlickable(dampFactor: number) {
     // make sure the body is a dynamic body
     this.setCanFall();
-    // Save the multiplier.  If it's not zero, this can be flicked by a swipe pad
+    // Save the multiplier.  If it's not zero, this can be flicked by a swipe
+    // pad
     this.flickMultiplier = dampFactor;
   }
 
   /**
-   * Indicate that this actor should hover at a specific location on the screen, rather than being
-   * placed at some point on the level itself. Note that the coordinates to this command are the
-   * center position of the hovering actor. Also, be careful about using hover with zoom... hover
-   * is relative to screen coordinates (pixels), not world coordinates, so it's going to look
-   * funny to use this with zoom
+   * Indicate that this actor should hover at a specific location on the screen,
+   * rather than being placed at some point on the level itself. Note that the
+   * coordinates to this command are the center position of the hovering actor.
+   * Also, be careful about using hover with zoom... hover is relative to screen
+   * coordinates (pixels), not world coordinates, so it's going to look funny to
+   * use this with zoom
    *
    * @param x the X coordinate (in pixels) where the actor should appear
    * @param y the Y coordinate (in pixels) where the actor should appear
@@ -312,11 +341,11 @@ export abstract class WorldActor extends BaseActor {
   public setHover(x: number, y: number) {
     let pmr = this.stage.config.pixelMeterRatio;
     this.hover = new XY(x * pmr, y * pmr);
-    this.stage.getWorld().repeatEvents.push(() => {
+    this.stage.getWorld().addRepeatEvent(() => {
       if (this.hover == null)
         return;
       this.hover.Set(x * pmr, y * pmr);
-      let a = this.stage.getWorld().camera.screenToMeters(this.hover.x, this.hover.y);
+      let a = this.stage.getWorld().getCamera().screenToMeters(this.hover.x, this.hover.y);
       this.hover.Set(a.x, a.y);
       this.body.SetTransform(this.hover, this.body.GetAngle());
     });
@@ -335,14 +364,19 @@ export abstract class WorldActor extends BaseActor {
   }
 
   /**
-   * Create a revolute joint between this actor and some other actor. Note that both actors need
-   * to have some mass (density can't be 0) or else this won't work.
+   * Create a revolute joint between this actor and some other actor. Note that
+   * both actors need to have some mass (density can't be 0) or else this won't
+   * work.
    *
    * @param anchor       The actor around which this actor will rotate
-   * @param anchorX      The X coordinate (relative to center) where joint fuses to the anchor
-   * @param anchorY      The Y coordinate (relative to center) where joint fuses to the anchor
-   * @param localAnchorX The X coordinate (relative to center) where joint fuses to this actor
-   * @param localAnchorY The Y coordinate (relative to center) where joint fuses to this actor
+   * @param anchorX      The X coordinate (relative to center) where joint fuses
+   *                     to the anchor
+   * @param anchorY      The Y coordinate (relative to center) where joint fuses
+   *                     to the anchor
+   * @param localAnchorX The X coordinate (relative to center) where joint fuses
+   *                     to this actor
+   * @param localAnchorY The Y coordinate (relative to center) where joint fuses
+   *                     to this actor
    */
   public setRevoluteJoint(anchor: WorldActor, anchorX: number, anchorY: number, localAnchorX: number, localAnchorY: number) {
     // make the body dynamic
@@ -364,10 +398,12 @@ export abstract class WorldActor extends BaseActor {
    * Attach a motor to make a joint turn
    *
    * @param motorSpeed  Speed in radians per second
-   * @param motorTorque torque of the motor... when in doubt, go with Float.POSITIVE_INFINITY
+   * @param motorTorque torque of the motor... when in doubt, go with something
+   *                    huge, like positive infinity
    */
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
-    // destroy the previously created joint, change the definition, re-create the joint
+    // destroy the previously created joint, change the definition, re-create
+    // the joint
     this.stage.getWorld().destroyJoint(this.revJoint);
     this.revJointDef.enableMotor = true;
     this.revJointDef.motorSpeed = motorSpeed;
@@ -382,7 +418,8 @@ export abstract class WorldActor extends BaseActor {
    * @param lower The lower bound in radians
    */
   public setRevoluteJointLimits(upper: number, lower: number) {
-    // destroy the previously created joint, change the definition, re-create the joint
+    // destroy the previously created joint, change the definition, re-create
+    // the joint
     this.stage.getWorld().destroyJoint(this.revJoint);
     this.revJointDef.upperAngle = upper;
     this.revJointDef.lowerAngle = lower;
@@ -391,14 +428,18 @@ export abstract class WorldActor extends BaseActor {
   }
 
   /**
-   * Create a weld joint between this actor and some other actor, to force the actors to stick
-   * together.
+   * Create a weld joint between this actor and some other actor, to force the
+   * actors to stick together.
    *
    * @param other  The actor that will be fused to this actor
-   * @param otherX The X coordinate (relative to center) where joint fuses to the other actor
-   * @param otherY The Y coordinate (relative to center) where joint fuses to the other actor
-   * @param localX The X coordinate (relative to center) where joint fuses to this actor
-   * @param localY The Y coordinate (relative to center) where joint fuses to this actor
+   * @param otherX The X coordinate (relative to center) where joint fuses to
+   *               the other actor
+   * @param otherY The Y coordinate (relative to center) where joint fuses to
+   *               the other actor
+   * @param localX The X coordinate (relative to center) where joint fuses to
+   *               this actor
+   * @param localY The Y coordinate (relative to center) where joint fuses to
+   *               this actor
    * @param angle  The angle between the actors
    */
   public setWeldJoint(other: WorldActor, otherX: number, otherY: number, localX: number,
@@ -417,10 +458,14 @@ export abstract class WorldActor extends BaseActor {
    * Create a distance joint between this actor and some other actor
    *
    * @param anchor       The actor to which this actor is connected
-   * @param anchorX      The X coordinate (relative to center) where joint fuses to the anchor
-   * @param anchorY      The Y coordinate (relative to center) where joint fuses to the anchor
-   * @param localAnchorX The X coordinate (relative to center) where joint fuses to this actor
-   * @param localAnchorY The Y coordinate (relative to center) where joint fuses to this actor
+   * @param anchorX      The X coordinate (relative to center) where joint fuses
+   *                     to the anchor
+   * @param anchorY      The Y coordinate (relative to center) where joint fuses
+   *                     to the anchor
+   * @param localAnchorX The X coordinate (relative to center) where joint fuses
+   *                     to this actor
+   * @param localAnchorY The Y coordinate (relative to center) where joint fuses
+   *                     to this actor
    */
   public setDistanceJoint(anchor: WorldActor, anchorX: number, anchorY: number, localAnchorX: number, localAnchorY: number) {
     // make the body dynamic
@@ -439,9 +484,7 @@ export abstract class WorldActor extends BaseActor {
     this.stage.getWorld().createJoint(mDistJointDef);
   }
 
-  /**
-   * Break any implicit joints connecting this actor
-   */
+  /** Break any implicit joints connecting this actor */
   public breakJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint != null) {

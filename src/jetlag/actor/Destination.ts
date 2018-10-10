@@ -4,8 +4,8 @@ import { JetLagSound } from "../support/Interfaces";
 import { JetLagStage } from "../JetLagStage";
 
 /**
- * Destinations are actors that the Hero should try to reach. When a Hero reaches a destination, the
- * Hero disappears, and the score updates.
+ * Destinations are actors that the Hero should try to reach. When a Hero
+ * reaches a destination, the Hero disappears, and the score updates.
  */
 export class Destination extends WorldActor {
     /** the number of heroes who can fit at /this/ destination */
@@ -24,13 +24,14 @@ export class Destination extends WorldActor {
     private onAttemptArrival: (h: Hero) => boolean = null;
 
     /**
-     * Create a basic Destination.  The destination won't yet have any physics attached to it.
-     * 
-     * @param manager The game-wide manager object
-     * @param scene The scene into which the Destination is being placed
+     * Create a basic Destination.  The destination won't yet have any physics
+     * attached to it.
+     *
+     * @param stage The stage into which the Destination is being placed
      * @param width The width, in meters, of the Destination
      * @param height The height, in meters, of the Destination
      * @param imgName The image to display for this destination
+     * @param z The z index of the Destination
      */
     constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
         super(stage, imgName, width, height, z);
@@ -38,8 +39,22 @@ export class Destination extends WorldActor {
         this.holding = 0;
     }
 
+    /**
+     *  Return the code that should be run when a hero tries to arrive at this
+     *  destination
+     */
     public getOnAttemptArrival() { return this.onAttemptArrival; }
-    public setOnAttemptArrival(callback: (h: Hero) => boolean) { this.onAttemptArrival = callback; }
+
+    /**
+     * Provide code that should run when the hero tries to reach this
+     * destination.  If the code returns /true/, the hero will be allowed in.
+     * Otherwise, it won't.
+     *
+     * @param callback The code to run to decide if the hero should be let in
+     */
+    public setOnAttemptArrival(callback: (h: Hero) => boolean) {
+        this.onAttemptArrival = callback;
+    }
 
     /**
      * Decide if a hero can be received by the destination.  This allows us to
@@ -49,7 +64,7 @@ export class Destination extends WorldActor {
      * 
      * @param h The hero who may be received by this destination
      */
-    public receive(h: Hero): boolean {
+    public receive(h: Hero) {
         // capacity check
         if (this.holding >= this.capacity)
             return false;
@@ -74,7 +89,7 @@ export class Destination extends WorldActor {
      * @param other   Other actor involved in this collision
      * @param contact A description of the collision
      */
-    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void { }
+    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) { }
 
     /**
      * Change the number of heroes that can be accepted by this destination (the
@@ -82,16 +97,14 @@ export class Destination extends WorldActor {
      *
      * @param heroes The number of heroes that can be accepted
      */
-    public setCapacity(heroes: number): void {
-        this.capacity = heroes;
-    }
+    public setCapacity(heroes: number) { this.capacity = heroes; }
 
     /**
      * Specify the sound to play when a hero arrives at this destination
      *
      * @param soundName The name of the sound file that should play
      */
-    public setArrivalSound(soundName: string): void {
+    public setArrivalSound(soundName: string) {
         this.arrivalSound = this.stage.device.getSpeaker().getSound(soundName);
     }
 }

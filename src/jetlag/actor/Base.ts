@@ -124,7 +124,9 @@ export class BaseActor implements Renderable {
     /** Animation support: the cells of the default animation */
     protected defaultAnimation: Animation;
 
-    /** Animation support: the cells of the animation to use when moving backwards */
+    /** 
+     * Animation support: the cells of the animation to use when moving backwards 
+     */
     protected defaultReverseAnimation: Animation;
 
     /** Animation support: the cells of the disappearance animation */
@@ -133,7 +135,10 @@ export class BaseActor implements Renderable {
     /** Animation support: the dimensions of the disappearance animation */
     private disappearAnimateSize: XY;
 
-    /** Animation support: the offset for placing the disappearance animation relative to the disappearing actor */
+    /** 
+     * Animation support: the offset for placing the disappearance animation
+     * relative to the disappearing actor 
+     */
     private disappearAnimateOffset: XY;
 
     /** Extra data for the game designer to attach to the actor */
@@ -146,7 +151,8 @@ export class BaseActor implements Renderable {
     public getBody() { return this.body; }
 
     /**
-     * Create a new BaseActor by creating an image that can be rendered to the screen
+     * Create a new BaseActor by creating an image that can be rendered to the
+     * screen
      *
      * @param scene   The scene into which this actor should be placed
      * @param imgName The image to show for this actor
@@ -170,7 +176,7 @@ export class BaseActor implements Renderable {
      * @param x    The X coordinate of the top left corner
      * @param y    The Y coordinate of the top left corner
      */
-    setBoxPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number): void {
+    setBoxPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number) {
         let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
         shape.SetAsBoxAtOrigin(this.size.w / 2, this.size.h / 2);
         let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
@@ -193,17 +199,17 @@ export class BaseActor implements Renderable {
     /**
      * Specify that this actor should have a polygon physics shape.
      *
-     * You must take extreme care when using this method. Polygon vertices must be given in
-     * CLOCKWISE order, and they must describe a convex shape.
+     * You must take extreme care when using this method. Polygon vertices must
+     * be given in CLOCKWISE order, and they must describe a convex shape.
      * COORDINATES ARE RELATIVE TO THE MIDDLE OF THE OBJECT
      *
      * @param type     Is the actor's body static or dynamic?
      * @param x        The X coordinate of the top left corner
      * @param y        The Y coordinate of the top left corner
-     * @param vertices Up to 16 coordinates representing the vertexes of this polygon, listed as
-     *                 x0,y0,x1,y1,x2,y2,...
+     * @param vertices Up to 16 coordinates representing the vertexes of this
+     *                 polygon, listed as x0,y0,x1,y1,x2,y2,...
      */
-    setPolygonPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number, vertices: number[]): void {
+    setPolygonPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number, vertices: number[]) {
         let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
         this.verts = [];
         for (let i = 0; i < vertices.length; i += 2)
@@ -238,7 +244,7 @@ export class BaseActor implements Renderable {
      * @param y      The Y coordinate of the top left corner
      * @param radius The radius of the underlying circle
      */
-    setCirclePhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number, radius: number): void {
+    setCirclePhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number, radius: number) {
         let shape = new PhysicsType2d.Collision.Shapes.CircleShape();
         shape.m_radius = radius;
 
@@ -263,8 +269,8 @@ export class BaseActor implements Renderable {
     /**
      * Internal method for updating an actor's velocity
      *
-     * We use this because we need to be careful about possibly breaking joints when we make the
-     * actor move
+     * We use this because we need to be careful about possibly breaking joints
+     * when we make the actor move
      *
      * @param x The new x velocity
      * @param y The new y velocity
@@ -282,13 +288,14 @@ export class BaseActor implements Renderable {
     /**
      * Break any joints that involve this actor, so that it can move freely.
      *
-     * NB: BaseActors don't have any joints to break, but classes that derive from BaseActor do
+     * NB: BaseActors don't have any joints to break, but classes that derive
+     * from BaseActor do
      */
-    breakJoints(): void { }
+    breakJoints() { }
 
     /**
-     * Every time the world advances by a timestep, we call this code to update the actor route and
-     * animation, and then draw the actor
+     * Every time the world advances by a timestep, we call this code to update
+     * the actor route and animation, and then draw the actor
      */
     render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
         if (!this.getEnabled())
@@ -314,10 +321,10 @@ export class BaseActor implements Renderable {
     /**
      * Indicate whether this actor engages in physics collisions or not
      *
-     * @param state True or false, depending on whether the actor will participate in physics
-     *              collisions or not
+     * @param state True or false, depending on whether the actor will
+     *              participate in physics collisions or not
      */
-    setCollisionsEnabled(state: boolean): void {
+    setCollisionsEnabled(state: boolean) {
         // The default is for all fixtures of a actor have the same sensor state
         let fixtures = this.body.GetFixtures();
         while (fixtures.MoveNext())
@@ -338,7 +345,8 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Adjust the default physics settings (density, elasticity, friction) for this actor
+     * Adjust the default physics settings (density, elasticity, friction) for
+     * this actor
      *
      * @param density    New density of the actor
      * @param elasticity New elasticity of the actor
@@ -406,11 +414,12 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Make the actor continuously rotate. This is usually only useful for fixed objects.
+     * Make the actor continuously rotate. This is usually only useful for fixed
+     * objects.
      *
      * @param duration Time it takes to complete one rotation
      */
-    public setRotationSpeed(duration: number): void {
+    public setRotationSpeed(duration: number) {
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
         this.body.SetAngularVelocity(duration);
@@ -421,15 +430,17 @@ export class BaseActor implements Renderable {
      *
      * @param quiet True if the disappear sound should not be played
      */
-    public remove(quiet: boolean): void {
-        // set it invisible immediately, so that future calls know to ignore this actor
+    public remove(quiet: boolean) {
+        // set it invisible immediately, so that future calls know to ignore
+        // this actor
         this.setEnabled(false);
 
         // play a sound when we remove this actor?
         if (this.disappearSound && !quiet)
             this.disappearSound.play();
-        // To do a disappear animation after we've removed the actor, we draw an actor, so that
-        // we have a clean hook into the animation system, but we disable its physics
+        // To do a disappear animation after we've removed the actor, we draw an
+        // actor, so that we have a clean hook into the animation system, but we
+        // disable its physics
         if (this.disapperAnimation != null) {
             let x = this.getXPosition() + this.disappearAnimateOffset.x;
             let y = this.getYPosition() + this.disappearAnimateOffset.y;
@@ -461,7 +472,7 @@ export class BaseActor implements Renderable {
      * @param x Velocity in X dimension
      * @param y Velocity in Y dimension
      */
-    public setAbsoluteVelocity(x: number, y: number): void {
+    public setAbsoluteVelocity(x: number, y: number) {
         // ensure this is a moveable actor
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
@@ -489,7 +500,7 @@ export class BaseActor implements Renderable {
      * @param velocity speed at which to travel along the route
      * @param loop     When the route completes, should we start it over again?
      */
-    public setRoute(route: Route, velocity: number, loop: boolean): void {
+    public setRoute(route: Route, velocity: number, loop: boolean) {
         // This must be a KinematicBody or a Dynamic Body!
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
@@ -514,7 +525,7 @@ export class BaseActor implements Renderable {
      * @param x The new X position, in pixels
      * @param y The new Y position, in pixels
      */
-    public setPosition(x: number, y: number): void {
+    public setPosition(x: number, y: number) {
         this.body.SetTransform(new XY(x + this.size.w / 2, y + this.size.h / 2), this.body.GetAngle());
     }
 
@@ -523,7 +534,7 @@ export class BaseActor implements Renderable {
      *
      * @param zIndex The z plane. Values range from -2 to 2. The default is 0.
      */
-    public setZIndex(zIndex: number): void {
+    public setZIndex(zIndex: number) {
         // Coerce index into legal range, then move it
         zIndex = (zIndex < -2) ? -2 : zIndex;
         zIndex = (zIndex > 2) ? 2 : zIndex;
@@ -538,7 +549,7 @@ export class BaseActor implements Renderable {
      * @param x Velocity in X dimension
      * @param y Velocity in Y dimension
      */
-    public addVelocity(x: number, y: number): void {
+    public addVelocity(x: number, y: number) {
         // ensure this is a moveable actor
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
@@ -552,10 +563,11 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Indicate that this actor's rotation should change in response to its direction of motion
+     * Indicate that this actor's rotation should change in response to its
+     * direction of motion
      */
-    public setRotationByDirection(): void {
-        this.scene.repeatEvents.push(() => {
+    public setRotationByDirection() {
+        this.scene.addRepeatEvent(() => {
             if (this.getEnabled()) {
                 let x = -this.body.GetLinearVelocity().x;
                 let y = -this.body.GetLinearVelocity().y;
@@ -573,7 +585,7 @@ export class BaseActor implements Renderable {
      * actor be subject to forces.  In practice, using this in a side-scroller
      * means the actor will fall to the ground.
      */
-    public setCanFall(): void {
+    public setCanFall() {
         this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
     }
 
@@ -581,28 +593,28 @@ export class BaseActor implements Renderable {
      * Request that this actor disappear after a specified amount of time
      *
      * @param delay How long to wait before hiding the actor, in milliseconds
-     * @param quiet Should the item should disappear quietly, or play its disappear sound?
+     * @param quiet Should the item should disappear quietly, or play its
+     *              disappear sound?
      */
-    public setDisappearDelay(delay: number, quiet: boolean): void {
-        this.scene.timer.addEvent(new TimedEvent(delay, false, () => this.remove(quiet)));
+    public setDisappearDelay(delay: number, quiet: boolean) {
+        this.scene.getTimer().addEvent(new TimedEvent(delay, false, () => this.remove(quiet)));
     }
 
     /**
      * Set a time that should pass before this actor appears on the screen
      *
-     * @param delay How long to wait before displaying the actor, in milliseconds
+     * @param delay How long to wait before displaying the actor, in
+     * milliseconds
      */
-    public setAppearDelay(delay: number): void {
+    public setAppearDelay(delay: number) {
         this.setEnabled(false);
-        this.scene.timer.addEvent(new TimedEvent(delay, false, () => {
+        this.scene.getTimer().addEvent(new TimedEvent(delay, false, () => {
             this.setEnabled(true);
         }));
     }
 
-    /**
-     * Indicate that this actor should not rotate due to torque
-     */
-    public disableRotation(): void {
+    /** Indicate that this actor should not rotate due to torque */
+    public disableRotation() {
         this.body.SetFixedRotation(true);
     }
 
@@ -611,7 +623,7 @@ export class BaseActor implements Renderable {
      *
      * @param soundName The name of the sound file to play
      */
-    public setDisappearSound(soundName: string): void {
+    public setDisappearSound(soundName: string) {
         this.disappearSound = this.device.getSpeaker().getSound(soundName);
     }
 
@@ -627,7 +639,8 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Set the animation sequence to use when the actor is moving in the negative X direction
+     * Set the animation sequence to use when the actor is moving in the
+     * negative X direction
      *
      * @param animation The animation to display
      */
@@ -636,13 +649,17 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Set the animation sequence to use when the actor is removed from the world
+     * Set the animation sequence to use when the actor is removed from the
+     * world
      *
      * @param animation The animation to display
-     * @param offsetX   Distance between the animation and the left side of the actor
+     * @param offsetX   Distance between the animation and the left side of the
+     *                  actor
      * @param offsetY   Distance between the animation and the top of the actor
-     * @param width     The width of the animation, in case it's not the same as the actor width
-     * @param height    The height of the animation, in case it's not the same as the actor height
+     * @param width     The width of the animation, in case it's not the same as
+     *                  the actor width
+     * @param height    The height of the animation, in case it's not the same
+     *                  as the actor height
      */
     public setDisappearAnimation(animation: Animation, offsetX: number, offsetY: number, width: number, height: number) {
         this.disapperAnimation = animation;
@@ -651,13 +668,16 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Indicate that this actor should shrink over time.  Note that using negative values will lead
-     * to growing instead of shrinking.
+     * Indicate that this actor should shrink over time.  Note that using
+     * negative values will lead to growing instead of shrinking.
      *
-     * @param shrinkX      The number of meters by which the X dimension should shrink each second
-     * @param shrinkY      The number of meters by which the Y dimension should shrink each second
-     * @param keepCentered Should the actor's center point stay the same as it shrinks, or should
-     *                     its top left corner stay in the same position
+     * @param shrinkX      The number of meters by which the X dimension should
+     *                     shrink each second
+     * @param shrinkY      The number of meters by which the Y dimension should
+     *                     shrink each second
+     * @param keepCentered Should the actor's center point stay the same as it
+     *                     shrinks, or should its top left corner stay in the
+     *                     same position
      */
     public setShrinkOverTime(shrinkX: number, shrinkY: number, keepCentered: boolean) {
         let done = false;
@@ -683,24 +703,26 @@ export class BaseActor implements Renderable {
                 done = true;
             }
         });
-        this.scene.timer.addEvent(te);
+        this.scene.getTimer().addEvent(te);
     }
 
     /**
-     * Set a dampening factor to cause a moving body to slow down without colliding with anything
+     * Set a dampening factor to cause a moving body to slow down without
+     * colliding with anything
      *
      * @param amount The amount of damping to apply
      */
-    public setDamping(amount: number): void {
+    public setDamping(amount: number) {
         this.body.SetLinearDamping(amount);
     }
 
     /**
-     * Set a dampening factor to cause a spinning body to decrease its rate of spin
+     * Set a dampening factor to cause a spinning body to decrease its rate of
+     * spin
      *
      * @param amount The amount of damping to apply
      */
-    public setAngularDamping(amount: number): void {
+    public setAngularDamping(amount: number) {
         this.body.SetAngularDamping(amount);
     }
 
@@ -712,8 +734,8 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Force an actor to have a Kinematic body type.  Kinematic bodies can move, but are not subject
-     * to forces in the same way as Dynamic bodies.
+     * Force an actor to have a Kinematic body type.  Kinematic bodies can move,
+     * but are not subject to forces in the same way as Dynamic bodies.
      */
     public setKinematic() {
         if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.KINEMATIC)
@@ -742,7 +764,7 @@ export class BaseActor implements Renderable {
      * @param width  The new width of the actor, in pixels
      * @param height The new height of the actor, in pixels
      */
-    public resize(x: number, y: number, width: number, height: number): void {
+    public resize(x: number, y: number, width: number, height: number) {
         // read old body information
         let oldBody = this.body;
         // The default is for all fixtures of a actor have the same sensor state
@@ -785,12 +807,12 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Indicate whether this actor is fast-moving, so that the physics simulator can do a better job
-     * dealing with tunneling effects.
+     * Indicate whether this actor is fast-moving, so that the physics simulator
+     * can do a better job dealing with tunneling effects.
      *
      * @param state True or false, depending on whether it is fast-moving or not
      */
-    setFastMoving(state: boolean): void {
+    setFastMoving(state: boolean) {
         this.body.SetBullet(state);
     }
 }

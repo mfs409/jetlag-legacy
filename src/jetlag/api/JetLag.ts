@@ -152,6 +152,12 @@ export class JetLagApi {
         this.nav = new NavigationApi(manager, stage);
     }
 
+    /**
+     * JetLag will try to figure out if it is running on a mobile device, and
+     * will return true if it concludes that it is.
+     */
+    public isMobile() { return this.stage.config.mobileMode; }
+
     /** Return the current frames per second of the game */
     public getFPS() { return this.stage.device.getRenderer().getFPS(); }
 
@@ -224,7 +230,7 @@ export class JetLagApi {
      * @param action The action to perform when the timer expires
      */
     public addTimer(interval: number, repeat: boolean, action: () => void) {
-        this.stage.getWorld().timer.addEvent(new TimedEvent(interval, repeat, action));
+        this.stage.getWorld().getTimer().addEvent(new TimedEvent(interval, repeat, action));
     }
 
     /**

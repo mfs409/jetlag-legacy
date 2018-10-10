@@ -64,6 +64,9 @@ export class JetLagConfig {
   /** Should we force the accelerometer to be off? */
   public forceAccelerometerOff = false;
 
+  /** Should we force the game to run in mobile mode? */
+  public mobileMode = false;
+
   /** The code that draws the main levels of the game */
   public levelBuilder: (index: number, jl: JetLagApi) => void = null;
 

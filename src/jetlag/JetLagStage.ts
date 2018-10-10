@@ -192,8 +192,8 @@ export class JetLagStage {
         }
         // Log the event?
         if (this.config.debugMode) {
-            let worldcoord = this.world.camera.screenToMeters(screenX, screenY);
-            let hudcoord = this.hud.camera.screenToMeters(screenX, screenY);
+            let worldcoord = this.world.getCamera().screenToMeters(screenX, screenY);
+            let hudcoord = this.hud.getCamera().screenToMeters(screenX, screenY);
             this.device.getConsole().info("World Touch: (" + worldcoord.x + ", "
                 + worldcoord.y + ")");
             this.device.getConsole().info("HUD Touch: (" + hudcoord.x + ", "
@@ -356,18 +356,16 @@ export class JetLagStage {
         this.world.advanceWorld(1 / 45, 8, 3);
 
         // Run any pending events, and clear one-time events
-        for (let e of this.world.oneTimeEvents) { e(); }
-        for (let e of this.world.repeatEvents) { e(); }
-        this.world.oneTimeEvents.length = 0;
+        this.world.runEvents();
 
         // Determine the center of the camera's focus
         this.world.adjustCamera();
 
         // The world is now static for this time step... we can display it!
         // Order is background, world, foreground, hud
-        this.background.render(renderer, this.world.camera, elapsedMillis);
+        this.background.render(renderer, this.world.getCamera(), elapsedMillis);
         this.world.render(renderer, elapsedMillis);
-        this.foreground.render(renderer, this.world.camera, elapsedMillis);
+        this.foreground.render(renderer, this.world.getCamera(), elapsedMillis);
         this.hud.render(renderer, elapsedMillis);
         renderer.showFrame();
     }

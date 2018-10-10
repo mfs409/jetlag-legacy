@@ -24,11 +24,11 @@ export class Goodie extends WorldActor {
    * Create a basic Goodie.  The goodie won't yet have any physics attached to
    * it.
    *
-   * @param game    The currently active game
-   * @param scene   The scene into which the destination is being placed
+   * @param stage   The stage into which the goodie will be made
    * @param width   width of this Goodie
    * @param height  height of this Goodie
    * @param imgName image to use for this Goodie
+   * @param z       The z index of the Goodie
    */
   constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
     super(stage, imgName, width, height, z);

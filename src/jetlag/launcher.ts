@@ -23,6 +23,8 @@ export function runGameAsHtml(domId: string, config: JetLagConfig) {
         }
     }
 
+    // Should we change the screen dimensions and font size based on the 
+    // size of the screen?
     if (config.adaptToScreenSize) {
         // as we compute the new screen width, height, and pixel ratio, we need
         // to be sure to remember the original ratio given in the game. JetLag
@@ -43,6 +45,14 @@ export function runGameAsHtml(domId: string, config: JetLagConfig) {
         config.pixelMeterRatio *= config.screenWidth / old.x;
         // NB: the ratio above is also the font scaling ratio
         config.fontScaling = config.screenWidth / old.x;
+    }
+
+    // The addressbar lets us force the game into mobile mode (i.e.,
+    // accelerometer on)
+    let x = window.location + "";
+    if (x.lastIndexOf("?mobile") == x.length - "?mobile".length) {
+        config.forceAccelerometerOff = false;
+        config.mobileMode = true;
     }
 
     let device = new HtmlDevice(config, domId, logger);

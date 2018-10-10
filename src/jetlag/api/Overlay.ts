@@ -44,8 +44,8 @@ export class OverlayApi {
      * @returns a pair {x,y} that represents the world coordinates, in meters
      */
     public overlayToWorldCoords(x: number, y: number) {
-        let pixels1 = this.overlay.camera.metersToScreen(x, y);
-        let pixels2 = this.stage.getWorld().camera.screenToMeters(pixels1.x, pixels1.y);
+        let pixels1 = this.overlay.getCamera().metersToScreen(x, y);
+        let pixels2 = this.stage.getWorld().getCamera().screenToMeters(pixels1.x, pixels1.y);
         return pixels2;
     }
 
@@ -99,7 +99,7 @@ export class OverlayApi {
         let panstart = (hudX: number, hudY: number) => {
             // Need to turn the meters of the hud into screen pixels, so that
             // world can convert to its meters
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             // If worldactor with draggable, we're good
             let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
             if (actor == null)
@@ -117,8 +117,8 @@ export class OverlayApi {
             // need an actor, and need coords in pixels
             if (foundActor == null)
                 return false;
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             foundActor.setPosition(meters.x - foundActor.getWidth() / 2, meters.y - foundActor.getHeight() / 2);
             return true;
         }
@@ -141,7 +141,7 @@ export class OverlayApi {
         this.overlay.addActor(c, 0);
         c.setSwipeHandler((hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
             // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
-            let pixels = this.overlay.camera.metersToScreen(hudX0, hudY0);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX0, hudY0);
             // If worldactor with flickMultiplier, we're good
             let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
             if (actor == null)
@@ -151,8 +151,8 @@ export class OverlayApi {
             if (actor.getFlickMultiplier() === 0)
                 return false;
             // Figure out the velocity to apply
-            let p2 = this.overlay.camera.metersToScreen(hudX1, hudY1);
-            let w = this.stage.getWorld().camera.screenToMeters(p2.x, p2.y);
+            let p2 = this.overlay.getCamera().metersToScreen(hudX1, hudY1);
+            let w = this.stage.getWorld().getCamera().screenToMeters(p2.x, p2.y);
             let dx = (w.x - actor.getXPosition()) * actor.getFlickMultiplier() * 1000 / time;
             let dy = w.y - actor.getYPosition() * actor.getFlickMultiplier() * 1000 / time;
             // prep the actor and flick it
@@ -175,8 +175,8 @@ export class OverlayApi {
         this.addTapControl(cfg, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             this.activeActor.setPosition(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
             this.activeActor = null;
             return true;
@@ -198,8 +198,8 @@ export class OverlayApi {
         this.addTapControl(cfg, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             let r = new Route().to(this.activeActor.getXPosition(), this.activeActor.getYPosition()).to(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
             this.activeActor.setAbsoluteVelocity(0, 0);
             this.activeActor.setRotationSpeed(0);
@@ -226,8 +226,8 @@ export class OverlayApi {
         this.addTapControl(cfg, (hudX: number, hudY: number) => {
             if (this.activeActor == null)
                 return false;
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let meters = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             let dx = this.activeActor.getXPosition() - (meters.x - this.activeActor.getWidth() / 2);
             let dy = this.activeActor.getYPosition() - (meters.y - this.activeActor.getHeight() / 2);
             let hy = Math.sqrt(dx * dx + dy * dy) / velocity;
@@ -313,7 +313,7 @@ export class OverlayApi {
      * @param action The action to perform
      */
     public addTimer(interval: number, repeat: boolean, action: () => void) {
-        this.overlay.timer.addEvent(new TimedEvent(interval, repeat, action));
+        this.overlay.getTimer().addEvent(new TimedEvent(interval, repeat, action));
     }
 
     /**
@@ -346,7 +346,7 @@ export class OverlayApi {
         });
         // Put the control and events in the appropriate lists
         this.overlay.addActor(c, 0);
-        this.stage.getWorld().repeatEvents.push(() => { if (active) whileDownAction(); });
+        this.stage.getWorld().addRepeatEvent(() => { if (active) whileDownAction(); });
         return c;
     }
 
@@ -378,8 +378,8 @@ export class OverlayApi {
         let isHolding = false;
         c.setTouchDownHandler((hudX: number, hudY: number) => {
             isHolding = true;
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let world = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             v.x = world.x;
             v.y = world.y;
             return true;
@@ -389,8 +389,8 @@ export class OverlayApi {
             return true;
         });
         c.setPanMoveHandler((hudX: number, hudY: number) => {
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let world = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             v.x = world.x;
             v.y = world.y;
             return isHolding;
@@ -398,7 +398,7 @@ export class OverlayApi {
         this.overlay.addActor(c, 0);
 
         let mLastThrow = 0;
-        this.stage.getWorld().repeatEvents.push(() => {
+        this.stage.getWorld().addRepeatEvent(() => {
             if (isHolding) {
                 let now = new Date().getTime();
                 if (mLastThrow + milliDelay < now) {
@@ -508,8 +508,8 @@ export class OverlayApi {
      */
     public ThrowDirectionalAction(hero: Hero, offsetX: number, offsetY: number) {
         return (hudX: number, hudY: number) => {
-            let pixels = this.overlay.camera.metersToScreen(hudX, hudY);
-            let world = this.stage.getWorld().camera.screenToMeters(pixels.x, pixels.y);
+            let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
+            let world = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             this.stage.getProjectilePool().throwAt(hero.getCenterX(), hero.getCenterY(), world.x, world.y, hero, offsetX, offsetY);
             return true;
         };
