@@ -32,7 +32,7 @@ export class HtmlRenderer implements JetLagRenderer {
      * mainContainer holds all of the sprites that will be rendered as part of
      * the currently in-progress render.
      */
-    mainContainer: PIXI.Container;
+    private mainContainer: PIXI.Container;
 
     /**
      * debugContainer holds outlines for sprites that will be rendered during
@@ -46,6 +46,7 @@ export class HtmlRenderer implements JetLagRenderer {
      *
      * @param cfg The game-wide configuration object
      * @param domId The ID of the DOM element into which we will render
+     * @param console A console, for printing errors and warnings
      */
     constructor(private cfg: JetLagConfig, domId: string, private console: HtmlConsole) {
         // Create a rendering context and attach it to the appropriate place in
@@ -72,15 +73,13 @@ export class HtmlRenderer implements JetLagRenderer {
      * 
      * @param callback The code to run once all assets are loaded
      */
-    loadAssets(callback: () => void) {
-        PIXI.loader.load(callback);
-    }
+    loadAssets(callback: () => void) { PIXI.loader.load(callback); }
 
     /**
      * Start the render loop.  Each iteration of the loop will call the
      * top-level game manager's render function.
      * 
-     * @param manager The top-level game manager
+     * @param stage The stage that is being drawn
      */
     public startRenderLoop(stage: JetLagStage) {
         this.renderer.ticker.add(() => {
@@ -195,7 +194,7 @@ export class HtmlRenderer implements JetLagRenderer {
     }
 
     /**
-     * Add a Picture (just image) to the next frame
+     * Add a Picture (just an image, no debug context) to the next frame
      * 
      * @param sprite The image to (possibly) display
      * @param camera The camera that determines which pictures to show, and where
@@ -258,7 +257,7 @@ export class HtmlRenderer implements JetLagRenderer {
      * @param imgName The name of the image to load
      */
     public getSprite(imgName: string) {
-        if (!PIXI.loader.resources[imgName]) {
+        if (!PIXI.loader.resources[imgName] && imgName !== "") {
             this.console.info("Unable to find graphics asset '" + imgName + "'");
             return new HtmlSprite("", new PIXI.Sprite());
         }
@@ -273,14 +272,15 @@ export class HtmlRenderer implements JetLagRenderer {
 
     /**
      * Create some text
+     * 
+     * @param txt The text to show
+     * @param opts PIXI options for the text
      */
     public makeText(txt: string, opts: any) {
         opts.fontSize = Math.floor(opts.fontSize * this.cfg.fontScaling);
         return new HtmlText(new PIXI.Text(txt, opts));
     }
 
+    /** Get a debug context that can be used by a sprite during debug renders */
     makeDebugContext() { return new HtmlDebugSprite(); }
-
 }
-
-

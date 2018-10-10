@@ -35,11 +35,13 @@ export class Camera {
 
     /**
      * Create a Camera by setting its bounds and its current pixel/meter ratio
-     * 
+     *
      * @param maxX The maximum X value (in meters)
      * @param maxY The maximum Y value (in meters)
      * @param ratio The initial pixel/meter ratio
-     * @param config The game-wide configuration object, used to get screen dimensions
+     * @param config The game-wide configuration object, used to get screen
+     *               dimensions
+     * @param console A console, for reporting errors and warnings
      */
     constructor(maxX: number, maxY: number, ratio: number, config: JetLagConfig, private console: JetLagConsole) {
         this.max.x = maxX;
@@ -55,9 +57,7 @@ export class Camera {
      * Get the pixel/meter ratio of the camera.  Increasing the ratio would 
      * equate to zooming in.  Decreasing the ratio would equate to zooming out.
      */
-    public getScale(): number {
-        return this.ratio;
-    }
+    public getScale(): number { return this.ratio; }
 
     /**
      * Set the pixel/meter ratio of the camera.
@@ -107,9 +107,9 @@ export class Camera {
     }
 
     /**
-     * Determine whether a sprite is within the region being shown by the camera,
-     * so that we can reduce the overhead on the renderer.
-     * 
+     * Determine whether a sprite is within the region being shown by the
+     * camera, so that we can reduce the overhead on the renderer.
+     *
      * @param x The X coordinate of the top left corner of the sprite, in meters
      * @param y The Y coordinate of the top left corner of the sprite, in meters
      * @param w The width of the sprite, in meters
@@ -123,16 +123,12 @@ export class Camera {
         return leftOk && rightOk && topOk && bottomOk;
     }
 
-    /**
-     * Return the X coordinate of the left of the camera viewport
-     */
+    /** Return the X coordinate of the left of the camera viewport */
     public getOffsetX() {
         return this.center.x - this.scaledVisibleRegionDims.w / 2;
     }
 
-    /**
-     * Return the Y coordinate of the top of the camera viewport
-     */
+    /** Return the Y coordinate of the top of the camera viewport */
     public getOffsetY() {
         return this.center.y - this.scaledVisibleRegionDims.h / 2;
     }

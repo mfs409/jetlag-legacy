@@ -1,8 +1,6 @@
 import { JetLagKeys, JetLagKeyboard } from "../support/Interfaces";
 
-/**
- * Keyboard abstracts the ways of responding to keyboard events
- */
+/** Keyboard abstracts the ways of responding to keyboard events */
 export class HtmlKeyboard implements JetLagKeyboard {
     /** handlers for when keys are pressed down */
     private downHandlers: (() => void)[] = [];
@@ -10,20 +8,31 @@ export class HtmlKeyboard implements JetLagKeyboard {
     /** handlers for when keys are released */
     private upHandlers: (() => void)[] = [];
 
+    /** 
+     * Build the Keyboard handler object
+     */
+    constructor() {
+        for (let o = 0; o < JetLagKeys.COUNT; ++o) {
+            this.upHandlers.push(null);
+            this.downHandlers.push(null);
+        }
+        document.addEventListener("keydown", (ev: KeyboardEvent) => this.keyDownHandler(ev));
+        document.addEventListener("keyup", (ev: KeyboardEvent) => this.keyUpHandler(ev));
+    }
+
     /** Set a handler to respond to some keydown event */
     public setKeyDownHandler(key: JetLagKeys, handler: () => void) { this.downHandlers[key.valueOf() as number] = handler; }
 
     /** Set a handler to respond to some keyup event */
     public setKeyUpHandler(key: JetLagKeys, handler: () => void) { this.upHandlers[key.valueOf() as number] = handler; }
 
+    /** Reset the keyboard (i.e., between levels) */
     public clearHandlers() {
         this.downHandlers = [];
         this.upHandlers = [];
     }
 
-    /**
-     * Convert a key code to KEYS enum
-     */
+    /** Convert a key code to KEYS enum */
     private toCode(code: number): number {
         let idx = -1;
         switch (code) {
@@ -38,9 +47,7 @@ export class HtmlKeyboard implements JetLagKeyboard {
         return idx;
     }
 
-    /**
-     * Respond to a key down event
-     */
+    /** Respond to a key down event */
     private keyDownHandler(ev: KeyboardEvent) {
         let idx = this.toCode(ev.keyCode);
         if (idx != -1) {
@@ -54,6 +61,8 @@ export class HtmlKeyboard implements JetLagKeyboard {
 
     /**
      * Respond to a key up event
+     * 
+     * @param ev The event to respond to
      */
     private keyUpHandler(ev: KeyboardEvent) {
         let idx = this.toCode(ev.keyCode);
@@ -64,17 +73,5 @@ export class HtmlKeyboard implements JetLagKeyboard {
                 ev.preventDefault();
             }
         }
-    }
-
-    /** 
-     * Build the Keyboard handler object
-     */
-    constructor() {
-        for (let o = 0; o < JetLagKeys.COUNT; ++o) {
-            this.upHandlers.push(null);
-            this.downHandlers.push(null);
-        }
-        document.addEventListener("keydown", (ev: KeyboardEvent) => this.keyDownHandler(ev));
-        document.addEventListener("keyup", (ev: KeyboardEvent) => this.keyUpHandler(ev));
     }
 }

@@ -4,11 +4,9 @@ import { JetLagSpeaker } from '../support/Interfaces';
 import { HtmlConsole } from './HtmlConsole';
 
 /**
- * Audio provides a store of sound and music objects that can be played at any
- * time.  The only difference between sounds and music is that music objects
+ * HtmlSpeaker provides a store of sound and music objects that can be played at
+ * any time.  The only difference between sounds and music is that music objects
  * will always loop, whereas sound objects never will.
- * 
- * NB: We've probably got too thin a wrapper around Howler.js, but it's fine for now.
  */
 export class HtmlSpeaker implements JetLagSpeaker {
     /** All of the sounds (non-looping audio) in the game, by name */
@@ -21,6 +19,7 @@ export class HtmlSpeaker implements JetLagSpeaker {
      * Create an audio object by loading all of the game's audio files
      * 
      * @param config The game-wide configuration
+     * @param console A console, for printing error messages
      */
     constructor(config: JetLagConfig, private console: HtmlConsole) {
         for (let name of config.soundNames) {
@@ -35,7 +34,6 @@ export class HtmlSpeaker implements JetLagSpeaker {
      * Get a previously loaded Sound object
      *
      * @param soundName Name of the sound file to retrieve
-     * @return a Sound object that can be used for sound effects
      */
     getSound(soundName: string) {
         let ret: Howl = this.sounds[soundName];
@@ -49,7 +47,6 @@ export class HtmlSpeaker implements JetLagSpeaker {
      * Get a previously loaded Music object
      *
      * @param musicName Name of the music file to retrieve
-     * @return a Music object that can be used to play background music
      */
     getMusic(musicName: string) {
         let ret: Howl = this.music[musicName];

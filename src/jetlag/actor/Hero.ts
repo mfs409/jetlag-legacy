@@ -40,7 +40,6 @@ export class Hero extends WorldActor {
      * defeated 
      */
     private mustSurvive: boolean;
-    getMustSurvive() { return this.mustSurvive; }
 
     /** Code to run when the hero's strength changes */
     private strengthChangeCallback: (h: Hero) => void;
@@ -82,14 +81,36 @@ export class Hero extends WorldActor {
     /** For tracking the current amount of rotation of the hero */
     private currentRotation = 0;
 
+    /**
+     * Construct a Hero, but don't give it any physics yet
+     *
+     * @param stage   The stage into which the Hero is being placed
+     * @param width   The width of the hero
+     * @param height  The height of the hero
+     * @param imgName The name of the file that has the default image for this
+     *                hero
+     * @param z       The z index of the hero
+     */
+    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
+        super(stage, imgName, width, height, z);
+    }
+
     /** Report the time until the hero's invincibility runs out */
     getInvincibleRemaining() {
         return Math.max(0, this.invincibleRemaining / 1000);
     }
 
     /** 
+     * Return true if the level should be lost immediately when this hero is
+     * defeated (for games with multiple heroes) 
+     */
+    getMustSurvive() { return this.mustSurvive; }
+
+    /** 
      * Set the time until the hero's invincibility runs out.  If this is making
      * a zero value positive, it makes the hero invincible. 
+     * 
+     * @param amount The number of seconds of invincibility to add
      */
     setInvincibleRemaining(amount: number) {
         this.invincibleRemaining = amount * 1000;
@@ -98,26 +119,12 @@ export class Hero extends WorldActor {
     }
 
     /**
-    * Construct a Hero, but don't give it any physics yet
-    *
-    * @param game    The currently active game
-    * @param scene   The scene into which the Hero is being placed
-    * @param width   The width of the hero
-    * @param height  The height of the hero
-    * @param imgName The name of the file that has the default image for this
-    *                hero
-    */
-    constructor(stage: JetLagStage, width: number, height: number, imgName: string, z: number) {
-        super(stage, imgName, width, height, z);
-    }
-
-    /**
      * Code to run when rendering the Hero.
-     *
-     * NB:  We can't just use the basic renderer, because we might need to
-     *      adjust a one-off animation (invincibility or throw) first
      */
     render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
+        // NB:  We can't just use the basic renderer, because we might need to
+        //      adjust a one-off animation (invincibility or throw) first
+
         // determine when to turn off throw animations
         if (this.throwAnimationTimeRemaining > 0) {
             this.throwAnimationTimeRemaining -= elapsedMillis;
@@ -279,11 +286,7 @@ export class Hero extends WorldActor {
         this.stage.score.onGoodieCollected(g);
     }
 
-    /**
-     * Return the hero's strength
-     *
-     * @return The strength of the hero
-     */
+    /** Return the hero's strength */
     public getStrength() { return this.strength; }
 
     /**
@@ -351,7 +354,7 @@ export class Hero extends WorldActor {
     /**
      * Make the hero's throw animation play while it is throwing a projectile
      */
-    doThrowAnimation() {
+    public doThrowAnimation() {
         if (this.throwAnimation != null) {
             this.animator.setCurrentAnimation(this.throwAnimation);
             this.throwAnimationTimeRemaining = this.throwAnimateTotalLength * 1000;
@@ -359,8 +362,9 @@ export class Hero extends WorldActor {
     }
 
     /**
-     * Put the hero in crawl mode. Note that we make the hero rotate when it is
-     * crawling
+     * Put the hero in crawl mode. 
+     * 
+     * @param rotate The amount to rotate the actor when the crawl starts
      */
     crawlOn(rotate: number) {
         if (this.crawling) {
@@ -373,9 +377,11 @@ export class Hero extends WorldActor {
     }
 
     /**
-    * Take the hero out of crawl mode
-    */
-    crawlOff(rotate: number) {
+     * Take the hero out of crawl mode
+     * 
+     * @param rotate The amount to rotate the actor when the crawl ends
+     */
+    public crawlOff(rotate: number) {
         if (!this.crawling) {
             return;
         }
@@ -389,7 +395,7 @@ export class Hero extends WorldActor {
      *
      * @param delta How much to add to the current rotation
      */
-    increaseRotation(delta: number) {
+    public increaseRotation(delta: number) {
         if (this.inAir) {
             this.currentRotation += delta;
             this.body.SetAngularVelocity(0);
@@ -483,7 +489,7 @@ export class Hero extends WorldActor {
     /**
      * Provide some code to run any time this hero's strength changes
      * 
-     * @callback The code to run
+     * @param callback The code to run
      */
     public setStrengthChangeCallback(callback: (h: Hero) => void) {
         this.strengthChangeCallback = callback;

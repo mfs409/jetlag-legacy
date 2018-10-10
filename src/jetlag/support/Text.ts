@@ -46,7 +46,7 @@ export class Text implements Renderable {
     }
 
     /**
-     * Show or hide this RenderableText
+     * Show or hide this Text
      *
      * @param vis The new state (true for showing, false for hidden)
      */
@@ -62,7 +62,8 @@ export class Text implements Renderable {
     public render(renderer: JetLagRenderer, camera: Camera) {
         if (!this.visible)
             return;
-        // Set the world position and the text, then let the renderer decide where to put it...
+        // Set the world position and the text, then let the renderer decide
+        // where to put it...
         this.text.setText(this.producer());
         this.text.setPosition(this.coord.x, this.coord.y);
         renderer.addTextToFrame(this.text, camera, this.center);

@@ -45,12 +45,19 @@ export interface JetLagDevice {
  * that we care about.
  */
 export interface JetLagTouchReceiver {
+    /** Code to run in response to a tap event */
     tap(screenX: number, screenY: number): void;
+    /** Code to run in response to the start of a pan event */
     panStart(screenX: number, screenY: number): void;
+    /** Code to run when a pan move event happens */
     panMove(screenX: number, screenY: number): void;
+    /** Code to run when a pan event ends */
     panStop(screenX: number, screenY: number): void;
+    /** Code to run when a touch down happens */
     touchDown(screenX: number, screenY: number): void;
+    /** Code to run when a touch up happens */
     touchUp(screenX: number, screenY: number): void;
+    /** Code to run in response to a swipe */
     swipe(x0: number, y0: number, x1: number, y1: number, time: number): void;
 }
 
@@ -71,8 +78,22 @@ export interface JetLagTouchScreen {
  * stage
  */
 export interface JetLagKeyboard {
+    /**
+     * Set the code to run when a key is pressed down
+     * 
+     * @param key The key to respond to
+     * @param handler The code to run when the key is pressed down
+     */
     setKeyDownHandler(key: JetLagKeys, handler: () => void): void;
+
+    /**
+     * Set the code to run when a key is released
+     * @param key The key to respond to
+     * @param handler The code to run when the key is released
+     */
     setKeyUpHandler(key: JetLagKeys, handler: () => void): void;
+
+    /** reset all key handlers (i.e., on level change) */
     clearHandlers(): void;
 }
 
@@ -81,48 +102,89 @@ export interface JetLagKeyboard {
  * the current stage
  */
 export interface JetLagAccelerometer {
+    /** Get the X and Y forces of the accelerometer */
     get(): XY;
+    /** Forcibly set the accelerometer X force */
     setX(x: number): void;
+    /** Forcibly set the accelerometer Y force */
     setY(y: number): void;
+    /** Report if the device has an accelerometer */
     getSupported(): boolean;
 }
 
 /** Renderer abstracts away differences between rendering engines */
 export interface JetLagRenderer {
+    /** Add an Actor to the next frame to be rendered */
     addActorToFrame(actor: BaseActor, camera: Camera): void;
+    /** Set the background color for the next frame to be rendered */
     setFrameColor(color: number): void;
+    /** Load all the assets that will be drawn in the future by the renderer */
     loadAssets(callback: () => void): void;
+    /** Add a picture to the next frame to be rendered */
     addPictureToFrame(sprite: JetLagSprite, camera: Camera): void;
+    /** Start rendering frames */
     startRenderLoop(stage: JetLagStage): void;
+    /** Get the next frame ready to render */
     initFrame(): void;
+    /** Show the frame that we've been preparing to render */
     showFrame(): void;
+    /** Add some text to the next frame to render */
     addTextToFrame(text: JetLagText, camera: Camera, center: boolean): void;
+    /** Create a renderable sprite */
     getSprite(imgName: string): JetLagSprite;
+    /** Report the renderer's frames per second */
     getFPS(): number;
+    /** Create a renderable text object */
     makeText(txt: string, opts: any): JetLagText;
+    /** Create a debug context, for debug rendering */
     makeDebugContext(): JetLagDebugSprite;
 }
 
 /** Vibration provides an abstract interface for vibrating the device */
 export interface JetLagVibration {
+    /** Vibrate the device for a number of milliseconds */
     vibrate(millis: number): void;
 }
 
 /** Speaker is a representation of the device's audio context */
 export interface JetLagSpeaker {
+    /**
+     * Return a sound that can be played
+     * 
+     * @param soundName The name of the sound to get
+     */
     getSound(soundName: string): JetLagSound;
+
+    /**
+     * Return a music object that can be played
+     * 
+     * @param musicName The name of the music to get
+     */
     getMusic(musicName: string): JetLagSound;
+
+    /**
+     * Reset the music volume for all sounds and music files
+     * 
+     * @param volume The new volume (scale from 0 to 1)
+     */
     resetMusicVolume(volume: number): void;
 }
 
 /** An abstract representation of three key/value stores */
 export interface JetLagStorage {
+    /** Clear all the facts for a level */
     clearLevelFacts(): void;
+    /** Set a fact that lasts only for the current level */
     setLevel(key: string, value: any): void;
+    /** Get a fact that was set for the current level */
     getLevel(key: string, defaultVal: any): string;
+    /** Set a fact that will remain until the game is quit */
     setSession(key: string, value: any): void;
+    /** Get a fact that lasts until the game is quit */
     getSession(key: string, defaultVal: any): string;
+    /** Set a fact that lasts even after the game is quit */
     setPersistent(key: string, value: string): void;
+    /** Get a fact that lasts even after the game is quit */
     getPersistent(key: string, defaultVal: string): string;
 }
 
@@ -140,10 +202,11 @@ export interface JetLagProcess {
 
 /** A representation of the device console */
 export interface JetLagConsole {
+    /** Display an urgent message */
     urgent(msg: string): void;
+    /** Display an informative message */
     info(msg: string): void;
 }
-
 
 /**
  * We are probably going to need a way to re-interpret the meaning of
@@ -162,40 +225,89 @@ export enum JetLagKeys {
     ESCAPE = 0, UP = 1, DOWN = 2, LEFT = 3, RIGHT = 4, SPACE = 5, COUNT = 6
 }
 
+/** An abstract representation of a sound */
 export interface JetLagSound {
+    /** Play the sound */
     play(): void;
+    /** Stop playing the sound */
     stop(): void;
 }
 
+/** JetLagText describes some text to render */
 export interface JetLagText {
+    /**
+     * Set the coordinates of the text
+     * 
+     * @param x The x coordinate for the text
+     * @param y The y coordinate for the text
+     */
     setPosition(x: number, y: number): void;
+
+    /** Get the X coordinate for the text */
     getXPosition(): number;
+
+    /** Get the Y coordinate for the text */
     getYPosition(): number;
+
+    /** Get the width and height of the text */
     getBounds(): XY;
+
+    /** Provide a string to display */
     setText(text: string): void;
+
+    /** Get the part of the text that gets used by the renderer */
     getRenderObject(): any;
 }
 
+/** JetLagSprite is an abstract renderable context */
 export interface JetLagSprite {
+    /** Report the image name that is being shown */
     getImgName(): string;
+
+    /** Set the X/Y coordinates of the sprite */
     setPosition(x: number, y: number): void;
+
+    /** Report the X coordinate of the sprite */
     getXPosition(): number;
+
+    /** Report the Y coordinate of the sprite */
     getYPosition(): number;
+
+    /** Report the width of the sprite */
     getWidth(): number;
+
+    /** Set the width of the sprite */
     setWidth(w: number): void;
+
+    /** Report the height of the sprite */
     getHeight(): number;
+
+    /** Set the height of the sprite */
     setHeight(h: number): void;
+
+    /** Set the rotation of the sprite */
     setRotation(r: number): void;
+
+    /** Set the position of a sprite relative to some anchor point (ax,ay) */
     setAnchoredPosition(ax: number, ay: number, x: number, y: number): void;
+
+    /** Get the part of the sprite that is used by the renderer */
     getRenderObject(): any;
+
+    /** Get the debug context for the sprite, for when we draw debug outlines */
     getDebugShape(): any;
 }
 
+/** 
+ * JetLagDebugSprite is a renderable context that can draw a shape outline and
+ * also a radial line
+ */
 export interface JetLagDebugSprite {
+    /** Return the shape outline */
     getShape(): any;
+    /** Return the line */
     getLine(): any;
 }
-
 
 /**
  * Renderable encapsulates anything that can be drawn on the screen.  In JetLag,

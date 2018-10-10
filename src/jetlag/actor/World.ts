@@ -94,8 +94,10 @@ export abstract class WorldActor extends BaseActor {
   /** Make the actor stop hovering */
   public clearHover() { this.hover = null; }
 
+  /** Report if the actor has a side on which collisions are disabled */
   public getOneSided() { return this.isOneSided; }
 
+  /** Return the distance joint on this actor, if there is one */
   public getDistJoint() { return this.distJoint; }
 
   /**
@@ -105,26 +107,55 @@ export abstract class WorldActor extends BaseActor {
    */
   public setStickyDelay(millis: number) { this.stickyDelay = millis; }
 
+  /** Return the amount of time before this actor will stick to things agaain */
   public getStickyDelay() { return this.stickyDelay; }
 
+  /**
+   * Report whether an actor is sticky on a side
+   *
+   * @param side The side to check for stickiness ([0,1,2,3] for [top, right,
+   * bottom, left])
+   */
   public getStickyState(side: number) { return this.isSticky[side]; }
 
+  /**
+   *  Get the passthrough ID for this actor.  Two actors with the same ID won't collide 
+   */
   public getPassThroughId() { return this.passThroughId; }
 
+  /** 
+   * Get the X distance between where the actor is and where the camera centers
+   * on it
+   */
   public getCameraOffsetX() { return this.cameraOffset.x; }
+
+  /** 
+   * Get the Y distance between where the actor is and where the camera centers
+   * on it
+   */
   public getCameraOffsetY() { return this.cameraOffset.y; }
 
+  /**
+   * Create a distance joint, as part of stickiness
+   * 
+   * @param joint The distance joint to create
+   */
   public setImplicitDistJoint(joint: PhysicsType2d.Dynamics.Joints.DistanceJoint) {
     this.distJoint = joint;
   }
 
+  /**
+   * Create a weld joint, as part of stickiness
+   * 
+   * @param joint The weld joint to create
+   */
   public setImplicitWeldJoint(joint: PhysicsType2d.Dynamics.Joints.WeldJoint) {
     this.weldJoint = joint;
   }
 
   /**
-   * Each descendant defines this to address any custom logic that we need to
-   * deal with on a collision
+   * Each descendant of WorldActor defines this to address any custom logic that
+   * we need to deal with on a collision
    *
    * @param other   Other object involved in this collision
    * @param contact A description of the contact that caused this collision
@@ -143,9 +174,7 @@ export abstract class WorldActor extends BaseActor {
     this.cameraOffset.y = y;
   }
 
-  /**
-   * Indicate that the actor should move with the tilt of the phone
-   */
+  /** Indicate that the actor should move with the tilt of the phone */
   public setMoveByTilting() {
     // make sure it is moveable, add it to the list of tilt actors
     if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC) {
@@ -260,7 +289,7 @@ export abstract class WorldActor extends BaseActor {
    * @param velocityY The Y velocity of the projectile when it is thrown
    */
   public setTouchToThrow(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
-    this.setTapCallback((worldX: number, worldY: number) => {
+    this.setTapHandler((worldX: number, worldY: number) => {
       this.stage.getProjectilePool().throwFixed(h, offsetX, offsetY, velocityX, velocityY);
       return true;
     });
@@ -269,21 +298,14 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Indicate that touching this object will cause some special code to run
    *
-   * @param activationGoodies1 Number of type-1 goodies that must be collected
-   *                           before it works
-   * @param activationGoodies2 Number of type-2 goodies that must be collected
-   *                           before it works
-   * @param activationGoodies3 Number of type-3 goodies that must be collected
-   *                           before it works
-   * @param activationGoodies4 Number of type-4 goodies that must be collected
-   *                           before it works
-   * @param disappear          True if the actor should disappear when the
-   *                           callback runs
-   * @param callback           The callback to run when the actor is touched
+   * @param activation A function to determine if the code should be allowed to
+   *                   run yet or not.
+   * @param disappear  True if the actor should disappear when the callback runs
+   * @param callback   The callback to run when the actor is touched
    */
   public setTouchCallback(activation: () => boolean, disappear: boolean, callback: (actor: WorldActor) => void) {
     // set the code to run on touch
-    this.setTapCallback((worldX: number, worldY: number) => {
+    this.setTapHandler((worldX: number, worldY: number) => {
       if (!activation())
         return false;
       if (disappear)
@@ -299,9 +321,7 @@ export abstract class WorldActor extends BaseActor {
    * @param side The side that registers collisions. 0 is bottom, 1 is right, 2
    *             is top, 3 is left, -1 means "none"
    */
-  public setOneSided(side: number) {
-    this.isOneSided = side;
-  }
+  public setOneSided(side: number) { this.isOneSided = side; }
 
   /**
    * Indicate that this actor should not have collisions with any other actor
@@ -309,9 +329,7 @@ export abstract class WorldActor extends BaseActor {
    *
    * @param id The number for this class of non-interacting actors
    */
-  public setPassThrough(id: number) {
-    this.passThroughId = id;
-  }
+  public setPassThrough(id: number) { this.passThroughId = id; }
 
   /**
    * Indicate that this actor can be flicked on the screen
@@ -395,7 +413,7 @@ export abstract class WorldActor extends BaseActor {
   }
 
   /**
-   * Attach a motor to make a joint turn
+   * Attach a motor to make a revolute joint turn
    *
    * @param motorSpeed  Speed in radians per second
    * @param motorTorque torque of the motor... when in doubt, go with something
@@ -412,7 +430,7 @@ export abstract class WorldActor extends BaseActor {
   }
 
   /**
-   * Set upper and lower bounds on the rotation of the joint
+   * Set upper and lower bounds on the rotation of a revolute joint
    *
    * @param upper The upper bound in radians
    * @param lower The lower bound in radians
@@ -442,8 +460,7 @@ export abstract class WorldActor extends BaseActor {
    *               this actor
    * @param angle  The angle between the actors
    */
-  public setWeldJoint(other: WorldActor, otherX: number, otherY: number, localX: number,
-    localY: number, angle: number) {
+  public setWeldJoint(other: WorldActor, otherX: number, otherY: number, localX: number, localY: number, angle: number) {
     let w = new PhysicsType2d.Dynamics.Joints.WeldJointDefinition();
     w.bodyA = this.body;
     w.bodyB = other.body;

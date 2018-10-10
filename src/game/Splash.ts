@@ -51,7 +51,7 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
         o.setImage("audio_on.png");
     // when the obstacle is touched, switch the mute state and update the
     // obstacle's picture
-    o.setTapCallback(() => {
+    o.setTapHandler(() => {
         jl.toggleMute();
         if (jl.getVolume()) {
             o.setImage("audio_on.png");

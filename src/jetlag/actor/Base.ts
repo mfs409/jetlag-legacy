@@ -20,10 +20,9 @@ enum BodyStyle { CIRCLE, RECTANGLE, POLYGON }
 /**
  * BaseActor is the parent of all Actor types.
  *
- * We use BaseActor as parent of both WorldActor (MainScene) and SceneActor 
- * (all other scenes), so that core functionality (physics, animation) can be in 
- * one place, even though many of the features of an WorldActor (MainScene) 
- * require a Score object, and are thus incompatible with non-Main scenes.
+ * We use BaseActor as parent of both WorldActor (WorldScene) and SceneActor
+ * (all other scenes), so that core functionality (physics, animation) can be in
+ * one place.
  */
 export class BaseActor implements Renderable {
     /**
@@ -31,25 +30,6 @@ export class BaseActor implements Renderable {
      * false, we don't run any updates on the object's physics body
      */
     private enabled: boolean = true;
-
-    /**
-     * Specify whether this actor is enabled or disabled.  When it is disabled,
-     * it effectively does not exist in the game: it won't be drawn, and its
-     * physics body will not be active.
-     *
-     * @param val The new state (true for enabled, false for disabled)
-     */
-    public setEnabled(val: boolean) {
-        this.enabled = val;
-        this.body.SetActive(val);
-    }
-
-    /**
-     * Return the current enabled/disabled state of this Renderable
-     *
-     * @return The state of the renderable
-     */
-    public getEnabled() { return this.enabled; }
 
     /** Physics body for this WorldActor */
     protected body: PhysicsType2d.Dynamics.Body;
@@ -62,9 +42,6 @@ export class BaseActor implements Renderable {
 
     /** The vertices, if this is a polygon */
     private verts: XY[];
-
-    public getNumVerts() { return this.verts.length; }
-    public getVert(index: number) { return this.verts[index].Clone(); }
 
     /** The z index of this actor. Valid range is [-2, 2] */
     private zIndex: number;
@@ -80,46 +57,30 @@ export class BaseActor implements Renderable {
 
     /** A debug render context */
     private debug: JetLagDebugSprite;
-    public getDebug() { return this.debug; }
 
     /** Code to run when this actor is tapped */
     private tapHandler: (worldX: number, worldY: number) => boolean = null;
-    public getTapHandler() { return this.tapHandler; }
-    public setTapHandler(handler: (worldX: number, worldY: number) => boolean) { this.tapHandler = handler; }
 
     /** handler for pan start event */
     private panStartHandler: (worldX: number, worldY: number) => boolean = null;
-    public getPanStartHandler() { return this.panStartHandler; }
-    public setPanStartHandler(handler: (worldX: number, worldY: number) => boolean) { this.panStartHandler = handler; }
 
     /** handler for pan move event */
     private panMoveHandler: (worldX: number, worldY: number) => boolean = null;
-    public getPanMoveHandler() { return this.panMoveHandler; }
-    public setPanMoveHandler(handler: (worldX: number, worldY: number) => boolean) { this.panMoveHandler = handler; }
 
     /** handler for pan stop event */
     private panStopHandler: (worldX: number, worldY: number) => boolean = null;
-    public getPanStopHandler() { return this.panStopHandler; }
-    public setPanStopHandler(handler: (worldX: number, worldY: number) => boolean) { this.panStopHandler = handler; }
 
     /** handler for downpress event */
     private touchDownHandler: (worldX: number, worldY: number) => boolean = null;
-    public getTouchDownHandler() { return this.touchDownHandler; }
-    public setTouchDownHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchDownHandler = handler; }
 
     /** handler for release event */
     private touchUpHandler: (worldX: number, worldY: number) => boolean = null;
-    public getTouchUpHandler() { return this.touchUpHandler; }
-    public setTouchUpHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchUpHandler = handler; }
 
     /** handler for swipe event */
     private swipeHandler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean = null;
-    public getSwipeHandler() { return this.swipeHandler; }
-    public setSwipeHandler(handler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean) { this.swipeHandler = handler; }
 
     /** Animation support: this tracks the current state of the active animation (if any) */
     protected animator: AnimationDriver;
-    public getAnimator() { return this.animator; }
 
     /** Animation support: the cells of the default animation */
     protected defaultAnimation: Animation;
@@ -144,20 +105,16 @@ export class BaseActor implements Renderable {
     /** Extra data for the game designer to attach to the actor */
     private extra: any = {};
 
-    public isPoly() { return this.bodyStyle === BodyStyle.POLYGON; }
-    public isBox() { return this.bodyStyle == BodyStyle.RECTANGLE; }
-    public isCircle() { return this.bodyStyle == BodyStyle.CIRCLE; }
-
-    public getBody() { return this.body; }
-
     /**
      * Create a new BaseActor by creating an image that can be rendered to the
      * screen
      *
      * @param scene   The scene into which this actor should be placed
+     * @param device  The abstract device on which the game is running
      * @param imgName The image to show for this actor
      * @param width   The width of the actor's image and body, in meters
      * @param height  The height of the actor's image and body, in meters
+     * @param z       The z index of the actor
      */
     constructor(private scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number, z: number) {
         this.animator = new AnimationDriver(device.getRenderer(), imgName);
@@ -168,6 +125,119 @@ export class BaseActor implements Renderable {
         this.size = { w: width, h: height };
         this.zIndex = z;
     }
+
+    /** Return the debug render context for this actor */
+    public getDebug() { return this.debug; }
+
+    /** Return the code to run when this actor is tapped */
+    public getTapHandler() { return this.tapHandler; }
+
+    /**
+     * Set the code to run when this actor is tapped
+     * 
+     * @param handler The code to run
+     */
+    public setTapHandler(handler: (worldX: number, worldY: number) => boolean) { this.tapHandler = handler; }
+
+    /** Ge the code to run when a pan event starts on this actor */
+    public getPanStartHandler() { return this.panStartHandler; }
+
+    /**
+     * Set the code to run when a pan event starts on this actor
+     * 
+     * @param handler The code to run
+     */
+    public setPanStartHandler(handler: (worldX: number, worldY: number) => boolean) { this.panStartHandler = handler; }
+
+    /** Get the code to run when a pan move event happens on this actor */
+    public getPanMoveHandler() { return this.panMoveHandler; }
+
+    /**
+     * Set the code to run when a pan move event happens on this actor
+     * 
+     * @param handler The code to run
+     */
+    public setPanMoveHandler(handler: (worldX: number, worldY: number) => boolean) { this.panMoveHandler = handler; }
+
+    /** Get the code to run when a pan stop event happens on this actor */
+    public getPanStopHandler() { return this.panStopHandler; }
+
+    /**
+     * Set the code to run when a pan stop event happens on this actor
+     * 
+     * @param handler The code to run
+     */
+    public setPanStopHandler(handler: (worldX: number, worldY: number) => boolean) { this.panStopHandler = handler; }
+
+    /** Get the code to run when a touch down event happens on this actor */
+    public getTouchDownHandler() { return this.touchDownHandler; }
+
+    /**
+     * Set the code to run when a touch down event happens on this actor
+     * 
+     * @param handler The code to run
+     */
+    public setTouchDownHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchDownHandler = handler; }
+
+    /** Get the code to run when a touch up event happens on this actor */
+    public getTouchUpHandler() { return this.touchUpHandler; }
+
+    /**
+     * Set the code to run when a touch up event happens on this actor
+     * 
+     * @param handler The code to run
+     */
+    public setTouchUpHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchUpHandler = handler; }
+
+    /** Get the code to run when a swip event happens on this actor */
+    public getSwipeHandler() { return this.swipeHandler; }
+
+    /**
+     * Set the code to run when a swip event happens on this actor
+     * 
+     * @param handler The code to run
+     */
+    public setSwipeHandler(handler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean) { this.swipeHandler = handler; }
+
+    /** Get the animation driver, which controls how this actor is animated */
+    public getAnimator() { return this.animator; }
+
+    /** Get the number of vertices of this actor, if it is a Polygon */
+    public getNumVerts() { return this.verts.length; }
+
+    /**
+     * Get one of the values from the actor's set of vertexes
+     * 
+     * @param index The index of the vertex to get
+     */
+    public getVert(index: number) { return this.verts[index].Clone(); }
+
+    /** Return true if this actor is a Polygon */
+    public isPoly() { return this.bodyStyle === BodyStyle.POLYGON; }
+
+    /** Return true if this actor is a rectangle */
+    public isBox() { return this.bodyStyle == BodyStyle.RECTANGLE; }
+
+    /** Return true if this actor is a circle */
+    public isCircle() { return this.bodyStyle == BodyStyle.CIRCLE; }
+
+    /** Return the physics body associated with this actor */
+    public getBody() { return this.body; }
+
+    /**
+     * Specify whether this actor is enabled or disabled.  When it is disabled,
+     * it effectively does not exist in the game: it won't be drawn, and its
+     * physics body will not be active.
+     *
+     * @param val The new state (true for enabled, false for disabled)
+     */
+    public setEnabled(val: boolean) {
+        this.enabled = val;
+        this.body.SetActive(val);
+    }
+
+    /** Return the current enabled/disabled state of this actor */
+    public getEnabled() { return this.enabled; }
 
     /**
      * Specify that this actor should have a rectangular physics shape
@@ -288,14 +358,18 @@ export class BaseActor implements Renderable {
     /**
      * Break any joints that involve this actor, so that it can move freely.
      *
-     * NB: BaseActors don't have any joints to break, but classes that derive
-     * from BaseActor do
+     * Note: BaseActors don't have any joints to break, but classes that derive
+     *       from BaseActor do
      */
     breakJoints() { }
 
     /**
      * Every time the world advances by a timestep, we call this code to update
      * the actor route and animation, and then draw the actor
+     * 
+     * @param renderer The game's renderer
+     * @param camera   The camera for the current stage
+     * @param elapsedMillis The milliseconds since the last render event
      */
     render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
         if (!this.getEnabled())
@@ -321,17 +395,21 @@ export class BaseActor implements Renderable {
     /**
      * Indicate whether this actor engages in physics collisions or not
      *
-     * @param state True or false, depending on whether the actor will
-     *              participate in physics collisions or not
+     * @param val True or false, depending on whether the actor will
+     *            participate in physics collisions or not
      */
-    setCollisionsEnabled(state: boolean) {
+    setCollisionsEnabled(val: boolean) {
         // The default is for all fixtures of a actor have the same sensor state
         let fixtures = this.body.GetFixtures();
         while (fixtures.MoveNext())
-            fixtures.Current().SetSensor(!state);
+            fixtures.Current().SetSensor(!val);
         fixtures.Reset();
     }
 
+    /**
+     * Report if this actor causes transfer of momentum when it collides with
+     * other actors (true) or not (false)
+     */
     getCollisionsEnabled() {
         let f = this.body.GetFixtures();
         while (f.MoveNext()) {
@@ -364,48 +442,31 @@ export class BaseActor implements Renderable {
         this.body.ResetMassData();
     }
 
-    /**
-     * Returns the X coordinate of this actor
-     *
-     * @return x coordinate of top left corner, in pixels
-     */
+    /** Returns the X coordinate of this actor */
     public getXPosition() {
         return this.body.GetPosition().x - this.size.w / 2;
     }
 
-    /**
-     * Returns the Y coordinate of this actor
-     *
-     * @return y coordinate of top left corner, in pixels
-     */
+    /** Returns the Y coordinate of this actor */
     public getYPosition() { return this.body.GetPosition().y - this.size.h / 2; }
 
+    /** Return the X coordinate of the center of this actor */
     public getCenterX() { return this.body.GetPosition().x; }
+
+    /** Return the Y coordinate of the center of this actor */
     public getCenterY() { return this.body.GetPosition().y; }
 
-    /**
-     * Returns the width of this actor
-     *
-     * @return the actor's width, in pixels
-     */
+    /** Returns the width of this actor */
     public getWidth() { return this.size.w; }
 
-    /**
-     * Return the height of this actor
-     *
-     * @return the actor's height, in pixels
-     */
+    /** Return the height of this actor */
     public getHeight() { return this.size.h; }
 
-    /**
-     * Use this to find the current rotation of an actor
-     *
-     * @return The rotation, in radians
-     */
+    /** Get the current rotation of the actor, in radians */
     public getRotation() { return this.body.GetAngle(); }
 
     /**
-     * Call this on an actor to rotate it. Note that this works best on boxes.
+     * Call this on an actor to rotate it around its center
      *
      * @param rotation amount to rotate the actor clockwise (in radians)
      */
@@ -417,12 +478,12 @@ export class BaseActor implements Renderable {
      * Make the actor continuously rotate. This is usually only useful for fixed
      * objects.
      *
-     * @param duration Time it takes to complete one rotation
+     * @param velocity: The angular velocity
      */
-    public setRotationSpeed(duration: number) {
+    public setRotationSpeed(velocity: number) {
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
-        this.body.SetAngularVelocity(duration);
+        this.body.SetAngularVelocity(velocity);
     }
 
     /**
@@ -452,18 +513,10 @@ export class BaseActor implements Renderable {
         }
     }
 
-    /**
-     * Returns the X velocity of of this actor
-     *
-     * @return Velocity in X dimension, in pixels per second
-     */
+    /** Return the X velocity of of this actor */
     public getXVelocity() { return this.body.GetLinearVelocity().x; }
 
-    /**
-     * Returns the Y velocity of of this actor
-     *
-     * @return Velocity in Y dimension, in pixels per second
-     */
+    /** Return the Y velocity of of this actor */
     public getYVelocity() { return this.body.GetLinearVelocity().y; }
 
     /**
@@ -481,17 +534,6 @@ export class BaseActor implements Renderable {
         // Disable sensor, or else this actor will go right through walls
         this.setCollisionsEnabled(true);
     }
-
-
-    /**
-     * Specify some code to run when this actor is tapped
-     *
-     * @param handler The TouchEventHandler to run in response to the tap
-     */
-    public setTapCallback(handler: (x: number, y: number) => boolean) {
-        this.tapHandler = handler;
-    }
-
 
     /**
      * Request that this actor moves according to a fixed route
@@ -614,9 +656,7 @@ export class BaseActor implements Renderable {
     }
 
     /** Indicate that this actor should not rotate due to torque */
-    public disableRotation() {
-        this.body.SetFixedRotation(true);
-    }
+    public disableRotation() { this.body.SetFixedRotation(true); }
 
     /**
      * Request that a sound plays whenever this actor disappears
@@ -626,7 +666,6 @@ export class BaseActor implements Renderable {
     public setDisappearSound(soundName: string) {
         this.disappearSound = this.device.getSpeaker().getSound(soundName);
     }
-
 
     /**
      * Set the default animation sequence for this actor, and start playing it
@@ -712,9 +751,7 @@ export class BaseActor implements Renderable {
      *
      * @param amount The amount of damping to apply
      */
-    public setDamping(amount: number) {
-        this.body.SetLinearDamping(amount);
-    }
+    public setDamping(amount: number) { this.body.SetLinearDamping(amount); }
 
     /**
      * Set a dampening factor to cause a spinning body to decrease its rate of
@@ -726,12 +763,8 @@ export class BaseActor implements Renderable {
         this.body.SetAngularDamping(amount);
     }
 
-    /**
-     * Indicate that this actor should be immune to the force of gravity
-     */
-    public setGravityDefy() {
-        this.body.SetGravityScale(0);
-    }
+    /** Indicate that this actor should be immune to the force of gravity */
+    public setGravityDefy() { this.body.SetGravityScale(0); }
 
     /**
      * Force an actor to have a Kinematic body type.  Kinematic bodies can move,
@@ -752,9 +785,9 @@ export class BaseActor implements Renderable {
     /**
      * Set additional information for this actor
      *
-     * @param text Object to attach to the actor
+     * @param extra Object to attach to the actor
      */
-    public setExtra(x: any) { this.extra = x; }
+    public setExtra(extra: any) { this.extra = extra; }
 
     /**
      * Change the size of an actor, and/or change its position
@@ -801,9 +834,10 @@ export class BaseActor implements Renderable {
         this.body.SetGravityScale(oldBody.GetGravityScale());
         this.body.SetLinearDamping(oldBody.GetLinearDamping());
         this.body.SetLinearVelocity(oldBody.GetLinearVelocity());
+        if (oldFix.IsSensor())
+            this.setCollisionsEnabled(false);
         // disable the old body
         oldBody.SetActive(false);
-        // TODO: did we forget sensor?
     }
 
     /**
@@ -812,7 +846,5 @@ export class BaseActor implements Renderable {
      *
      * @param state True or false, depending on whether it is fast-moving or not
      */
-    setFastMoving(state: boolean) {
-        this.body.SetBullet(state);
-    }
+    public setFastMoving(state: boolean) { this.body.SetBullet(state); }
 }

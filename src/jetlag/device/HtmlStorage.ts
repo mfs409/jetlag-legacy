@@ -9,20 +9,22 @@ import { HtmlConsole } from "./HtmlConsole";
  *               but will be discarded when the player leaves the page.
  * - Level:      Things saved here will remain only until the player moves to
  *               another level
- *
- * Note: there are a few special-purpose key/value pairs in the Level storage.
- * See the 'KEYS' enum for more information
  */
 export class HtmlStorage implements JetLagStorage {
     /**
      * Store string/object pairs that get reset whenever we navigate away from
-     * the page, but which persist across levels 
+     * the game, but which persist across levels 
      */
     private readonly sessionFacts: { [index: string]: any } = {};
 
     /** Store string/object pairs that get reset whenever we change levels */
     private levelFacts: { [index: string]: any } = {};
 
+    /**
+     * Construct an HtmlStorage object
+     * 
+     * @param console A console, for printing error messages
+     */
     constructor(private console: HtmlConsole) { }
 
     /** Clear the level facts */
@@ -35,15 +37,14 @@ export class HtmlStorage implements JetLagStorage {
      * @param key The key by which to remember the data being saved
      * @param value The value to store with the provided key
      */
-    public setLevel(key: string, value: any) {
-        this.levelFacts[key] = value;
-    }
+    public setLevel(key: string, value: any) { this.levelFacts[key] = value; }
 
     /**
      * Read some information that was saved as a key/value pair.  This
      * information is specific to the current level
      * 
      * @param key The key with which the value was previously saved
+     * @param defaultVal A value to return if the key is not valid
      */
     public getLevel(key: string, defaultVal: any): string {
         let res = this.levelFacts[key];
@@ -69,6 +70,7 @@ export class HtmlStorage implements JetLagStorage {
      * information should be safe to access even if the browser has been closed.
      * 
      * @param key The key with which the value was previously saved
+     * @param defaultVal A value to return if the key is not valid
      */
     public getSession(key: string, defaultVal: any): string {
         let res = this.sessionFacts[key];
@@ -94,6 +96,7 @@ export class HtmlStorage implements JetLagStorage {
      * information should be safe to access even if the browser has been closed.
      * 
      * @param key The key with which the value was previously saved
+     * @param defaultVal A value to return if the key is not valid
      */
     public getPersistent(key: string, defaultVal: string): string {
         let res = localStorage.getItem(key);

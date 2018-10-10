@@ -99,7 +99,7 @@ function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, hei
     let tile = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height, img: "leveltile.png" });
 
     // attach a callback and print the level number with a touchCallback, and then put text on top of it
-    tile.setTapCallback(() => { jl.nav.doLevel(whichLevel); return true; });
+    tile.setTapHandler(() => { jl.nav.doLevel(whichLevel); return true; });
     jl.world.addText({ center: true, x: x + width / 2, y: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, producer: () => { return whichLevel + "" }, z: 0 });
 }
 
@@ -114,7 +114,7 @@ function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, hei
  */
 function drawPrevButton(jl: JetLagApi, x: number, y: number, width: number, height: number, chooserLevel: number) {
     let btn = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height, img: "leftarrow.png" });
-    btn.setTapCallback(() => { jl.nav.doChooser(chooserLevel); return true; });
+    btn.setTapHandler(() => { jl.nav.doChooser(chooserLevel); return true; });
 }
 
 /**
@@ -128,7 +128,7 @@ function drawPrevButton(jl: JetLagApi, x: number, y: number, width: number, heig
  */
 function drawNextButton(jl: JetLagApi, x: number, y: number, width: number, height: number, chooserLevel: number) {
     let btn = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height, img: "rightarrow.png" });
-    btn.setTapCallback(() => { jl.nav.doChooser(chooserLevel); return true; });
+    btn.setTapHandler(() => { jl.nav.doChooser(chooserLevel); return true; });
 }
 
 /**
@@ -141,5 +141,5 @@ function drawNextButton(jl: JetLagApi, x: number, y: number, width: number, heig
  */
 function drawSplashButton(jl: JetLagApi, x: number, y: number, width: number, height: number) {
     let btn = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height, img: "backarrow.png" });
-    btn.setTapCallback(() => { jl.nav.doSplash(1); return true; });
+    btn.setTapHandler(() => { jl.nav.doSplash(1); return true; });
 }

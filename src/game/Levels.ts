@@ -872,12 +872,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // make a few pokeable obstacles
         let o = jl.world.makeObstacle({ box: true, x: 14, y: 0, width: .25, height: 2, img: "purpleball.png" });
         o.setPhysics(0, 100, 0);
-        o.setTapCallback(() => { jl.hud.setActiveActor(o); return true; })
+        o.setTapHandler(() => { jl.hud.setActiveActor(o); return true; })
         jl.hud.createPokeToPlaceZone({ x: 0, y: 0, width: 16, height: 9, img: "" });
 
         let o2 = jl.world.makeObstacle({ box: true, x: 14, y: 2, width: 2, height: .25, img: "purpleball.png" });
         o2.setPhysics(0, 100, 0);
-        o2.setTapCallback(() => { jl.hud.setActiveActor(o2); return true; })
+        o2.setTapHandler(() => { jl.hud.setActiveActor(o2); return true; })
 
         // Note that we need to make the joystick *after* the pokeToPlaceZone,
         // or else our interaction with the zone will prevent the joystick from
@@ -932,7 +932,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set up our obstacle so that collision and touch make it play sounds
         let o = jl.world.makeObstacle({ x: 5, y: 5, width: .75, height: .75, img: "purpleball.png" });
         o.setPhysics(1, 0, 1);
-        o.setTapCallback(() => { jl.playSound("lowpitch.ogg"); return true; });
+        o.setTapHandler(() => { jl.playSound("lowpitch.ogg"); return true; });
         o.setHeroCollisionCallback(() => { jl.playSound("hipitch.ogg"); });
 
         welcomeMessage(jl, "Touch the purple ball or collide with it, and a " + "sound will play");
@@ -2674,7 +2674,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setDefaultAnimation(jl.makeAnimation(200, true, ["legstar1.png", "legstar1.png"]));
         h.setDefaultReverseAnimation(jl.makeAnimation(200, true, ["fliplegstar8.png", "fliplegstar8.png"]));
-        h.setTapCallback(() => { jl.hud.setActiveActor(h); return true; })
+        h.setTapHandler(() => { jl.hud.setActiveActor(h); return true; })
         jl.hud.createPokeToMoveZone({ x: 0, y: 0, width: 16, height: 9, img: "" }, 5, false);
 
         jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
@@ -2948,7 +2948,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "legstar1.png" });
         h.setDefaultAnimation(jl.makeAnimation(200, true, ["legstar1.png", "legstar1.png"]));
         h.setDefaultReverseAnimation(jl.makeAnimation(200, true, ["fliplegstar8.png", "fliplegstar8.png"]));
-        h.setTapCallback(() => { jl.hud.setActiveActor(h); return true; })
+        h.setTapHandler(() => { jl.hud.setActiveActor(h); return true; })
         h.setPhysics(1, 0, .5);
         jl.hud.createPokeToRunZone({ x: 0, y: 0, width: 16, height: 9, img: "" }, 5, true);
 
