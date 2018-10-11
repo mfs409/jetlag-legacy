@@ -1,0 +1,1713 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>JetLagStage | JetLag Documentation</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">JetLag Documentation</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_jetlagstage_.html">&quot;JetLagStage&quot;</a>
+				</li>
+				<li>
+					<a href="_jetlagstage_.jetlagstage.html">JetLagStage</a>
+				</li>
+			</ul>
+			<h1>Class JetLagStage</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>JetLagStage is the container for all of the functionality for the playable
+						portion of a game.  JetLagStage has several components:</p>
+						<ul>
+							<li>The WorldScene, where all the action of the game happens</li>
+							<li>The heads-up display (HUD), where the user interface of the game is drawn.</li>
+							<li>The Score object</li>
+							<li>The background music and background color</li>
+							<li>The background and foreground parallax layers</li>
+							<li>The code for building, managing, and dismissing the win/lose/pause/welcome
+							scenes</li>
+						</ul>
+					</div>
+					<p>JetLagStage is effectively a singleton: we re-use it for every stage that
+					gets displayed.</p>
+					<p>JetLagStage is also the unit that receives all gestures, and forwards them to
+						either the hud, the world, or one of the overlay scenes.  (Note: strictly
+					speaking, the HUD is just an overlay scene.)</p>
+					<p>JetLagStage does not manage transitions between stages on its own. Instead,
+						it has mechanisms (onScreenChange and endLevel) for resetting itself at the
+					beginning of a stage, and cleaning itself up at the end of a stage.</p>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">JetLagStage</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#background" class="tsd-kind-icon">background</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#backgroundcolor" class="tsd-kind-icon">background<wbr>Color</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#config" class="tsd-kind-icon">config</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#device" class="tsd-kind-icon">device</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#foreground" class="tsd-kind-icon">foreground</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#gesturehudfirst" class="tsd-kind-icon">gesture<wbr>Hud<wbr>First</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#hud" class="tsd-kind-icon">hud</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#losescenebuilder" class="tsd-kind-icon">lose<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#manager" class="tsd-kind-icon">manager</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#music" class="tsd-kind-icon">music</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#musicplaying" class="tsd-kind-icon">music<wbr>Playing</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#overlay" class="tsd-kind-icon">overlay</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#pausescenebuilder" class="tsd-kind-icon">pause<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#projectilepool" class="tsd-kind-icon">projectile<wbr>Pool</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#score" class="tsd-kind-icon">score</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#welcomescenebuilder" class="tsd-kind-icon">welcome<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#winscenebuilder" class="tsd-kind-icon">win<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_jetlagstage_.jetlagstage.html#world" class="tsd-kind-icon">world</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#clearoverlayscene" class="tsd-kind-icon">clear<wbr>Overlay<wbr>Scene</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#endlevel" class="tsd-kind-icon">end<wbr>Level</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#getbackground" class="tsd-kind-icon">get<wbr>Background</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#getforeground" class="tsd-kind-icon">get<wbr>Foreground</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#gethud" class="tsd-kind-icon">get<wbr>Hud</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#getprojectilepool" class="tsd-kind-icon">get<wbr>Projectile<wbr>Pool</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#getworld" class="tsd-kind-icon">get<wbr>World</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#onscreenchange" class="tsd-kind-icon">on<wbr>Screen<wbr>Change</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#panmove" class="tsd-kind-icon">pan<wbr>Move</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#panstart" class="tsd-kind-icon">pan<wbr>Start</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#panstop" class="tsd-kind-icon">pan<wbr>Stop</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#pausemusic" class="tsd-kind-icon">pause<wbr>Music</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#playmusic" class="tsd-kind-icon">play<wbr>Music</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#render" class="tsd-kind-icon">render</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setbackgroundcolor" class="tsd-kind-icon">set<wbr>Background<wbr>Color</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setgesturehudfirst" class="tsd-kind-icon">set<wbr>Gesture<wbr>Hud<wbr>First</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setlosescenebuilder" class="tsd-kind-icon">set<wbr>Lose<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setmusic" class="tsd-kind-icon">set<wbr>Music</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setpausescenebuilder" class="tsd-kind-icon">set<wbr>Pause<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setprojectilepool" class="tsd-kind-icon">set<wbr>Projectile<wbr>Pool</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setwelcomescenebuilder" class="tsd-kind-icon">set<wbr>Welcome<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#setwinscenebuilder" class="tsd-kind-icon">set<wbr>Win<wbr>Scene<wbr>Builder</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#stopmusic" class="tsd-kind-icon">stop<wbr>Music</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#swipe" class="tsd-kind-icon">swipe</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#tap" class="tsd-kind-icon">tap</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#touchdown" class="tsd-kind-icon">touch<wbr>Down</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_jetlagstage_.jetlagstage.html#touchup" class="tsd-kind-icon">touch<wbr>Up</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Jet<wbr>Lag<wbr>Stage<span class="tsd-signature-symbol">(</span>manager<span class="tsd-signature-symbol">: </span><a href="_jetlagmanager_.jetlagmanager.html" class="tsd-signature-type">JetLagManager</a>, device<span class="tsd-signature-symbol">: </span><a href="../interfaces/_support_interfaces_.jetlagdevice.html" class="tsd-signature-type">JetLagDevice</a>, config<span class="tsd-signature-symbol">: </span><a href="_jetlagconfig_.jetlagconfig.html" class="tsd-signature-type">JetLagConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_jetlagstage_.jetlagstage.html" class="tsd-signature-type">JetLagStage</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L80">JetLagStage.ts:80</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Construct the JetLagStage container, into which we inject any stage we
+									ever have.</p>
+								</div>
+								<p>Note that a stage is not usable until onScreenChange() has been called.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>manager: <a href="_jetlagmanager_.jetlagmanager.html" class="tsd-signature-type">JetLagManager</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The JetLagManager object, which transitions among stages</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5>device: <a href="../interfaces/_support_interfaces_.jetlagdevice.html" class="tsd-signature-type">JetLagDevice</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The JetLagDevice object, which abstracts away all device
+											details</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5>config: <a href="_jetlagconfig_.jetlagconfig.html" class="tsd-signature-type">JetLagConfig</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The JetLagConfig object, which stores all configuration
+											for this game</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_jetlagstage_.jetlagstage.html" class="tsd-signature-type">JetLagStage</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="background" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> background</h3>
+					<div class="tsd-signature tsd-kind-icon">background<span class="tsd-signature-symbol">:</span> <a href="_scene_parallax_.parallaxscene.html" class="tsd-signature-type">ParallaxScene</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L62">JetLagStage.ts:62</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The background layers</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="backgroundcolor" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> background<wbr>Color</h3>
+					<div class="tsd-signature tsd-kind-icon">background<wbr>Color<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;16777215</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L59">JetLagStage.ts:59</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Background color for the stage being drawn when no overlay. defaults to
+							black</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="config" class="tsd-anchor"></a>
+					<h3>config</h3>
+					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <a href="_jetlagconfig_.jetlagconfig.html" class="tsd-signature-type">JetLagConfig</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L94">JetLagStage.ts:94</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The JetLagConfig object, which stores all configuration
+							for this game</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="device" class="tsd-anchor"></a>
+					<h3>device</h3>
+					<div class="tsd-signature tsd-kind-icon">device<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_support_interfaces_.jetlagdevice.html" class="tsd-signature-type">JetLagDevice</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L94">JetLagStage.ts:94</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The JetLagDevice object, which abstracts away all device
+							details</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="foreground" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> foreground</h3>
+					<div class="tsd-signature tsd-kind-icon">foreground<span class="tsd-signature-symbol">:</span> <a href="_scene_parallax_.parallaxscene.html" class="tsd-signature-type">ParallaxScene</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L65">JetLagStage.ts:65</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The foreground layers</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="gesturehudfirst" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> gesture<wbr>Hud<wbr>First</h3>
+					<div class="tsd-signature tsd-kind-icon">gesture<wbr>Hud<wbr>First<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L80">JetLagStage.ts:80</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Should gestures route to the HUD first, or to the WORLD first?</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="hud" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> hud</h3>
+					<div class="tsd-signature tsd-kind-icon">hud<span class="tsd-signature-symbol">:</span> <a href="_scene_overlay_.overlayscene.html" class="tsd-signature-type">OverlayScene</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L38">JetLagStage.ts:38</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A heads-up display</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="losescenebuilder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> lose<wbr>Scene<wbr>Builder</h3>
+					<div class="tsd-signature tsd-kind-icon">lose<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L50">JetLagStage.ts:50</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The function for creating this level&#39;s lose scene</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="manager" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> manager</h3>
+					<div class="tsd-signature tsd-kind-icon">manager<span class="tsd-signature-symbol">:</span> <a href="_jetlagmanager_.jetlagmanager.html" class="tsd-signature-type">JetLagManager</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L94">JetLagStage.ts:94</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The JetLagManager object, which transitions among stages</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="music" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> music</h3>
+					<div class="tsd-signature tsd-kind-icon">music<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_support_interfaces_.jetlagsound.html" class="tsd-signature-type">JetLagSound</a><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L71">JetLagStage.ts:71</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The music, if any</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="musicplaying" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> music<wbr>Playing</h3>
+					<div class="tsd-signature tsd-kind-icon">music<wbr>Playing<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L74">JetLagStage.ts:74</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Whether the music is playing or not</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="overlay" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> overlay</h3>
+					<div class="tsd-signature tsd-kind-icon">overlay<span class="tsd-signature-symbol">:</span> <a href="_scene_overlay_.overlayscene.html" class="tsd-signature-type">OverlayScene</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L41">JetLagStage.ts:41</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Any pause, win, or lose scene that supercedes the world and hud</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="pausescenebuilder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> pause<wbr>Scene<wbr>Builder</h3>
+					<div class="tsd-signature tsd-kind-icon">pause<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L53">JetLagStage.ts:53</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The function for creating this level&#39;s pause scene</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="projectilepool" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> projectile<wbr>Pool</h3>
+					<div class="tsd-signature tsd-kind-icon">projectile<wbr>Pool<span class="tsd-signature-symbol">:</span> <a href="_support_projectilepool_.projectilepool.html" class="tsd-signature-type">ProjectilePool</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L77">JetLagStage.ts:77</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A pool of projectiles for use by the hero</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="score" class="tsd-anchor"></a>
+					<h3>score</h3>
+					<div class="tsd-signature tsd-kind-icon">score<span class="tsd-signature-symbol">:</span> <a href="_support_score_.score.html" class="tsd-signature-type">Score</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L68">JetLagStage.ts:68</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Track all the scores</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="welcomescenebuilder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> welcome<wbr>Scene<wbr>Builder</h3>
+					<div class="tsd-signature tsd-kind-icon">welcome<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L44">JetLagStage.ts:44</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The function for creating this level&#39;s pre-scene</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="winscenebuilder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> win<wbr>Scene<wbr>Builder</h3>
+					<div class="tsd-signature tsd-kind-icon">win<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L47">JetLagStage.ts:47</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The function for creating this level&#39;s win scene</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="world" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> world</h3>
+					<div class="tsd-signature tsd-kind-icon">world<span class="tsd-signature-symbol">:</span> <a href="_scene_world_.worldscene.html" class="tsd-signature-type">WorldScene</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L35">JetLagStage.ts:35</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The physics world in which all actors exist</p>
+						</div>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="clearoverlayscene" class="tsd-anchor"></a>
+					<h3>clear<wbr>Overlay<wbr>Scene</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Overlay<wbr>Scene<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L301">JetLagStage.ts:301</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Hide the current overlay scene that is showing</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="endlevel" class="tsd-anchor"></a>
+					<h3>end<wbr>Level</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">end<wbr>Level<span class="tsd-signature-symbol">(</span>win<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L411">JetLagStage.ts:411</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>When a playable level ends, we run this code to shut it down, show an
+									overlay, and then invoke the JetLagManager to choose the next stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>win: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>true if the level was won, false otherwise</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getbackground" class="tsd-anchor"></a>
+					<h3>get<wbr>Background</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Background<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_scene_parallax_.parallaxscene.html" class="tsd-signature-type">ParallaxScene</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L108">JetLagStage.ts:108</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return the background layers for the current stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_scene_parallax_.parallaxscene.html" class="tsd-signature-type">ParallaxScene</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getforeground" class="tsd-anchor"></a>
+					<h3>get<wbr>Foreground</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Foreground<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_scene_parallax_.parallaxscene.html" class="tsd-signature-type">ParallaxScene</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L111">JetLagStage.ts:111</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return the foreground layers for the current stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_scene_parallax_.parallaxscene.html" class="tsd-signature-type">ParallaxScene</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="gethud" class="tsd-anchor"></a>
+					<h3>get<wbr>Hud</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Hud<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_scene_overlay_.overlayscene.html" class="tsd-signature-type">OverlayScene</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L105">JetLagStage.ts:105</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return the heads-up display for the current stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_scene_overlay_.overlayscene.html" class="tsd-signature-type">OverlayScene</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getprojectilepool" class="tsd-anchor"></a>
+					<h3>get<wbr>Projectile<wbr>Pool</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Projectile<wbr>Pool<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_support_projectilepool_.projectilepool.html" class="tsd-signature-type">ProjectilePool</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L99">JetLagStage.ts:99</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return the projectile pool for the current stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_support_projectilepool_.projectilepool.html" class="tsd-signature-type">ProjectilePool</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getworld" class="tsd-anchor"></a>
+					<h3>get<wbr>World</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>World<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_scene_world_.worldscene.html" class="tsd-signature-type">WorldScene</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L102">JetLagStage.ts:102</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return the main world for the current stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_scene_world_.worldscene.html" class="tsd-signature-type">WorldScene</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="onscreenchange" class="tsd-anchor"></a>
+					<h3>on<wbr>Screen<wbr>Change</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Screen<wbr>Change<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L377">JetLagStage.ts:377</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Before we call programmer code to load a new stage, we call this to
+									ensure that everything is in a clean state.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="panmove" class="tsd-anchor"></a>
+					<h3>pan<wbr>Move</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">pan<wbr>Move<span class="tsd-signature-symbol">(</span>screenX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L235">JetLagStage.ts:235</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a PAN MOVE event</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate where the pan moved, in pixels</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate where the pan moved, in pixels</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="panstart" class="tsd-anchor"></a>
+					<h3>pan<wbr>Start</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">pan<wbr>Start<span class="tsd-signature-symbol">(</span>screenX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L221">JetLagStage.ts:221</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a PAN START event</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate where the pan started, in pixels</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate where the pan started, in pixels</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="panstop" class="tsd-anchor"></a>
+					<h3>pan<wbr>Stop</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">pan<wbr>Stop<span class="tsd-signature-symbol">(</span>screenX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L249">JetLagStage.ts:249</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a PAN END event</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate where the pan ended, in pixels</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate where the pan ended, in pixels</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pausemusic" class="tsd-anchor"></a>
+					<h3>pause<wbr>Music</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">pause<wbr>Music<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L443">JetLagStage.ts:443</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>If the level has music attached to it, this pauses it</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="playmusic" class="tsd-anchor"></a>
+					<h3>play<wbr>Music</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">play<wbr>Music<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L435">JetLagStage.ts:435</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>If the level has music attached to it, this starts playing it</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="render" class="tsd-anchor"></a>
+					<h3>render</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">render<span class="tsd-signature-symbol">(</span>renderer<span class="tsd-signature-symbol">: </span><a href="../interfaces/_support_interfaces_.jetlagrenderer.html" class="tsd-signature-type">JetLagRenderer</a>, elapsedMillis<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L311">JetLagStage.ts:311</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This code is called every 1/45th of a second to update the game state and
+									re-draw the screen</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>renderer: <a href="../interfaces/_support_interfaces_.jetlagrenderer.html" class="tsd-signature-type">JetLagRenderer</a></h5>
+								</li>
+								<li>
+									<h5>elapsedMillis: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The time in milliseconds since the previous render</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setbackgroundcolor" class="tsd-anchor"></a>
+					<h3>set<wbr>Background<wbr>Color</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Background<wbr>Color<span class="tsd-signature-symbol">(</span>color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L163">JetLagStage.ts:163</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Set the background color of the stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>color: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The numerical (&quot;hex&quot;) value for the background color.</p>
+										<pre><code>         #FFFFFF means white, #<span class="hljs-number">000000</span> means black, etc.</code></pre>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setgesturehudfirst" class="tsd-anchor"></a>
+					<h3>set<wbr>Gesture<wbr>Hud<wbr>First</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Gesture<wbr>Hud<wbr>First<span class="tsd-signature-symbol">(</span>val<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L155">JetLagStage.ts:155</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Control whether the HUD or World gets to process gestures first</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>val: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>True if the HUD should process gestures first, false if the
+										World should</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setlosescenebuilder" class="tsd-anchor"></a>
+					<h3>set<wbr>Lose<wbr>Scene<wbr>Builder</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Lose<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">(</span>builder<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L136">JetLagStage.ts:136</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Provide code that builds a &quot;Lose&quot; overlay when the stage is lost</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>builder: <span class="tsd-signature-type">function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A callback that builds the lose scene</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setmusic" class="tsd-anchor"></a>
+					<h3>set<wbr>Music</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Music<span class="tsd-signature-symbol">(</span>music<span class="tsd-signature-symbol">: </span><a href="../interfaces/_support_interfaces_.jetlagsound.html" class="tsd-signature-type">JetLagSound</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L179">JetLagStage.ts:179</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Set the music for the stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>music: <a href="../interfaces/_support_interfaces_.jetlagsound.html" class="tsd-signature-type">JetLagSound</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The music to assign to the stage</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setpausescenebuilder" class="tsd-anchor"></a>
+					<h3>set<wbr>Pause<wbr>Scene<wbr>Builder</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Pause<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">(</span>builder<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L145">JetLagStage.ts:145</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Provide code that builds a &quot;Pause&quot; overlay on demand</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>builder: <span class="tsd-signature-type">function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A callback that builds the pause scene</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setprojectilepool" class="tsd-anchor"></a>
+					<h3>set<wbr>Projectile<wbr>Pool</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Projectile<wbr>Pool<span class="tsd-signature-symbol">(</span>pool<span class="tsd-signature-symbol">: </span><a href="_support_projectilepool_.projectilepool.html" class="tsd-signature-type">ProjectilePool</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L170">JetLagStage.ts:170</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Attach a projectile pool to the current stage</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>pool: <a href="_support_projectilepool_.projectilepool.html" class="tsd-signature-type">ProjectilePool</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The projectile pool to assign to the stage</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setwelcomescenebuilder" class="tsd-anchor"></a>
+					<h3>set<wbr>Welcome<wbr>Scene<wbr>Builder</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Welcome<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">(</span>builder<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L118">JetLagStage.ts:118</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Provide code that builds a &quot;Welcome&quot; overlay when the stage starts</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>builder: <span class="tsd-signature-type">function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A callback that builds the welcome scene</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setwinscenebuilder" class="tsd-anchor"></a>
+					<h3>set<wbr>Win<wbr>Scene<wbr>Builder</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Win<wbr>Scene<wbr>Builder<span class="tsd-signature-symbol">(</span>builder<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L127">JetLagStage.ts:127</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Provide code that builds a &quot;Win&quot; overlay when the stage is won</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>builder: <span class="tsd-signature-type">function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A callback that builds the win scene</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>overlay<span class="tsd-signature-symbol">: </span><a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>overlay: <a href="_api_overlay_.overlayapi.html" class="tsd-signature-type">OverlayApi</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="stopmusic" class="tsd-anchor"></a>
+					<h3>stop<wbr>Music</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">stop<wbr>Music<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L451">JetLagStage.ts:451</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>If the level has music attached to it, this stops it</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="swipe" class="tsd-anchor"></a>
+					<h3>swipe</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">swipe<span class="tsd-signature-symbol">(</span>screenX0<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY0<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenX1<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY1<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, time<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L296">JetLagStage.ts:296</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a SWIPE event.  This is a blocking event.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX0: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate where the swipe started</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY0: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate where the swipe started</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenX1: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate where the swipe ended</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY1: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate where the swipe ended</p>
+									</div>
+								</li>
+								<li>
+									<h5>time: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The duration (in milliseconds) of the swipe</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tap" class="tsd-anchor"></a>
+					<h3>tap</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">tap<span class="tsd-signature-symbol">(</span>screenX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L187">JetLagStage.ts:187</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a TAP event</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate of the tap, in pixels</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate of the tap, in pixels</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="touchdown" class="tsd-anchor"></a>
+					<h3>touch<wbr>Down</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">touch<wbr>Down<span class="tsd-signature-symbol">(</span>screenX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L264">JetLagStage.ts:264</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a TOUCH DOWN event.  This is a low-level event, but it&#39;s useful
+									for detecting &quot;hold&quot; events.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate of the touch down, in pixels</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate of the touch down, in pixels</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="touchup" class="tsd-anchor"></a>
+					<h3>touch<wbr>Up</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">touch<wbr>Up<span class="tsd-signature-symbol">(</span>screenX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, screenY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/5c08497/src/jetlag/JetLagStage.ts#L279">JetLagStage.ts:279</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Handle a TOUCH UP event.  This is a low-level event, but it&#39;s useful
+									for detecting &quot;hold&quot; events.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>screenX: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The x coordinate of the touch release, in pixels</p>
+									</div>
+								</li>
+								<li>
+									<h5>screenY: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The y coordinate of the touch release, in pixels</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-external-module">
+						<a href="../modules/_jetlagstage_.html">"<wbr>Jet<wbr>Lag<wbr>Stage"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_jetlagstage_.jetlagstage.html" class="tsd-kind-icon">Jet<wbr>Lag<wbr>Stage</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#background" class="tsd-kind-icon">background</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#backgroundcolor" class="tsd-kind-icon">background<wbr>Color</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#config" class="tsd-kind-icon">config</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#device" class="tsd-kind-icon">device</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#foreground" class="tsd-kind-icon">foreground</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#gesturehudfirst" class="tsd-kind-icon">gesture<wbr>Hud<wbr>First</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#hud" class="tsd-kind-icon">hud</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#losescenebuilder" class="tsd-kind-icon">lose<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#manager" class="tsd-kind-icon">manager</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#music" class="tsd-kind-icon">music</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#musicplaying" class="tsd-kind-icon">music<wbr>Playing</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#overlay" class="tsd-kind-icon">overlay</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#pausescenebuilder" class="tsd-kind-icon">pause<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#projectilepool" class="tsd-kind-icon">projectile<wbr>Pool</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#score" class="tsd-kind-icon">score</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#welcomescenebuilder" class="tsd-kind-icon">welcome<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#winscenebuilder" class="tsd-kind-icon">win<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_jetlagstage_.jetlagstage.html#world" class="tsd-kind-icon">world</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#clearoverlayscene" class="tsd-kind-icon">clear<wbr>Overlay<wbr>Scene</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#endlevel" class="tsd-kind-icon">end<wbr>Level</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#getbackground" class="tsd-kind-icon">get<wbr>Background</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#getforeground" class="tsd-kind-icon">get<wbr>Foreground</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#gethud" class="tsd-kind-icon">get<wbr>Hud</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#getprojectilepool" class="tsd-kind-icon">get<wbr>Projectile<wbr>Pool</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#getworld" class="tsd-kind-icon">get<wbr>World</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#onscreenchange" class="tsd-kind-icon">on<wbr>Screen<wbr>Change</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#panmove" class="tsd-kind-icon">pan<wbr>Move</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#panstart" class="tsd-kind-icon">pan<wbr>Start</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#panstop" class="tsd-kind-icon">pan<wbr>Stop</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#pausemusic" class="tsd-kind-icon">pause<wbr>Music</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#playmusic" class="tsd-kind-icon">play<wbr>Music</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#render" class="tsd-kind-icon">render</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setbackgroundcolor" class="tsd-kind-icon">set<wbr>Background<wbr>Color</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setgesturehudfirst" class="tsd-kind-icon">set<wbr>Gesture<wbr>Hud<wbr>First</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setlosescenebuilder" class="tsd-kind-icon">set<wbr>Lose<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setmusic" class="tsd-kind-icon">set<wbr>Music</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setpausescenebuilder" class="tsd-kind-icon">set<wbr>Pause<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setprojectilepool" class="tsd-kind-icon">set<wbr>Projectile<wbr>Pool</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setwelcomescenebuilder" class="tsd-kind-icon">set<wbr>Welcome<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#setwinscenebuilder" class="tsd-kind-icon">set<wbr>Win<wbr>Scene<wbr>Builder</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#stopmusic" class="tsd-kind-icon">stop<wbr>Music</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#swipe" class="tsd-kind-icon">swipe</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#tap" class="tsd-kind-icon">tap</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#touchdown" class="tsd-kind-icon">touch<wbr>Down</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_jetlagstage_.jetlagstage.html#touchup" class="tsd-kind-icon">touch<wbr>Up</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
