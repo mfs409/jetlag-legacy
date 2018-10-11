@@ -1,10 +1,11 @@
 {
     "name": "jetlag",
-    "version": "0.0.1",
+    "version": "0.9.0",
     "description": "TypeScript evolution of LibLOL, using PhysicsType2d and PIXI.js",
     "devDependencies": {
         "@types/howler": "^2.0.5",
         "ts-loader": "^4.5.0",
+        "typedoc": "^0.13.0",
         "typescript": "^3.0.1",
         "webpack": "^4.17.1",
         "webpack-cli": "^3.1.0",
@@ -12,7 +13,9 @@
     },
     "scripts": {
         "start": "webpack-dev-server",
-        "test": "echo \"no tests yet\" && exit 1"
+        "test": "echo \"no tests yet\" && exit 1",
+        "doc": "rm -rf ./docs && typedoc --out ./docs --name \"JetLag Documentation\" ./src/jetlag/",
+        "production": "node_modules/.bin/webpack-cli --mode production"
     },
     "author": "Micah Carlisle, Maximilian Hasselbusch, and Michael Spear",
     "license": "MIT",
