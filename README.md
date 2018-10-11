@@ -8,8 +8,8 @@ the spirit of LibLOL.  In particular:
   section of a single file
 
 As an HTML5 project, JetLag differs from LibLOL in a few ways:
-* It uses PIXI.js and PhysicsType2D instead of LibGDX and Box2D, so some names 
-  and features are a little bit different
+* It uses PIXI.js, Howler.js, and PhysicsType2D instead of LibGDX and Box2D, so
+  some names and features are a little bit different
 * It uses TypeScript instead of Java, which leads to simpler, cleaner code
 
 Note that JetLag still is a mobile-first framework.  It uses Hammer.js for 
@@ -38,6 +38,10 @@ This is an initial port of JetLag.  It is under active development.  While many
 parts of JetLag are effectively stable, we reserve the right to change any and
 all APIs and interfaces.
 
+## Mobile Support
+To force JetLag to run in a more mobile-friendly mode, append `?mobile` to the
+address bar.
+
 ## Coding Standards
 JetLag is supposed to be a library that its users will hack for their own
 purposes.  Consequently, we prefer that programmers preserve the structure we
@@ -48,7 +52,6 @@ To make the JetLag code easy to hack, we try to adhere to the following
 conventions:
 - We avoid excessive boilerplate.  For example, we do not use TypeScript getters
   and setters
-- Fields are not public unless they are read-only
 - Some classes are "effectively" singletons.  These live in the top-level
   `jetlag` folder
 - Only one exported class appears per file.  A file may export many interfaces.

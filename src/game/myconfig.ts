@@ -39,7 +39,7 @@ export class MyConfig extends JetLagConfig {
     this.storageKey = "com.me.myjetlaggame.prefs";
 
     // Set up the resource prefix
-    this.resourcePrefix = "/assets/";
+    this.resourcePrefix = "./assets/";
 
     // list the images that the game will use
     this.imageNames = [
