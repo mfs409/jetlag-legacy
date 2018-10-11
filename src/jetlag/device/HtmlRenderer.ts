@@ -257,8 +257,10 @@ export class HtmlRenderer implements JetLagRenderer {
      * @param imgName The name of the image to load
      */
     public getSprite(imgName: string) {
-        if (!PIXI.loader.resources[imgName] && imgName !== "") {
-            this.console.info("Unable to find graphics asset '" + imgName + "'");
+        if (!PIXI.loader.resources[imgName]) {
+            if (imgName !== "") {
+                this.console.info("Unable to find graphics asset '" + imgName + "'");
+            }
             return new HtmlSprite("", new PIXI.Sprite());
         }
         return new HtmlSprite(imgName, new PIXI.Sprite(PIXI.loader.resources[imgName].texture));
