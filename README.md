@@ -42,6 +42,11 @@ all APIs and interfaces.
 To force JetLag to run in a more mobile-friendly mode, append `?mobile` to the
 address bar.
 
+## Documentation
+Documentation for JetLag is available on 
+[GitHub Pages](https://mfs409.github.io/jetlag/ "JetLag GitHub Pages")
+
+
 ## Coding Standards
 JetLag is supposed to be a library that its users will hack for their own
 purposes.  Consequently, we prefer that programmers preserve the structure we
