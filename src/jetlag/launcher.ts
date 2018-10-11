@@ -2,6 +2,7 @@ import { JetLagManager } from "./JetLagManager"
 import { JetLagConfig } from "./JetLagConfig";
 import { HtmlDevice } from "./device/HtmlDevice"
 import { HtmlConsole } from "./device/HtmlConsole"
+import fscreen from "fscreen"
 
 /**
  * Given a valid config object and the name of a DIV tag, run the game as an
@@ -23,6 +24,45 @@ export function runGameAsHtml(domId: string, config: JetLagConfig) {
         }
     }
 
+    // The addressbar lets us force the game into mobile mode (i.e.,
+    // accelerometer on, full screen)
+    let x = window.location + "";
+    if (x.lastIndexOf("?mobile") == x.length - "?mobile".length) {
+        config.forceAccelerometerOff = false;
+        config.mobileMode = true;
+    }
+
+    // If we're in mobile mode, we need to let the user initiate full screen,
+    // which requires a callback.
+    if (config.mobileMode) {
+        // try to lock orientation... This isn't working yet...
+        (screen as any).orientation.lock((screen as any).orientation.type);
+        // Put a message on screen about starting the game
+        let elem = document.getElementById(domId);
+        let d = document.createElement("div");
+        d.innerHTML = "<b>Press Anywhere to Begin</b>";
+        document.body.appendChild(d);
+        document.onclick = () => {
+            // In response to the user gesture, we can remove the message, turn
+            // on full screen mode, and start the game
+            document.body.removeChild(d);
+            fscreen.requestFullscreen(elem);
+            launchGame(config, logger, domId);
+        }
+    }
+    else {
+        launchGame(config, logger, domId);
+    }
+}
+
+/**
+ * This internal method is actually responsible for launching the game
+ * 
+ * @param config The JetLagConfig object
+ * @param logger A logger, for printing debug messages
+ * @param domId  The Id of the DOM element where the game should be drawn
+ */
+function launchGame(config: JetLagConfig, logger: HtmlConsole, domId: string) {
     // Should we change the screen dimensions and font size based on the 
     // size of the screen?
     if (config.adaptToScreenSize) {
@@ -47,13 +87,6 @@ export function runGameAsHtml(domId: string, config: JetLagConfig) {
         config.fontScaling = config.screenWidth / old.x;
     }
 
-    // The addressbar lets us force the game into mobile mode (i.e.,
-    // accelerometer on)
-    let x = window.location + "";
-    if (x.lastIndexOf("?mobile") == x.length - "?mobile".length) {
-        config.forceAccelerometerOff = false;
-        config.mobileMode = true;
-    }
 
     let device = new HtmlDevice(config, domId, logger);
     let manager = new JetLagManager(config, device);
