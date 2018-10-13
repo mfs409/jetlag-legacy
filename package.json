@@ -15,7 +15,7 @@
     "scripts": {
         "start": "webpack-dev-server",
         "test": "echo \"no tests yet\" && exit 1",
-        "doc": "rm -rf ./docs && typedoc --out ./docs --name \"JetLag Documentation\" ./src/jetlag/",
+        "doc": "rm -rf ./docs && typedoc --out ./docs --name \"JetLag Documentation\" ./src/jetlag/ && touch ./docs/.nojekyll",
         "production": "node_modules/.bin/webpack-cli --mode production"
     },
     "author": "Micah Carlisle, Maximilian Hasselbusch, and Michael Spear",

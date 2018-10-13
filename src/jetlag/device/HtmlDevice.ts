@@ -1,6 +1,7 @@
+import fscreen from "fscreen"
+
 import { JetLagConfig } from "../JetLagConfig"
 import { JetLagDevice, JetLagAccelerometerMode } from "../support/Interfaces"
-
 import { HtmlTouchScreen } from "./HtmlTouchScreen"
 import { HtmlAccelerometer } from "./HtmlAccelerometer"
 import { HtmlKeyboard } from "./HtmlKeyboard"
@@ -43,6 +44,24 @@ export class HtmlDevice implements JetLagDevice {
      */
     private readonly storage: HtmlStorage;
 
+    /**
+     * Create an HtmlDevice context to abstract away browser features
+     *
+     * @param cfg     The game-wide configuration object
+     * @param domId   The Id of the DOM element where the game exists
+     * @param console A console device, for debug messages
+     */
+    constructor(cfg: JetLagConfig, domId: string, private readonly console: HtmlConsole) {
+        this.storage = new HtmlStorage(this.console);
+        this.speaker = new HtmlSpeaker(cfg, this.console);
+        this.touch = new HtmlTouchScreen(domId);
+        this.keyboard = new HtmlKeyboard();
+        this.accel = new HtmlAccelerometer(JetLagAccelerometerMode.DEFAULT_LANDSCAPE, cfg.forceAccelerometerOff, this.console);
+        this.vibe = new HtmlVibration(this.console);
+        this.process = new HtmlProcess();
+        this.renderer = new HtmlRenderer(cfg, domId, this.console);
+    }
+
     /** Getter for the touchscreen */
     getTouchScreen() { return this.touch; }
 
@@ -71,20 +90,90 @@ export class HtmlDevice implements JetLagDevice {
     getConsole() { return this.console; }
 
     /**
-     * Create an HtmlDevice context to abstract away browser features
+     * Build an HtmlDevice object, and then pass it to the provided callback.
      *
-     * @param cfg     The game-wide configuration object
-     * @param domId   The Id of the DOM element where the game exists
-     * @param console A console device, for debug messages
+     * @param domId  The name of the DIV into which the game should be placed
+     * @param logger An HTML Console that can be used to print error messages
+     * @param config The game configuration object
+     * @param callback A callback to run once the device is ready
      */
-    constructor(cfg: JetLagConfig, domId: string, private readonly console: HtmlConsole) {
-        this.storage = new HtmlStorage(this.console);
-        this.speaker = new HtmlSpeaker(cfg, this.console);
-        this.touch = new HtmlTouchScreen(domId);
-        this.keyboard = new HtmlKeyboard();
-        this.accel = new HtmlAccelerometer(JetLagAccelerometerMode.DEFAULT_LANDSCAPE, cfg.forceAccelerometerOff, this.console);
-        this.vibe = new HtmlVibration(this.console);
-        this.process = new HtmlProcess();
-        this.renderer = new HtmlRenderer(cfg, domId, this.console);
+    static initialize(domId: string, logger: HtmlConsole, config: JetLagConfig, callback: (config: JetLagConfig, device: JetLagDevice) => void) {
+        // The addressbar lets us force the game into mobile mode (i.e.,
+        // accelerometer on, full screen)
+        let x = window.location + "";
+        if (x.lastIndexOf("?mobile") == x.length - "?mobile".length) {
+            config.forceAccelerometerOff = false;
+            config.mobileMode = true;
+        }
+
+        // If we're in mobile mode, we need to let the user initiate full screen
+        // before we compute the screen size
+        if (config.mobileMode) {
+            // try to lock orientation... This isn't working yet...
+            (screen as any).orientation.lock((screen as any).orientation.type);
+
+            // Put a message on screen about starting the game
+            let elem = document.getElementById(domId);
+            let d = document.createElement("div");
+            d.innerHTML = "<b>Press Anywhere to Begin</b>";
+            document.body.appendChild(d);
+
+            // When the page is clicked, we will switch to full screen.  Then we
+            // can infer the screen size and finish building the device.
+            document.onclick = () => {
+                // prevent double-touches from doing funny things
+                document.onclick = null;
+                // go full screen
+                fscreen.requestFullscreen(elem);
+                // Remove the message
+                document.body.removeChild(d);
+                // wait a second before finishing up the configuration of the
+                // device
+                setTimeout(() => {
+                    // Adjust screen dimensions based on new fullscreen size,
+                    // then make the device and run the callback
+                    if (config.adaptToScreenSize) {
+                        HtmlDevice.adjustScreenDimensions(config);
+                    }
+                    callback(config, new HtmlDevice(config, domId, logger));
+                }, 1000);
+            }
+        }
+        else {
+            // Adjust screen dimensions based on new fullscreen size, then make
+            // the device and run the callback
+            if (config.adaptToScreenSize) {
+                HtmlDevice.adjustScreenDimensions(config);
+            }
+            callback(config, new HtmlDevice(config, domId, logger));
+        }
+    }
+
+    /**
+     * If the game is supposed to fill the screen, this code will change the
+     * config object to maximize the div in which the game is drawn
+     *
+     * @param config The JetLagConfig object
+     */
+    static adjustScreenDimensions(config: JetLagConfig) {
+        // as we compute the new screen width, height, and pixel ratio, we need
+        // to be sure to remember the original ratio given in the game. JetLag
+        // can't stretch differently in X than in Y, becaues there is only one
+        // pixel/meter ratio.
+        let targetRatio = config.screenWidth / config.screenHeight;
+        let screen = { x: window.innerWidth, y: window.innerHeight };
+        let old = { x: config.screenWidth, y: config.screenHeight };
+        if (screen.y * targetRatio < screen.x) {
+            // vertical is constraining
+            config.screenHeight = screen.y;
+            config.screenWidth = screen.y * targetRatio;
+        }
+        else {
+            config.screenWidth = screen.x;
+            config.screenHeight = screen.x / targetRatio;
+        }
+        config.pixelMeterRatio *= config.screenWidth / old.x;
+        // NB: the ratio above is also the font scaling ratio
+        config.fontScaling = config.screenWidth / old.x;
     }
 }
