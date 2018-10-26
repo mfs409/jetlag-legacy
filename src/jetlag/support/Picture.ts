@@ -1,6 +1,6 @@
-import { Renderable } from "./Interfaces"
-import { Camera } from "./Camera"
-import { JetLagSprite, JetLagRenderer } from "./Interfaces";
+import { Renderable } from "../internal/support/Interfaces"
+import { Camera } from "../internal/support/Camera"
+import { JetLagSprite, JetLagRenderer } from "../internal/support/Interfaces";
 
 /**
  * Picture is a lightweight alternative to BaseActor and its descendents.  Its

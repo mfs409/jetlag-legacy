@@ -20,5 +20,19 @@
   ],
   "include": [
     "src/game/*"
-  ]
+  ],
+  "typedocOptions": {
+    "out": "./docs/",
+    "name": "JetLag Documentation",
+    "exclude": [
+      "**/internal/*.ts",
+      "**/internal/*/*.ts"
+    ],
+    "mode": "file",
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "hideGenerator": true
+  }
 }

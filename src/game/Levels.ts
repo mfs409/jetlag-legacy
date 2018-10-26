@@ -1,11 +1,11 @@
-import { JetLagApi as JetLagApi } from "../jetlag/api/JetLag";
+import { JetLagApi as JetLagApi } from "../jetlag/api/JetLagApi";
+import { OverlayApi as OverlayApi } from "../jetlag/api/OverlayApi";
 import { Route } from "../jetlag/support/Route";
 import { Goodie } from "../jetlag/actor/Goodie";
 import { Hero } from "../jetlag/actor/Hero";
-import { OverlayApi as OverlayApi } from "../jetlag/api/Overlay";
 import { WorldActor as WorldActor } from "../jetlag/actor/World";
 import { Enemy } from "../jetlag/actor/Enemy";
-import { JetLagKeys } from "../jetlag/support/Interfaces";
+import { JetLagKeys } from "../jetlag/support/JetLagKeys";
 import { Obstacle } from "../jetlag/actor/Obstacle";
 
 /**

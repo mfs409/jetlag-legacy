@@ -1,7 +1,7 @@
 import { BaseActor as BaseActor } from "./Base"
 import { Hero } from "./Hero"
-import { JetLagStage } from "../JetLagStage";
-import { XY } from "../support/XY";
+import { JetLagStage } from "../internal/JetLagStage";
+import { XY } from "../internal/support/XY";
 
 /**
  * World is the base class upon which every actor in the main game is

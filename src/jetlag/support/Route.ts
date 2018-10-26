@@ -1,4 +1,4 @@
-import { XY } from "./XY";
+import { XY } from "../internal/support/XY";
 
 /**
  * Route specifies a set of points that an actor will move among, in order, at a

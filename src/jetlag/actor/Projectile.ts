@@ -1,9 +1,9 @@
 import { WorldActor as WorldActor } from "./World"
 import { Obstacle } from "./Obstacle"
-import { Camera } from "../support/Camera"
-import { JetLagRenderer } from "../support/Interfaces";
-import { XY } from "../support/XY";
-import { JetLagStage } from "../JetLagStage";
+import { Camera } from "../internal/support/Camera"
+import { JetLagRenderer } from "../internal/support/Interfaces";
+import { XY } from "../internal/support/XY";
+import { JetLagStage } from "../internal/JetLagStage";
 
 /**
  * Projectiles are actors that can be thrown from the hero's location in order to remove enemies.

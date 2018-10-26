@@ -4,10 +4,10 @@ import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"
 import { Obstacle } from "./Obstacle"
 import { Animation } from "../support/Animation"
-import { Camera } from "../support/Camera"
-import { JetLagRenderer, JetLagSound } from "../support/Interfaces";
-import { JetLagStage } from "../JetLagStage";
-import { XY } from "../support/XY";
+import { Camera } from "../internal/support/Camera"
+import { JetLagRenderer, JetLagSound } from "../internal/support/Interfaces";
+import { JetLagStage } from "../internal/JetLagStage";
+import { XY } from "../internal/support/XY";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to

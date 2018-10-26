@@ -2,7 +2,7 @@ import { WorldActor as WorldActor } from "./World"
 import { Hero } from "./Hero"
 import { Obstacle } from "./Obstacle"
 import { Projectile } from "./Projectile"
-import { JetLagStage } from "../JetLagStage";
+import { JetLagStage } from "../internal/JetLagStage";
 
 /**
  * Enemies are things to be avoided or defeated by the Hero. Enemies do damage

@@ -1,6 +1,6 @@
 import { WorldActor as WorldActor } from "./World"
 import { Hero } from "./Hero"
-import { JetLagStage } from "../JetLagStage";
+import { JetLagStage } from "../internal/JetLagStage";
 
 /**
  * Goodies are actors that a hero can collect.

@@ -1,6 +1,6 @@
-import { Camera } from "../support/Camera"
-import { XY } from "../support/XY"
-import { JetLagText, JetLagRenderer, Renderable } from "../support/Interfaces";
+import { Camera } from "../internal/support/Camera"
+import { XY } from "../internal/support/XY"
+import { JetLagText, JetLagRenderer, Renderable } from "../internal/support/Interfaces";
 
 /**
  * JetLag's Text object provides a way to generate text and put it onto the

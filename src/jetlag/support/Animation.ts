@@ -1,4 +1,4 @@
-import { JetLagRenderer, JetLagSprite } from "./Interfaces";
+import { JetLagRenderer, JetLagSprite } from "../internal/support/Interfaces";
 
 /**
  * Animation is a way of describing a set of images that can be used to do

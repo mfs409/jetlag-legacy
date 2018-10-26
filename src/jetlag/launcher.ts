@@ -1,8 +1,8 @@
-import { JetLagManager } from "./JetLagManager"
-import { JetLagConfig } from "./JetLagConfig";
-import { HtmlDevice } from "./device/HtmlDevice"
-import { HtmlConsole } from "./device/HtmlConsole"
-import { JetLagDevice } from "./support/Interfaces";
+import { JetLagManager } from "./internal/JetLagManager"
+import { JetLagConfig } from "./support/JetLagConfig";
+import { HtmlDevice } from "./internal/device/HtmlDevice"
+import { HtmlConsole } from "./internal/device/HtmlConsole"
+import { JetLagDevice } from "./internal/support/Interfaces";
 
 /**
  * Given a valid config object and the name of a DIV tag, run the game as an

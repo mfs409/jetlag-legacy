@@ -1,4 +1,4 @@
-import { JetLagConfig, JetLagVerbosity } from "../jetlag/JetLagConfig"
+import { JetLagConfig, JetLagVerbosity } from "../jetlag/support/JetLagConfig"
 import { buildChooserScreen } from "./Chooser"
 import { buildLevelScreen } from "./Levels";
 import { buildStoreScreen } from "./Store";

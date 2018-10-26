@@ -1,15 +1,15 @@
 /// <reference path="../../../typings/PhysicsType2d.v0_9.d.ts" />
 
-import { Renderable } from "../support/Interfaces"
-import { BaseScene as BaseScene } from "../scene/Base"
+import { Renderable } from "../internal/support/Interfaces"
+import { BaseScene as BaseScene } from "../internal/scene/BaseScene"
 import { Route } from "../support/Route"
-import { RouteDriver } from "../support/RouteDriver"
-import { AnimationDriver } from "../support/AnimationDriver"
+import { RouteDriver } from "../internal/support/RouteDriver"
+import { AnimationDriver } from "../internal/support/AnimationDriver"
 import { Animation } from "../support/Animation"
-import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../support/Interfaces"
-import { TimedEvent } from "../support/TimedEvent"
-import { Camera } from "../support/Camera"
-import { XY } from "../support/XY"
+import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../internal/support/Interfaces"
+import { TimedEvent } from "../internal/support/TimedEvent"
+import { Camera } from "../internal/support/Camera"
+import { XY } from "../internal/support/XY"
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and

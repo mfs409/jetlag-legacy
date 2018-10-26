@@ -1,7 +1,7 @@
 import { WorldActor as WorldActor } from "./World"
 import { Hero } from "./Hero"
-import { JetLagSound } from "../support/Interfaces";
-import { JetLagStage } from "../JetLagStage";
+import { JetLagSound } from "../internal/support/Interfaces";
+import { JetLagStage } from "../internal/JetLagStage";
 
 /**
  * Destinations are actors that the Hero should try to reach. When a Hero
