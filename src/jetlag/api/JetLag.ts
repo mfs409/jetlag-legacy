@@ -150,6 +150,7 @@ export class JetLagApi {
         this.hud = new OverlayApi(stage, stage.getHud());
         this.score = new ScoreApi(stage);
         this.nav = new NavigationApi(manager, stage);
+        this.projectiles = new ProjectileApi(stage);
     }
 
     /**
