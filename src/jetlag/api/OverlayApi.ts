@@ -7,7 +7,9 @@ import { Route } from "../support/Route";
 import { BaseActor as BaseActor } from "../actor/Base";
 import { JetLagStage } from "../internal/JetLagStage";
 import { XY } from "../internal/support/XY";
-import { ImageConfig, checkImageConfig, TextConfig } from "./JetLagApi";
+import { ImageConfig } from "./ImageConfig";
+import { checkImageConfig } from "../internal/support/Functions";
+import { TextConfig } from "./TextConfig";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the

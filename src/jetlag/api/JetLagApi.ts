@@ -10,91 +10,6 @@ import { TimedEvent } from "../internal/support/TimedEvent";
 import { JetLagKeys } from "../support/JetLagKeys";
 
 /**
- * ImageConfig wraps all of the basic configuration for a non-actor image.  It
- * consists of the following mandatory fields:
- * - x and y: for the coordinates of the top-left corner
- * - width and height: for the dimensions of the image
- * - img: the name of the image file to use for this image
- *
- * It also provides the following optional fields:
- * - z: the z index of the image (-2, -1, 0, 1, or 2).  If none is provided, 0
- *   will be used.
- */
-export class ImageConfig {
-    /** X coordinate of the top left corner */
-    x = 0;
-    /** Y coordinate of the top left corner */
-    y = 0;
-    /** Width of the image */
-    width = 0;
-    /** Height of the image */
-    height = 0;
-    /** The name of the image to use for this actor */
-    img?= "";
-    /** Z index of the image */
-    z?= 0;
-}
-
-/**
- * TextConfig wraps all of the basic configuration for text on the screen.  It
- * consists of the following mandatory fields:
- * - x and y: for the coordinates of either the top-left corner (default), or
- *   the center of the image (when the optional 'center' field is true)
- * - face, color, and size: for configuring the font to use.  Note that color
- *   should be an HTML hex code, e.g., "#FF0000"
- * - producer: a function that makes the text to display
- *
- * It also provides the following optional fields:
- * - z: the z index of the text (-2, -1, 0, 1, or 2).  If none is provided, 0
- *   will be used
- * - center: true if the X and Y coordinates should be for the center of the
- *   text, false (or not provided) if the X and Y coordinates should be for the
- *   top left corner of the text.
- */
-export class TextConfig {
-    /** X coordinate of the top left corner or center*/
-    x = 0;
-    /** Y coordinate of the top left corner or center */
-    y = 0;
-    /** Should the text be centered at X,Y (true) or is (X,Y) top-left (false) */
-    center?= false;
-    /** Font to use */
-    face = "Arial";
-    /** Color for the text */
-    color = "#FFFFFF";
-    /** Font size */
-    size = 22;
-    /** A function that produces the text to display */
-    producer: () => string = () => { return "" };
-    /** Z index of the text */
-    z?= 0;
-}
-
-/**
- * Check an ImageConfig object, and set default values for optional fields
- * 
- * @param c The ImageConfig object to check
- */
-export function checkImageConfig(c: ImageConfig) {
-    if (!c.z) c.z = 0;
-    if (c.z < -2) c.z = -2;
-    if (c.z > 2) c.z = 2;
-    if (!c.img) c.img = "";
-}
-
-/**
- * Check a TextConfig object, and set default values for optional fields
- * 
- * @param c The TextConfig object to check
- */
-export function checkTextConfig(c: TextConfig) {
-    if (!c.center) c.center = false;
-    if (!c.z) c.z = 0;
-    if (c.z < -2) c.z = -2;
-    if (c.z > 2) c.z = 2;
-}
-
-/**
  * JetLagApi provides a broad, public, declarative interface to the core
  * functionality of JetLag.
  *
@@ -173,16 +88,18 @@ export class JetLagApi {
 
     /** Manage the state of Mute */
     public toggleMute() {
+        let st = this.stage.device.getStorage();
         // volume is either 1 or 0
-        if (this.stage.device.getStorage().getPersistent("volume", "1") === "1") {
+        if (st.getPersistent("volume", "1") === "1") {
             // set volume to 0, set image to 'unmute'
-            this.stage.device.getStorage().setPersistent("volume", "0");
+            st.setPersistent("volume", "0");
         } else {
             // set volume to 1, set image to 'mute'
-            this.stage.device.getStorage().setPersistent("volume", "1");
+            st.setPersistent("volume", "1");
         }
         // update all music
-        this.stage.device.getSpeaker().resetMusicVolume(parseInt(this.stage.device.getStorage().getPersistent("volume", "1")));
+        let sp = this.stage.device.getSpeaker();
+        sp.resetMusicVolume(parseInt(st.getPersistent("volume", "1")));
     }
 
     /**
@@ -190,7 +107,8 @@ export class JetLagApi {
      * not muted, false corresponds to muted.
      */
     public getVolume() {
-        return this.stage.device.getStorage().getPersistent("volume", "1") === "1";
+        let st = this.stage.device.getStorage();
+        return st.getPersistent("volume", "1") === "1";
     }
 
     /**
@@ -216,8 +134,8 @@ export class JetLagApi {
     /**
      * Set the background music for this level
      *
-     * @param musicName Name of the music file to play.  Remember: this file must
-     *                  have been registered as Music, not as a Sound
+     * @param musicName Name of the music file to play.  Remember: this file
+     *                  must have been registered as Music, not as a Sound
      */
     public setMusic(musicName: string) {
         this.stage.setMusic(this.stage.device.getSpeaker().getMusic(musicName));
@@ -231,7 +149,8 @@ export class JetLagApi {
      * @param action The action to perform when the timer expires
      */
     public addTimer(interval: number, repeat: boolean, action: () => void) {
-        this.stage.getWorld().getTimer().addEvent(new TimedEvent(interval, repeat, action));
+        let e = new TimedEvent(interval, repeat, action);
+        this.stage.getWorld().getTimer().addEvent(e);
     }
 
     /**
