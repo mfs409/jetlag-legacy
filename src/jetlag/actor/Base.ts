@@ -210,7 +210,7 @@ export class BaseActor implements Renderable {
      * 
      * @param index The index of the vertex to get
      */
-    public getVert(index: number) { return this.verts[index].Clone(); }
+    public getVert(index: number) { return new XY(this.verts[index].x, this.verts[index].y); }
 
     /** Return true if this actor is a Polygon */
     public isPoly() { return this.bodyStyle === BodyStyle.POLYGON; }
