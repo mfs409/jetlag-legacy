@@ -1,6 +1,6 @@
 import { JetLagConfig } from "../support/JetLagConfig"
 import { JetLagDevice } from "./support/Interfaces"
-import { JetLagApi as JetLagApi } from "../api/JetLagApi"
+import { JetLagApi } from "../api/JetLagApi"
 import { JetLagStage } from "./JetLagStage"
 
 /** Types of stages in the game */

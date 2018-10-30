@@ -1,4 +1,4 @@
-import { BaseScene as BaseScene } from "./BaseScene"
+import { BaseScene } from "./BaseScene"
 import { JetLagRenderer } from "../support/Interfaces";
 
 /**

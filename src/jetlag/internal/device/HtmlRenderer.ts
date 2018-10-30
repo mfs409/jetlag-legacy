@@ -1,5 +1,5 @@
 import { JetLagConfig } from "../../support/JetLagConfig"
-import { BaseActor as BaseActor } from "../../actor/Base"
+import { BaseActor as BaseActor } from "../../actor/BaseActor"
 import { Camera } from "../support/Camera"
 import { JetLagRenderer, JetLagText, JetLagSprite } from "../support/Interfaces"
 import { HtmlText } from "./HtmlText"

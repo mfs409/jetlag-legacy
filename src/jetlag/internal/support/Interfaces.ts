@@ -1,4 +1,4 @@
-import { BaseActor as BaseActor } from "../../actor/Base";
+import { BaseActor } from "../../actor/BaseActor";
 import { Camera } from "./Camera";
 import { XY } from "./XY";
 import { JetLagStage } from "../JetLagStage";

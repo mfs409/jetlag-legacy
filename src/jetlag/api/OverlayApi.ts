@@ -1,10 +1,10 @@
-import { OverlayScene as OverlayScene } from "../internal/scene/OverlayScene"
-import { WorldActor as WorldActor } from "../actor/World"
+import { OverlayScene } from "../internal/scene/OverlayScene"
+import { WorldActor } from "../actor/WorldActor"
 import { TimedEvent } from "../internal/support/TimedEvent"
 import { Renderable } from "../internal/support/Interfaces"
 import { Hero } from "../actor/Hero"
 import { Route } from "../support/Route";
-import { BaseActor as BaseActor } from "../actor/Base";
+import { BaseActor } from "../actor/BaseActor";
 import { JetLagStage } from "../internal/JetLagStage";
 import { XY } from "../internal/support/XY";
 import { ImageConfig } from "./ImageConfig";

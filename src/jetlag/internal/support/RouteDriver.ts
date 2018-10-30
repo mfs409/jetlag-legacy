@@ -1,4 +1,4 @@
-import { BaseActor as BaseActor } from "../../actor/Base"
+import { BaseActor } from "../../actor/BaseActor"
 import { JetLagConsole } from "./Interfaces";
 import { Route } from "../../support/Route";
 import { XY } from "./XY";

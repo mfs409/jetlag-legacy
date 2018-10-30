@@ -1,5 +1,5 @@
-import { WorldActor as WorldActor } from "../../actor/World";
-import { WorldApi as WorldApi } from "../../api/WorldApi";
+import { WorldActor } from "../../actor/WorldActor";
+import { WorldApi } from "../../api/WorldApi";
 import { JetLagConfig } from "../../support/JetLagConfig";
 import { XY } from "./XY";
 

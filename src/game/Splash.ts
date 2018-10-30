@@ -1,4 +1,4 @@
-import { JetLagApi as JetLagApi } from "../jetlag/api/JetLagApi";
+import { JetLagApi } from "../jetlag/api/JetLagApi";
 
 /**
  * buildSplashScreen has the code we use to set up the opening screen of the

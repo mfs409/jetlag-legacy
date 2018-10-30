@@ -1,4 +1,4 @@
-import { WorldActor as WorldActor } from "./World"
+import { WorldActor } from "./WorldActor"
 import { Obstacle } from "./Obstacle"
 import { Camera } from "../internal/support/Camera"
 import { JetLagRenderer } from "../internal/support/Interfaces";

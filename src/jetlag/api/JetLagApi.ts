@@ -1,9 +1,9 @@
 import { Animation } from "../support/Animation";
-import { ScoreApi as ScoreApi } from "./ScoreApi"
-import { WorldApi as WorldApi } from "./WorldApi"
-import { OverlayApi as OverlayApi } from "./OverlayApi"
+import { ScoreApi } from "./ScoreApi"
+import { WorldApi } from "./WorldApi"
+import { OverlayApi } from "./OverlayApi"
 import { JetLagManager } from "../internal/JetLagManager"
-import { NavigationApi as NavigationApi } from "./NavigationApi"
+import { NavigationApi } from "./NavigationApi"
 import { JetLagStage } from "../internal/JetLagStage";
 import { ProjectileApi } from "./ProjectileApi"
 import { TimedEvent } from "../internal/support/TimedEvent";

@@ -1,4 +1,4 @@
-import { WorldActor as WorldActor } from "./World"
+import { WorldActor } from "./WorldActor"
 import { Enemy } from "./Enemy"
 import { Destination } from "./Destination"
 import { Goodie } from "./Goodie"

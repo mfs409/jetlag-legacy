@@ -4,7 +4,7 @@ import { Hero } from "../actor/Hero"
 import { Goodie } from "../actor/Goodie"
 import { Enemy } from "../actor/Enemy"
 import { Destination } from "../actor/Destination"
-import { WorldActor as WorldActor } from "../actor/World";
+import { WorldActor } from "../actor/WorldActor";
 import { ParallaxLayer } from "../internal/support/ParallaxLayer";
 import { Svg } from "../internal/support/Svg";
 import { JetLagStage } from "../internal/JetLagStage";

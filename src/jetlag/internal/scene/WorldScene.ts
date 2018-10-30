@@ -1,5 +1,5 @@
-import { BaseScene as BaseScene } from "./BaseScene"
-import { WorldActor as WorldActor } from "../../actor/World"
+import { BaseScene } from "./BaseScene"
+import { WorldActor } from "../../actor/WorldActor"
 import { Hero } from "../../actor/Hero"
 import { Enemy } from "../../actor/Enemy"
 import { Projectile } from "../../actor/Projectile"

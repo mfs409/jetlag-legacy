@@ -63,7 +63,7 @@ export class Score {
   constructor(private stage: JetLagStage) { }
 
   /** Reset all the scores at the beginning of a new level */
-  reset() {
+  public reset() {
     this.victoryType = VictoryType.DESTINATION;
     this.victoryHeroCount = 0;
     this.victoryGoodieCount = [0, 0, 0, 0];
@@ -83,7 +83,7 @@ export class Score {
    * When a hero arrives at a destination, decide whether it means it is time
    * for the game to be won.
    */
-  onDestinationArrive() {
+  public onDestinationArrive() {
     // check if the level is complete
     this.destinationArrivals++;
     if ((this.victoryType == VictoryType.DESTINATION)
@@ -97,7 +97,7 @@ export class Score {
    *
    * @param goodie The goodie that was collected
    */
-  onGoodieCollected(goodie: Goodie) {
+  public onGoodieCollected(goodie: Goodie) {
     // Update goodie counts
     for (let i = 0; i < 4; i++) {
       this.goodiesCollected[i] += goodie.getScore(i);
@@ -120,66 +120,66 @@ export class Score {
    * 
    * @param which The type of goodie to report (0-3)
    */
-  getGoodieCount(which: number) { return this.goodiesCollected[which]; }
+  public getGoodieCount(which: number) { return this.goodiesCollected[which]; }
 
   /**
    * Increment the goodie count
    * 
    * @param which The type of goodie to increment (0-3)
    */
-  incGoodieCount(which: number) { this.goodiesCollected[which]++; }
+  public incGoodieCount(which: number) { this.goodiesCollected[which]++; }
 
   /**
    * Set the number of goodies collected
    * @param which The type of goodie to set
    * @param val   The new value for that type of goodie
    */
-  setGoodieCount(which: number, val: number) {
+  public setGoodieCount(which: number, val: number) {
     this.goodiesCollected[which] = val;
   }
 
   /** Report the time left in the lose countdown */
-  getLoseCountdown() { return this.loseCountDownRemaining; }
+  public getLoseCountdown() { return this.loseCountDownRemaining; }
 
   /**
    * Set the amount of time left for a lose countdown
    * 
    * @param timeout The time until the level is lost
    */
-  setLoseCountdown(timeout: number) { this.loseCountDownRemaining = timeout; }
+  public setLoseCountdown(timeout: number) { this.loseCountDownRemaining = timeout; }
 
   /**
    * Add some time to the lose countdown
    * 
    * @param delta The amount of time to add
    */
-  extendLoseCountdown(delta: number) { this.loseCountDownRemaining += delta; }
+  public extendLoseCountdown(delta: number) { this.loseCountDownRemaining += delta; }
 
   /** Report the time left in the win countdown */
-  getWinCountdown() { return this.winCountRemaining; }
+  public getWinCountdown() { return this.winCountRemaining; }
 
   /**
    * Set the amount of time left for a win countdown
    * 
    * @param timeout The time until the level is won
    */
-  setWinCountdown(timeout: number) { this.winCountRemaining = timeout; }
+  public setWinCountdown(timeout: number) { this.winCountRemaining = timeout; }
 
   /** Report the time that has elapsed in the stopwatch */
-  getStopwatch() { let r = this.stopWatchProgress; return r == -100 ? 0 : r; }
+  public getStopwatch() { let r = this.stopWatchProgress; return r == -100 ? 0 : r; }
 
   /** 
    * Set the amount of time in the stopwatch
    * 
    * @param val The amount of time that will be reported as having elapsed
    */
-  setStopwatch(val: number) { this.stopWatchProgress = val; }
+  public setStopwatch(val: number) { this.stopWatchProgress = val; }
 
   /** Register that a new hero has been created */
-  onHeroCreated() { this.heroesCreated++; }
+  public onHeroCreated() { this.heroesCreated++; }
 
   /** Register that a new enemy has been created */
-  onEnemyCreated() { this.enemiesCreated++; }
+  public onEnemyCreated() { this.enemiesCreated++; }
 
   /** 
    * On every clock tick, this is called to update the countdowns and stopwatch.
@@ -190,7 +190,7 @@ export class Score {
    * 
    * @returns -1 to lose, 1 to win, 0 otherwise 
    */
-  onClockTick(elapsedMillis: number) {
+  public onClockTick(elapsedMillis: number) {
     if (this.loseCountDownRemaining != -100) {
       this.loseCountDownRemaining -= elapsedMillis / 1000;
       if (this.loseCountDownRemaining < 0) {
@@ -216,7 +216,7 @@ export class Score {
    * @param enemy The enemy who defeated the hero
    * @param hero  The hero who was defeated
    */
-  onDefeatHero(enemy: Enemy, hero: Hero) {
+  public onDefeatHero(enemy: Enemy, hero: Hero) {
     // Lose if all enemies defeated, or if this hero had to survive
     this.heroesDefeated++;
     if (enemy.getOnDefeatHero()) {
@@ -233,7 +233,7 @@ export class Score {
   /**
    * Indicate that an enemy was defeated.  This may cause the level to be won
    */
-  onEnemyDefeated() {
+  public onEnemyDefeated() {
     // if we win by defeating enemies, see if we've defeated enough of them:
     this.enemiesDefeated++;
     if (this.victoryType != VictoryType.ENEMYCOUNT) {
@@ -252,7 +252,7 @@ export class Score {
   }
 
   /** Returns the number of enemies defeated */
-  getEnemiesDefeated() { return this.enemiesDefeated; }
+  public getEnemiesDefeated() { return this.enemiesDefeated; }
 
   /**
    * Indicate that the level should be won by some number of heroes reaching the
@@ -260,7 +260,7 @@ export class Score {
    * 
    * @param howmany The number of heroes that must reach the destination
    */
-  setWinDestination(howmany: number) {
+  public setWinDestination(howmany: number) {
     this.victoryType = VictoryType.DESTINATION;
     this.victoryHeroCount = howmany;
   }
@@ -272,7 +272,7 @@ export class Score {
    * @param howMany The number of enemies that must be defeated to win the
    *                level.  Leave blank if the answer is "all"
    */
-  setVictoryEnemyCount(howMany?: number) {
+  public setVictoryEnemyCount(howMany?: number) {
     this.victoryType = VictoryType.ENEMYCOUNT;
     if (howMany) {
       this.victoryEnemyCount = howMany;

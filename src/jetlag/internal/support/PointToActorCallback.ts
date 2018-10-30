@@ -1,4 +1,4 @@
-import { BaseActor as BaseActor } from "../../actor/Base"
+import { BaseActor } from "../../actor/BaseActor"
 import { XY } from "./XY";
 
 /**

@@ -1,7 +1,7 @@
 /// <reference path="../../../typings/PhysicsType2d.v0_9.d.ts" />
 
 import { Renderable } from "../internal/support/Interfaces"
-import { BaseScene as BaseScene } from "../internal/scene/BaseScene"
+import { BaseScene } from "../internal/scene/BaseScene"
 import { Route } from "../support/Route"
 import { RouteDriver } from "../internal/support/RouteDriver"
 import { AnimationDriver } from "../internal/support/AnimationDriver"

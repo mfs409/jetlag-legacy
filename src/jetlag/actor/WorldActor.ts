@@ -1,4 +1,4 @@
-import { BaseActor as BaseActor } from "./Base"
+import { BaseActor } from "./BaseActor"
 import { Hero } from "./Hero"
 import { JetLagStage } from "../internal/JetLagStage";
 import { XY } from "../internal/support/XY";

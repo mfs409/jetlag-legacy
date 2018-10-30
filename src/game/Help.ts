@@ -1,4 +1,4 @@
-import { JetLagApi as JetLagApi } from "../jetlag/api/JetLagApi";
+import { JetLagApi  } from "../jetlag/api/JetLagApi";
 import { JetLagKeys } from "../jetlag/support/JetLagKeys";
 
 /**

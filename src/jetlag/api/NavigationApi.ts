@@ -1,5 +1,5 @@
 import { JetLagManager } from "../internal/JetLagManager"
-import { OverlayApi as OverlayApi } from "./OverlayApi"
+import { OverlayApi } from "./OverlayApi"
 import { JetLagStage } from "../internal/JetLagStage";
 
 /**

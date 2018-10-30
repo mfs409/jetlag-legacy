@@ -1,4 +1,4 @@
-import { WorldActor as WorldActor } from "./World"
+import { WorldActor } from "./WorldActor"
 import { Hero } from "./Hero"
 import { JetLagSound } from "../internal/support/Interfaces";
 import { JetLagStage } from "../internal/JetLagStage";
