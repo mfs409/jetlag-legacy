@@ -93,16 +93,16 @@ export class WorldApi {
      * Draw some text in the scene, centering it on a specific point
      *
      * @param cfg A TextConfig object, which will specify how to draw the text
-     *
+     * @param producer A function that produces the text to display
      * @return The text, so it can be shown and hidden in the future
      */
-    public addText(cfg: TextConfig): Renderable {
+    public addText(cfg: TextConfig, producer: () => string): Renderable {
         checkTextConfig(cfg);
         if (cfg.center) {
-            return this.stage.getWorld().addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+            return this.stage.getWorld().addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
         }
         else {
-            return this.stage.getWorld().addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+            return this.stage.getWorld().addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
         }
     }
 

@@ -6,22 +6,19 @@ import { buildHelpScreen } from "./Help";
 import { buildSplashScreen } from "./Splash";
 
 /**
- * MyConfig stores things like screen dimensions, default text, font 
- * configuration, and the names of all the assets (images and sounds) used by 
- * the game.
+ * GameConfig stores things like screen dimensions and other game configuration,
+ * as well as the names of all the assets (images and sounds) used by this game.
  */
-export class MyConfig extends JetLagConfig {
-
+export class GameConfig extends JetLagConfig {
   /**
-   * The MyConfig object is used to pass configuration information to the LOL
-   * system.
+   * The GameConfig object is used to pass configuration information to the
+   * JetLag system.
    *
    * To see documentation for any of these variables, hover your mouse over the
    * word on the left side of the equals sign.
    */
   constructor() {
-    // Always start with this line
-    super();
+    super(); // Always start with this line
 
     // The size of the screen, and some game behavior configuration
     this.screenWidth = 1600;

@@ -5,7 +5,6 @@
  *   the center of the image (when the optional 'center' field is true)
  * - face, color, and size: for configuring the font to use.  Note that color
  *   should be an HTML hex code, e.g., "#FF0000"
- * - producer: a function that makes the text to display
  *
  * It also provides the following optional fields:
  * - z: the z index of the text (-2, -1, 0, 1, or 2).  If none is provided, 0
@@ -27,8 +26,6 @@ export class TextConfig {
     color = "#FFFFFF";
     /** Font size */
     size = 22;
-    /** A function that produces the text to display */
-    producer: () => string = () => { return "" };
     /** Z index of the text */
     z?= 0;
 }

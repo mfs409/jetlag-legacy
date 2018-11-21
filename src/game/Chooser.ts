@@ -1,4 +1,4 @@
-import { JetLagApi  } from "../jetlag/api/JetLagApi"
+import { JetLagApi } from "../jetlag/api/JetLagApi"
 import { JetLagKeys } from "../jetlag/support/JetLagKeys";
 
 /**
@@ -100,7 +100,7 @@ function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, hei
 
     // attach a callback and print the level number with a touchCallback, and then put text on top of it
     tile.setTapHandler(() => { jl.nav.doLevel(whichLevel); return true; });
-    jl.world.addText({ center: true, x: x + width / 2, y: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, producer: () => { return whichLevel + "" }, z: 0 });
+    jl.world.addText({ center: true, x: x + width / 2, y: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => { return whichLevel + "" });
 }
 
 /**

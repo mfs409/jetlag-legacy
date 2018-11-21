@@ -402,7 +402,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             });
             // On top of the button, we will write some text, centered around
             // the center of the screen
-            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => "An obstacle's appearance may\nnot match its physics", z: 0 });
+            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => "An obstacle's appearance may\nnot match its physics");
             // Note that we are putting tap controls and text on 'overlay', but
             // we can still access jl.world.  This means, for example, that you
             // could have a button that lets the user choose a character, and
@@ -440,8 +440,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // callback
         jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
             overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
-            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => "Obstacles can have different amounts\nof friction and elasticity", z: 0 });
-            overlay.addText({ x: 0, y: 0, face: "Arial", color: "#00FFFF", size: 12, producer: () => "(Releasing the joystick does not stop the hero anymore)", z: 0 });
+            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => "Obstacles can have different amounts\nof friction and elasticity");
+            overlay.addText({ x: 0, y: 0, face: "Arial", color: "#00FFFF", size: 12, z: 0 }, () => "(Releasing the joystick does not stop the hero anymore)");
             overlay.addTimer(4, false, () => { jl.nav.dismissOverlayScene(); });
         });
     }
@@ -478,7 +478,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // This finally shows a situation where a prefix or suffix is useful when adding text
         //
         // Note: jl.score.getGoodies1 is one of quite a few available displays
-        jl.hud.addText({ x: .25, y: 8.5, face: "Arial", color: "#FF00FF", size: 20, producer: () => jl.score.getGoodies1() + "/2 Goodies", z: 2 });
+        jl.hud.addText({ x: .25, y: 8.5, face: "Arial", color: "#FF00FF", size: 20, z: 2 }, () => jl.score.getGoodies1() + "/2 Goodies");
 
         welcomeMessage(jl, "You must collect two blue balls.\nThen the destination will work");
 
@@ -488,7 +488,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 jl.nav.nextLevel();
                 return true;
             });
-            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => "Great Job", z: 0 });
+            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => "Great Job");
             jl.playSound("winsound.ogg");
         });
     }
@@ -519,7 +519,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         g.setPath(new Path().to(3, 3).to(6, 3).to(6, 6).to(3, 6).to(3, 3), 10, true);
 
         // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
-        jl.hud.addText({ x: .05, y: 8, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
+        jl.hud.addText({ x: .05, y: 8, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + " Goodies");
 
         welcomeMessage(jl, "Every actor can move...");
         winMessage(jl, "Great Job");
@@ -543,12 +543,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setVictoryGoodies(5, 0, 0, 0);
 
         // put the goodie count on the screen
-        jl.hud.addText({ x: 0, y: 8, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + "/5 Goodies", z: 2 });
+        jl.hud.addText({ x: 0, y: 8, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + "/5 Goodies");
 
         // put a simple countdown on the screen.  The first line says "15 seconds", the second
         // actually draws something on the screen showing remaining time
         jl.score.setLoseCountdown(15);
-        jl.world.addText({ x: 0, y: 7, face: "Arial", color: "#000000", size: 32, producer: () => jl.score.getLoseCountdown().toFixed(0), z: 2 });
+        jl.world.addText({ x: 0, y: 7, face: "Arial", color: "#000000", size: 32, z: 2 }, () => jl.score.getLoseCountdown().toFixed(0));
 
         // let's also add a screen for pausing the game. In a real game, every level should have
         // a button for pausing the game, and the pause scene should have a button for going
@@ -565,7 +565,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, producer: () => "Game Paused", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
             });
             return true;
         });
@@ -594,7 +594,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setStopwatch(0);
 
         // Draw the stopwatch on the HUD
-        jl.hud.addText({ x: .1, y: 8, face: "Arial", color: "#000000", size: 32, producer: () => jl.score.getStopwatch().toFixed(0), z: 2 });
+        jl.hud.addText({ x: .1, y: 8, face: "Arial", color: "#000000", size: 32, z: 2 }, () => jl.score.getStopwatch().toFixed(0));
 
         // Put a button on the HUD to pause the game
         jl.hud.addTapControl({ x: 0.1, y: 8.5, width: .4, height: .4, img: "pause.png" }, () => {
@@ -603,7 +603,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#000000", size: 32, producer: () => "Game Paused", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "Game Paused");
                 overlay.addTapControl({ x: 0.1, y: 8.5, width: .4, height: .4, img: "backarrow.png" }, () => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doSplash(1);
@@ -655,7 +655,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // draw a strength meter to show this hero's strength.  Note that we are using a suffix
         // parameter to the addDisplay() function
-        jl.world.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, producer: () => h.getStrength() + " Strength", z: 2 });
+        jl.world.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, z: 2 }, () => h.getStrength() + " Strength");
 
         // our first enemy stands still:
         let e = jl.world.makeEnemy({ x: 8, y: 8, width: .5, height: .5, img: "redball.png" });
@@ -689,7 +689,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 jl.nav.repeatLevel();
                 return true;
             });
-            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => endText, z: 0 });
+            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => endText);
         });
     }
 
@@ -711,7 +711,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Start a countdown with 10 seconds, and put a timer on the HUD
         jl.score.setLoseCountdown(10);
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, producer: () => jl.score.getLoseCountdown().toFixed(0), z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, z: 2 }, () => jl.score.getLoseCountdown().toFixed(0));
 
         // indicate that defeating all of the enemies is the way to win this level
         jl.score.setVictoryEnemyCount();
@@ -743,7 +743,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         g.setCollectCallback((g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); });
 
         // Display the hero's strength
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, producer: () => h.getStrength() + " Strength", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, z: 2 }, () => h.getStrength() + " Strength");
 
         // win by defeating one enemy
         jl.score.setVictoryEnemyCount(1);
@@ -783,12 +783,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setVictoryDestination(1);
 
         // display a goodie count for type-1 goodies
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + " Goodies");
 
-        jl.hud.addText({ x: .1, y: 7.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => h.getInvincibleRemaining().toFixed(0) + " Invincibility", z: 2 });
+        jl.hud.addText({ x: .1, y: 7.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => h.getInvincibleRemaining().toFixed(0) + " Invincibility");
 
         // put a frames-per-second display on the screen.
-        jl.hud.addText({ x: .1, y: 8, face: "Arial", color: "#C8C864", size: 12, producer: () => jl.getFPS().toFixed(0) + " fps", z: 2 });
+        jl.hud.addText({ x: .1, y: 8, face: "Arial", color: "#C8C864", size: 12, z: 2 }, () => jl.getFPS().toFixed(0) + " fps");
 
         welcomeMessage(jl, "The blue ball will make you invincible for 15 seconds");
         winMessage(jl, "Great Job");
@@ -817,7 +817,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         g2.setScore(9, 0, 0, 0);
 
         // print a goodie count to show how the count goes up and down
-        jl.hud.addText({ x: 7, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => "Your score is: " + jl.score.getGoodies1(), z: 2 });
+        jl.hud.addText({ x: 7, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => "Your score is: " + jl.score.getGoodies1());
 
         welcomeMessage(jl, "Collect 'the right' blue balls to activate destination");
         winMessage(jl, "Great Job");
@@ -952,7 +952,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // We won't add a destination... instead, the level will end in victory after 25 seconds
         jl.score.setWinCountdown(25);
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, producer: () => jl.score.getWinCountdown().toFixed(0), z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, z: 2 }, () => jl.score.getWinCountdown().toFixed(0));
 
         // Let's have an enemy, too
         jl.world.makeEnemy({ x: 7, y: 3.5, width: 2, height: 2, img: "redball.png" });
@@ -1106,10 +1106,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setHover(8, 1);
 
         // Add a meter to show how far the hero has traveled
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#FF00FF", size: 16, producer: () => Math.floor(h.getXPosition()) + " m", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#FF00FF", size: 16, z: 2 }, () => Math.floor(h.getXPosition()) + " m");
 
         // Add some text about the previous best score
-        jl.world.addText({ x: .1, y: 8, face: "Arial", color: "#000000", size: 12, producer: () => "best: " + jl.score.getGameFact("HighScore32", "0") + "M", z: 0 });
+        jl.world.addText({ x: .1, y: 8, face: "Arial", color: "#000000", size: 12, z: 0 }, () => "best: " + jl.score.getGameFact("HighScore32", "0") + "M");
 
         welcomeMessage(jl, "Side Scroller with basic repeating background");
         // when this level ends, we save the best score. Once the score is saved, it is saved
@@ -1678,7 +1678,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setVictoryEnemyCount();
 
         // put a count of defeated enemies on the screen
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, producer: () => jl.score.getEnemiesDefeated() + " Enemies Defeated", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, z: 2 }, () => jl.score.getEnemiesDefeated() + " Enemies Defeated");
 
         welcomeMessage(jl, "Throw balls at the enemies before they reproduce");
         winMessage(jl, "Great Job");
@@ -1887,7 +1887,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setPath(new Path().to(15, 7).to(5, 2).to(15, 7), 1, true);
         g.setRotationSpeed(0.25);
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + " Goodies");
 
         // draw a picture when the level is won, and don't print text...
         // this particular picture isn't very useful
@@ -1936,7 +1936,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 jl.nav.repeatLevel();
                 return true;
             });
-            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => "Oh well...", z: 0 });
+            overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => "Oh well...");
         });
 
         welcomeMessage(jl, "Press the right side of the screen to crawl or the left side to jump.");
@@ -1992,7 +1992,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         h.setMoveByTilting();
 
         // put an enemy defeated count on the screen, in red with a small font
-        jl.hud.addText({ x: .5, y: 8, face: "Arial", color: "#FF0000", size: 10, producer: () => jl.score.getEnemiesDefeated() + "/4 Enemies Defeated", z: 2 });
+        jl.hud.addText({ x: .5, y: 8, face: "Arial", color: "#FF0000", size: 10, z: 2 }, () => jl.score.getEnemiesDefeated() + "/4 Enemies Defeated");
 
         // make a moveable obstacle that can defeat enemies
         let o = jl.world.makeObstacle({ x: 10, y: 2, width: 1, height: 1, img: "blueball.png" });
@@ -2086,7 +2086,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.projectiles.setImageSource("colorstar1.png");
 
         // show how many shots are left
-        jl.hud.addText({ x: .5, y: 8.5, face: "Arial", color: "#FF00FF", size: 12, producer: () => jl.projectiles.getRemaining() + " projectiles left", z: 2 });
+        jl.hud.addText({ x: .5, y: 8.5, face: "Arial", color: "#FF00FF", size: 12, z: 2 }, () => jl.projectiles.getRemaining() + " projectiles left");
 
         // draw a bunch of enemies to defeat
         let e = jl.world.makeEnemy({ x: 4, y: 5, width: .5, height: .5, img: "redball.png" });
@@ -2215,7 +2215,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set a timer callback. after three seconds, the callback will run
         jl.addTimer(2, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFF00", size: 12, producer: () => "Ooh... a draggable enemy", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFF00", size: 12, z: 0 }, () => "Ooh... a draggable enemy");
                 overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
@@ -2233,7 +2233,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // doesn't count while the PauseScene is showing...)
         jl.addTimer(6, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FF00FF", size: 12, producer: () => "Touch the enemy and it will go away", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FF00FF", size: 12, z: 0 }, () => "Touch the enemy and it will go away");
                 overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
@@ -2250,7 +2250,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // draw an enemy, a goodie, and a destination, all with
             // fixed velocities
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFF00", size: 12, producer: () => "Now you can see the rest of the level", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFF00", size: 12, z: 0 }, () => "Now you can see the rest of the level");
                 overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
@@ -2296,7 +2296,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         h.setMoveByTilting();
         jl.world.setCameraChase(h);
 
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + " Goodies");
         jl.score.setVictoryDestination(1);
 
         // this obstacle is a collision callback... when the hero hits it,
@@ -2350,7 +2350,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
-                        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, producer: () => "The destination is now available", z: 0 });
+                        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "The destination is now available");
                         jl.world.makeDestination({ x: 63, y: 8, width: 1, height: 1, img: "mustardball.png" });
                     });
                 }
@@ -2441,7 +2441,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let sc = (e: Enemy, actor: WorldActor) => {
             // always reset the pausescene, in case it has something on it from before...
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#58E2A0", size: 16, producer: () => "good job, here's a prize", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#58E2A0", size: 16, z: 0 }, () => "good job, here's a prize");
                 overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
@@ -2489,7 +2489,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         h.setPhysics(5, 0, 0.6);
         h.setMoveByTilting();
 
-        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
+        jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + " Goodies");
 
         // the destination won't work until some goodies are collected...
         let d = jl.world.makeDestination({ x: 15, y: 1, width: 1, height: 1, img: "colorstar1.png" });
@@ -2529,7 +2529,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         jl.hud.addTapControl({ x: 0, y: 300, width: 20, height: 20, img: "red.png" }, (hudX: number, hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, producer: () => "Game Paused", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
                 overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
@@ -2554,7 +2554,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // we're going to win by "surviving" for 25 seconds... with no
         // enemies, that shouldn't be too hard
         jl.score.setWinCountdown(25);
-        jl.hud.addText({ x: 28, y: 250, face: "Arial", color: "#C0C0C0", size: 16, producer: () => "" + jl.score.getWinCountdown(), z: 2 });
+        jl.hud.addText({ x: 28, y: 250, face: "Arial", color: "#C0C0C0", size: 16, z: 2 }, () => "" + jl.score.getWinCountdown());
         // just to play it safe, let's say that we win on reaching a destination...
         // this ensures that collecting goodies or defeating enemies won't
         // accidentally cause us to win. Of course, with no destination,
@@ -2784,12 +2784,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         d.setOnAttemptArrival(() => { return jl.score.getGoodies1() >= 1 && jl.score.getGoodies2() >= 1 && jl.score.getGoodies3() >= 3; });
         jl.score.setVictoryDestination(1);
 
-        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#00FFFF", size: 16, producer: () => jl.score.getGoodies1() + " blue", z: 2 });
-        jl.hud.addText({ x: 1, y: 1.5, face: "Arial", color: "#00FFFF", size: 16, producer: () => jl.score.getGoodies2() + " green", z: 2 });
-        jl.hud.addText({ x: 1, y: 2, face: "Arial", color: "#00FFFF", size: 16, producer: () => jl.score.getGoodies3() + " red", z: 2 });
+        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#00FFFF", size: 16, z: 2 }, () => jl.score.getGoodies1() + " blue");
+        jl.hud.addText({ x: 1, y: 1.5, face: "Arial", color: "#00FFFF", size: 16, z: 2 }, () => jl.score.getGoodies2() + " green");
+        jl.hud.addText({ x: 1, y: 2, face: "Arial", color: "#00FFFF", size: 16, z: 2 }, () => jl.score.getGoodies3() + " red");
 
         jl.score.setLoseCountdown(100);
-        jl.hud.addText({ x: 15, y: 8, face: "Arial", color: "#000000", size: 32, producer: () => jl.score.getLoseCountdown().toFixed() + "", z: 2 });
+        jl.hud.addText({ x: 15, y: 8, face: "Arial", color: "#000000", size: 32, z: 2 }, () => jl.score.getLoseCountdown().toFixed() + "");
 
         // draw the goodies
         for (let i = 0; i < 3; ++i) {
@@ -2955,9 +2955,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        jl.hud.addText({ x: .25, y: .5, face: "Arial", color: "#000000", size: 12, producer: () => "Level: " + jl.score.getLevelFact("level test", "-1"), z: 2 });
-        jl.hud.addText({ x: .25, y: .75, face: "Arial", color: "#000000", size: 12, producer: () => "Session: " + jl.score.getSessionFact("session test", "-1"), z: 2 });
-        jl.hud.addText({ x: .25, y: 1, face: "Arial", color: "#000000", size: 12, producer: () => "Game: " + jl.score.getGameFact("game test", "-1"), z: 2 });
+        jl.hud.addText({ x: .25, y: .5, face: "Arial", color: "#000000", size: 12, z: 2 }, () => "Level: " + jl.score.getLevelFact("level test", "-1"));
+        jl.hud.addText({ x: .25, y: .75, face: "Arial", color: "#000000", size: 12, z: 2 }, () => "Session: " + jl.score.getSessionFact("session test", "-1"));
+        jl.hud.addText({ x: .25, y: 1, face: "Arial", color: "#000000", size: 12, z: 2 }, () => "Game: " + jl.score.getGameFact("game test", "-1"));
 
         jl.hud.addTapControl({ x: 0, y: .5, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
             jl.score.setLevelFact("level test", "" + (1 + parseInt(jl.score.getLevelFact("level test", "-1"))));
@@ -3101,7 +3101,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 20, producer: () => "you can only pause once...", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => "you can only pause once...");
             });
             w.setImage("");
             return true;
@@ -3148,7 +3148,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // for pausing the level
         jl.hud.addTapControl({ x: 0, y: 0, width: 1, height: 1, img: "red.png" }, (hudX: number, hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, producer: () => "Game Paused", z: 0 });
+                overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
                 overlay.addTapControl({ x: 3, y: 1, width: 1, height: 1, img: "red.png" }, (eventPositionX: number, eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doChooser(1);
@@ -3174,7 +3174,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
-                        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, producer: () => "This is a second pause scene!", z: 0 });
+                        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "This is a second pause scene!");
                     });
                     return true;
                 });
@@ -3298,7 +3298,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // we win by collecting 10 goodies...
         jl.score.setVictoryGoodies(10, 0, 0, 0);
-        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#FFFFFF", size: 20, producer: () => jl.score.getGoodies1() + " goodies", z: 2 });
+        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => jl.score.getGoodies1() + " goodies");
 
         // now set up an obstacle and attach a callback to it
         //
@@ -3414,7 +3414,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     }
 
     // Put the level number in the top right corner of every level
-    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#872436", size: 22, producer: () => "Level " + index, z: 2 });
+    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#872436", size: 22 + index, z: 2 }, () => "Level ");
 }
 
 /**
@@ -3433,7 +3433,7 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
             jl.nav.dismissOverlayScene();
             return true;
         });
-        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => message, z: 0 });
+        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     });
 }
 
@@ -3447,7 +3447,7 @@ export function winMessage(jl: JetLagApi, message: string, callback: () => void 
             jl.nav.nextLevel();
             return true;
         });
-        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => message, z: 0 });
+        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
         if (callback !== null)
             callback();
     });
@@ -3463,7 +3463,7 @@ export function loseMessage(jl: JetLagApi, message: string, callback: () => void
             jl.nav.repeatLevel();
             return true;
         });
-        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, producer: () => message, z: 0 });
+        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
         if (callback !== null)
             callback();
     });

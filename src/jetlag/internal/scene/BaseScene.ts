@@ -314,12 +314,12 @@ export abstract class BaseScene {
    * @param fontName  The name of the font to use
    * @param fontColor The color of the font
    * @param fontSize  The size of the font
-   * @param producer  Code to generate the text to display
    * @param zIndex    The z index of the text
+   * @param producer  Code to generate the text to display
    * @return A Renderable of the text, so it can be enabled/disabled by program
    * code
    */
-  public addText(x: number, y: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number) {
+  public addText(x: number, y: number, fontName: string, fontColor: string, fontSize: number, zIndex: number, producer: () => string) {
     let t = new Text(this.device.getRenderer(), fontName, fontSize, fontColor, x, y, false, producer);
     this.addActor(t, zIndex);
     return t;
@@ -333,12 +333,12 @@ export abstract class BaseScene {
    * @param fontName  The name of the font to use
    * @param fontColor The color of the font
    * @param fontSize  The size of the font
-   * @param producer  Code to generate the text to display
    * @param zIndex    The z index of the text
+   * @param producer  Code to generate the text to display
    * @return A Renderable of the text, so it can be enabled/disabled by program
    *         code
    */
-  public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, producer: () => string, zIndex: number) {
+  public addTextCentered(centerX: number, centerY: number, fontName: string, fontColor: string, fontSize: number, zIndex: number, producer: () => string) {
     let t = new Text(this.device.getRenderer(), fontName, fontSize, fontColor, centerX, centerY, true, producer);
     this.addActor(t, zIndex);
     return t;

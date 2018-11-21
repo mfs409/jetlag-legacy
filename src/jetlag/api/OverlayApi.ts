@@ -296,14 +296,15 @@ export class OverlayApi {
      * information on how to configure text.
      *
      * @param cfg A TextConfig object, which will specify how to draw the text
+     * @param producer A function that produces the text to display
      * @return The display, so that it can be controlled further if needed
      */
-    public addText(cfg: TextConfig): Renderable {
+    public addText(cfg: TextConfig, producer: () => string): Renderable {
         if (cfg.center) {
-            return this.overlay.addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+            return this.overlay.addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
         }
         else {
-            return this.overlay.addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.producer, cfg.z);
+            return this.overlay.addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
         }
     }
 
