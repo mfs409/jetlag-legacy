@@ -1,52 +1,52 @@
 import { BaseActor } from "../../actor/BaseActor"
 import { JetLagConsole } from "./Interfaces";
-import { Route } from "../../support/Route";
+import { Path } from "../../support/Path";
 import { XY } from "./XY";
 
 /**
- * RouteDriver is an internal class, used to determine placement for an actor
- * whose motion is controlled by a Route
+ * PathDriver is an internal class, used to determine placement for an actor
+ * whose motion is controlled by a Path
  */
-export class RouteDriver {
-    /** Is the route still running? */
+export class PathDriver {
+    /** Is the path still running? */
     private done = false;
 
-    /** Index of the next point in the route */
+    /** Index of the next point in the path */
     private nextIndex: number;
 
     /**
-     * Constructing a route driver also starts the route
+     * Constructing a path driver also starts the path
      *
-     * @param route    The route to apply
+     * @param path    The path to apply
      * @param velocity The speed at which the actor moves
-     * @param loop     Should the route repeat when it completes?
-     * @param actor    The actor to which the route should be applied
+     * @param loop     Should the path repeat when it completes?
+     * @param actor    The actor to which the path should be applied
      */
-    constructor(private route: Route, private readonly velocity: number, private readonly loop: boolean, private actor: BaseActor, logger: JetLagConsole) {
-        if (route.getNumPoints() < 2) {
-            logger.urgent("Error: route must have at least two points");
-            this.haltRoute();
+    constructor(private path: Path, private readonly velocity: number, private readonly loop: boolean, private actor: BaseActor, logger: JetLagConsole) {
+        if (path.getNumPoints() < 2) {
+            logger.urgent("Error: path must have at least two points");
+            this.haltPath();
         }
         else {
-            this.startRoute();
+            this.startPath();
         }
     }
 
-    /** Stop processing a route, and stop the actor too */
-    private haltRoute() {
+    /** Stop processing a path, and stop the actor too */
+    private haltPath() {
         this.done = true;
         this.actor.setAbsoluteVelocity(0, 0);
     }
 
-    /** Begin running a route */
-    private startRoute() {
+    /** Begin running a path */
+    private startPath() {
         // move to the starting point
-        let r = this.route.getPoint(0);
+        let r = this.path.getPoint(0);
         // convert start point from topleft to center, move actor to it
         this.actor.getBody().SetTransform(new XY(r.x + this.actor.getWidth() / 2, r.y + this.actor.getHeight() / 2), 0);
         // set up our next goal, start moving toward it
         this.nextIndex = 1;
-        let p = this.route.getPoint(this.nextIndex)
+        let p = this.path.getPoint(this.nextIndex)
         // convert from the point to a unit vector, then set velocity
         p.x -= this.actor.getXPosition();
         p.y -= this.actor.getYPosition();
@@ -56,7 +56,7 @@ export class RouteDriver {
         this.actor.updateVelocity(p.x, p.y);
     }
 
-    /** Figure out where we need to go next when driving a route */
+    /** Figure out where we need to go next when driving a path */
     public drive() {
         // quit if we're done and we don't loop
         if (this.done) {
@@ -64,8 +64,8 @@ export class RouteDriver {
         }
 
         // if we haven't passed the goal, keep going
-        let source = this.route.getPoint(this.nextIndex - 1);
-        let goal = this.route.getPoint(this.nextIndex)
+        let source = this.path.getPoint(this.nextIndex - 1);
+        let goal = this.path.getPoint(this.nextIndex)
         let goalDx = source.x - goal.x;
         let goalDy = source.y - goal.y;
         let actorDx = source.x - this.actor.getXPosition();
@@ -85,10 +85,10 @@ export class RouteDriver {
 
         // Update the goal, and restart, stop, or start moving toward it
         this.nextIndex++;
-        if (this.nextIndex == this.route.getNumPoints()) {
-            // reset if it's a loop, else terminate Route
+        if (this.nextIndex == this.path.getNumPoints()) {
+            // reset if it's a loop, else terminate path
             if (this.loop) {
-                this.startRoute();
+                this.startPath();
             } else {
                 this.done = true;
                 this.actor.updateVelocity(0, 0);
@@ -96,7 +96,7 @@ export class RouteDriver {
         }
         else {
             // advance to next point
-            let p = this.route.getPoint(this.nextIndex)
+            let p = this.path.getPoint(this.nextIndex)
             p.x -= this.actor.getXPosition();
             p.y -= this.actor.getYPosition();
             p.Normalize();

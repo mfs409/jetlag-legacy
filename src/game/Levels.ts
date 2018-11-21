@@ -1,6 +1,6 @@
 import { JetLagApi } from "../jetlag/api/JetLagApi";
 import { OverlayApi } from "../jetlag/api/OverlayApi";
-import { Route } from "../jetlag/support/Route";
+import { Path } from "../jetlag/support/Path";
 import { Goodie } from "../jetlag/actor/Goodie";
 import { Hero } from "../jetlag/actor/Hero";
 import { WorldActor } from "../jetlag/actor/WorldActor";
@@ -210,15 +210,15 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setVictoryDestination(1);
         welcomeMessage(jl, "Avoid the enemy and\nreach the destination");
 
-        // Draw an enemy, and attach a route to it.
+        // Draw an enemy, and attach a path to it.
         //
-        // The route will have two points.  The first is (14, 8.25), and the
-        // second is (14, 0).  Note what happens when the route repeats: we
+        // The path will have two points.  The first is (14, 8.25), and the
+        // second is (14, 0).  Note what happens when the path repeats: we
         // never say "there is a third point that is the same as the start
         // point", so the enemy teleports back to the starting point after it
         // reaches (14, 0).
         let e = jl.world.makeEnemy({ x: 14, y: 1.5, width: .75, height: .75, img: "redball.png" });
-        e.setRoute(new Route().to(14, 8.25).to(14, 0), 4, true);
+        e.setPath(new Path().to(14, 8.25).to(14, 0), 4, true);
 
         // Note that if we don't explicitly call winMessage() and loseMessage(),
         // then when the player wins or loses, gameplay will immediately 
@@ -226,7 +226,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // *and* winning!
     }
 
-    // This level also puts an enemy on a route, but now the route has three 
+    // This level also puts an enemy on a path, but now the path has three 
     // points, so that the enemy returns to its starting point
     else if (index == 9) {
         jl.world.enableTilt(10, 10);
@@ -236,11 +236,11 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.makeDestination({ x: 15, y: 1, width: .75, height: .75, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        // Notice how the Enemy Route has 3 points, so that it travels back and
-        // forth.  Routes can be made extremely complex.  Be sure to try a lot
+        // Notice how the Enemy path has 3 points, so that it travels back and
+        // forth.  Paths can be made extremely complex.  Be sure to try a lot
         // of variations.
         let e = jl.world.makeEnemy({ x: 14, y: 1.5, width: .75, height: .75, img: "redball.png" });
-        e.setRoute(new Route().to(14, 8.25).to(10, 0).to(14, 8.25), 4, true);
+        e.setPath(new Path().to(14, 8.25).to(10, 0).to(14, 8.25), 4, true);
 
         welcomeMessage(jl, "Avoid the enemy and\nreach the destination");
         loseMessage(jl, "Try Again");
@@ -493,7 +493,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         });
     }
 
-    // Earlier, we saw that enemies could move along a Route. So can any other actor, so we'll
+    // Earlier, we saw that enemies could move along a path. So can any other actor, so we'll
     // move destinations, goodies, and obstacles, too.
     else if (index == 15) {
         // start with a hero who is controlled via Joystick
@@ -506,17 +506,17 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // works
         let d = jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
         d.setOnAttemptArrival(() => { return jl.score.getGoodies1() >= 1; });
-        d.setRoute(new Route().to(15, 8).to(15, .25).to(15, 8), 4, true);
+        d.setPath(new Path().to(15, 8).to(15, .25).to(15, 8), 4, true);
         jl.score.setVictoryDestination(1);
 
         // make an obstacle that moves
         let o = jl.world.makeObstacle({ box: true, x: 0, y: 0, width: 1, height: 1, img: "purpleball.png" });
         o.setPhysics(0, 100, 0);
-        o.setRoute(new Route().to(0, 0).to(8, 8).to(0, 0), 2, true);
+        o.setPath(new Path().to(0, 0).to(8, 8).to(0, 0), 2, true);
 
         // make a goodie that moves
         let g = jl.world.makeGoodie({ x: 5, y: 5, width: .5, height: .5, img: "blueball.png" });
-        g.setRoute(new Route().to(3, 3).to(6, 3).to(6, 6).to(3, 6).to(3, 3), 10, true);
+        g.setPath(new Path().to(3, 3).to(6, 3).to(6, 6).to(3, 6).to(3, 3), 10, true);
 
         // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
         jl.hud.addText({ x: .05, y: 8, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
@@ -669,7 +669,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // our second enemy moves along a path
         e = jl.world.makeEnemy({ x: 7, y: 7, width: .5, height: .5, img: "redball.png" });
         e.setPhysics(1.0, 0.3, 0.6);
-        e.setRoute(new Route().to(7, 7).to(7, 1).to(7, 7), 2, true);
+        e.setPath(new Path().to(7, 7).to(7, 1).to(7, 7), 2, true);
         e.setDamage(4);
         e.setOnDefeatHero(() => { endText = "Stay out of my way!"; });
 
@@ -773,7 +773,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // this goodie makes us invincible
         let g = jl.world.makeGoodie({ x: 15, y: 8, width: .5, height: .5, img: "blueball.png" });
         g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
-        g.setRoute(new Route().to(15, 8).to(10, 3).to(15, 8), 5, true);
+        g.setPath(new Path().to(15, 8).to(10, 3).to(15, 8), 5, true);
         g.setRotationSpeed(0.25);
 
         // we'll still say you win by reaching the Destination. Defeating
@@ -979,7 +979,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // this enemy starts from off-screen... you've got to be quick to survive!
         let e = jl.world.makeEnemy({ x: 4, y: -16, width: 8, height: 8, img: "redball.png" });
-        e.setRoute(new Route().to(4, -16).to(4, 0).to(4, -16), 6, true);
+        e.setPath(new Path().to(4, -16).to(4, 0).to(4, -16), 6, true);
 
         welcomeMessage(jl, "Reach the destination to win the level.");
         winMessage(jl, "Great Job");
@@ -1885,7 +1885,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // add a goodie that makes the hero invincible
         let g = jl.world.makeGoodie({ x: 15, y: 7, width: .5, height: .5, img: "blueball.png" });
         g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
-        g.setRoute(new Route().to(15, 7).to(5, 2).to(15, 7), 1, true);
+        g.setPath(new Path().to(15, 7).to(5, 2).to(15, 7), 1, true);
         g.setRotationSpeed(0.25);
         jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, producer: () => jl.score.getGoodies1() + " Goodies", z: 2 });
 
@@ -2188,7 +2188,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // create an enemy that will appear after 3 seconds
         let e2 = jl.world.makeEnemy({ x: 5, y: 5, width: 2, height: 2, img: "redball.png" });
         e2.setPhysics(1.0, 0.3, 0.6);
-        e2.setRoute(new Route().to(5, 5).to(10, 7).to(5, 5), 3, true);
+        e2.setPath(new Path().to(5, 5).to(10, 7).to(5, 5), 3, true);
         e2.setAppearDelay(3);
     }
 
@@ -2689,7 +2689,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
 
     // It can be useful to make a hero stick to an obstacle. As an example,
-    // if the hero should stand on a platform that moves along a route, then
+    // if the hero should stand on a platform that moves along a path, then
     // we will want the hero to "stick" to it, even as the platform moves
     // downward.
     else if (index == 72) {
@@ -2712,13 +2712,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // This obstacle is sticky on top... Jump onto it and watch what
         // happens
         let o = jl.world.makeObstacle({ box: true, x: 2, y: 6, width: 2, height: .25, img: "red.png" });
-        o.setRoute(new Route().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true);
+        o.setPath(new Path().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true);
         o.setPhysics(100, 0, .1);
         o.setSticky(true, false, false, false);
 
         // This obstacle is not sticky... it's not nearly as much fun
         let o2 = jl.world.makeObstacle({ box: true, x: 11, y: 6, width: 2, height: .25, img: "red.png" });
-        o2.setRoute(new Route().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true);
+        o2.setPath(new Path().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true);
         o2.setPhysics(100, 0, 1);
 
         // draw some buttons for moving the hero
@@ -3398,14 +3398,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // This obstacle is sticky on top... Jump onto it and watch what
         // happens
         let o = jl.world.makeObstacle({ box: true, x: 2, y: 6, width: 2, height: .25, img: "red.png" });
-        o.setRoute(new Route().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true);
+        o.setPath(new Path().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true);
         o.setPhysics(100, 0, .1);
         o.setSticky(true, false, false, false);
         o.setOneSided(0);
 
         // This obstacle is not sticky... it's not nearly as much fun
         let o2 = jl.world.makeObstacle({ box: true, x: 11, y: 6, width: 2, height: .25, img: "red.png" });
-        o2.setRoute(new Route().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true);
+        o2.setPath(new Path().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true);
         o2.setPhysics(100, 0, 1);
 
         // draw some buttons for moving the hero

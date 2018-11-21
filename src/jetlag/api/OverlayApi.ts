@@ -3,7 +3,7 @@ import { WorldActor } from "../actor/WorldActor"
 import { TimedEvent } from "../internal/support/TimedEvent"
 import { Renderable } from "../internal/support/Interfaces"
 import { Hero } from "../actor/Hero"
-import { Route } from "../support/Route";
+import { Path } from "../support/Path";
 import { BaseActor } from "../actor/BaseActor";
 import { JetLagStage } from "../internal/JetLagStage";
 import { XY } from "../internal/support/XY";
@@ -202,10 +202,10 @@ export class OverlayApi {
                 return false;
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
-            let r = new Route().to(this.activeActor.getXPosition(), this.activeActor.getYPosition()).to(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
+            let r = new Path().to(this.activeActor.getXPosition(), this.activeActor.getYPosition()).to(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
             this.activeActor.setAbsoluteVelocity(0, 0);
             this.activeActor.setRotationSpeed(0);
-            this.activeActor.setRoute(r, velocity, false);
+            this.activeActor.setPath(r, velocity, false);
             if (clear)
                 this.activeActor = null;
             return true;

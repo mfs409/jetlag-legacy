@@ -76,7 +76,7 @@ export class JetLagStage {
     /** A pool of projectiles for use by the hero */
     private projectilePool: ProjectilePool;
 
-    /** Should gestures route to the HUD first, or to the WORLD first? */
+    /** Should gestures go to the HUD first, or to the WORLD first? */
     private gestureHudFirst = true;
 
     /**

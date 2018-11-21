@@ -2,8 +2,8 @@
 
 import { Renderable } from "../internal/support/Interfaces"
 import { BaseScene } from "../internal/scene/BaseScene"
-import { Route } from "../support/Route"
-import { RouteDriver } from "../internal/support/RouteDriver"
+import { Path } from "../support/Path"
+import { PathDriver } from "../internal/support/PathDriver"
 import { AnimationDriver } from "../internal/support/AnimationDriver"
 import { Animation } from "../support/Animation"
 import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../internal/support/Interfaces"
@@ -47,10 +47,10 @@ export class BaseActor implements Renderable {
     private zIndex: number;
 
     /** 
-     * Does this WorldActor follow a route? If so, the Driver will be used to
-     * advance the  actor along its route.
+     * Does this WorldActor follow a path?  If so, the Driver will be used to
+     * advance the  actor along its path.
      */
-    private route: RouteDriver = null;
+    private path: PathDriver = null;
 
     /** Sound to play when the actor disappears */
     private disappearSound: JetLagSound;
@@ -365,7 +365,7 @@ export class BaseActor implements Renderable {
 
     /**
      * Every time the world advances by a timestep, we call this code to update
-     * the actor route and animation, and then draw the actor
+     * the actor path and animation, and then draw the actor
      * 
      * @param renderer The game's renderer
      * @param camera   The camera for the current stage
@@ -374,7 +374,7 @@ export class BaseActor implements Renderable {
     render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
         if (!this.getEnabled())
             return;
-        if (this.route) this.route.drive();
+        if (this.path) this.path.drive();
 
         // choose the default TextureRegion to show... this is how we animate
         this.animator.advanceAnimation(elapsedMillis);
@@ -536,20 +536,20 @@ export class BaseActor implements Renderable {
     }
 
     /**
-     * Request that this actor moves according to a fixed route
+     * Request that this actor moves according to a fixed path
      *
-     * @param route    The route to follow
-     * @param velocity speed at which to travel along the route
-     * @param loop     When the route completes, should we start it over again?
+     * @param path    The path to follow
+     * @param velocity speed at which to travel along the path
+     * @param loop     When the path completes, should we start it over again?
      */
-    public setRoute(route: Route, velocity: number, loop: boolean) {
+    public setPath(path: Path, velocity: number, loop: boolean) {
         // This must be a KinematicBody or a Dynamic Body!
         if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
             this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
         }
 
-        // Create a Driver to advance the actor's position according to the route
-        this.route = new RouteDriver(route, velocity, loop, this, this.device.getConsole());
+        // Create a Driver to advance the actor's position according to the path
+        this.path = new PathDriver(path, velocity, loop, this, this.device.getConsole());
     }
 
     /**
