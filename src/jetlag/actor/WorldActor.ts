@@ -43,17 +43,9 @@ export abstract class WorldActor extends BaseActor {
 
   /** 
    * Sometimes an actor collides with another actor, and should stick to it. In
-   * that case, we create two joints to connect the two actors. This is the
-   * Distance joint that connects them 
+   * that case, we use this distance joint to make the actors stick together
    */
   private distJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
-
-  /**
-   * Sometimes an actor collides with another actor, and should stick to it.  In
-   * that case, we create two joints to connect the two actors. This is the Weld
-   * joint that connects them 
-   */
-  private weldJoint: PhysicsType2d.Dynamics.Joints.WeldJoint;
 
   /** 
    * When we have actors stuck together, we might want to set a brief delay
@@ -142,15 +134,6 @@ export abstract class WorldActor extends BaseActor {
    */
   public setImplicitDistJoint(joint: PhysicsType2d.Dynamics.Joints.DistanceJoint) {
     this.distJoint = joint;
-  }
-
-  /**
-   * Create a weld joint, as part of stickiness
-   * 
-   * @param joint The weld joint to create
-   */
-  public setImplicitWeldJoint(joint: PhysicsType2d.Dynamics.Joints.WeldJoint) {
-    this.weldJoint = joint;
   }
 
   /**
@@ -507,8 +490,6 @@ export abstract class WorldActor extends BaseActor {
     if (this.distJoint != null) {
       this.stage.getWorld().destroyJoint(this.distJoint);
       this.distJoint = null;
-      this.stage.getWorld().destroyJoint(this.weldJoint);
-      this.weldJoint = null;
     }
   }
 }

@@ -71,11 +71,6 @@ export class AnimationDriver {
         this.imageIndex = 0;
     }
 
-    /** Choose a random index from the animation's images */
-    public switchToRandomIndex() {
-        this.imageIndex = Math.floor(Math.random() * this.images.length);
-    }
-
     /**
      * When an actor renders, we use this method to figure out which image to
      * display

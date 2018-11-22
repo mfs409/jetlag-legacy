@@ -148,10 +148,11 @@ export class ProjectileApi {
     /**
      * Specify the image file from which to randomly choose projectile images
      *
-     * @param imgName The file to use when picking images
+     * @param images An array of image names, from which to choose images at
+     *               random
      */
-    public setImageSource(imgName: string) {
-        this.stage.getProjectilePool().setProjectileImageSource(imgName);
+    public setImageSource(images: string[]) {
+        this.stage.getProjectilePool().setProjectileImageSource(images);
     }
 
     /** Return the number of remaining projectiles */

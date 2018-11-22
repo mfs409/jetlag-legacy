@@ -55,6 +55,9 @@ export class ProjectilePool {
     /** For choosing random images for the projectiles */
     private randomizeImages = false;
 
+    /** The array of images from which to choose for each projectile */
+    private randomImageSources: string[] = null;
+
     /**
      * Create a pool of projectiles, and set the way they are thrown.
      *
@@ -122,8 +125,10 @@ export class ProjectilePool {
         b.setCollisionsEnabled(!this.sensor);
         b.getAnimator().resetCurrentAnimation();
 
-        if (this.randomizeImages)
-            b.getAnimator().switchToRandomIndex();
+        if (this.randomizeImages) {
+            let idx = Math.floor(Math.random() * this.randomImageSources.length);
+            b.setImage(this.randomImageSources[idx]);
+        }
 
         // calculate offset for starting position of projectile, put it on
         // screen
@@ -328,11 +333,10 @@ export class ProjectilePool {
     /**
      * Specify the image file from which to randomly choose projectile images
      *
-     * @param imgName The file to use when picking images
+     * @param images An array of images from which to pick
      */
-    public setProjectileImageSource(imgName: string) {
-        for (let p of this.pool)
-            p.getAnimator().updateImage(this.stage.device.getRenderer(), imgName);
+    public setProjectileImageSource(images: string[]) {
+        this.randomImageSources = images;
         this.randomizeImages = true;
     }
 }

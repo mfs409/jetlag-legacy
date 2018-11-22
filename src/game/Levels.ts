@@ -2083,7 +2083,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.projectiles.setLimitOnThrows(20);
 
         // Allow the projectile image to be chosen randomly from a set of images
-        jl.projectiles.setImageSource("colorstar1.png");
+        jl.projectiles.setImageSource(["colorstar1.png", "colorstar2.png", "colorstar3.png", "colorstar4.png"]);
 
         // show how many shots are left
         jl.hud.addText({ x: .5, y: 8.5, face: "Arial", color: "#FF00FF", size: 12, z: 2 }, () => jl.projectiles.getRemaining() + " projectiles left");

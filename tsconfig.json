@@ -15,19 +15,12 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "src/game/*"
-  ],
+  "exclude": ["node_modules"],
+  "include": ["src/game/*"],
   "typedocOptions": {
     "out": "./docs/",
     "name": "JetLag Documentation",
-    "exclude": [
-      "**/internal/*.ts",
-      "**/internal/*/*.ts"
-    ],
+    "exclude": ["**/internal/*.ts", "**/internal/*/*.ts"],
     "mode": "file",
     "excludeExternals": true,
     "excludeNotExported": true,

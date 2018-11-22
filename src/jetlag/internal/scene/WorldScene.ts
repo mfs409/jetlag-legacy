@@ -319,10 +319,9 @@ export class WorldScene extends BaseScene {
             || (sticky.getStickyState(1) && other.getXPosition() + other.getWidth() <= sticky.getXPosition())
             || (sticky.getStickyState(3) && other.getXPosition() >= sticky.getXPosition() + sticky.getWidth())
             || (sticky.getStickyState(2) && other.getYPosition() + other.getHeight() <= sticky.getYPosition())) {
-            // create distance and weld joints... somehow, the combination is
-            // needed to get this to work. Note that this function runs during
-            // the box2d step, so we need to make the joint in a callback that
-            // runs later
+            // create a distance joint. Note that this function runs during the
+            // box2d step, so we need to make the joint in a callback that runs
+            // later
             let v = contact.GetWorldManifold().points[0];
             this.oneTimeEvents.push(() => {
                 other.getBody().SetLinearVelocity(new XY(0, 0));
@@ -330,10 +329,6 @@ export class WorldScene extends BaseScene {
                 d.Initialize(sticky.getBody(), other.getBody(), v, v);
                 d.collideConnected = true;
                 other.setImplicitDistJoint(this.world.CreateJoint(d) as PhysicsType2d.Dynamics.Joints.DistanceJoint);
-                let w = new PhysicsType2d.Dynamics.Joints.WeldJointDefinition();
-                w.Initialize(sticky.getBody(), other.getBody(), v);
-                w.collideConnected = true;
-                other.setImplicitWeldJoint(this.world.CreateJoint(w) as PhysicsType2d.Dynamics.Joints.WeldJoint);
             });
         }
     }
