@@ -4,6 +4,7 @@ import { Hero } from "./Hero"
 import { TimedEvent } from "../internal/support/TimedEvent"
 import { JetLagStage } from "../internal/JetLagStage";
 import { Projectile } from "./Projectile";
+import { Goodie } from "./Goodie";
 
 /**
  * Obstacles are usually walls, except they can move, and can be used to run all
@@ -24,6 +25,9 @@ export class Obstacle extends WorldActor {
 
     /** This callback is for when an enemy collides with an obstacle */
     private enemyCollision: (thisActor: Obstacle, collideActor: Enemy, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+
+    /** This callback is for when a goodie collides with an obstacle */
+    private goodieCollision: (thisActor: Obstacle, collideActor: Goodie, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null;
 
     /** Indicate that this obstacle does not re-enable jumping for the hero */
     private noJumpReenable = false;
@@ -81,6 +85,15 @@ export class Obstacle extends WorldActor {
     }
 
     /**
+     * Set the callback to run when this obstacle collides with a goodie
+     * 
+     * @param callback The code to run
+     */
+    setGoodieCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Goodie, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+        this.goodieCollision = callback;
+    }
+
+    /**
      * Return true if this obstacle doesn't count for letting an in-air hero jump again
      */
     getNoNumpReenable() { return this.noJumpReenable; }
@@ -95,6 +108,8 @@ export class Obstacle extends WorldActor {
      * @param contact A description of the contact that caused this collision
      */
     onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
+        if (other instanceof Goodie && this.goodieCollision)
+            this.goodieCollision(this, other, contact);
     }
 
     /**

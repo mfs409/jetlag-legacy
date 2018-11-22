@@ -6,6 +6,7 @@ import { Projectile } from "../../actor/Projectile"
 import { JetLagRenderer, JetLagDevice } from "../support/Interfaces"
 import { XY } from "../support/XY"
 import { JetLagConfig } from "../../support/JetLagConfig";
+import { Obstacle } from "../../actor/Obstacle";
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
@@ -135,8 +136,8 @@ export class WorldScene extends BaseScene {
                 // the order is Hero, Enemy, Goodie, Projectile, Obstacle,
                 // Destination
                 //
-                // Of those, Hero, Enemy, and Projectile are the only ones with
-                // a non-empty onCollide
+                // Of those, Hero, Enemy, Projectile, and Obstacle are the only
+                // ones with a non-empty onCollide
                 let c0: WorldActor;
                 let c1: WorldActor;
                 if (a instanceof Hero) {
@@ -155,6 +156,12 @@ export class WorldScene extends BaseScene {
                     c0 = a as WorldActor;
                     c1 = b as WorldActor;
                 } else if (b instanceof Projectile) {
+                    c0 = b as WorldActor;
+                    c1 = a as WorldActor;
+                } else if (a instanceof Obstacle) {
+                    c0 = a as WorldActor;
+                    c1 = b as WorldActor;
+                } else if (b instanceof Obstacle) {
                     c0 = b as WorldActor;
                     c1 = a as WorldActor;
                 } else {

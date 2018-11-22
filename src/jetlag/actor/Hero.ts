@@ -209,7 +209,7 @@ export class Hero extends WorldActor {
         else if (this.crawling && enemy.getDefeatByCrawl()) {
             enemy.defeat(true, this);
         }
-        // // defeat by jumping only if the hero's bottom is above the enemy's
+        // defeat by jumping only if the hero's bottom is above the enemy's
         // head
         else if (this.inAir && enemy.getDefeatByJump() && this.getYPosition() + this.getHeight() < enemy.getYPosition()) {
             enemy.defeat(true, this);
