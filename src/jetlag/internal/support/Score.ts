@@ -295,4 +295,10 @@ export class Score {
     this.victoryType = VictoryType.GOODIECOUNT;
     this.victoryGoodieCount = [v1, v2, v3, v4];
   }
+
+  /** Return the number of heroes that have been defeated so far */
+  public getHeroesDefeated() { return this.heroesDefeated; }
+
+  /** Return the number of heroes that have arrived at a destination so far */
+  public getDestinationArrivals() { return this.destinationArrivals; }
 }

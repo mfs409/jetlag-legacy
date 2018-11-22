@@ -256,4 +256,10 @@ export class ScoreApi {
      * might want to immediately end the game
      */
     public loseLevel() { this.stage.endLevel(false); }
+
+    /** Return the number of heroes that have been defeated so far */
+    public getHeroesDefeated() { return this.stage.score.getHeroesDefeated(); }
+
+    /** Return the number of heroes that have arrived at a destination so far */
+    public getDestinationArrivals() { return this.stage.score.getDestinationArrivals(); }
 }
