@@ -13,6 +13,7 @@ import { ActorConfig } from "./ActorConfig"
 import { TextConfig } from "./TextConfig"
 import { ImageConfig } from "./ImageConfig"
 import { checkImageConfig, checkTextConfig, checkActorConfig } from "../internal/support/Functions"
+import { b2BodyType } from "box2d.ts";
 
 /**
  * WorldApi provides all of the features needed for creating actors and
@@ -119,16 +120,16 @@ export class WorldApi {
         let o: Obstacle;
         if (cfg.verts != null) {
             o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            o.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+            o.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
             o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+            o.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius: number = Math.max(cfg.width, cfg.height);
             o = new Obstacle(this.stage, radius, radius, cfg.img, cfg.z);
-            o.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+            o.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         this.stage.getWorld().addActor(o, cfg.z);
         return o;
@@ -147,16 +148,16 @@ export class WorldApi {
         let h: Hero;
         if (cfg.verts != null) {
             h = new Hero(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            h.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, cfg.x, cfg.y, cfg.verts);
+            h.setPolygonPhysics(b2BodyType.b2_dynamicBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
             h = new Hero(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            h.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, cfg.x, cfg.y);
+            h.setBoxPhysics(b2BodyType.b2_dynamicBody, cfg.x, cfg.y);
         }
         else {
             let radius: number = Math.max(cfg.width, cfg.height);
             h = new Hero(this.stage, radius, radius, cfg.img, cfg.z);
-            h.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, cfg.x, cfg.y, radius / 2);
+            h.setCirclePhysics(b2BodyType.b2_dynamicBody, cfg.x, cfg.y, radius / 2);
         }
         this.stage.score.onHeroCreated();
         this.stage.getWorld().addActor(h, 0);
@@ -176,16 +177,16 @@ export class WorldApi {
         let e: Enemy;
         if (cfg.verts != null) {
             e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            e.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+            e.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
             e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            e.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+            e.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius = Math.max(cfg.width, cfg.height);
             e = new Enemy(this.stage, radius, radius, cfg.img, cfg.z);
-            e.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+            e.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         this.stage.score.onEnemyCreated();
         this.stage.getWorld().addActor(e, 0);
@@ -205,16 +206,16 @@ export class WorldApi {
         let d: Destination;
         if (cfg.verts != null) {
             d = new Destination(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            d.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+            d.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
             d = new Destination(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            d.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+            d.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius = Math.max(cfg.width, cfg.height);
             d = new Destination(this.stage, radius, radius, cfg.img, cfg.z);
-            d.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+            d.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         d.setCollisionsEnabled(false);
         this.stage.getWorld().addActor(d, 0);
@@ -234,16 +235,16 @@ export class WorldApi {
         let g: Goodie;
         if (cfg.verts != null) {
             g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            g.setPolygonPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, cfg.verts);
+            g.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
             g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
-            g.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+            g.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius: number = Math.max(cfg.width, cfg.height);
             g = new Goodie(this.stage, radius, radius, cfg.img, cfg.z);
-            g.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y, radius / 2);
+            g.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         g.setCollisionsEnabled(false);
         this.stage.getWorld().addActor(g, 0);

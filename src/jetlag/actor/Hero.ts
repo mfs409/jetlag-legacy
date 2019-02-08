@@ -7,7 +7,7 @@ import { Animation } from "../support/Animation"
 import { Camera } from "../internal/support/Camera"
 import { JetLagRenderer, JetLagSound } from "../internal/support/Interfaces";
 import { JetLagStage } from "../internal/JetLagStage";
-import { XY } from "../internal/support/XY";
+import { b2Contact, b2BodyType, b2Vec2, b2Transform } from "box2d.ts";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -156,7 +156,7 @@ export class Hero extends WorldActor {
      * @param other   Other object involved in this collision
      * @param contact A description of the contact that caused this collision
      */
-    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
+    onCollide(other: WorldActor, contact: b2Contact) {
         // NB: we currently ignore Projectile and Hero
         if (other instanceof Enemy) {
             this.onCollideWithEnemy(other as Enemy);
@@ -244,16 +244,16 @@ export class Hero extends WorldActor {
      *
      * @param o The obstacle with which this hero collided
      */
-    private onCollideWithObstacle(o: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
+    private onCollideWithObstacle(o: Obstacle, contact: b2Contact) {
         // do we need to play a sound?
         o.playCollideSound();
 
         // Did we collide with a sensor?
         let sensor = true;
         // The default is for all fixtures of a actor have the same sensor state
-        let fixtures = this.body.GetFixtures();
-        if (fixtures.MoveNext()) {
-            sensor = sensor && fixtures.Current().IsSensor();
+        let fixtures = this.body.GetFixtureList();
+        if (fixtures) {
+            sensor = sensor && fixtures.IsSensor();
         }
 
         // reset rotation of hero if this obstacle is not a sensor
@@ -313,7 +313,7 @@ export class Hero extends WorldActor {
      * @param y Velocity in Y direction
      */
     public setJumpImpulses(x: number, y: number) {
-        this.jumpImpulses = new XY(x, -y);
+        this.jumpImpulses = new b2Vec2(x, -y);
     }
 
     /**
@@ -325,9 +325,9 @@ export class Hero extends WorldActor {
             return;
         }
         let v = this.body.GetLinearVelocity();
-        v.x = v.x + this.jumpImpulses.x;
-        v.y = v.y + this.jumpImpulses.y;
-        this.updateVelocity(v.x, v.y);
+        let x = v.x + this.jumpImpulses.x;
+        let y = v.y + this.jumpImpulses.y;
+        this.updateVelocity(x, y);
         if (!this.allowMultiJump) {
             this.inAir = true;
         }
@@ -371,7 +371,9 @@ export class Hero extends WorldActor {
             return;
         }
         this.crawling = true;
-        this.body.SetTransform(this.body.GetPosition(), this.body.GetAngle() + rotate);
+        let xform = new b2Transform();
+        xform.SetPositionAngle(this.body.GetPosition(), this.body.GetAngle() + rotate);
+        this.body.SetTransform(xform);
         if (this.crawlAnimation != null)
             this.animator.setCurrentAnimation(this.crawlAnimation);
     }
@@ -386,7 +388,9 @@ export class Hero extends WorldActor {
             return;
         }
         this.crawling = false;
-        this.body.SetTransform(this.body.GetPosition(), this.body.GetAngle() - rotate);
+        let xform = new b2Transform();
+        xform.SetPositionAngle(this.body.GetPosition(), this.body.GetAngle() - rotate);
+        this.body.SetTransform(xform);
         this.animator.setCurrentAnimation(this.defaultAnimation);
     }
 
@@ -399,7 +403,9 @@ export class Hero extends WorldActor {
         if (this.inAir) {
             this.currentRotation += delta;
             this.body.SetAngularVelocity(0);
-            this.body.SetTransform(this.body.GetPosition(), this.currentRotation);
+            let xform = new b2Transform();
+            xform.SetPositionAngle(this.body.GetPosition(), this.currentRotation);
+            this.body.SetTransform(xform);
         }
     }
 
@@ -413,8 +419,8 @@ export class Hero extends WorldActor {
     public setTouchAndGo(x: number, y: number) {
         this.setTapHandler((worldX: number, worldY: number) => {
             // if it was hovering, its body type won't be Dynamic
-            if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC)
-                this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+            if (this.body.GetType() != b2BodyType.b2_dynamicBody)
+                this.body.SetType(b2BodyType.b2_dynamicBody);
             this.setAbsoluteVelocity(x, y);
             // turn off isTouchAndGo, so we can't double-touch
             this.setTapHandler(null);

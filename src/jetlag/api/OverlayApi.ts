@@ -6,10 +6,10 @@ import { Hero } from "../actor/Hero"
 import { Path } from "../support/Path";
 import { BaseActor } from "../actor/BaseActor";
 import { JetLagStage } from "../internal/JetLagStage";
-import { XY } from "../internal/support/XY";
 import { ImageConfig } from "./ImageConfig";
 import { checkImageConfig } from "../internal/support/Functions";
 import { TextConfig } from "./TextConfig";
+import { b2BodyType, b2Vec2 } from "box2d.ts";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
@@ -61,7 +61,7 @@ export class OverlayApi {
     public addTapControl(cfg: ImageConfig, action: (hudX: number, hudY: number) => boolean) {
         checkImageConfig(cfg);
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, cfg.z);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         c.setTapHandler(action);
         this.overlay.addActor(c, cfg.z);
         return c;
@@ -79,7 +79,7 @@ export class OverlayApi {
      */
     public addPanCallbackControl(cfg: ImageConfig, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean) {
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         c.setPanStartHandler(panStart);
         c.setPanMoveHandler(panMove);
         c.setPanStopHandler(panStop);
@@ -139,7 +139,7 @@ export class OverlayApi {
      */
     public createSwipeZone(cfg: ImageConfig) {
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         this.overlay.addActor(c, 0);
         c.setSwipeHandler((hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
             // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
@@ -233,7 +233,7 @@ export class OverlayApi {
             let dx = this.activeActor.getXPosition() - (meters.x - this.activeActor.getWidth() / 2);
             let dy = this.activeActor.getYPosition() - (meters.y - this.activeActor.getHeight() / 2);
             let hy = Math.sqrt(dx * dx + dy * dy) / velocity;
-            let v = new XY(dx / hy, dy / hy);
+            let v = new b2Vec2(dx / hy, dy / hy);
             this.activeActor.setRotationSpeed(0);
             this.activeActor.setAbsoluteVelocity(-v.x, -v.y);
             if (clear)
@@ -286,7 +286,7 @@ export class OverlayApi {
      */
     public addImage(cfg: ImageConfig) {
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         this.overlay.addActor(c, 0);
         return c;
     }
@@ -333,7 +333,7 @@ export class OverlayApi {
      */
     public addToggleButton(cfg: ImageConfig, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
+        c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         let active = false; // will be captured by lambdas below
         c.setTouchDownHandler((hudX: number, hudY: number) => {
             active = true;
@@ -376,8 +376,8 @@ export class OverlayApi {
      */
     public addDirectionalThrowButton(cfg: ImageConfig, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
         let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
-        c.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, cfg.x, cfg.y);
-        let v = new XY(0, 0);
+        c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
+        let v = new b2Vec2(0, 0);
         let isHolding = false;
         c.setTouchDownHandler((hudX: number, hudY: number) => {
             isHolding = true;

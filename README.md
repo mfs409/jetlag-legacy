@@ -8,8 +8,8 @@ the spirit of LibLOL.  In particular:
   section of a single file
 
 As an HTML5 project, JetLag differs from LibLOL in a few ways:
-* It uses PIXI.js, Howler.js, and PhysicsType2D instead of LibGDX and Box2D, so
-  some names and features are a little bit different
+* It uses PIXI.js, Howler.js, and Box2d.ts instead of LibGDX, so some names
+  and features are a little bit different
 * It uses TypeScript instead of Java, which leads to simpler, cleaner code
 
 Note that JetLag still is a mobile-first framework.  It uses Hammer.js for 

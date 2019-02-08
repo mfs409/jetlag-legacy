@@ -1,8 +1,8 @@
 import { BaseActor } from "../../actor/BaseActor";
 import { Camera } from "./Camera";
-import { XY } from "./XY";
 import { JetLagStage } from "../JetLagStage";
 import { JetLagKeys } from "../../support/JetLagKeys";
+import { b2Vec2 } from "box2d.ts";
 
 /**
  * JetLagDevice bundles the abstractions of the parts of a game device.  This
@@ -104,7 +104,7 @@ export interface JetLagKeyboard {
  */
 export interface JetLagAccelerometer {
     /** Get the X and Y forces of the accelerometer */
-    get(): XY;
+    get(): b2Vec2;
     /** Forcibly set the accelerometer X force */
     setX(x: number): void;
     /** Forcibly set the accelerometer Y force */
@@ -244,7 +244,7 @@ export interface JetLagText {
     getYPosition(): number;
 
     /** Get the width and height of the text */
-    getBounds(): XY;
+    getBounds(): b2Vec2;
 
     /** Provide a string to display */
     setText(text: string): void;

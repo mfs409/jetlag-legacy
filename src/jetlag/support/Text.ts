@@ -1,6 +1,6 @@
 import { Camera } from "../internal/support/Camera"
-import { XY } from "../internal/support/XY"
 import { JetLagText, JetLagRenderer, Renderable } from "../internal/support/Interfaces";
+import { b2Vec2 } from "box2d.ts";
 
 /**
  * JetLag's Text object provides a way to generate text and put it onto the
@@ -18,7 +18,7 @@ export class Text implements Renderable {
     private text: JetLagText;
 
     /** coordinate of the text */
-    private readonly coord = new XY(0, 0);
+    private readonly coord = new b2Vec2(0, 0);
 
     /** Should we center at coord (true) or is it top-left? */
     private readonly center: boolean;

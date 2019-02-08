@@ -3414,7 +3414,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     }
 
     // Put the level number in the top right corner of every level
-    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#872436", size: 22 + index, z: 2 }, () => "Level ");
+    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#872436", size: 22, z: 2 }, () => "Level " + index);
 }
 
 /**

@@ -1,7 +1,10 @@
 import { BaseActor } from "./BaseActor"
 import { Hero } from "./Hero"
 import { JetLagStage } from "../internal/JetLagStage";
-import { XY } from "../internal/support/XY";
+import {
+  b2RevoluteJointDef, b2RevoluteJoint, b2DistanceJoint, b2Contact,
+  b2BodyType, b2WeldJointDef, b2DistanceJointDef, b2Vec2
+} from "box2d.ts";
 
 /**
  * World is the base class upon which every actor in the main game is
@@ -17,13 +20,13 @@ export abstract class WorldActor extends BaseActor {
    * When the camera follows the actor without centering on it, this gives us
    * the difference between the actor and camera 
    */
-  private cameraOffset = new XY(0, 0);
+  private cameraOffset = new b2Vec2(0, 0);
 
   /** By default, actors can't be dragged on screen */
   private draggable = false;
 
   /** A vector for computing hover placement */
-  private hover: XY | null;
+  private hover: b2Vec2 | null;
 
   /** 
    * Disable 3 of 4 sides of a Actors, to allow walking through walls. The value
@@ -36,16 +39,16 @@ export abstract class WorldActor extends BaseActor {
   private passThroughId: number = 0;
 
   /** A definition for when we attach a revolute joint to this actor */
-  private revJointDef: PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition;
+  private revJointDef: b2RevoluteJointDef;
 
   /** A joint that allows this actor to revolve around another */
-  private revJoint: PhysicsType2d.Dynamics.Joints.Joint;
+  private revJoint: b2RevoluteJoint;
 
   /** 
    * Sometimes an actor collides with another actor, and should stick to it. In
    * that case, we use this distance joint to make the actors stick together
    */
-  private distJoint: PhysicsType2d.Dynamics.Joints.DistanceJoint;
+  private distJoint: b2DistanceJoint;
 
   /** 
    * When we have actors stuck together, we might want to set a brief delay
@@ -132,7 +135,7 @@ export abstract class WorldActor extends BaseActor {
    * 
    * @param joint The distance joint to create
    */
-  public setImplicitDistJoint(joint: PhysicsType2d.Dynamics.Joints.DistanceJoint) {
+  public setImplicitDistJoint(joint: b2DistanceJoint) {
     this.distJoint = joint;
   }
 
@@ -143,7 +146,7 @@ export abstract class WorldActor extends BaseActor {
    * @param other   Other object involved in this collision
    * @param contact A description of the contact that caused this collision
    */
-  abstract onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact): void;
+  abstract onCollide(other: WorldActor, contact: b2Contact): void;
 
   /**
    * Make the camera follow the actor, but without centering the actor on the
@@ -160,8 +163,8 @@ export abstract class WorldActor extends BaseActor {
   /** Indicate that the actor should move with the tilt of the phone */
   public setMoveByTilting() {
     // make sure it is moveable, add it to the list of tilt actors
-    if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.DYNAMIC) {
-      this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+    if (this.body.GetType() != b2BodyType.b2_dynamicBody) {
+      this.body.SetType(b2BodyType.b2_dynamicBody);
     }
     this.stage.getWorld().addTiltActor(this);
     // turn off sensor behavior, so this collides with stuff...
@@ -178,9 +181,9 @@ export abstract class WorldActor extends BaseActor {
   public setDraggable(immuneToPhysics: boolean) {
     // If the current body is static, we must change it!
     if (immuneToPhysics)
-      this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+      this.body.SetType(b2BodyType.b2_kinematicBody);
     else
-      this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+      this.body.SetType(b2BodyType.b2_dynamicBody);
     this.draggable = true;
   }
 
@@ -193,7 +196,7 @@ export abstract class WorldActor extends BaseActor {
    * @param chaseInY Should the actor change its y velocity?
    */
   public setChaseSpeed(speed: number, target: WorldActor, chaseInX: boolean, chaseInY: boolean) {
-    this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+    this.body.SetType(b2BodyType.b2_dynamicBody);
     this.stage.getWorld().addRepeatEvent(() => {
       // don't chase something that isn't visible
       if (!target.getEnabled())
@@ -238,7 +241,7 @@ export abstract class WorldActor extends BaseActor {
    *                   keep the hero's existing Y velocity
    */
   public setChaseFixedMagnitude(target: WorldActor, xMagnitude: number, yMagnitude: number, ignoreX: boolean, ignoreY: boolean) {
-    this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+    this.body.SetType(b2BodyType.b2_dynamicBody);
     let out_this = this;
     this.stage.getWorld().addRepeatEvent(() => {
       // don't chase something that isn't visible
@@ -341,14 +344,16 @@ export abstract class WorldActor extends BaseActor {
    */
   public setHover(x: number, y: number) {
     let pmr = this.stage.config.pixelMeterRatio;
-    this.hover = new XY(x * pmr, y * pmr);
+    this.hover = new b2Vec2(x * pmr, y * pmr);
     this.stage.getWorld().addRepeatEvent(() => {
       if (this.hover == null)
         return;
       this.hover.Set(x * pmr, y * pmr);
       let a = this.stage.getWorld().getCamera().screenToMeters(this.hover.x, this.hover.y);
       this.hover.Set(a.x, a.y);
-      this.body.SetTransform(this.hover, this.body.GetAngle());
+      let xform = this.body.GetTransform().Clone();
+      xform.SetPositionAngle(this.hover, this.body.GetAngle());
+      this.body.SetTransform(xform);
     });
   }
 
@@ -383,7 +388,7 @@ export abstract class WorldActor extends BaseActor {
     // make the body dynamic
     this.setCanFall();
     // create joint, connect anchors
-    this.revJointDef = new PhysicsType2d.Dynamics.Joints.RevoluteJointDefinition();
+    this.revJointDef = new b2RevoluteJointDef();
     this.revJointDef.bodyA = anchor.body;
     this.revJointDef.bodyB = this.body;
     this.revJointDef.localAnchorA.Set(anchorX, anchorY);
@@ -392,7 +397,7 @@ export abstract class WorldActor extends BaseActor {
     this.revJointDef.collideConnected = false;
     this.revJointDef.referenceAngle = 0;
     this.revJointDef.enableLimit = false;
-    this.revJoint = this.stage.getWorld().createJoint(this.revJointDef);
+    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef);
   }
 
   /**
@@ -405,11 +410,11 @@ export abstract class WorldActor extends BaseActor {
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
     // destroy the previously created joint, change the definition, re-create
     // the joint
-    this.stage.getWorld().destroyJoint(this.revJoint);
+    this.stage.getWorld().getWorld().DestroyJoint(this.revJoint);
     this.revJointDef.enableMotor = true;
     this.revJointDef.motorSpeed = motorSpeed;
     this.revJointDef.maxMotorTorque = motorTorque;
-    this.revJoint = this.stage.getWorld().createJoint(this.revJointDef);
+    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef);
   }
 
   /**
@@ -421,11 +426,11 @@ export abstract class WorldActor extends BaseActor {
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create
     // the joint
-    this.stage.getWorld().destroyJoint(this.revJoint);
+    this.stage.getWorld().getWorld().DestroyJoint(this.revJoint);
     this.revJointDef.upperAngle = upper;
     this.revJointDef.lowerAngle = lower;
     this.revJointDef.enableLimit = true;
-    this.revJoint = this.stage.getWorld().createJoint(this.revJointDef);
+    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef);
   }
 
   /**
@@ -444,14 +449,14 @@ export abstract class WorldActor extends BaseActor {
    * @param angle  The angle between the actors
    */
   public setWeldJoint(other: WorldActor, otherX: number, otherY: number, localX: number, localY: number, angle: number) {
-    let w = new PhysicsType2d.Dynamics.Joints.WeldJointDefinition();
+    let w = new b2WeldJointDef();
     w.bodyA = this.body;
     w.bodyB = other.body;
     w.localAnchorA.Set(localX, localY);
     w.localAnchorB.Set(otherX, otherY);
     w.referenceAngle = angle;
     w.collideConnected = false;
-    this.stage.getWorld().createJoint(w);
+    this.stage.getWorld().getWorld().CreateJoint(w);
   }
 
   /**
@@ -472,7 +477,7 @@ export abstract class WorldActor extends BaseActor {
     this.setCanFall();
 
     // set up a joint so the head can't move too far
-    let mDistJointDef = new PhysicsType2d.Dynamics.Joints.DistanceJointDefinition();
+    let mDistJointDef = new b2DistanceJointDef();
     mDistJointDef.bodyA = anchor.body;
     mDistJointDef.bodyB = this.body;
     mDistJointDef.localAnchorA.Set(anchorX, anchorY);
@@ -481,14 +486,14 @@ export abstract class WorldActor extends BaseActor {
     mDistJointDef.dampingRatio = 0.1;
     mDistJointDef.frequencyHz = 2;
 
-    this.stage.getWorld().createJoint(mDistJointDef);
+    this.stage.getWorld().getWorld().CreateJoint(mDistJointDef);
   }
 
   /** Break any implicit joints connecting this actor */
   public breakJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint != null) {
-      this.stage.getWorld().destroyJoint(this.distJoint);
+      this.stage.getWorld().getWorld().DestroyJoint(this.distJoint);
       this.distJoint = null;
     }
   }

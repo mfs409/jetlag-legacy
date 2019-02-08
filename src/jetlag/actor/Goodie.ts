@@ -1,6 +1,7 @@
 import { WorldActor } from "./WorldActor"
 import { Hero } from "./Hero"
 import { JetLagStage } from "../internal/JetLagStage";
+import { b2Contact } from "box2d.ts";
 
 /**
  * Goodies are actors that a hero can collect.
@@ -63,7 +64,7 @@ export class Goodie extends WorldActor {
    * @param other   Other object involved in this collision
    * @param contact A description of the contact that caused this collision
    */
-  onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) { }
+  onCollide(other: WorldActor, contact: b2Contact) { }
 
   /**
    * Set the score of this goodie.

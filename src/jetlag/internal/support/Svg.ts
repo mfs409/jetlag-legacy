@@ -1,7 +1,7 @@
 import { WorldActor } from "../../actor/WorldActor";
 import { WorldApi } from "../../api/WorldApi";
 import { JetLagConfig } from "../../support/JetLagConfig";
-import { XY } from "./XY";
+import { b2Vec2, b2Transform } from "box2d.ts";
 
 /**
  * The Svg infrastructure allows the game designer to load SVG line drawings
@@ -16,7 +16,7 @@ export class Svg {
     private config: JetLagConfig;
 
     /** The user-specified top left corner */
-    private translate = new XY(0, 0);
+    private translate = new b2Vec2(0, 0);
 
     /** The requested stretch factors */
     private userStretch = { x: 1, y: 1 };
@@ -28,16 +28,16 @@ export class Svg {
     private world: WorldApi;
 
     /** Coordinate of the last point we drew */
-    private last = new XY(0, 0);
+    private last = new b2Vec2(0, 0);
 
     /** Coordinate of the first point we drew */
-    private first = new XY(0, 0);
+    private first = new b2Vec2(0, 0);
 
     /** Coordinate of the current point being drawn */
-    private curr = new XY(0, 0);
+    private curr = new b2Vec2(0, 0);
 
     /** The computed top and left boundaries of the SVG, in pixels */
-    private topleft: XY = null;
+    private topleft: b2Vec2 = null;
 
     /**
      * The parser is essentially a finite state machine. The states are 0 for 
@@ -256,7 +256,7 @@ export class Svg {
      * @param start The point from which the line originates
      * @param stop  The point to which the line extends
      */
-    private addLine(start: XY, stop: XY) {
+    private addLine(start: b2Vec2, stop: b2Vec2) {
         // Get the pixel coordinates of the SVG line
         let x1 = start.x, x2 = stop.x, y1 = start.y, y2 = stop.y;
 
@@ -306,7 +306,9 @@ export class Svg {
         let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         // Make an obstacle and rotate it
         let o = this.world.makeObstacle({ box: true, x: x1, y: y1, width: len, height: .05, img: "" });
-        o.getBody().SetTransform(new XY(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
+        let xform = new b2Transform();
+        xform.SetPositionAngle(new b2Vec2(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
+        o.getBody().SetTransform(xform);
         // let the game code modify this line segment
         this.callback(o);
     }
@@ -320,7 +322,7 @@ export class Svg {
      * @param start The point from which the line originates
      * @param stop  The point to which the line extends
      */
-    private updateTL(start: XY, stop: XY) {
+    private updateTL(start: b2Vec2, stop: b2Vec2) {
         // Get the pixel coordinates of the SVG line
         let x1 = start.x, x2 = stop.x, y1 = start.y, y2 = stop.y;
 
@@ -336,7 +338,7 @@ export class Svg {
 
         // If this is the first line, we need to initialize our top/left storage
         if (this.topleft == null) {
-            this.topleft = new XY(x1, y1);
+            this.topleft = new b2Vec2(x1, y1);
         }
 
         // Update our estimtes of top/left

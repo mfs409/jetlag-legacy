@@ -3,6 +3,7 @@ import { Projectile } from "../../actor/Projectile"
 import { Hero } from "../../actor/Hero"
 import { JetLagSound } from "./Interfaces";
 import { JetLagStage } from "../JetLagStage";
+import { b2Transform } from "box2d.ts";
 
 /**
  * ProjectilePool stores a set of projectiles.  We can get into lots of
@@ -133,7 +134,9 @@ export class ProjectilePool {
         // calculate offset for starting position of projectile, put it on
         // screen
         b.setRangeFrom(h.getXPosition() + offsetX, h.getYPosition() + offsetY);
-        b.getBody().SetTransform(b.getRangeFrom(), 0);
+        let xform = new b2Transform();
+        xform.SetPositionAngle(b.getRangeFrom(), 0);
+        b.getBody().SetTransform(xform);
 
         // give the projectile velocity, show it, and play sound
         b.updateVelocity(velocityX, velocityY);
@@ -179,7 +182,9 @@ export class ProjectilePool {
         // calculate offset for starting position of projectile, put it on
         // screen
         b.setRangeFrom(heroX + offsetX, heroY + offsetY);
-        b.getBody().SetTransform(b.getRangeFrom(), 0);
+        let xform = new b2Transform();
+        xform.SetPositionAngle(b.getRangeFrom(), 0);
+        b.getBody().SetTransform(xform);
 
         // give the projectile velocity
         if (this.enableFixedVectorVelocity) {

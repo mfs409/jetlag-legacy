@@ -5,6 +5,7 @@ import { TimedEvent } from "../internal/support/TimedEvent"
 import { JetLagStage } from "../internal/JetLagStage";
 import { Projectile } from "./Projectile";
 import { Goodie } from "./Goodie";
+import { b2Contact } from "box2d.ts";
 
 /**
  * Obstacles are usually walls, except they can move, and can be used to run all
@@ -18,16 +19,16 @@ export class Obstacle extends WorldActor {
      * way to run custom code. This callback defines what code to run when a
      * hero collides with this obstacle. 
      */
-    private heroCollision: (thisActor: Obstacle, collideActor: Hero, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null;
+    private heroCollision: (thisActor: Obstacle, collideActor: Hero, contact: b2Contact) => void = null;
 
     /** This callback is for when a projectile collides with an obstacle */
-    private projectileCollision: (thisActor: Obstacle, collideActor: Projectile, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+    private projectileCollision: (thisActor: Obstacle, collideActor: Projectile, contact: b2Contact) => void = null
 
     /** This callback is for when an enemy collides with an obstacle */
-    private enemyCollision: (thisActor: Obstacle, collideActor: Enemy, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null
+    private enemyCollision: (thisActor: Obstacle, collideActor: Enemy, contact: b2Contact) => void = null
 
     /** This callback is for when a goodie collides with an obstacle */
-    private goodieCollision: (thisActor: Obstacle, collideActor: Goodie, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void = null;
+    private goodieCollision: (thisActor: Obstacle, collideActor: Goodie, contact: b2Contact) => void = null;
 
     /** Indicate that this obstacle does not re-enable jumping for the hero */
     private noJumpReenable = false;
@@ -65,7 +66,7 @@ export class Obstacle extends WorldActor {
      * 
      * @param callback The callback to run on a collision with a hero
      */
-    setHeroCollisionCallback(callback: (thisActor: Obstacle, collideActor: Hero, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+    setHeroCollisionCallback(callback: (thisActor: Obstacle, collideActor: Hero, contact: b2Contact) => void) {
         this.heroCollision = callback;
     }
 
@@ -80,7 +81,7 @@ export class Obstacle extends WorldActor {
      * 
      * @param callback The code to run
      */
-    setEnemyCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Enemy, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+    setEnemyCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Enemy, contact: b2Contact) => void) {
         this.enemyCollision = callback;
     }
 
@@ -89,7 +90,7 @@ export class Obstacle extends WorldActor {
      * 
      * @param callback The code to run
      */
-    setGoodieCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Goodie, contact: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+    setGoodieCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Goodie, contact: b2Contact) => void) {
         this.goodieCollision = callback;
     }
 
@@ -107,7 +108,7 @@ export class Obstacle extends WorldActor {
      * @param other   Other object involved in this collision
      * @param contact A description of the contact that caused this collision
      */
-    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
+    onCollide(other: WorldActor, contact: b2Contact) {
         if (other instanceof Goodie && this.goodieCollision)
             this.goodieCollision(this, other, contact);
     }
@@ -128,7 +129,7 @@ export class Obstacle extends WorldActor {
         // disable collisions on this obstacle
         this.setCollisionsEnabled(false);
         // register a callback to multiply the hero's speed by factor
-        this.heroCollision = (self: WorldActor, h: WorldActor, c: PhysicsType2d.Dynamics.Contacts.Contact) => {
+        this.heroCollision = (self: WorldActor, h: WorldActor, c: b2Contact) => {
             let x = h.getXVelocity() * factor;
             let y = h.getYVelocity() * factor;
             h.updateVelocity(x, y);
@@ -140,7 +141,7 @@ export class Obstacle extends WorldActor {
      *
      * @param callback The code to run on a collision
      */
-    public setProjectileCollisionCallback(callback: (self: Obstacle, h: Projectile, c: PhysicsType2d.Dynamics.Contacts.Contact) => void) {
+    public setProjectileCollisionCallback(callback: (self: Obstacle, h: Projectile, c: b2Contact) => void) {
         this.projectileCollision = callback;
     }
 
@@ -173,19 +174,19 @@ export class Obstacle extends WorldActor {
         // disable collisions on this obstacle
         this.setCollisionsEnabled(false);
         // register a callback to change the hero's speed
-        this.heroCollision = (self: Obstacle, h: Hero, c: PhysicsType2d.Dynamics.Contacts.Contact) => {
+        this.heroCollision = (self: Obstacle, h: Hero, c: b2Contact) => {
             // boost the speed
             let v = h.getBody().GetLinearVelocity();
-            v.x += boostAmountX;
-            v.y += boostAmountY;
-            h.updateVelocity(v.x, v.y);
+            let x = v.x + boostAmountX;
+            let y = v.y + boostAmountY;
+            h.updateVelocity(x, y);
             // now set a timer to un-boost the speed
             if (boostDuration > 0) {
                 this.stage.getWorld().getTimer().addEvent(new TimedEvent(boostDuration, false, () => {
                     let v = h.getBody().GetLinearVelocity();
-                    v.x -= boostAmountX;
-                    v.y -= boostAmountY;
-                    h.updateVelocity(v.x, v.y);
+                    let x = v.x - boostAmountX;
+                    let y = v.y - boostAmountY;
+                    h.updateVelocity(x, y);
                 }));
             }
         }

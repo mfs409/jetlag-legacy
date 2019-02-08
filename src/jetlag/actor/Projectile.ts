@@ -2,15 +2,15 @@ import { WorldActor } from "./WorldActor"
 import { Obstacle } from "./Obstacle"
 import { Camera } from "../internal/support/Camera"
 import { JetLagRenderer } from "../internal/support/Interfaces";
-import { XY } from "../internal/support/XY";
 import { JetLagStage } from "../internal/JetLagStage";
+import { b2BodyType, b2Contact, b2Vec2 } from "box2d.ts";
 
 /**
  * Projectiles are actors that can be thrown from the hero's location in order to remove enemies.
  */
 export class Projectile extends WorldActor {
     /** This is the initial point from which the projectile was thrown */
-    private rangeFrom = new XY(0, 0);
+    private rangeFrom = new b2Vec2(0, 0);
 
     /** 
      * We have to be careful in side-scrolling games, or else projectiles can
@@ -45,9 +45,9 @@ export class Projectile extends WorldActor {
         super(stage, imgName, width, height, zIndex);
         if (isCircle) {
             let radius = Math.max(width, height);
-            this.setCirclePhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y, radius / 2);
+            this.setCirclePhysics(b2BodyType.b2_dynamicBody, x, y, radius / 2);
         } else {
-            this.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.DYNAMIC, x, y);
+            this.setBoxPhysics(b2BodyType.b2_dynamicBody, x, y);
         }
         this.setFastMoving(true);
         this.body.SetGravityScale(0);
@@ -108,7 +108,7 @@ export class Projectile extends WorldActor {
      * @param other   Other object involved in this collision
      * @param contact A description of the contact that caused this collision
      */
-    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
+    onCollide(other: WorldActor, contact: b2Contact) {
         // if this is an obstacle, check if it is a projectile callback, and if
         // so, do the callback
         if (other instanceof Obstacle) {

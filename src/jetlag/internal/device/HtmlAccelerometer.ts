@@ -1,6 +1,6 @@
-import { XY } from "../support/XY"
 import { JetLagAccelerometer, JetLagAccelerometerMode } from "../support/Interfaces";
 import { HtmlConsole } from "./HtmlConsole";
+import { b2Vec2 } from "box2d.ts";
 
 /**
  * HtmlAccelerometer provides access to device orientation and motion events
@@ -15,7 +15,7 @@ import { HtmlConsole } from "./HtmlConsole";
  */
 export class HtmlAccelerometer implements JetLagAccelerometer {
   /** The most recent accelerometer reading */
-  private accel = new XY(0, 0);
+  private accel = new b2Vec2(0, 0);
 
   /** Is tilt supported on this device? */
   private tiltSupported = false;

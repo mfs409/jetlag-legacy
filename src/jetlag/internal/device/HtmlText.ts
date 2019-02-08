@@ -1,5 +1,5 @@
 import { JetLagText } from "../support/Interfaces"
-import { XY } from "../support/XY";
+import { b2Vec2 } from "box2d.ts";
 
 /** HtmlText provides JetLagText functionality via the PIXI.text type. */
 export class HtmlText implements JetLagText {
@@ -34,9 +34,9 @@ export class HtmlText implements JetLagText {
     }
 
     /** Get the width and height of this text */
-    getBounds(): XY {
+    getBounds() {
         let bounds = this.text.getBounds();
-        return new XY(bounds.width, bounds.height);
+        return new b2Vec2(bounds.width, bounds.height);
     }
 
     /** Get the part of the Text that can be passed to the renderer */

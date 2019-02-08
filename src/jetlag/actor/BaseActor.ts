@@ -1,5 +1,3 @@
-/// <reference path="../../../typings/PhysicsType2d.v0_9.d.ts" />
-
 import { Renderable } from "../internal/support/Interfaces"
 import { BaseScene } from "../internal/scene/BaseScene"
 import { Path } from "../support/Path"
@@ -9,7 +7,10 @@ import { Animation } from "../support/Animation"
 import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../internal/support/Interfaces"
 import { TimedEvent } from "../internal/support/TimedEvent"
 import { Camera } from "../internal/support/Camera"
-import { XY } from "../internal/support/XY"
+import {
+    b2Body, b2BodyType, b2PolygonShape,
+    b2BodyDef, b2FixtureDef, b2CircleShape, b2Vec2, b2Transform
+} from "box2d.ts";
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
@@ -32,7 +33,7 @@ export class BaseActor implements Renderable {
     private enabled: boolean = true;
 
     /** Physics body for this WorldActor */
-    protected body: PhysicsType2d.Dynamics.Body;
+    protected body: b2Body;
 
     /** The type of body for this actor */
     private bodyStyle: BodyStyle;
@@ -41,7 +42,7 @@ export class BaseActor implements Renderable {
     private size: { w: number, h: number };
 
     /** The vertices, if this is a polygon */
-    private verts: XY[];
+    private verts: b2Vec2[];
 
     /** The z index of this actor. Valid range is [-2, 2] */
     private zIndex: number;
@@ -94,13 +95,13 @@ export class BaseActor implements Renderable {
     private disapperAnimation: Animation;
 
     /** Animation support: the dimensions of the disappearance animation */
-    private disappearAnimateSize: XY;
+    private disappearAnimateSize: b2Vec2;
 
     /** 
      * Animation support: the offset for placing the disappearance animation
      * relative to the disappearing actor 
      */
-    private disappearAnimateOffset: XY;
+    private disappearAnimateOffset: b2Vec2;
 
     /** Extra data for the game designer to attach to the actor */
     private extra: any = {};
@@ -119,8 +120,8 @@ export class BaseActor implements Renderable {
     constructor(private scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number, z: number) {
         this.animator = new AnimationDriver(device.getRenderer(), imgName);
         this.debug = device.getRenderer().makeDebugContext();
-        this.disappearAnimateSize = new XY(0, 0);
-        this.disappearAnimateOffset = new XY(0, 0);
+        this.disappearAnimateSize = new b2Vec2(0, 0);
+        this.disappearAnimateOffset = new b2Vec2(0, 0);
         this.scene = scene;
         this.size = { w: width, h: height };
         this.zIndex = z;
@@ -210,7 +211,7 @@ export class BaseActor implements Renderable {
      * 
      * @param index The index of the vertex to get
      */
-    public getVert(index: number) { return new XY(this.verts[index].x, this.verts[index].y); }
+    public getVert(index: number) { return new b2Vec2(this.verts[index].x, this.verts[index].y); }
 
     /** Return true if this actor is a Polygon */
     public isPoly() { return this.bodyStyle === BodyStyle.POLYGON; }
@@ -246,18 +247,18 @@ export class BaseActor implements Renderable {
      * @param x    The X coordinate of the top left corner
      * @param y    The Y coordinate of the top left corner
      */
-    setBoxPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number) {
-        let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
-        shape.SetAsBoxAtOrigin(this.size.w / 2, this.size.h / 2);
-        let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
+    setBoxPhysics(type: b2BodyType, x: number, y: number) {
+        let shape = new b2PolygonShape();
+        shape.SetAsBox(this.size.w / 2, this.size.h / 2);
+        let boxBodyDef = new b2BodyDef();
         boxBodyDef.type = type;
         boxBodyDef.position.x = x + this.size.w / 2;
         boxBodyDef.position.y = y + this.size.h / 2;
-        this.body = this.scene.createBody(boxBodyDef);
+        this.body = this.scene.getWorld().CreateBody(boxBodyDef);
 
-        let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
+        let fd = new b2FixtureDef();
         fd.shape = shape;
-        this.body.CreateFixtureFromDefinition(fd);
+        this.body.CreateFixture(fd);
         this.setPhysics(0, 0, 0);
 
         this.body.SetUserData(this);
@@ -279,24 +280,24 @@ export class BaseActor implements Renderable {
      * @param vertices Up to 16 coordinates representing the vertexes of this
      *                 polygon, listed as x0,y0,x1,y1,x2,y2,...
      */
-    setPolygonPhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number, vertices: number[]) {
-        let shape = new PhysicsType2d.Collision.Shapes.PolygonShape();
+    setPolygonPhysics(type: b2BodyType, x: number, y: number, vertices: number[]) {
+        let shape = new b2PolygonShape();
         this.verts = [];
         for (let i = 0; i < vertices.length; i += 2)
-            this.verts[i / 2] = new XY(vertices[i], vertices[i + 1]);
+            this.verts[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
         // print some debug info, since vertices are tricky
         for (let vert of this.verts)
             this.device.getConsole().info("vert at " + vert.x + "," + vert.y);
         shape.Set(this.verts);
-        let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
+        let boxBodyDef = new b2BodyDef();
         boxBodyDef.type = type;
         boxBodyDef.position.x = x + this.size.w / 2;
         boxBodyDef.position.y = y + this.size.h / 2;
-        this.body = this.scene.createBody(boxBodyDef);
+        this.body = this.scene.getWorld().CreateBody(boxBodyDef);
 
-        let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
+        let fd = new b2FixtureDef();
         fd.shape = shape;
-        this.body.CreateFixtureFromDefinition(fd);
+        this.body.CreateFixture(fd);
         this.setPhysics(0, 0, 0);
 
         // link the body to the actor
@@ -314,19 +315,19 @@ export class BaseActor implements Renderable {
      * @param y      The Y coordinate of the top left corner
      * @param radius The radius of the underlying circle
      */
-    setCirclePhysics(type: PhysicsType2d.Dynamics.BodyType, x: number, y: number, radius: number) {
-        let shape = new PhysicsType2d.Collision.Shapes.CircleShape();
+    setCirclePhysics(type: b2BodyType, x: number, y: number, radius: number) {
+        let shape = new b2CircleShape();
         shape.m_radius = radius;
 
-        let boxBodyDef = new PhysicsType2d.Dynamics.BodyDefinition();
+        let boxBodyDef = new b2BodyDef();
         boxBodyDef.type = type;
         boxBodyDef.position.x = x + this.size.w / 2;
         boxBodyDef.position.y = y + this.size.h / 2;
-        this.body = this.scene.createBody(boxBodyDef);
+        this.body = this.scene.getWorld().CreateBody(boxBodyDef);
 
-        let fd = new PhysicsType2d.Dynamics.FixtureDefinition();
+        let fd = new b2FixtureDef();
         fd.shape = shape;
-        this.body.CreateFixtureFromDefinition(fd);
+        this.body.CreateFixture(fd);
         this.setPhysics(0, 0, 0);
 
         // link the body to the actor
@@ -348,11 +349,11 @@ export class BaseActor implements Renderable {
     updateVelocity(x: number, y: number) {
         // make sure it is not static... heroes are already Dynamic, let's just set everything else
         // that is static to kinematic... that's probably safest.
-        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
-            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() == b2BodyType.b2_staticBody) {
+            this.body.SetType(b2BodyType.b2_kinematicBody);
         }
         this.breakJoints();
-        this.body.SetLinearVelocity(new XY(x, y));
+        this.body.SetLinearVelocity(new b2Vec2(x, y));
     }
 
     /**
@@ -400,10 +401,9 @@ export class BaseActor implements Renderable {
      */
     setCollisionsEnabled(val: boolean) {
         // The default is for all fixtures of a actor have the same sensor state
-        let fixtures = this.body.GetFixtures();
-        while (fixtures.MoveNext())
-            fixtures.Current().SetSensor(!val);
-        fixtures.Reset();
+        for (let f = this.body.GetFixtureList(); f; f = f.GetNext()) {
+            f.SetSensor(!val);
+        }
     }
 
     /**
@@ -411,14 +411,10 @@ export class BaseActor implements Renderable {
      * other actors (true) or not (false)
      */
     getCollisionsEnabled() {
-        let f = this.body.GetFixtures();
-        while (f.MoveNext()) {
-            if (f.Current().IsSensor()) {
-                f.Reset();
+        for (let f = this.body.GetFixtureList(); f; f = f.GetNext()) {
+            if (f.IsSensor())
                 return true;
-            }
         }
-        f.Reset();
         return false;
     }
 
@@ -431,14 +427,11 @@ export class BaseActor implements Renderable {
      * @param friction   New friction of the actor
      */
     setPhysics(density: number, elasticity: number, friction: number) {
-        let fixtures = this.body.GetFixtures();
-        while (fixtures.MoveNext()) {
-            let f = fixtures.Current();
+        for (let f = this.body.GetFixtureList(); f; f = f.GetNext()) {
             f.SetDensity(density);
             f.SetRestitution(elasticity);
             f.SetFriction(friction);
         }
-        fixtures.Reset();
         this.body.ResetMassData();
     }
 
@@ -471,7 +464,9 @@ export class BaseActor implements Renderable {
      * @param rotation amount to rotate the actor clockwise (in radians)
      */
     public setRotation(rotation: number) {
-        this.body.SetTransform(this.body.GetPosition(), rotation);
+        let xform = new b2Transform();
+        xform.SetPositionAngle(this.body.GetPosition(), rotation);
+        this.body.SetTransform(xform);
     }
 
     /**
@@ -481,8 +476,8 @@ export class BaseActor implements Renderable {
      * @param velocity: The angular velocity
      */
     public setRotationSpeed(velocity: number) {
-        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
-            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() == b2BodyType.b2_staticBody)
+            this.body.SetType(b2BodyType.b2_kinematicBody);
         this.body.SetAngularVelocity(velocity);
     }
 
@@ -506,7 +501,7 @@ export class BaseActor implements Renderable {
             let x = this.getXPosition() + this.disappearAnimateOffset.x;
             let y = this.getYPosition() + this.disappearAnimateOffset.y;
             let o = new BaseActor(this.scene, this.device, "", this.disappearAnimateSize.x, this.disappearAnimateSize.y, this.zIndex);
-            o.setBoxPhysics(PhysicsType2d.Dynamics.BodyType.STATIC, x, y);
+            o.setBoxPhysics(b2BodyType.b2_staticBody, x, y);
             this.scene.addActor(o, 0);
             o.setCollisionsEnabled(false);
             o.setDefaultAnimation(this.disapperAnimation);
@@ -527,8 +522,8 @@ export class BaseActor implements Renderable {
      */
     public setAbsoluteVelocity(x: number, y: number) {
         // ensure this is a moveable actor
-        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
-            this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+        if (this.body.GetType() == b2BodyType.b2_staticBody)
+            this.body.SetType(b2BodyType.b2_dynamicBody);
         // change its velocity
         this.updateVelocity(x, y);
         // Disable sensor, or else this actor will go right through walls
@@ -544,8 +539,8 @@ export class BaseActor implements Renderable {
      */
     public setPath(path: Path, velocity: number, loop: boolean) {
         // This must be a KinematicBody or a Dynamic Body!
-        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC) {
-            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() == b2BodyType.b2_staticBody) {
+            this.body.SetType(b2BodyType.b2_kinematicBody);
         }
 
         // Create a Driver to advance the actor's position according to the path
@@ -568,7 +563,9 @@ export class BaseActor implements Renderable {
      * @param y The new Y position, in pixels
      */
     public setPosition(x: number, y: number) {
-        this.body.SetTransform(new XY(x + this.size.w / 2, y + this.size.h / 2), this.body.GetAngle());
+        let xform = new b2Transform();
+        xform.SetPositionAngle(new b2Vec2(x + this.size.w / 2, y + this.size.h / 2), this.body.GetAngle());
+        this.body.SetTransform(xform);
     }
 
     /**
@@ -593,13 +590,13 @@ export class BaseActor implements Renderable {
      */
     public addVelocity(x: number, y: number) {
         // ensure this is a moveable actor
-        if (this.body.GetType() == PhysicsType2d.Dynamics.BodyType.STATIC)
-            this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+        if (this.body.GetType() == b2BodyType.b2_dynamicBody)
+            this.body.SetType(b2BodyType.b2_dynamicBody);
         // Add to the velocity of the actor
         let v = this.body.GetLinearVelocity();
-        v.x += x;
-        v.y += y;
-        this.updateVelocity(v.x, v.y);
+        let x2 = v.x + x;
+        let y2 = v.y + y;
+        this.updateVelocity(x2, y2);
         // Disable sensor, or else this actor will go right through walls
         this.setCollisionsEnabled(true);
     }
@@ -614,7 +611,9 @@ export class BaseActor implements Renderable {
                 let x = -this.body.GetLinearVelocity().x;
                 let y = -this.body.GetLinearVelocity().y;
                 let angle = Math.atan2(y, x) + Math.atan2(-1, 0);
-                this.body.SetTransform(this.body.GetPosition(), angle);
+                let xform = new b2Transform();
+                xform.SetPositionAngle(this.body.GetPosition(), angle);
+                this.body.SetTransform(xform);
             }
         });
     }
@@ -628,7 +627,7 @@ export class BaseActor implements Renderable {
      * means the actor will fall to the ground.
      */
     public setCanFall() {
-        this.body.SetType(PhysicsType2d.Dynamics.BodyType.DYNAMIC);
+        this.body.SetType(b2BodyType.b2_dynamicBody);
     }
 
     /**
@@ -771,8 +770,8 @@ export class BaseActor implements Renderable {
      * but are not subject to forces in the same way as Dynamic bodies.
      */
     public setKinematic() {
-        if (this.body.GetType() != PhysicsType2d.Dynamics.BodyType.KINEMATIC)
-            this.body.SetType(PhysicsType2d.Dynamics.BodyType.KINEMATIC);
+        if (this.body.GetType() != b2BodyType.b2_kinematicBody)
+            this.body.SetType(b2BodyType.b2_kinematicBody);
     }
 
     /**
@@ -801,9 +800,7 @@ export class BaseActor implements Renderable {
         // read old body information
         let oldBody = this.body;
         // The default is for all fixtures of a actor have the same sensor state
-        let fixtures = oldBody.GetFixtures();
-        fixtures.MoveNext();
-        let oldFix = fixtures.Current();
+        let oldFix = oldBody.GetFixtureList();
         // make a new body
         if (this.bodyStyle === BodyStyle.CIRCLE) {
             this.setCirclePhysics(oldBody.GetType(), x, y, (width > height) ? width / 2 : height / 2);
@@ -813,7 +810,7 @@ export class BaseActor implements Renderable {
             // we need to manually scale all the vertices
             let xScale = height / this.size.h;
             let yScale = width / this.size.w;
-            let ps = oldFix.GetShape() as PhysicsType2d.Collision.Shapes.PolygonShape;
+            let ps = oldFix.GetShape() as b2PolygonShape;
             let verts: number[] = [];
             for (let i = 0; i < ps.m_vertices.length; ++i) {
                 let mTempVector = ps.m_vertices[i];
@@ -830,7 +827,9 @@ export class BaseActor implements Renderable {
         this.setFastMoving(oldBody.IsBullet());
         // clone forces
         this.body.SetAngularVelocity(oldBody.GetAngularVelocity());
-        this.body.SetTransform(this.body.GetPosition(), oldBody.GetAngle());
+        let xform = new b2Transform();
+        xform.SetPositionAngle(this.body.GetPosition(), oldBody.GetAngle());
+        this.body.SetTransform(xform);
         this.body.SetGravityScale(oldBody.GetGravityScale());
         this.body.SetLinearDamping(oldBody.GetLinearDamping());
         this.body.SetLinearVelocity(oldBody.GetLinearVelocity());

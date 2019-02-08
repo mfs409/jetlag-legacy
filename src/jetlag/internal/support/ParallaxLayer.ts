@@ -1,7 +1,7 @@
 import { JetLagSprite, JetLagDevice, JetLagRenderer } from "./Interfaces";
 import { JetLagConfig } from "../../support/JetLagConfig";
 import { Camera } from "./Camera";
-import { XY } from "./XY";
+import { b2Vec2 } from "box2d.ts";
 
 /**
  * A ParallaxLayer is a layer that seems to scroll and repeat at a velocity that
@@ -21,7 +21,7 @@ export class ParallaxLayer {
     private images: JetLagSprite[] = [];
 
     /** coords of last render */
-    private last = new XY(0, 0);
+    private last = new b2Vec2(0, 0);
 
     /** Width of the image to display */
     private width: number;
@@ -30,7 +30,7 @@ export class ParallaxLayer {
     private height: number;
 
     /** Last camera position */
-    private lastCam = new XY(0, 0);
+    private lastCam = new b2Vec2(0, 0);
 
     /**
      * Construct a ParallaxLayer that can be rendered correctly
