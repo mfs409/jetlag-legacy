@@ -20,12 +20,13 @@
   "typedocOptions": {
     "out": "./docs/",
     "name": "JetLag Documentation",
-    "exclude": ["**/internal/*.ts", "**/internal/*/*.ts"],
+    "exclude": ["**/internal/*.ts", "**/internal/*/*.ts", "**/node_modules/**/*"],
     "mode": "file",
     "excludeExternals": true,
     "excludeNotExported": true,
     "excludePrivate": true,
     "excludeProtected": true,
-    "hideGenerator": true
+    "hideGenerator": true,
+    "ignoreCompilerErrors": true
   }
 }

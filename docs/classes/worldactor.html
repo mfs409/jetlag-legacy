@@ -87,6 +87,9 @@
 										<a href="projectile.html" class="tsd-signature-type">Projectile</a>
 									</li>
 									<li>
+										<a href="goodie.html" class="tsd-signature-type">Goodie</a>
+									</li>
+									<li>
 										<a href="obstacle.html" class="tsd-signature-type">Obstacle</a>
 									</li>
 									<li>
@@ -94,9 +97,6 @@
 									</li>
 									<li>
 										<a href="destination.html" class="tsd-signature-type">Destination</a>
-									</li>
-									<li>
-										<a href="goodie.html" class="tsd-signature-type">Goodie</a>
 									</li>
 									<li>
 										<a href="hero.html" class="tsd-signature-type">Hero</a>
@@ -196,7 +196,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#sethover" class="tsd-kind-icon">set<wbr>Hover</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setimage" class="tsd-kind-icon">set<wbr>Image</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setimplicitdistjoint" class="tsd-kind-icon">set<wbr>Implicit<wbr>Dist<wbr>Joint</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setimplicitweldjoint" class="tsd-kind-icon">set<wbr>Implicit<wbr>Weld<wbr>Joint</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setkinematic" class="tsd-kind-icon">set<wbr>Kinematic</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setmovebytilting" class="tsd-kind-icon">set<wbr>Move<wbr>ByTilting</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setonesided" class="tsd-kind-icon">set<wbr>One<wbr>Sided</a></li>
@@ -204,6 +203,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setpanstarthandler" class="tsd-kind-icon">set<wbr>Pan<wbr>Start<wbr>Handler</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setpanstophandler" class="tsd-kind-icon">set<wbr>Pan<wbr>Stop<wbr>Handler</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setpassthrough" class="tsd-kind-icon">set<wbr>Pass<wbr>Through</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setpath" class="tsd-kind-icon">set<wbr>Path</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setphysics" class="tsd-kind-icon">set<wbr>Physics</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setpolygonphysics" class="tsd-kind-icon">set<wbr>Polygon<wbr>Physics</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setposition" class="tsd-kind-icon">set<wbr>Position</a></li>
@@ -213,7 +213,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setrotation" class="tsd-kind-icon">set<wbr>Rotation</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setrotationbydirection" class="tsd-kind-icon">set<wbr>Rotation<wbr>ByDirection</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setrotationspeed" class="tsd-kind-icon">set<wbr>Rotation<wbr>Speed</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setroute" class="tsd-kind-icon">set<wbr>Route</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="worldactor.html#setshrinkovertime" class="tsd-kind-icon">set<wbr>Shrink<wbr>Over<wbr>Time</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setsticky" class="tsd-kind-icon">set<wbr>Sticky</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="worldactor.html#setstickydelay" class="tsd-kind-icon">set<wbr>Sticky<wbr>Delay</a></li>
@@ -244,7 +243,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L72">actor/World.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L67">actor/WorldActor.ts:67</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -304,7 +303,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#addvelocity">addVelocity</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L594">actor/Base.ts:594</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L591">actor/BaseActor.ts:591</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -342,7 +341,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#breakjoints">breakJoints</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L505">actor/World.ts:505</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L493">actor/WorldActor.ts:493</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -364,7 +363,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L95">actor/World.ts:95</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L90">actor/WorldActor.ts:90</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -387,7 +386,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#disablerotation">disableRotation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L659">actor/Base.ts:659</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L658">actor/BaseActor.ts:658</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -410,7 +409,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getanimator">getAnimator</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L203">actor/Base.ts:203</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L204">actor/BaseActor.ts:204</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -426,14 +425,14 @@
 					<a name="getbody" class="tsd-anchor"></a>
 					<h3>get<wbr>Body</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Body<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Body</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Body<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2Body</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getbody">getBody</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L225">actor/Base.ts:225</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L226">actor/BaseActor.ts:226</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -441,7 +440,7 @@
 									<p>Return the physics body associated with this actor</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Body</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">b2Body</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -455,7 +454,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L130">actor/World.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L125">actor/WorldActor.ts:125</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -478,7 +477,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L136">actor/World.ts:136</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L131">actor/WorldActor.ts:131</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -502,7 +501,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getcenterx">getCenterX</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L454">actor/Base.ts:454</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L447">actor/BaseActor.ts:447</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -525,7 +524,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getcentery">getCenterY</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L457">actor/Base.ts:457</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L450">actor/BaseActor.ts:450</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -548,7 +547,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getcollisionsenabled">getCollisionsEnabled</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L413">actor/Base.ts:413</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L413">actor/BaseActor.ts:413</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -572,7 +571,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getdebug">getDebug</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L130">actor/Base.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L131">actor/BaseActor.ts:131</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -588,13 +587,13 @@
 					<a name="getdistjoint" class="tsd-anchor"></a>
 					<h3>get<wbr>Dist<wbr>Joint</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Dist<wbr>Joint<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DistanceJoint</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Dist<wbr>Joint<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2DistanceJoint</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L101">actor/World.ts:101</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L96">actor/WorldActor.ts:96</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -602,7 +601,7 @@
 									<p>Return the distance joint on this actor, if there is one</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">DistanceJoint</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">b2DistanceJoint</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -616,7 +615,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L89">actor/World.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L84">actor/WorldActor.ts:84</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -639,7 +638,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getenabled">getEnabled</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L240">actor/Base.ts:240</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L241">actor/BaseActor.ts:241</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -662,7 +661,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getextra">getExtra</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L783">actor/Base.ts:783</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L782">actor/BaseActor.ts:782</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -685,7 +684,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L92">actor/World.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L87">actor/WorldActor.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -708,7 +707,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getheight">getHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L463">actor/Base.ts:463</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L456">actor/BaseActor.ts:456</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -731,7 +730,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getnumverts">getNumVerts</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L206">actor/Base.ts:206</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L207">actor/BaseActor.ts:207</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -753,7 +752,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L98">actor/World.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L93">actor/WorldActor.ts:93</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -776,7 +775,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getpanmovehandler">getPanMoveHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L153">actor/Base.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L154">actor/BaseActor.ts:154</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -820,7 +819,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getpanstarthandler">getPanStartHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L143">actor/Base.ts:143</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L144">actor/BaseActor.ts:144</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -864,7 +863,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getpanstophandler">getPanStopHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L163">actor/Base.ts:163</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L164">actor/BaseActor.ts:164</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -907,7 +906,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L124">actor/World.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L119">actor/WorldActor.ts:119</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -930,7 +929,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getrotation">getRotation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L466">actor/Base.ts:466</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L459">actor/BaseActor.ts:459</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -952,7 +951,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L111">actor/World.ts:111</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L106">actor/WorldActor.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -974,7 +973,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L119">actor/World.ts:119</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L114">actor/WorldActor.ts:114</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1007,7 +1006,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getswipehandler">getSwipeHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L193">actor/Base.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L194">actor/BaseActor.ts:194</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1060,7 +1059,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#gettaphandler">getTapHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L133">actor/Base.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L134">actor/BaseActor.ts:134</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1104,7 +1103,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#gettouchdownhandler">getTouchDownHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L173">actor/Base.ts:173</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L174">actor/BaseActor.ts:174</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1148,7 +1147,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#gettouchuphandler">getTouchUpHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L183">actor/Base.ts:183</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L184">actor/BaseActor.ts:184</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1185,14 +1184,14 @@
 					<a name="getvert" class="tsd-anchor"></a>
 					<h3>get<wbr>Vert</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Vert<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">XY</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Vert<span class="tsd-signature-symbol">(</span>index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2Vec2</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getvert">getVert</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L213">actor/Base.ts:213</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L214">actor/BaseActor.ts:214</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1209,7 +1208,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">XY</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">b2Vec2</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -1224,7 +1223,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getwidth">getWidth</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L460">actor/Base.ts:460</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L453">actor/BaseActor.ts:453</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1247,7 +1246,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getxposition">getXPosition</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L446">actor/Base.ts:446</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L439">actor/BaseActor.ts:439</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1270,7 +1269,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getxvelocity">getXVelocity</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L517">actor/Base.ts:517</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L512">actor/BaseActor.ts:512</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1293,7 +1292,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getyposition">getYPosition</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L451">actor/Base.ts:451</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L444">actor/BaseActor.ts:444</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1316,7 +1315,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#getyvelocity">getYVelocity</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L520">actor/Base.ts:520</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L515">actor/BaseActor.ts:515</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1339,7 +1338,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#isbox">isBox</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L219">actor/Base.ts:219</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L220">actor/BaseActor.ts:220</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1362,7 +1361,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#iscircle">isCircle</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L222">actor/Base.ts:222</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L223">actor/BaseActor.ts:223</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1385,7 +1384,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#ispoly">isPoly</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L216">actor/Base.ts:216</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L217">actor/BaseActor.ts:217</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1401,13 +1400,13 @@
 					<a name="oncollide" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagAbstract">Abstract</span> on<wbr>Collide</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">on<wbr>Collide<span class="tsd-signature-symbol">(</span>other<span class="tsd-signature-symbol">: </span><a href="worldactor.html" class="tsd-signature-type">WorldActor</a>, contact<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Contact</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Collide<span class="tsd-signature-symbol">(</span>other<span class="tsd-signature-symbol">: </span><a href="worldactor.html" class="tsd-signature-type">WorldActor</a>, contact<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2Contact</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L163">actor/World.ts:163</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L149">actor/WorldActor.ts:149</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1425,7 +1424,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>contact: <span class="tsd-signature-type">Contact</span></h5>
+									<h5>contact: <span class="tsd-signature-type">b2Contact</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>A description of the contact that caused this collision</p>
 									</div>
@@ -1446,7 +1445,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#remove">remove</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L494">actor/Base.ts:494</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L489">actor/BaseActor.ts:489</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1478,13 +1477,13 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#render">render</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L374">actor/Base.ts:374</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L375">actor/BaseActor.ts:375</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Every time the world advances by a timestep, we call this code to update
-									the actor route and animation, and then draw the actor</p>
+									the actor path and animation, and then draw the actor</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1523,7 +1522,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#resize">resize</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L800">actor/Base.ts:800</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L799">actor/BaseActor.ts:799</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1573,7 +1572,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setabsolutevelocity">setAbsoluteVelocity</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L528">actor/Base.ts:528</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L523">actor/BaseActor.ts:523</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1611,7 +1610,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setangulardamping">setAngularDamping</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L762">actor/Base.ts:762</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L761">actor/BaseActor.ts:761</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1644,7 +1643,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setappeardelay">setAppearDelay</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L651">actor/Base.ts:651</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L650">actor/BaseActor.ts:650</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1670,14 +1669,14 @@
 					<a name="setboxphysics" class="tsd-anchor"></a>
 					<h3>set<wbr>Box<wbr>Physics</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Box<wbr>Physics<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BodyType</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Box<wbr>Physics<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2BodyType</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setboxphysics">setBoxPhysics</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L249">actor/Base.ts:249</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L250">actor/BaseActor.ts:250</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1688,7 +1687,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>type: <span class="tsd-signature-type">BodyType</span></h5>
+									<h5>type: <span class="tsd-signature-type">b2BodyType</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Is the actor&#39;s body static or dynamic?</p>
 									</div>
@@ -1720,7 +1719,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L172">actor/World.ts:172</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L158">actor/WorldActor.ts:158</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1759,7 +1758,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setcanfall">setCanFall</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L630">actor/Base.ts:630</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L629">actor/BaseActor.ts:629</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1785,7 +1784,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L257">actor/World.ts:257</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L243">actor/WorldActor.ts:243</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1843,7 +1842,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L212">actor/World.ts:212</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L198">actor/WorldActor.ts:198</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1886,14 +1885,14 @@
 					<a name="setcirclephysics" class="tsd-anchor"></a>
 					<h3>set<wbr>Circle<wbr>Physics</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Circle<wbr>Physics<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BodyType</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, radius<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Circle<wbr>Physics<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2BodyType</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, radius<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setcirclephysics">setCirclePhysics</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L317">actor/Base.ts:317</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L318">actor/BaseActor.ts:318</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1904,7 +1903,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>type: <span class="tsd-signature-type">BodyType</span></h5>
+									<h5>type: <span class="tsd-signature-type">b2BodyType</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Is the actor&#39;s body static or dynamic?</p>
 									</div>
@@ -1943,7 +1942,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setcollisionsenabled">setCollisionsEnabled</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L401">actor/Base.ts:401</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L402">actor/BaseActor.ts:402</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1976,7 +1975,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setdamping">setDamping</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L754">actor/Base.ts:754</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L753">actor/BaseActor.ts:753</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2009,7 +2008,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setdefaultanimation">setDefaultAnimation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L675">actor/Base.ts:675</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L674">actor/BaseActor.ts:674</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2041,7 +2040,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setdefaultreverseanimation">setDefaultReverseAnimation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L686">actor/Base.ts:686</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L685">actor/BaseActor.ts:685</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2074,7 +2073,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setdisappearanimation">setDisappearAnimation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L703">actor/Base.ts:703</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L702">actor/BaseActor.ts:702</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2134,7 +2133,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setdisappeardelay">setDisappearDelay</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L641">actor/Base.ts:641</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L640">actor/BaseActor.ts:640</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2173,7 +2172,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setdisappearsound">setDisappearSound</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L666">actor/Base.ts:666</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L665">actor/BaseActor.ts:665</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2204,7 +2203,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L487">actor/World.ts:487</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L475">actor/WorldActor.ts:475</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2263,7 +2262,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L195">actor/World.ts:195</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L181">actor/WorldActor.ts:181</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2297,7 +2296,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setenabled">setEnabled</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L234">actor/Base.ts:234</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L235">actor/BaseActor.ts:235</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2331,7 +2330,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setextra">setExtra</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L790">actor/Base.ts:790</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L789">actor/BaseActor.ts:789</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2363,7 +2362,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setfastmoving">setFastMoving</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L849">actor/Base.ts:849</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L848">actor/BaseActor.ts:848</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2395,7 +2394,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L340">actor/World.ts:340</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L326">actor/WorldActor.ts:326</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2428,7 +2427,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setgravitydefy">setGravityDefy</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L767">actor/Base.ts:767</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L766">actor/BaseActor.ts:766</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2450,7 +2449,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L359">actor/World.ts:359</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L345">actor/WorldActor.ts:345</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2493,7 +2492,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setimage">setImage</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L560">actor/Base.ts:560</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L555">actor/BaseActor.ts:555</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2518,13 +2517,13 @@
 					<a name="setimplicitdistjoint" class="tsd-anchor"></a>
 					<h3>set<wbr>Implicit<wbr>Dist<wbr>Joint</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Implicit<wbr>Dist<wbr>Joint<span class="tsd-signature-symbol">(</span>joint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DistanceJoint</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Implicit<wbr>Dist<wbr>Joint<span class="tsd-signature-symbol">(</span>joint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2DistanceJoint</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L143">actor/World.ts:143</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L138">actor/WorldActor.ts:138</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2535,40 +2534,9 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>joint: <span class="tsd-signature-type">DistanceJoint</span></h5>
+									<h5>joint: <span class="tsd-signature-type">b2DistanceJoint</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>The distance joint to create</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="setimplicitweldjoint" class="tsd-anchor"></a>
-					<h3>set<wbr>Implicit<wbr>Weld<wbr>Joint</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Implicit<wbr>Weld<wbr>Joint<span class="tsd-signature-symbol">(</span>joint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WeldJoint</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L152">actor/World.ts:152</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Create a weld joint, as part of stickiness</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>joint: <span class="tsd-signature-type">WeldJoint</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The weld joint to create</p>
 									</div>
 								</li>
 							</ul>
@@ -2587,7 +2555,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setkinematic">setKinematic</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L773">actor/Base.ts:773</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L772">actor/BaseActor.ts:772</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2610,7 +2578,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L178">actor/World.ts:178</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L164">actor/WorldActor.ts:164</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2632,7 +2600,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L324">actor/World.ts:324</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L310">actor/WorldActor.ts:310</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2665,7 +2633,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setpanmovehandler">setPanMoveHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L160">actor/Base.ts:160</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L161">actor/BaseActor.ts:161</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2718,7 +2686,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setpanstarthandler">setPanStartHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L150">actor/Base.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L151">actor/BaseActor.ts:151</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2771,7 +2739,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setpanstophandler">setPanStopHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L170">actor/Base.ts:170</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L171">actor/BaseActor.ts:171</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2823,7 +2791,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L332">actor/World.ts:332</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L318">actor/WorldActor.ts:318</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2846,6 +2814,50 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setpath" class="tsd-anchor"></a>
+					<h3>set<wbr>Path</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Path<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><a href="path.html" class="tsd-signature-type">Path</a>, velocity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, loop<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setpath">setPath</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L540">actor/BaseActor.ts:540</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Request that this actor moves according to a fixed path</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>path: <a href="path.html" class="tsd-signature-type">Path</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The path to follow</p>
+									</div>
+								</li>
+								<li>
+									<h5>velocity: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>speed at which to travel along the path</p>
+									</div>
+								</li>
+								<li>
+									<h5>loop: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>When the path completes, should we start it over again?</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="setphysics" class="tsd-anchor"></a>
 					<h3>set<wbr>Physics</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
@@ -2856,7 +2868,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setphysics">setPhysics</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L433">actor/Base.ts:433</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L429">actor/BaseActor.ts:429</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2894,14 +2906,14 @@
 					<a name="setpolygonphysics" class="tsd-anchor"></a>
 					<h3>set<wbr>Polygon<wbr>Physics</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Polygon<wbr>Physics<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BodyType</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Polygon<wbr>Physics<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2BodyType</span>, x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, vertices<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setpolygonphysics">setPolygonPhysics</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L282">actor/Base.ts:282</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L283">actor/BaseActor.ts:283</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2915,7 +2927,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>type: <span class="tsd-signature-type">BodyType</span></h5>
+									<h5>type: <span class="tsd-signature-type">b2BodyType</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Is the actor&#39;s body static or dynamic?</p>
 									</div>
@@ -2955,7 +2967,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setposition">setPosition</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L570">actor/Base.ts:570</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L565">actor/BaseActor.ts:565</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2992,7 +3004,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L399">actor/World.ts:399</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L387">actor/WorldActor.ts:387</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3053,7 +3065,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L438">actor/World.ts:438</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L426">actor/WorldActor.ts:426</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3090,7 +3102,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L422">actor/World.ts:422</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L410">actor/WorldActor.ts:410</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3129,7 +3141,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setrotation">setRotation</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L473">actor/Base.ts:473</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L466">actor/BaseActor.ts:466</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3161,7 +3173,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setrotationbydirection">setRotationByDirection</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L611">actor/Base.ts:611</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L608">actor/BaseActor.ts:608</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3185,7 +3197,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setrotationspeed">setRotationSpeed</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L483">actor/Base.ts:483</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L478">actor/BaseActor.ts:478</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3205,50 +3217,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-					<a name="setroute" class="tsd-anchor"></a>
-					<h3>set<wbr>Route</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Route<span class="tsd-signature-symbol">(</span>route<span class="tsd-signature-symbol">: </span><a href="route.html" class="tsd-signature-type">Route</a>, velocity<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, loop<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setroute">setRoute</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L545">actor/Base.ts:545</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Request that this actor moves according to a fixed route</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>route: <a href="route.html" class="tsd-signature-type">Route</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The route to follow</p>
-									</div>
-								</li>
-								<li>
-									<h5>velocity: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>speed at which to travel along the route</p>
-									</div>
-								</li>
-								<li>
-									<h5>loop: <span class="tsd-signature-type">boolean</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>When the route completes, should we start it over again?</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="setshrinkovertime" class="tsd-anchor"></a>
 					<h3>set<wbr>Shrink<wbr>Over<wbr>Time</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
@@ -3259,7 +3227,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setshrinkovertime">setShrinkOverTime</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L721">actor/Base.ts:721</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L720">actor/BaseActor.ts:720</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3307,7 +3275,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L380">actor/World.ts:380</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L368">actor/WorldActor.ts:368</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3356,7 +3324,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L108">actor/World.ts:108</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L103">actor/WorldActor.ts:103</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3388,7 +3356,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setswipehandler">setSwipeHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L200">actor/Base.ts:200</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L201">actor/BaseActor.ts:201</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3450,7 +3418,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#settaphandler">setTapHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L140">actor/Base.ts:140</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L141">actor/BaseActor.ts:141</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3502,7 +3470,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L306">actor/World.ts:306</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L292">actor/WorldActor.ts:292</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3577,7 +3545,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#settouchdownhandler">setTouchDownHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L180">actor/Base.ts:180</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L181">actor/BaseActor.ts:181</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3629,7 +3597,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L291">actor/World.ts:291</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L277">actor/WorldActor.ts:277</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3690,7 +3658,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#settouchuphandler">setTouchUpHandler</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L190">actor/Base.ts:190</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L191">actor/BaseActor.ts:191</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3742,7 +3710,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/World.ts#L463">actor/World.ts:463</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/WorldActor.ts#L451">actor/WorldActor.ts:451</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3809,7 +3777,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#setzindex">setZIndex</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L579">actor/Base.ts:579</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L576">actor/BaseActor.ts:576</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3841,7 +3809,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="baseactor.html">BaseActor</a>.<a href="baseactor.html#updatevelocity">updateVelocity</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/actor/Base.ts#L348">actor/Base.ts:348</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/actor/BaseActor.ts#L349">actor/BaseActor.ts:349</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3928,6 +3896,9 @@
 						<a href="overlayapi.html" class="tsd-kind-icon">Overlay<wbr>Api</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="path.html" class="tsd-kind-icon">Path</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="picture.html" class="tsd-kind-icon">Picture</a>
 					</li>
 					<li class=" tsd-kind-class">
@@ -3935,9 +3906,6 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="projectileapi.html" class="tsd-kind-icon">Projectile<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="route.html" class="tsd-kind-icon">Route</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="scoreapi.html" class="tsd-kind-icon">Score<wbr>Api</a>
@@ -4166,9 +4134,6 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="worldactor.html#setimplicitdistjoint" class="tsd-kind-icon">set<wbr>Implicit<wbr>Dist<wbr>Joint</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="worldactor.html#setimplicitweldjoint" class="tsd-kind-icon">set<wbr>Implicit<wbr>Weld<wbr>Joint</a>
-							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="worldactor.html#setkinematic" class="tsd-kind-icon">set<wbr>Kinematic</a>
 							</li>
@@ -4189,6 +4154,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="worldactor.html#setpassthrough" class="tsd-kind-icon">set<wbr>Pass<wbr>Through</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="worldactor.html#setpath" class="tsd-kind-icon">set<wbr>Path</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="worldactor.html#setphysics" class="tsd-kind-icon">set<wbr>Physics</a>
@@ -4216,9 +4184,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="worldactor.html#setrotationspeed" class="tsd-kind-icon">set<wbr>Rotation<wbr>Speed</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="worldactor.html#setroute" class="tsd-kind-icon">set<wbr>Route</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="worldactor.html#setshrinkovertime" class="tsd-kind-icon">set<wbr>Shrink<wbr>Over<wbr>Time</a>

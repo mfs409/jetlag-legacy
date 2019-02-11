@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Route | JetLag Documentation</title>
+	<title>Path | JetLag Documentation</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -52,10 +52,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="route.html">Route</a>
+					<a href="path.html">Path</a>
 				</li>
 			</ul>
-			<h1>Class Route</h1>
+			<h1>Class Path</h1>
 		</div>
 	</div>
 </header>
@@ -65,7 +65,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Route specifies a set of points that an actor will move among, in order, at a
+						<p>Path specifies a set of points that an actor will move among, in order, at a
 						fixed speed.</p>
 					</div>
 				</div>
@@ -74,7 +74,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Route</span>
+						<span class="target">Path</span>
 					</li>
 				</ul>
 			</section>
@@ -85,9 +85,9 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="route.html#getnumpoints" class="tsd-kind-icon">get<wbr>Num<wbr>Points</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="route.html#getpoint" class="tsd-kind-icon">get<wbr>Point</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="route.html#to" class="tsd-kind-icon">to</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="path.html#getnumpoints" class="tsd-kind-icon">get<wbr>Num<wbr>Points</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="path.html#getpoint" class="tsd-kind-icon">get<wbr>Point</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="path.html#to" class="tsd-kind-icon">to</a></li>
 							</ul>
 						</section>
 					</div>
@@ -105,12 +105,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/support/Route.ts#L32">support/Route.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/support/Path.ts#L32">support/Path.ts:32</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Return the number of points in this route</p>
+									<p>Return the number of points in this path</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -121,18 +121,18 @@
 					<a name="getpoint" class="tsd-anchor"></a>
 					<h3>get<wbr>Point</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Point<span class="tsd-signature-symbol">(</span>i<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">XY</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Point<span class="tsd-signature-symbol">(</span>i<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">b2Vec2</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/support/Route.ts#L29">support/Route.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/support/Path.ts#L29">support/Path.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Return a copy of the ith point in the route.  We return a copy, so that the
+									<p>Return a copy of the ith point in the path.  We return a copy, so that the
 									caller can use the point</p>
 								</div>
 							</div>
@@ -145,7 +145,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">XY</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">b2Vec2</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -153,13 +153,13 @@
 					<a name="to" class="tsd-anchor"></a>
 					<h3>to</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">to<span class="tsd-signature-symbol">(</span>x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="route.html" class="tsd-signature-type">Route</a></li>
+						<li class="tsd-signature tsd-kind-icon">to<span class="tsd-signature-symbol">(</span>x<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, y<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="path.html" class="tsd-signature-type">Path</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/f246fea/src/jetlag/support/Route.ts#L18">support/Route.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/mfs409/jetlag/blob/fe4935b/src/jetlag/support/Path.ts#L18">support/Path.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -183,7 +183,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="route.html" class="tsd-signature-type">Route</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="path.html" class="tsd-signature-type">Path</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -244,6 +244,24 @@
 					<li class=" tsd-kind-class">
 						<a href="overlayapi.html" class="tsd-kind-icon">Overlay<wbr>Api</a>
 					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class">
+						<a href="path.html" class="tsd-kind-icon">Path</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="path.html#getnumpoints" class="tsd-kind-icon">get<wbr>Num<wbr>Points</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="path.html#getpoint" class="tsd-kind-icon">get<wbr>Point</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="path.html#to" class="tsd-kind-icon">to</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-class">
 						<a href="picture.html" class="tsd-kind-icon">Picture</a>
 					</li>
@@ -253,24 +271,6 @@
 					<li class=" tsd-kind-class">
 						<a href="projectileapi.html" class="tsd-kind-icon">Projectile<wbr>Api</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-class">
-						<a href="route.html" class="tsd-kind-icon">Route</a>
-						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="route.html#getnumpoints" class="tsd-kind-icon">get<wbr>Num<wbr>Points</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="route.html#getpoint" class="tsd-kind-icon">get<wbr>Point</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="route.html#to" class="tsd-kind-icon">to</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-class">
 						<a href="scoreapi.html" class="tsd-kind-icon">Score<wbr>Api</a>
 					</li>
