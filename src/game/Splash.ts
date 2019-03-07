@@ -20,27 +20,13 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     // start the music
     jl.setMusic("tune.ogg");
 
-    // draw the background. Note that "Play", "Help", and "Quit" are part of the
-    // image.
+    // draw the background
     jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "splash.png", z: -2 });
 
-    // Place an invisible button over the "Play" text on the background image,
-    // and set it up so that pressing it switches to the first page of the level
-    // chooser.
-    jl.hud.addTapControl({ x: 6.75, y: 5, width: 2.5, height: 1.25, img: "" }, () => {
+    // Place an invisible button over most of the screen, so that tapping will
+    // start the game
+    jl.hud.addTapControl({ x: 0, y: 0, width: 15, height: 9, img: "" }, () => {
         jl.nav.doChooser(1);
-        return true;
-    });
-
-    // Do the same, but this button goes to the first help screen
-    jl.hud.addTapControl({ x: 2.3, y: 5.7, width: 1.8, height: .9, img: "" }, () => {
-        jl.nav.doHelp(1);
-        return true;
-    });
-
-    // Set up the quit button
-    jl.hud.addTapControl({ x: 11.75, y: 5.75, width: 2, height: .9, img: "" }, () => {
-        jl.nav.doQuit();
         return true;
     });
 
