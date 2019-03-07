@@ -26,7 +26,7 @@ export class GameConfig extends JetLagConfig {
     this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
-    this.debugMode = true;
+    this.debugMode = false;
     this.forceAccelerometerOff = true;
     this.verbosity = JetLagVerbosity.LOUD;
 
@@ -41,7 +41,7 @@ export class GameConfig extends JetLagConfig {
     // list the images that the game will use
     this.imageNames = [
       "audio_off.png", "audio_on.png", "splash.png", "board.png", "bottom.png",
-      "bottom_mini.png",
+      "bottom_mini.png", "backarrow.png",
       "walker1.png", "walker2.png", "walker3.png", "walker4.png",
       "jumper1.png", "jumper2.png", "jumper3.png", "jumper4.png",
       "pause.png", "book.png", "bricks.png", "trampoline.png", "flag.png"
