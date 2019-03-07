@@ -48,7 +48,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     jl.hud.addTapControl({ x: 15.25, y: 1, width: .5, height: .5, img: "pause.png" }, () => { pause(jl); return true; });
 
     // Draw a back button
-    jl.hud.addTapControl({ x: 15.25, y: .25, width: .5, height: .5, img: "backarrow.png" }, () => { jl.nav.doChooser(Math.ceil(index / 24)); return true; })
+    jl.hud.addTapControl({ x: 15.25, y: .25, width: .5, height: .5, img: "backarrow.png" }, () => { jl.nav.doChooser(1); return true; })
 
     // Show the distance and books collected
     jl.hud.addText({ x: .1, y: 0, face: "Arial", color: "#FFFFFF", size: 22, z: 2 }, () => Math.floor(girl.getXPosition()) + " m");
