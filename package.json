@@ -4,15 +4,15 @@
     "description": "TypeScript evolution of LibLOL, using PhysicsType2d and PIXI.js",
     "devDependencies": {
         "@types/fscreen": "^1.0.1",
-        "@types/howler": "^2.0.5",
         "@types/hammerjs": "^2.0.36",
+        "@types/howler": "^2.0.5",
         "@types/pixi.js": "^4.8.0",
         "ts-loader": "^4.5.0",
         "typedoc": "^0.13.0",
         "typescript": "^3.0.1",
         "webpack": "^4.17.1",
         "webpack-cli": "^3.1.0",
-        "webpack-dev-server": "^3.1.6"
+        "webpack-dev-server": "^3.2.1"
     },
     "scripts": {
         "start": "webpack-dev-server",
