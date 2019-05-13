@@ -88,7 +88,10 @@ export class Camera {
 
     /**
      * Set the center point on which the camera should focus
-     * 
+     *
+     * NB: this is called (indirectly) by the render loop in order to make sure
+     *     we don't go out of bounds.
+     *
      * @param centerX The X coordinate of the center point (in meters)
      * @param centerY The Y coordinate of the center point (in meters)
      */
@@ -100,10 +103,16 @@ export class Camera {
         let left = centerX - this.scaledVisibleRegionDims.w / 2;
         let right = centerX + this.scaledVisibleRegionDims.w / 2;
 
-        if (top >= this.min.y && bottom <= this.max.y)
-            this.center.y = centerY;
-        if (left >= this.min.x && right <= this.max.x)
-            this.center.x = centerX;
+        this.center.y = centerY;
+        this.center.x = centerX;
+        if (bottom > this.max.y)
+            this.center.y = this.max.y - this.scaledVisibleRegionDims.h / 2;
+        if (top < this.min.y)
+            this.center.y = this.min.y + this.scaledVisibleRegionDims.h / 2;
+        if (right > this.max.x)
+            this.center.x = this.max.x - this.scaledVisibleRegionDims.w / 2;
+        if (left < this.min.x)
+            this.center.x = this.min.x + this.scaledVisibleRegionDims.w / 2;
     }
 
     /**
