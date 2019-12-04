@@ -1,4 +1,5 @@
 import { JetLagSprite } from "../support/Interfaces"
+import * as PIXI from 'pixi.js';
 
 /** A sprite any picture that can be drawn to the screen */
 export class HtmlSprite implements JetLagSprite {

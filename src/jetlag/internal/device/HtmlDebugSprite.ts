@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 /**
  * HtmlDebugSprite is used when we need to render a debug outline on an actor
  */

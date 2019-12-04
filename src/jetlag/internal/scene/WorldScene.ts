@@ -6,13 +6,12 @@ import { Projectile } from "../../actor/Projectile"
 import { JetLagRenderer, JetLagDevice } from "../support/Interfaces"
 import { JetLagConfig } from "../../support/JetLagConfig";
 import { Obstacle } from "../../actor/Obstacle";
-import "box2d.ts";
 import { b2Vec2, b2ContactListener, b2Contact, b2ContactImpulse, b2Manifold, b2WorldManifold, b2DistanceJointDef, b2DistanceJoint } from "box2d.ts";
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
  * provides all of the interesting types of actors that JetLag supports, as well
- * as support for tilt and music.
+ * as support for tilt.
  */
 export class WorldScene extends BaseScene {
     /** All actors whose behavior should change due to tilt */

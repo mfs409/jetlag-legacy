@@ -41,6 +41,11 @@ export class HtmlRenderer implements JetLagRenderer {
     private debugContainer: PIXI.Container = null;
 
     /**
+     * loader is the mechanism for loading images that will be used in the game
+     */
+    private loader: PIXI.Loader;
+
+    /**
      * Initialize the renderer and prepare to load all graphics assets.  Note
      * that the assets won't load until loadAssets() is called.
      *
@@ -62,9 +67,10 @@ export class HtmlRenderer implements JetLagRenderer {
         }
 
         // Set the names of the graphics assets, but don't load them yet.
-        PIXI.loader.reset();
+        this.loader = new PIXI.Loader();
+        // PIXI.Loader.reset();
         for (let imgName of cfg.imageNames) {
-            PIXI.loader.add(imgName, cfg.resourcePrefix + imgName);
+            this.loader.add(imgName, cfg.resourcePrefix + imgName);
         }
     }
 
@@ -73,7 +79,7 @@ export class HtmlRenderer implements JetLagRenderer {
      * 
      * @param callback The code to run once all assets are loaded
      */
-    loadAssets(callback: () => void) { PIXI.loader.load(callback); }
+    loadAssets(callback: () => void) { this.loader.load(callback); }
 
     /**
      * Start the render loop.  Each iteration of the loop will call the
@@ -257,13 +263,13 @@ export class HtmlRenderer implements JetLagRenderer {
      * @param imgName The name of the image to load
      */
     public getSprite(imgName: string) {
-        if (!PIXI.loader.resources[imgName]) {
+        if (!this.loader.resources[imgName]) {
             if (imgName !== "") {
                 this.console.info("Unable to find graphics asset '" + imgName + "'");
             }
             return new HtmlSprite("", new PIXI.Sprite());
         }
-        return new HtmlSprite(imgName, new PIXI.Sprite(PIXI.loader.resources[imgName].texture));
+        return new HtmlSprite(imgName, new PIXI.Sprite(this.loader.resources[imgName].texture));
     }
 
     /**
