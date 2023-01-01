@@ -19,11 +19,11 @@
         "howler": "^2.1.2",
         "pixi.js": "^5.2.0",
         "@types/hammerjs": "^2.0.36",
-        "ts-loader": "^6.2.1",
+        "ts-loader": "^9.4.2",
         "typedoc": "^0.15.3",
         "typescript": "3.0.1",
-        "webpack": "^4.41.2",
-        "webpack-cli": "^3.3.10",
+        "webpack": "^5.75.0",
+        "webpack-cli": "^5.0.1",
         "webpack-dev-server": "^3.11.3"
     }
 }
