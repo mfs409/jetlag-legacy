@@ -1,5 +1,6 @@
 import { JetLagText } from "../support/Interfaces"
-import { b2Vec2 } from "box2d.ts";
+import { b2Vec2 } from "@box2d/core";
+import { Text as PixiText } from "pixi.js"
 
 /** HtmlText provides JetLagText functionality via the PIXI.text type. */
 export class HtmlText implements JetLagText {
@@ -7,7 +8,7 @@ export class HtmlText implements JetLagText {
      * Create an HtmlText by wrapping a PIXI text
      * @param text A PIXI text object
      */
-    constructor(private text: PIXI.Text) { }
+    constructor(private text: PixiText) { }
 
     /** Report the X position of the text */
     getXPosition() { return this.text.position.x; }

@@ -14,8 +14,8 @@ export class HtmlKeyboard implements JetLagKeyboard {
      */
     constructor() {
         for (let o = 0; o < JetLagKeys.COUNT; ++o) {
-            this.upHandlers.push(null);
-            this.downHandlers.push(null);
+            this.upHandlers.push(() => { });
+            this.downHandlers.push(() => { });
         }
         document.addEventListener("keydown", (ev: KeyboardEvent) => this.keyDownHandler(ev));
         document.addEventListener("keyup", (ev: KeyboardEvent) => this.keyUpHandler(ev));

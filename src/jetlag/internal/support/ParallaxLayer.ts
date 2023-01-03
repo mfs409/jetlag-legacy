@@ -1,7 +1,7 @@
 import { JetLagSprite, JetLagDevice, JetLagRenderer } from "./Interfaces";
 import { JetLagConfig } from "../../support/JetLagConfig";
 import { Camera } from "./Camera";
-import { b2Vec2 } from "box2d.ts";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * A ParallaxLayer is a layer that seems to scroll and repeat at a velocity that

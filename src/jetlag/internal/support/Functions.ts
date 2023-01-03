@@ -10,7 +10,6 @@ import { ImageConfig } from "../../api/ImageConfig"
 export function checkActorConfig(c: ActorConfig) {
     if (!c.img) c.img = "";
     if (!c.box) c.box = false;
-    if (!c.verts) c.verts = null;
     if (!c.z) c.z = 0;
     if (c.z < -2) c.z = -2;
     if (c.z > 2) c.z = 2;

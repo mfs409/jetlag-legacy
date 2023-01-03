@@ -1,10 +1,10 @@
+import { Graphics, Sprite as PixiSprite } from "pixi.js";
 import { JetLagSprite } from "../support/Interfaces"
-import * as PIXI from 'pixi.js';
 
 /** A sprite any picture that can be drawn to the screen */
 export class HtmlSprite implements JetLagSprite {
     /** A debug context, for when we need to print shape outlines */
-    private debug: PIXI.Graphics;
+    private debug: Graphics;
 
     /**
      * Construct a sprite
@@ -12,8 +12,8 @@ export class HtmlSprite implements JetLagSprite {
      * @param imgName the name of the image file to load
      * @param sprite The PIXI sprite to use
      */
-    constructor(private imgName: string, private sprite: PIXI.Sprite) {
-        this.debug = new PIXI.Graphics();
+    constructor(private imgName: string, private sprite: PixiSprite) {
+        this.debug = new Graphics();
     }
 
     /** Return the image that is used for this sprite */

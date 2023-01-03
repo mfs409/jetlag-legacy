@@ -1,3 +1,6 @@
 node_modules/
 bundle.js
-local/
+bundle.js.map
+.vscode
+dist/
+docs/

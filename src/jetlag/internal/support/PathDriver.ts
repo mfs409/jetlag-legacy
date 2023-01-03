@@ -1,7 +1,7 @@
 import { BaseActor } from "../../actor/BaseActor"
 import { JetLagConsole } from "./Interfaces";
 import { Path } from "../../support/Path";
-import { b2Vec2, b2Transform } from "box2d.ts";
+import { b2Vec2, b2Transform } from "@box2d/core";
 
 /**
  * PathDriver is an internal class, used to determine placement for an actor
@@ -12,7 +12,7 @@ export class PathDriver {
     private done = false;
 
     /** Index of the next point in the path */
-    private nextIndex: number;
+    private nextIndex = -1;
 
     /**
      * Constructing a path driver also starts the path
@@ -53,7 +53,7 @@ export class PathDriver {
         p.x -= this.actor.getXPosition();
         p.y -= this.actor.getYPosition();
         p.Normalize();
-        p = p.SelfMul(this.velocity);
+        p = p.Scale(this.velocity);
         console.log(p);
         this.actor.updateVelocity(p.x, p.y);
     }
@@ -102,7 +102,7 @@ export class PathDriver {
             p.x -= this.actor.getXPosition();
             p.y -= this.actor.getYPosition();
             p.Normalize();
-            p = p.SelfMul(this.velocity);
+            p = p.Scale(this.velocity);
             this.actor.updateVelocity(p.x, p.y);
         }
     }

@@ -5,7 +5,8 @@ import { TimedEvent } from "../internal/support/TimedEvent"
 import { JetLagStage } from "../internal/JetLagStage";
 import { Projectile } from "./Projectile";
 import { Goodie } from "./Goodie";
-import { b2Contact } from "box2d.ts";
+import { b2Contact } from "@box2d/core";
+import { Howl } from "howler";
 
 /**
  * Obstacles are usually walls, except they can move, and can be used to run all
@@ -19,31 +20,31 @@ export class Obstacle extends WorldActor {
      * way to run custom code. This callback defines what code to run when a
      * hero collides with this obstacle. 
      */
-    private heroCollision: (thisActor: Obstacle, collideActor: Hero, contact: b2Contact) => void = null;
+    private heroCollision?: (thisActor: Obstacle, collideActor: Hero, contact: b2Contact) => void;
 
     /** This callback is for when a projectile collides with an obstacle */
-    private projectileCollision: (thisActor: Obstacle, collideActor: Projectile, contact: b2Contact) => void = null
+    private projectileCollision?: (thisActor: Obstacle, collideActor: Projectile, contact: b2Contact) => void;
 
     /** This callback is for when an enemy collides with an obstacle */
-    private enemyCollision: (thisActor: Obstacle, collideActor: Enemy, contact: b2Contact) => void = null
+    private enemyCollision?: (thisActor: Obstacle, collideActor: Enemy, contact: b2Contact) => void;
 
     /** This callback is for when a goodie collides with an obstacle */
-    private goodieCollision: (thisActor: Obstacle, collideActor: Goodie, contact: b2Contact) => void = null;
+    private goodieCollision?: (thisActor: Obstacle, collideActor: Goodie, contact: b2Contact) => void;
 
     /** Indicate that this obstacle does not re-enable jumping for the hero */
     private noJumpReenable = false;
 
     /** a sound to play when the obstacle is hit by a hero */
-    private collideSound: Howl;
+    private collideSound?: Howl;
 
     /** 
      * how long to delay (in nanoseconds) between attempts to play the collide
      * sound 
      */
-    private collideSoundDelay: number;
+    private collideSoundDelay = 0;
 
     /** Time of last collision sound */
-    private lastCollideSoundTime: number;
+    private lastCollideSoundTime = 0;
 
     /**
      * Build an obstacle, but do not give it any Physics body yet
@@ -81,7 +82,7 @@ export class Obstacle extends WorldActor {
      * 
      * @param callback The code to run
      */
-    setEnemyCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Enemy, contact: b2Contact) => void) {
+    setEnemyCollisionCallback(callback: (thisActor: Obstacle, collideActor: Enemy, contact: b2Contact) => void) {
         this.enemyCollision = callback;
     }
 
@@ -90,14 +91,14 @@ export class Obstacle extends WorldActor {
      * 
      * @param callback The code to run
      */
-    setGoodieCollisionCallback(callback: (thisSctor: Obstacle, collideActor: Goodie, contact: b2Contact) => void) {
+    setGoodieCollisionCallback(callback: (thisActor: Obstacle, collideActor: Goodie, contact: b2Contact) => void) {
         this.goodieCollision = callback;
     }
 
     /**
      * Return true if this obstacle doesn't count for letting an in-air hero jump again
      */
-    getNoNumpReenable() { return this.noJumpReenable; }
+    getNoJumpReenable() { return this.noJumpReenable; }
 
     /**
      * Code to run when an Obstacle collides with a WorldActor.
@@ -129,7 +130,7 @@ export class Obstacle extends WorldActor {
         // disable collisions on this obstacle
         this.setCollisionsEnabled(false);
         // register a callback to multiply the hero's speed by factor
-        this.heroCollision = (self: WorldActor, h: WorldActor, c: b2Contact) => {
+        this.heroCollision = (_self: WorldActor, h: WorldActor, _c: b2Contact) => {
             let x = h.getXVelocity() * factor;
             let y = h.getYVelocity() * factor;
             h.updateVelocity(x, y);
@@ -150,7 +151,7 @@ export class Obstacle extends WorldActor {
      * obstacle
      */
     public playCollideSound() {
-        if (this.collideSound == null)
+        if (!this.collideSound)
             return;
 
         // Make sure we have waited long enough since the last time we played the sound
@@ -174,7 +175,7 @@ export class Obstacle extends WorldActor {
         // disable collisions on this obstacle
         this.setCollisionsEnabled(false);
         // register a callback to change the hero's speed
-        this.heroCollision = (self: Obstacle, h: Hero, c: b2Contact) => {
+        this.heroCollision = (_self: Obstacle, h: Hero, _c: b2Contact) => {
             // boost the speed
             let v = h.getBody().GetLinearVelocity();
             let x = v.x + boostAmountX;

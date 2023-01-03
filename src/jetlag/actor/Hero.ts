@@ -7,7 +7,7 @@ import { Animation } from "../support/Animation"
 import { Camera } from "../internal/support/Camera"
 import { JetLagRenderer, JetLagSound } from "../internal/support/Interfaces";
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2Contact, b2BodyType, b2Vec2, b2Transform } from "box2d.ts";
+import { b2Contact, b2BodyType, b2Vec2, b2Transform } from "@box2d/core";
 
 /**
   * The Hero is the focal point of a game. While it is technically possible to
@@ -33,28 +33,28 @@ export class Hero extends WorldActor {
      * When the hero jumps, this specifies the amount of velocity to add to
      * simulate a jump 
      */
-    private jumpImpulses: { x: number, y: number } = null;
+    private jumpImpulses: { x: number, y: number } = { x: 0, y: 0 };
 
     /** 
      * For tracking if the game should end immediately when this hero is
      * defeated 
      */
-    private mustSurvive: boolean;
+    private mustSurvive = false;
 
     /** Code to run when the hero's strength changes */
-    private strengthChangeCallback: (h: Hero) => void;
+    private strengthChangeCallback?: (h: Hero) => void;
 
     /** cells involved in animation for invincibility */
-    private invincibleAnimation: Animation = null;
+    private invincibleAnimation?: Animation;
 
     /** cells involved in animation for throwing */
-    private throwAnimation: Animation = null;
+    private throwAnimation?: Animation;
 
     /** seconds that constitute a throw action */
-    private throwAnimateTotalLength: number;
+    private throwAnimateTotalLength = -1;
 
     /** how long until we stop showing the throw animation */
-    private throwAnimationTimeRemaining: number;
+    private throwAnimationTimeRemaining = -1;
 
     /** 
      * Track if the hero is in the air, so that it can't jump when it isn't
@@ -64,19 +64,19 @@ export class Hero extends WorldActor {
     private inAir = false;
 
     /** Indicate that the hero can jump while in the air */
-    private allowMultiJump: boolean;
+    private allowMultiJump = false;
 
     /** Sound to play when a jump occurs */
-    private jumpSound: JetLagSound;
+    private jumpSound?: JetLagSound;
 
     /** cells involved in animation for jumping */
-    private jumpAnimation: Animation;
+    private jumpAnimation?: Animation;
 
     /** Is the hero currently in crawl mode? */
-    private crawling: boolean;
+    private crawling = false;
 
     /** cells involved in animation for crawling */
-    private crawlAnimation: Animation;
+    private crawlAnimation?: Animation;
 
     /** For tracking the current amount of rotation of the hero */
     private currentRotation = 0;
@@ -114,37 +114,37 @@ export class Hero extends WorldActor {
      */
     setInvincibleRemaining(amount: number) {
         this.invincibleRemaining = amount * 1000;
-        if (this.invincibleAnimation != null && amount > 0)
+        if (this.invincibleAnimation && amount > 0)
             this.animator.setCurrentAnimation(this.invincibleAnimation);
     }
 
     /**
      * Code to run when rendering the Hero.
      */
-    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
+    render(renderer: JetLagRenderer, camera: Camera, elapsedMs: number) {
         // NB:  We can't just use the basic renderer, because we might need to
         //      adjust a one-off animation (invincibility or throw) first
 
         // determine when to turn off throw animations
         if (this.throwAnimationTimeRemaining > 0) {
-            this.throwAnimationTimeRemaining -= elapsedMillis;
+            this.throwAnimationTimeRemaining -= elapsedMs;
             if (this.throwAnimationTimeRemaining <= 0) {
                 this.throwAnimationTimeRemaining = 0;
-                this.animator.setCurrentAnimation(this.defaultAnimation);
+                this.animator.setCurrentAnimation(this.defaultAnimation!);
             }
         }
 
         // determine when to turn off invincibility and cease invincibility
         // animation
         if (this.invincibleRemaining > 0) {
-            this.invincibleRemaining -= elapsedMillis;
+            this.invincibleRemaining -= elapsedMs;
             if (this.invincibleRemaining <= 0) {
                 this.invincibleRemaining = 0;
-                if (this.invincibleAnimation != null)
-                    this.animator.setCurrentAnimation(this.defaultAnimation);
+                if (this.invincibleAnimation)
+                    this.animator.setCurrentAnimation(this.defaultAnimation!);
             }
         }
-        super.render(renderer, camera, elapsedMillis);
+        super.render(renderer, camera, elapsedMs);
     }
 
     /**
@@ -234,7 +234,7 @@ export class Hero extends WorldActor {
       */
     private addStrength(amount: number) {
         this.strength += amount;
-        if (this.strengthChangeCallback != null) {
+        if (this.strengthChangeCallback) {
             this.strengthChangeCallback(this);
         }
     }
@@ -262,13 +262,13 @@ export class Hero extends WorldActor {
 
         // if there is code attached to the obstacle for modifying the hero's
         // behavior, run it
-        if (o.getHeroCollisionCallback() != null)
-            o.getHeroCollisionCallback()(o, this, contact);
+        if (o.getHeroCollisionCallback())
+            o.getHeroCollisionCallback()!(o, this, contact);
 
         // If this is a wall, then mark us not in the air so we can do more
         // jumps. Note that sensors should not enable jumps for the hero.
         if ((this.inAir || this.allowMultiJump) && !sensor
-            && !o.getNoNumpReenable()) {
+            && !o.getNoJumpReenable()) {
             this.stopJump();
         }
     }
@@ -282,7 +282,7 @@ export class Hero extends WorldActor {
         // hide the goodie, count it, and update strength
         g.remove(false);
         if (g.getCollectCallback())
-            g.getCollectCallback()(g, this);
+            g.getCollectCallback()!(g, this);
         this.stage.score.onGoodieCollected(g);
     }
 
@@ -300,7 +300,7 @@ export class Hero extends WorldActor {
     public setStrength(amount: number) {
         let old = this.strength;
         this.strength = amount;
-        if (old != amount && this.strengthChangeCallback != null) {
+        if (old != amount && this.strengthChangeCallback) {
             this.strengthChangeCallback(this);
         }
     }
@@ -331,10 +331,10 @@ export class Hero extends WorldActor {
         if (!this.allowMultiJump) {
             this.inAir = true;
         }
-        if (this.jumpAnimation != null)
+        if (this.jumpAnimation)
             this.animator.setCurrentAnimation(this.jumpAnimation);
 
-        if (this.jumpSound != null) {
+        if (this.jumpSound) {
             this.jumpSound.play();
         }
         // suspend creation of sticky joints, so the hero can actually move
@@ -347,7 +347,7 @@ export class Hero extends WorldActor {
     private stopJump() {
         if (this.inAir || this.allowMultiJump) {
             this.inAir = false;
-            this.animator.setCurrentAnimation(this.defaultAnimation);
+            this.animator.setCurrentAnimation(this.defaultAnimation!);
         }
     }
 
@@ -355,7 +355,7 @@ export class Hero extends WorldActor {
      * Make the hero's throw animation play while it is throwing a projectile
      */
     public doThrowAnimation() {
-        if (this.throwAnimation != null) {
+        if (this.throwAnimation) {
             this.animator.setCurrentAnimation(this.throwAnimation);
             this.throwAnimationTimeRemaining = this.throwAnimateTotalLength * 1000;
         }
@@ -371,10 +371,10 @@ export class Hero extends WorldActor {
             return;
         }
         this.crawling = true;
-        let xform = new b2Transform();
-        xform.SetPositionAngle(this.body.GetPosition(), this.body.GetAngle() + rotate);
-        this.body.SetTransform(xform);
-        if (this.crawlAnimation != null)
+        let transform = new b2Transform();
+        transform.SetPositionAngle(this.body.GetPosition(), this.body.GetAngle() + rotate);
+        this.body.SetTransform(transform);
+        if (this.crawlAnimation)
             this.animator.setCurrentAnimation(this.crawlAnimation);
     }
 
@@ -388,10 +388,10 @@ export class Hero extends WorldActor {
             return;
         }
         this.crawling = false;
-        let xform = new b2Transform();
-        xform.SetPositionAngle(this.body.GetPosition(), this.body.GetAngle() - rotate);
-        this.body.SetTransform(xform);
-        this.animator.setCurrentAnimation(this.defaultAnimation);
+        let transform = new b2Transform();
+        transform.SetPositionAngle(this.body.GetPosition(), this.body.GetAngle() - rotate);
+        this.body.SetTransform(transform);
+        this.animator.setCurrentAnimation(this.defaultAnimation!);
     }
 
     /**
@@ -403,9 +403,9 @@ export class Hero extends WorldActor {
         if (this.inAir) {
             this.currentRotation += delta;
             this.body.SetAngularVelocity(0);
-            let xform = new b2Transform();
-            xform.SetPositionAngle(this.body.GetPosition(), this.currentRotation);
-            this.body.SetTransform(xform);
+            let transform = new b2Transform();
+            transform.SetPositionAngle(this.body.GetPosition(), this.currentRotation);
+            this.body.SetTransform(transform);
         }
     }
 
@@ -417,13 +417,13 @@ export class Hero extends WorldActor {
      * @param y Velocity in Y dimension
      */
     public setTouchAndGo(x: number, y: number) {
-        this.setTapHandler((worldX: number, worldY: number) => {
+        this.setTapHandler((_worldX: number, _worldY: number) => {
             // if it was hovering, its body type won't be Dynamic
             if (this.body.GetType() != b2BodyType.b2_dynamicBody)
                 this.body.SetType(b2BodyType.b2_dynamicBody);
             this.setAbsoluteVelocity(x, y);
             // turn off isTouchAndGo, so we can't double-touch
-            this.setTapHandler(null);
+            this.setTapHandler(undefined);
             return true;
         });
     }
@@ -433,7 +433,7 @@ export class Hero extends WorldActor {
 
     /** Indicate that touching this hero should make it jump */
     public setTouchToJump() {
-        this.setTapHandler((worldX: number, worldY: number) => {
+        this.setTapHandler((_worldX: number, _worldY: number) => {
             this.jump();
             return true;
         });

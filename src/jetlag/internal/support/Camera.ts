@@ -50,6 +50,7 @@ export class Camera {
         this.center.y = (this.max.y - this.min.y) / 2;
         this.screenDims.w = config.screenWidth;
         this.screenDims.h = config.screenHeight;
+        this.ratio = ratio;
         this.setScale(ratio);
     }
 

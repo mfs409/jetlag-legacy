@@ -6,12 +6,20 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <style>
+    html,
     body {
-      background-color: #eee;
-      height: 100vh;
+      background-color: #000;
+      height: 100%;
       overflow: hidden;
       margin: 0;
       padding: 0;
+    }
+
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100%+3px);
     }
   </style>
   <title>JetLag Demo Game</title>
@@ -21,6 +29,7 @@
   <div style="text-align:center">
     <div id="game-player"></div>
   </div>
+  <div style="color: white; font-family: halogen; font-size: 1pt; float: left;">(C)</div>
   <script src="./bundle.js"></script>
 </body>
 

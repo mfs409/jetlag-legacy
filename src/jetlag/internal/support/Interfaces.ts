@@ -2,7 +2,7 @@ import { BaseActor } from "../../actor/BaseActor";
 import { Camera } from "./Camera";
 import { JetLagStage } from "../JetLagStage";
 import { JetLagKeys } from "../../support/JetLagKeys";
-import { b2Vec2 } from "box2d.ts";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * JetLagDevice bundles the abstractions of the parts of a game device.  This
@@ -144,7 +144,7 @@ export interface JetLagRenderer {
 /** Vibration provides an abstract interface for vibrating the device */
 export interface JetLagVibration {
     /** Vibrate the device for a number of milliseconds */
-    vibrate(millis: number): void;
+    vibrate(ms: number): void;
 }
 
 /** Speaker is a representation of the device's audio context */
@@ -316,5 +316,5 @@ export interface Renderable {
      * rendering, do it here, too.  If the object should be culled (not rendered
      * because it isn't in view), that should be decided here too.
      */
-    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number): void;
+    render(renderer: JetLagRenderer, camera: Camera, elapsedMs: number): void;
 }

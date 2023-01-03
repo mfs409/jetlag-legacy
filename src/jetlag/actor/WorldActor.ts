@@ -4,13 +4,13 @@ import { JetLagStage } from "../internal/JetLagStage";
 import {
   b2RevoluteJointDef, b2RevoluteJoint, b2DistanceJoint, b2Contact,
   b2BodyType, b2WeldJointDef, b2DistanceJointDef, b2Vec2
-} from "box2d.ts";
+} from "@box2d/core";
 
 /**
  * World is the base class upon which every actor in the main game is
  * built. Every actor has a physics representation (rectangle, circle, or
  * convex polygon). Actors typically have an image associated with them, too,
- * so that they have a visual appearance during gameplay.
+ * so that they have a visual appearance during game play.
  *
  * A game should rarely deal with World objects directly, instead using
  * Hero, Goodie, Destination, Enemy, Obstacle, and Projectile objects.
@@ -26,7 +26,7 @@ export abstract class WorldActor extends BaseActor {
   private draggable = false;
 
   /** A vector for computing hover placement */
-  private hover: b2Vec2 | null;
+  private hover?: b2Vec2;
 
   /** 
    * Disable 3 of 4 sides of a Actors, to allow walking through walls. The value
@@ -39,23 +39,23 @@ export abstract class WorldActor extends BaseActor {
   private passThroughId: number = 0;
 
   /** A definition for when we attach a revolute joint to this actor */
-  private revJointDef: b2RevoluteJointDef;
+  private revJointDef?: b2RevoluteJointDef;
 
   /** A joint that allows this actor to revolve around another */
-  private revJoint: b2RevoluteJoint;
+  private revJoint?: b2RevoluteJoint;
 
   /** 
    * Sometimes an actor collides with another actor, and should stick to it. In
    * that case, we use this distance joint to make the actors stick together
    */
-  private distJoint: b2DistanceJoint;
+  private distJoint?: b2DistanceJoint;
 
   /** 
    * When we have actors stuck together, we might want to set a brief delay
    * before they can re-join. This field represents that delay time, in
    * milliseconds. 
    */
-  private stickyDelay: number;
+  private stickyDelay = -1;
 
   /** 
    * Track if Heros stick to this World. The array has 4 positions,
@@ -87,7 +87,7 @@ export abstract class WorldActor extends BaseActor {
   public getFlickMultiplier() { return this.flickMultiplier; }
 
   /** Make the actor stop hovering */
-  public clearHover() { this.hover = null; }
+  public clearHover() { this.hover = undefined; }
 
   /** Report if the actor has a side on which collisions are disabled */
   public getOneSided() { return this.isOneSided; }
@@ -98,11 +98,11 @@ export abstract class WorldActor extends BaseActor {
   /**
    * Set a delay before the actor will stick to things again
    *
-   * @param millis The milliseconds before stickiness works again
+   * @param ms The milliseconds before stickiness works again
    */
-  public setStickyDelay(millis: number) { this.stickyDelay = millis; }
+  public setStickyDelay(ms: number) { this.stickyDelay = ms; }
 
-  /** Return the amount of time before this actor will stick to things agaain */
+  /** Return the amount of time before this actor will stick to things again */
   public getStickyDelay() { return this.stickyDelay; }
 
   /**
@@ -275,8 +275,8 @@ export abstract class WorldActor extends BaseActor {
    * @param velocityY The Y velocity of the projectile when it is thrown
    */
   public setTouchToThrow(h: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
-    this.setTapHandler((worldX: number, worldY: number) => {
-      this.stage.getProjectilePool().throwFixed(h, offsetX, offsetY, velocityX, velocityY);
+    this.setTapHandler((_worldX: number, _worldY: number) => {
+      this.stage.getProjectilePool()!.throwFixed(h, offsetX, offsetY, velocityX, velocityY);
       return true;
     });
   }
@@ -291,7 +291,7 @@ export abstract class WorldActor extends BaseActor {
    */
   public setTouchCallback(activation: () => boolean, disappear: boolean, callback: (actor: WorldActor) => void) {
     // set the code to run on touch
-    this.setTapHandler((worldX: number, worldY: number) => {
+    this.setTapHandler((_worldX: number, _worldY: number) => {
       if (!activation())
         return false;
       if (disappear)
@@ -346,14 +346,14 @@ export abstract class WorldActor extends BaseActor {
     let pmr = this.stage.config.pixelMeterRatio;
     this.hover = new b2Vec2(x * pmr, y * pmr);
     this.stage.getWorld().addRepeatEvent(() => {
-      if (this.hover == null)
+      if (!this.hover)
         return;
       this.hover.Set(x * pmr, y * pmr);
       let a = this.stage.getWorld().getCamera().screenToMeters(this.hover.x, this.hover.y);
       this.hover.Set(a.x, a.y);
-      let xform = this.body.GetTransform().Clone();
-      xform.SetPositionAngle(this.hover, this.body.GetAngle());
-      this.body.SetTransform(xform);
+      let transform = this.body.GetTransform().Clone();
+      transform.SetPositionAngle(this.hover, this.body.GetAngle());
+      this.body.SetTransform(transform);
     });
   }
 
@@ -410,11 +410,13 @@ export abstract class WorldActor extends BaseActor {
   public setRevoluteJointMotor(motorSpeed: number, motorTorque: number) {
     // destroy the previously created joint, change the definition, re-create
     // the joint
-    this.stage.getWorld().getWorld().DestroyJoint(this.revJoint);
-    this.revJointDef.enableMotor = true;
-    this.revJointDef.motorSpeed = motorSpeed;
-    this.revJointDef.maxMotorTorque = motorTorque;
-    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef);
+    if (this.revJoint) {
+      this.stage.getWorld().getWorld().DestroyJoint(this.revJoint);
+      this.revJointDef!.enableMotor = true;
+      this.revJointDef!.motorSpeed = motorSpeed;
+      this.revJointDef!.maxMotorTorque = motorTorque;
+    }
+    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef!);
   }
 
   /**
@@ -426,11 +428,11 @@ export abstract class WorldActor extends BaseActor {
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create
     // the joint
-    this.stage.getWorld().getWorld().DestroyJoint(this.revJoint);
-    this.revJointDef.upperAngle = upper;
-    this.revJointDef.lowerAngle = lower;
-    this.revJointDef.enableLimit = true;
-    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef);
+    this.stage.getWorld().getWorld().DestroyJoint(this.revJoint!);
+    this.revJointDef!.upperAngle = upper;
+    this.revJointDef!.lowerAngle = lower;
+    this.revJointDef!.enableLimit = true;
+    this.revJoint = this.stage.getWorld().getWorld().CreateJoint(this.revJointDef!);
   }
 
   /**
@@ -483,8 +485,8 @@ export abstract class WorldActor extends BaseActor {
     mDistJointDef.localAnchorA.Set(anchorX, anchorY);
     mDistJointDef.localAnchorB.Set(localAnchorX, localAnchorY);
     mDistJointDef.collideConnected = false;
-    mDistJointDef.dampingRatio = 0.1;
-    mDistJointDef.frequencyHz = 2;
+    mDistJointDef.damping = 0.1;
+    mDistJointDef.stiffness = 2;
 
     this.stage.getWorld().getWorld().CreateJoint(mDistJointDef);
   }
@@ -492,9 +494,9 @@ export abstract class WorldActor extends BaseActor {
   /** Break any implicit joints connecting this actor */
   public breakJoints() {
     // Clobber any joints, or this won't be able to move
-    if (this.distJoint != null) {
+    if (this.distJoint) {
       this.stage.getWorld().getWorld().DestroyJoint(this.distJoint);
-      this.distJoint = null;
+      this.distJoint = undefined;
     }
   }
 }

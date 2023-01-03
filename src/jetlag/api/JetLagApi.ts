@@ -68,12 +68,6 @@ export class JetLagApi {
         this.projectiles = new ProjectileApi(stage);
     }
 
-    /**
-     * JetLag will try to figure out if it is running on a mobile device, and
-     * will return true if it concludes that it is.
-     */
-    public isMobile() { return this.stage.config.mobileMode; }
-
     /** Return the current frames per second of the game */
     public getFPS() { return this.stage.device.getRenderer().getFPS(); }
 
@@ -122,7 +116,7 @@ export class JetLagApi {
     }
 
     /**
-     * Set a behavior to happen when a key is downpressed
+     * Set a behavior to happen when a key is down-pressed
      *
      * @param key The KEY to handle
      * @param action The action to perform when the key is released

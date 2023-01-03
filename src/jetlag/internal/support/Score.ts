@@ -17,7 +17,7 @@ enum VictoryType {
 /** Score tracks the progress of a player through a level of the game */
 export class Score {
   /** Describes how a level is won. */
-  private victoryType: VictoryType;
+  private victoryType!: VictoryType;
 
   /** The number of heroes who must reach destinations to win by DESTINATION */
   private victoryHeroCount = 0;
@@ -220,7 +220,7 @@ export class Score {
     // Lose if all enemies defeated, or if this hero had to survive
     this.heroesDefeated++;
     if (enemy.getOnDefeatHero()) {
-      enemy.getOnDefeatHero()(enemy, hero);
+      enemy.getOnDefeatHero()!(enemy, hero);
     }
     if (hero.getMustSurvive()) {
       this.stage.endLevel(false);

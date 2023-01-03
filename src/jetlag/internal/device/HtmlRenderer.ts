@@ -5,7 +5,7 @@ import { JetLagRenderer, JetLagText, JetLagSprite } from "../support/Interfaces"
 import { HtmlText } from "./HtmlText"
 import { HtmlSprite } from "./HtmlSprite"
 import { HtmlDebugSprite } from "./HtmlDebugSprite"
-import * as PIXI from 'pixi.js';
+import { Application, Container, Graphics, Loader, Sprite as PixiSprite, Text as PixiText, utils } from "pixi.js";
 import { HtmlConsole } from "./HtmlConsole";
 import { JetLagStage } from "../JetLagStage";
 
@@ -26,24 +26,24 @@ import { JetLagStage } from "../JetLagStage";
  */
 export class HtmlRenderer implements JetLagRenderer {
     /** The renderer object is responsible for drawing onto a canvas */
-    private renderer: PIXI.Application;
+    private renderer: Application;
 
     /**
      * mainContainer holds all of the sprites that will be rendered as part of
      * the currently in-progress render.
      */
-    private mainContainer: PIXI.Container;
+    private mainContainer: Container;
 
     /**
      * debugContainer holds outlines for sprites that will be rendered during
      * the currently in-progress render, but only if we are in debug mode.
      */
-    private debugContainer: PIXI.Container = null;
+    private debugContainer?: Container;
 
     /**
      * loader is the mechanism for loading images that will be used in the game
      */
-    private loader: PIXI.Loader;
+    private loader: Loader;
 
     /**
      * Initialize the renderer and prepare to load all graphics assets.  Note
@@ -56,20 +56,19 @@ export class HtmlRenderer implements JetLagRenderer {
     constructor(private cfg: JetLagConfig, domId: string, private console: HtmlConsole) {
         // Create a rendering context and attach it to the appropriate place in
         // the DOM
-        PIXI.utils.skipHello();
-        this.renderer = new PIXI.Application({ width: cfg.screenWidth, height: cfg.screenHeight, antialias: true });
-        document.getElementById(domId).appendChild(this.renderer.view);
+        utils.skipHello();
+        this.renderer = new Application({ width: cfg.screenWidth, height: cfg.screenHeight, antialias: true });
+        document.getElementById(domId)!.appendChild(this.renderer.view);
 
         // Set up the containers we will use when rendering
-        this.mainContainer = new PIXI.Container();
+        this.mainContainer = new Container();
         if (cfg.debugMode) {
-            this.debugContainer = new PIXI.Container();
+            this.debugContainer = new Container();
         }
 
         // Set the names of the graphics assets, but don't load them yet.
-        this.loader = new PIXI.Loader();
-        // PIXI.Loader.reset();
-        for (let imgName of cfg.imageNames) {
+        this.loader = new Loader();
+        for (let imgName of cfg.imageNames!) {
             this.loader.add(imgName, cfg.resourcePrefix + imgName);
         }
     }
@@ -97,13 +96,13 @@ export class HtmlRenderer implements JetLagRenderer {
     public initFrame() {
         this.renderer.stage.removeChildren();
         this.mainContainer.removeChildren();
-        if (this.debugContainer != null)
+        if (this.debugContainer)
             this.debugContainer.removeChildren();
     }
 
     /** Display the next frame on the screen */
     public showFrame() {
-        if (this.debugContainer != null)
+        if (this.debugContainer)
             this.mainContainer.addChild(this.debugContainer);
         this.renderer.stage.addChild(this.mainContainer);
     }
@@ -142,10 +141,10 @@ export class HtmlRenderer implements JetLagRenderer {
         sprite.setRotation(r);
         this.mainContainer.addChild(sprite.getRenderObject());
         // Debug rendering is the hard part!
-        if (this.debugContainer != null) {
+        if (this.debugContainer) {
             if (actor.isBox()) {
                 // For rectangles, just use the PIXI rectangle
-                let rect = actor.getDebug().getShape() as PIXI.Graphics;
+                let rect = actor.getDebug().getShape() as Graphics;
                 rect.clear();
                 rect.lineStyle(1, 0x00FF00);
                 rect.drawRect(x, y, w, h);
@@ -157,14 +156,14 @@ export class HtmlRenderer implements JetLagRenderer {
             }
             else if (actor.isCircle()) {
                 // For circles, use the PIXI Circle
-                let circ = actor.getDebug().getShape() as PIXI.Graphics;
+                let circ = actor.getDebug().getShape() as Graphics;
                 circ.clear();
                 let radius = Math.max(w, h) / 2;
                 circ.lineStyle(1, 0x0000FF);
                 circ.drawCircle(x + w / 2, y + w / 2, radius);
                 this.debugContainer.addChild(circ);
                 // Also draw a radius, to indicate rotation
-                let line = actor.getDebug().getLine() as PIXI.Graphics;
+                let line = actor.getDebug().getLine() as Graphics;
                 line.clear();
                 line.position.set(x + w / 2, y + h / 2);
                 let xx = radius * Math.cos(r);
@@ -175,17 +174,17 @@ export class HtmlRenderer implements JetLagRenderer {
             else if (actor.isPoly()) {
                 // For polygons, we need to translate the points (they are 
                 // 0-relative in Box2d)
-                let poly = actor.getDebug().getShape() as PIXI.Graphics;
+                let poly = actor.getDebug().getShape() as Graphics;
                 poly.clear;
                 poly.lineStyle(1, 0xFFFF00);
                 let pts: number[] = [];
-                for (let i = 0; i < actor.getNumVerts(); ++i) {
-                    pts.push(s * actor.getVert(i).x + x + w / 2);
-                    pts.push(s * actor.getVert(i).y + y + h / 2);
+                for (let i = 0; i < actor.getNumVertices(); ++i) {
+                    pts.push(s * actor.getVert(i)!.x + x + w / 2);
+                    pts.push(s * actor.getVert(i)!.y + y + h / 2);
                 }
                 // NB: must repeat start point of polygon in PIXI
-                pts.push(s * actor.getVert(0).x + x + w / 2);
-                pts.push(s * actor.getVert(0).y + y + h / 2);
+                pts.push(s * actor.getVert(0)!.x + x + w / 2);
+                pts.push(s * actor.getVert(0)!.y + y + h / 2);
                 poly.drawPolygon(pts);
                 // rotation
                 poly.position.set(x + w / 2, y + h / 2);
@@ -221,8 +220,8 @@ export class HtmlRenderer implements JetLagRenderer {
         sprite.setHeight(scale * sprite.getHeight());
         this.mainContainer.addChild(sprite.getRenderObject());
         // Debug rendering: draw a box around the image
-        if (this.debugContainer != null) {
-            let rect = sprite.getDebugShape() as PIXI.Graphics;
+        if (this.debugContainer) {
+            let rect = sprite.getDebugShape() as Graphics;
             rect.clear();
             rect.lineStyle(1, 0xFF0000);
             rect.drawRect(x + 1, y, sprite.getWidth() - 1, sprite.getHeight() - 1);
@@ -267,9 +266,9 @@ export class HtmlRenderer implements JetLagRenderer {
             if (imgName !== "") {
                 this.console.info("Unable to find graphics asset '" + imgName + "'");
             }
-            return new HtmlSprite("", new PIXI.Sprite());
+            return new HtmlSprite("", new PixiSprite());
         }
-        return new HtmlSprite(imgName, new PIXI.Sprite(this.loader.resources[imgName].texture));
+        return new HtmlSprite(imgName, new PixiSprite(this.loader.resources[imgName].texture));
     }
 
     /**
@@ -286,7 +285,7 @@ export class HtmlRenderer implements JetLagRenderer {
      */
     public makeText(txt: string, opts: any) {
         opts.fontSize = Math.floor(opts.fontSize * this.cfg.fontScaling);
-        return new HtmlText(new PIXI.Text(txt, opts));
+        return new HtmlText(new PixiText(txt, opts));
     }
 
     /** Get a debug context that can be used by a sprite during debug renders */

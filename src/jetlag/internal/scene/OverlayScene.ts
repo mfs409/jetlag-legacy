@@ -15,20 +15,20 @@ export class OverlayScene extends BaseScene {
     /**
      * Draw the OverlayScene
      *
-     * @param renderer      The render object to use to draw the scene
-     * @param elapsedMillis The time since the last render
+     * @param renderer  The render object to use to draw the scene
+     * @param elapsedMs The time since the last render
      */
-    render(renderer: JetLagRenderer, elapsedMillis: number) {
+    render(renderer: JetLagRenderer, elapsedMs: number) {
         // advance timers and world
         //
         // TODO: should we be using elapsedMillis for the Step?
-        this.timer.advance(elapsedMillis);
-        this.world.Step(1 / 45, 8, 3);
+        this.timer.advance(elapsedMs);
+        this.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
 
         // Draw everything
         for (let zPlane of this.renderables) {
             for (let renderable of zPlane) {
-                renderable.render(renderer, this.camera, elapsedMillis);
+                renderable.render(renderer, this.camera, elapsedMs);
             }
         }
         return true;

@@ -7,25 +7,25 @@ import { JetLagSprite, JetLagRenderer } from "./Interfaces";
  */
 export class AnimationDriver {
     /** The currently running animation */
-    private currentAnimation: Animation;
+    private currentAnimation?: Animation;
 
     /** 
      * The images that comprise the current animation will be the elements of
      * this array 
      */
-    private images: JetLagSprite[];
+    private images: JetLagSprite[] = [];
 
     /** 
      * The index to display from images, for the case where there is no active
      * animation. This is useful for animateByGoodieCount.
      */
-    private imageIndex: number;
+    private imageIndex = 0;
 
     /** The frame of the currently running animation that is being displayed */
-    private activeFrame: number;
+    private activeFrame = 0;
 
     /** The amount of time for which the current frame has been displayed */
-    private elapsedTime: number;
+    private elapsedTime = 0;
 
     /**
      * Build an AnimationDriver by giving it an image name. This allows us to
@@ -65,8 +65,6 @@ export class AnimationDriver {
      * @param imgName The name of the image file to use
      */
     public updateImage(renderer: JetLagRenderer, imgName: string) {
-        if (this.images == null)
-            this.images = [null];
         this.images[0] = renderer.getSprite(imgName);
         this.imageIndex = 0;
     }
@@ -80,7 +78,7 @@ export class AnimationDriver {
      */
     public advanceAnimation(elapsedMillis: number) {
         // If we're in 'show a specific image' mode, then don't change anything
-        if (this.currentAnimation == null)
+        if (!this.currentAnimation)
             return;
 
         // Advance the time
@@ -105,7 +103,7 @@ export class AnimationDriver {
     /** Return the current image for the active animation. */
     public getCurrent() {
         // If we're in "show a specific image" mode, return the image to show
-        if (this.currentAnimation == null)
+        if (!this.currentAnimation)
             return this.images[this.imageIndex];
         // return the current item
         return this.currentAnimation.getCell(this.activeFrame);

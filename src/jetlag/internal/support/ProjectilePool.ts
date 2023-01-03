@@ -3,7 +3,7 @@ import { Projectile } from "../../actor/Projectile"
 import { Hero } from "../../actor/Hero"
 import { JetLagSound } from "./Interfaces";
 import { JetLagStage } from "../JetLagStage";
-import { b2Transform } from "box2d.ts";
+import { b2Transform } from "@box2d/core";
 
 /**
  * ProjectilePool stores a set of projectiles.  We can get into lots of
@@ -24,40 +24,40 @@ export class ProjectilePool {
      * A dampening factor to apply to projectiles thrown via "directional"
      * mechanism 
      */
-    private directionalDamp: number;
+    private directionalDamp = 1
 
     /** Indicates that projectiles should be sensors */
     private sensor: boolean;
 
     /** Indicates that vector projectiles should have a fixed velocity */
-    private enableFixedVectorVelocity: boolean;
+    private enableFixedVectorVelocity = false;
 
     /**
      *  The magnitude of the velocity for vector projectiles thrown with a fixed
      *  velocity 
      */
-    private fixedVectorVelocity: number;
+    private fixedVectorVelocity = 0;
 
     /** 
      * Indicate that projectiles should face in the direction they are initially
      * thrown 
      */
-    private rotateVectorThrow: boolean;
+    private rotateVectorThrow = false;
 
     /** Index of next available projectile in the pool */
     private nextIndex: number;
 
     /** Sound to play when projectiles are thrown */
-    private throwSound: JetLagSound;
+    private throwSound?: JetLagSound;
 
     /** The sound to play when a projectile disappears */
-    private projectileDisappearSound: string;
+    private projectileDisappearSound = "";
 
     /** For choosing random images for the projectiles */
     private randomizeImages = false;
 
     /** The array of images from which to choose for each projectile */
-    private randomImageSources: string[] = null;
+    private randomImageSources?: string[];
 
     /**
      * Create a pool of projectiles, and set the way they are thrown.
@@ -86,8 +86,8 @@ export class ProjectilePool {
         this.nextIndex = 0;
         this.poolSize = size;
         // record vars that describe how the projectile behaves
-        this.throwSound = null;
-        this.projectileDisappearSound = null;
+        this.throwSound = undefined;
+        this.projectileDisappearSound = "";
         this.remaining = -1;
         this.sensor = true;
     }
@@ -127,8 +127,8 @@ export class ProjectilePool {
         b.getAnimator().resetCurrentAnimation();
 
         if (this.randomizeImages) {
-            let idx = Math.floor(Math.random() * this.randomImageSources.length);
-            b.setImage(this.randomImageSources[idx]);
+            let idx = Math.floor(Math.random() * this.randomImageSources!.length);
+            b.setImage(this.randomImageSources![idx]);
         }
 
         // calculate offset for starting position of projectile, put it on

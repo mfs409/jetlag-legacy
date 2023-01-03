@@ -396,7 +396,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
             // We are going to put a big black button over the whole screen.
             // Clicking it will get rid of this overlay
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudX: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (_hudX: number, _hudY: number) => {
                 jl.nav.dismissOverlayScene();
                 return true;
             });
@@ -484,7 +484,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Set up a win scene that also plays a sound.  This should look familiar.  And, as you can imagine, we can do lose scenes too.
         jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (_hudx: number, _hudY: number) => {
                 jl.nav.nextLevel();
                 return true;
             });
@@ -561,7 +561,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // dismissed
         jl.hud.addTapControl({ x: 15, y: 0, width: 1, height: 1, img: "red.png" }, (): boolean => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -599,7 +599,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Put a button on the HUD to pause the game
         jl.hud.addTapControl({ x: 0.1, y: 8.5, width: .4, height: .4, img: "pause.png" }, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "noise.png" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "noise.png" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -685,7 +685,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         welcomeMessage(jl, "The hero can defeat up to two enemies...");
         winMessage(jl, "Great Job");
         jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (_hudx: number, _hudY: number) => {
                 jl.nav.repeatLevel();
                 return true;
             });
@@ -732,7 +732,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // draw an enemy.  It does 2 units of damage.  If it disappears, it will make a sound
         let e = jl.world.makeEnemy({ x: 10, y: 6, width: .5, height: .5, img: "redball.png" });
-        e.setOnDefeated((e: Enemy, h: WorldActor) => { jl.playSound("slowdown.ogg"); });
+        e.setOnDefeated((_e: Enemy, _h?: WorldActor) => { jl.playSound("slowdown.ogg"); });
 
         // draw another enemy.  It is too deadly for us to ever defeat.
         let e2 = jl.world.makeEnemy({ x: 7, y: 7, width: 2, height: 2, img: "redball.png" });
@@ -740,7 +740,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // this goodie gives an extra "2" units of strength:
         let g = jl.world.makeGoodie({ x: 14, y: 7, width: .5, height: .5, img: "blueball.png" });
-        g.setCollectCallback((g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); });
+        g.setCollectCallback((_g: Goodie, h: Hero) => { jl.playSound("woowoowoo.ogg"); h.setStrength(2 + h.getStrength()); });
 
         // Display the hero's strength
         jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#000000", size: 32, z: 2 }, () => h.getStrength() + " Strength");
@@ -772,7 +772,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // this goodie makes us invincible
         let g = jl.world.makeGoodie({ x: 15, y: 8, width: .5, height: .5, img: "blueball.png" });
-        g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
+        g.setCollectCallback((_g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setPath(new Path().to(15, 8).to(10, 3).to(15, 8), 5, true);
         g.setRotationSpeed(0.25);
 
@@ -850,7 +850,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o = jl.world.makeObstacle({ box: true, x: 3, y: 3, width: .75, height: .15, img: "purpleball.png" });
         o.setRotation(Math.PI / 4);
 
-        welcomeMessage(jl, "More obstacle tricks, to include one that can be dragged");
+        welcomeMessage(jl, "More obstacle tricks, including one that can be dragged");
         winMessage(jl, "Great Job");
     }
 
@@ -1490,8 +1490,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Add buttons for throwing to the left and right.  Each keeps throwing for as long as
         // it is held, but only throws once every 100 milliseconds
-        jl.hud.addToggleButton({ x: 0, y: 0, width: 8, height: 9, img: "" }, jl.hud.makeRepeatThrow(h, 100, 0, 1, -30, 0), null);
-        jl.hud.addToggleButton({ x: 8, y: 0, width: 8, height: 9, img: "" }, jl.hud.makeRepeatThrow(h, 100, 1, 1, 30, 0), null);
+        jl.hud.addToggleButton({ x: 0, y: 0, width: 8, height: 9, img: "" }, jl.hud.makeRepeatThrow(h, 100, 0, 1, -30, 0), undefined);
+        jl.hud.addToggleButton({ x: 8, y: 0, width: 8, height: 9, img: "" }, jl.hud.makeRepeatThrow(h, 100, 1, 1, 30, 0), undefined);
 
         welcomeMessage(jl, "Press left and right to throw projectiles");
         winMessage(jl, "Great Job");
@@ -1647,7 +1647,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // draw an enemy that makes a sound when it disappears
         let e = jl.world.makeEnemy({ x: 8, y: 4, width: .5, height: .5, img: "redball.png" });
-        e.setOnDefeated((e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg"));
+        e.setOnDefeated((_e: Enemy, _a?: WorldActor) => jl.playSound("lowpitch.ogg"));
 
         // This variable is part of the callback, so we can access it from our go() method
         let counter = 0.5;
@@ -1663,13 +1663,13 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     x: e.getXPosition() - counter,
                     y: y, width: .5, height: .5, img: "redball.png"
                 });
-                left.setOnDefeated((e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg"));
+                left.setOnDefeated((_e: Enemy, _a?: WorldActor) => jl.playSound("lowpitch.ogg"));
                 // make an enemy to the right and up
                 let right = jl.world.makeEnemy({
                     x: e.getXPosition() + counter,
                     y: y, width: .5, height: .5, img: "redball.png"
                 });
-                right.setOnDefeated((e: Enemy, a: WorldActor) => jl.playSound("lowpitch.ogg"));
+                right.setOnDefeated((_e: Enemy, _a?: WorldActor) => jl.playSound("lowpitch.ogg"));
                 counter += 1;
             }
         });
@@ -1866,7 +1866,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             e.setPhysics(1.0, 0.3, 0.6);
             e.setRotationSpeed(1);
             e.setDamage(4);
-            e.setOnDefeated((e: Enemy, a: WorldActor) => jl.playSound("hipitch.ogg"));
+            e.setOnDefeated((_e: Enemy, _a?: WorldActor) => jl.playSound("hipitch.ogg"));
 
             // The first enemy we create will harm the hero even if the hero is invincible
             if (i == 0)
@@ -1884,7 +1884,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // add a goodie that makes the hero invincible
         let g = jl.world.makeGoodie({ x: 15, y: 7, width: .5, height: .5, img: "blueball.png" });
-        g.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
+        g.setCollectCallback((_g: Goodie, h: Hero) => { h.setInvincibleRemaining(h.getInvincibleRemaining() + 15); });
         g.setPath(new Path().to(15, 7).to(5, 2).to(15, 7), 1, true);
         g.setRotationSpeed(0.25);
         jl.hud.addText({ x: .1, y: 8.5, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => jl.score.getGoodies1() + " Goodies");
@@ -1892,7 +1892,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // draw a picture when the level is won, and don't print text...
         // this particular picture isn't very useful
         jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "fade.png" }, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "fade.png" }, (_hudx: number, _hudY: number) => {
                 jl.nav.nextLevel();
                 return true;
             });
@@ -1932,7 +1932,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // include a picture on the "try again" screen
         jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "fade.png" }, (hudx: number, hudY: number) => {
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "fade.png" }, (_hudx: number, _hudY: number) => {
                 jl.nav.repeatLevel();
                 return true;
             });
@@ -1953,7 +1953,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // create 7 goodies, each of which adds 1 to the hero's strength
         for (let i = 0; i < 7; ++i) {
             let g = jl.world.makeGoodie({ x: 1 + i, y: 1 + i, width: .5, height: .5, img: "blueball.png" });
-            g.setCollectCallback((g: Goodie, h: Hero) => { h.setStrength(1 + h.getStrength()) });
+            g.setCollectCallback((_g: Goodie, h: Hero) => { h.setStrength(1 + h.getStrength()) });
         }
 
         jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
@@ -2002,7 +2002,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // matches "big", then this obstacle defeats the enemy, and the obstacle disappears.
         o.setEnemyCollisionCallback((thisActor: Obstacle, collideActor: Enemy) => {
             if (collideActor.getExtra() === "big") {
-                collideActor.defeat(true, null);
+                collideActor.defeat(true, undefined);
                 thisActor.remove(true);
             }
         });
@@ -2011,8 +2011,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         let o2 = jl.world.makeObstacle({ x: .5, y: .5, width: .5, height: .5, img: "blueball.png" });
         o2.setPhysics(5, 0, 0.6);
         o2.setMoveByTilting();
-        o2.setEnemyCollisionCallback((thisActor: Obstacle, collideActor: Enemy) => {
-            collideActor.defeat(true, null);
+        o2.setEnemyCollisionCallback((_thisActor: Obstacle, collideActor: Enemy) => {
+            collideActor.defeat(true, undefined);
         });
         // make four enemies.  Mark the big one, so we can defeat it with the big obstacle
         jl.world.makeEnemy({ x: 10, y: 2, width: .5, height: .5, img: "redball.png" });
@@ -2216,7 +2216,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.addTimer(2, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFF00", size: 12, z: 0 }, () => "Ooh... a draggable enemy");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2234,7 +2234,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.addTimer(6, false, () => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FF00FF", size: 12, z: 0 }, () => "Touch the enemy and it will go away");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2251,7 +2251,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // fixed velocities
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFF00", size: 12, z: 0 }, () => "Now you can see the rest of the level");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2309,7 +2309,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setLevelFact("crossings", "0");
         // the callback id is 0, there is no delay, and no goodies are
         // needed before it works
-        o.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
+        o.setHeroCollisionCallback((thisActor: Obstacle, _collideActor: Hero) => {
             // get rid of the obstacle we just collided with
             thisActor.remove(false);
             // make a goodie
@@ -2321,7 +2321,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // we're going to chain a bunch of callbacks together, and
             // the best way to do that is to make a single callback that
             // behaves differently based on the value of some information we save as part of the level (a "LevelFact")
-            let sc2 = (thisActor: Obstacle, collideActor: Hero) => {
+            let sc2 = (thisActor: Obstacle, _collideActor: Hero) => {
                 let crossings = parseInt(jl.score.getLevelFact("crossings", "0"));
                 // The second callback works the same way
                 if (crossings == 0) {
@@ -2346,7 +2346,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     thisActor.remove(false);
                     // print a message and pause the game, via PauseScene
                     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (_hudx: number, _hudY: number) => {
                             jl.nav.dismissOverlayScene();
                             return true;
                         });
@@ -2395,7 +2395,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setDisappearSound("hipitch.ogg");
 
         let g = jl.world.makeGoodie({ x: 0, y: 0, width: 2, height: 2, img: "blueball.png" });
-        g.setCollectCallback((g: Goodie, h: Hero) => jl.playSound("lowpitch.ogg"));
+        g.setCollectCallback((_g: Goodie, _h: Hero) => jl.playSound("lowpitch.ogg"));
     }
 
 
@@ -2416,7 +2416,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // a goodie, so we can do defeat by invincibility
         let g1 = jl.world.makeGoodie({ x: 10, y: 5, width: .5, height: .5, img: "purpleball.png" });
-        g1.setCollectCallback((g: Goodie, h: Hero) => { h.setInvincibleRemaining(15); });
+        g1.setCollectCallback((_g: Goodie, h: Hero) => { h.setInvincibleRemaining(15); });
 
         // enable throwing projectiles, so that we can test enemy callbacks
         // again
@@ -2429,20 +2429,20 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         o.setPhysics(1000, 0, 0);
         o.setDraggable(false);
         jl.hud.createDragZone({ x: 0, y: 0, width: 16, height: 9, img: "" });
-        o.setEnemyCollisionCallback((thisActor: Obstacle, collideActor: Enemy) => {
+        o.setEnemyCollisionCallback((_thisActor: Obstacle, collideActor: Enemy) => {
             if (collideActor.getExtra() === "weak") {
-                collideActor.defeat(true, null);
+                collideActor.defeat(true, undefined);
             }
         });
 
         // now draw our enemies... we need enough to be able to test that
         // all four defeat mechanisms work. Note that we attach defeat
         // callback code to each of them, but the callback only runs on a collision-based defeat
-        let sc = (e: Enemy, actor: WorldActor) => {
+        let sc = (_e: Enemy, _actor?: WorldActor) => {
             // always reset the pausescene, in case it has something on it from before...
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#58E2A0", size: 16, z: 0 }, () => "good job, here's a prize");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2527,10 +2527,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Here's a simple pause button and pause scene
 
-        jl.hud.addTapControl({ x: 0, y: 300, width: 20, height: 20, img: "red.png" }, (hudX: number, hudY: number) => {
+        jl.hud.addTapControl({ x: 0, y: 300, width: 20, height: 20, img: "red.png" }, (_hudX: number, _hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -2804,7 +2804,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // When the hero collides with this obstacle, we'll increase the
         // time remaining
         let o = jl.world.makeObstacle({ box: true, x: 14, y: 8, width: 1, height: 1, img: "red.png" });
-        o.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
+        o.setHeroCollisionCallback((thisActor: Obstacle, _collideActor: Hero) => {
             // add 15 seconds to the timer
             jl.score.updateTimerExpiration(15);
             thisActor.remove(true);
@@ -2922,7 +2922,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // create a platform that we can jump through from below
         let platform = jl.world.makeObstacle({ box: true, x: 3, y: 7.5, width: 2, height: .2, img: "red.png" });
         // Set a callback, then re-enable the platform's collision effect.
-        platform.setHeroCollisionCallback((thisActor: Obstacle, collideActor: Hero) => {
+        platform.setHeroCollisionCallback((_thisActor: Obstacle, collideActor: Hero) => {
             collideActor.setAbsoluteVelocity(collideActor.getXVelocity(), -5);
         });
         platform.setCollisionsEnabled(true);
@@ -2959,15 +2959,15 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.hud.addText({ x: .25, y: .75, face: "Arial", color: "#000000", size: 12, z: 2 }, () => "Session: " + jl.score.getSessionFact("session test", "-1"));
         jl.hud.addText({ x: .25, y: 1, face: "Arial", color: "#000000", size: 12, z: 2 }, () => "Game: " + jl.score.getGameFact("game test", "-1"));
 
-        jl.hud.addTapControl({ x: 0, y: .5, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: .5, width: .2, height: .25, img: "red.png" }, (_x: number, _y: number) => {
             jl.score.setLevelFact("level test", "" + (1 + parseInt(jl.score.getLevelFact("level test", "-1"))));
             return true;
         });
-        jl.hud.addTapControl({ x: 0, y: .75, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: .75, width: .2, height: .25, img: "red.png" }, (_x: number, _y: number) => {
             jl.score.setSessionFact("session test", "" + (1 + parseInt(jl.score.getSessionFact("session test", "-1"))));
             return true;
         });
-        jl.hud.addTapControl({ x: 0, y: 1, width: .2, height: .25, img: "red.png" }, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: 1, width: .2, height: .25, img: "red.png" }, (_x: number, _y: number) => {
             jl.score.setGameFact("game test", "" + (1 + parseInt(jl.score.getGameFact("game test", "-1"))));
             return true;
         });
@@ -3092,12 +3092,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // add a one-time callback control
         let hasPaused = false;
-        let w = jl.hud.addTapControl({ x: .1, y: .1, width: .5, height: .5, img: "pause.png" }, (x: number, y: number) => {
+        let w = jl.hud.addTapControl({ x: .1, y: .1, width: .5, height: .5, img: "pause.png" }, (_x: number, _y: number) => {
             if (hasPaused)
                 return false;
             hasPaused = true;
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (_hudx: number, _hudY: number) => {
                     jl.nav.dismissOverlayScene();
                     return true;
                 });
@@ -3146,16 +3146,16 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
         // Create a pause scene that has a back button on it, and a button
         // for pausing the level
-        jl.hud.addTapControl({ x: 0, y: 0, width: 1, height: 1, img: "red.png" }, (hudX: number, hudY: number) => {
+        jl.hud.addTapControl({ x: 0, y: 0, width: 1, height: 1, img: "red.png" }, (_hudX: number, _hudY: number) => {
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 3, y: 1, width: 1, height: 1, img: "red.png" }, (eventPositionX: number, eventPositionY: number) => {
+                overlay.addTapControl({ x: 3, y: 1, width: 1, height: 1, img: "red.png" }, (_eventPositionX: number, _eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.nav.doChooser(1);
                     return true;
                 });
 
-                overlay.addTapControl({ x: 1, y: 1, width: 1, height: 1, img: "red.png" }, (eventPositionX: number, eventPositionY: number) => {
+                overlay.addTapControl({ x: 1, y: 1, width: 1, height: 1, img: "red.png" }, (_eventPositionX: number, _eventPositionY: number) => {
                     jl.nav.dismissOverlayScene();
                     jl.score.winLevel();
                     return true;
@@ -3235,7 +3235,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.world.makeDestination({ x: 7.5, y: .25, width: 1, height: 1, img: "mustardball.png" });
         jl.score.setVictoryDestination(1);
 
-        jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (x: number, y: number) => {
+        jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, (_x: number, _y: number) => {
             for (let h of heroes) {
                 h.setAbsoluteVelocity(5 - jl.getRandom(10), -3);
             }
@@ -3308,7 +3308,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
             // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
             // and a new obstacle on the screen.  We'll randomize their placement just a bit.
             // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
+            (_thisActor: Obstacle, _collideActor: Hero) => {
                 // make a random enemy and a random goodie.  Put them in X coordinates relative to the trigger
                 jl.world.makeEnemy({ x: trigger.getXPosition() + 8 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "redball.png" });
                 jl.world.makeGoodie({ x: trigger.getXPosition() + 9 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "blueball.png" });
@@ -3316,7 +3316,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 trigger.setPosition(trigger.getXPosition() + 16, trigger.getYPosition());
             };
         trigger.setHeroCollisionCallback(lc);
-        // No transfer of momeuntum when the hero collides with the trigger
+        // No transfer of momentum when the hero collides with the trigger
         trigger.setCollisionsEnabled(false);
     }
 
@@ -3441,14 +3441,14 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
  * This is a standard way of drawing a black screen with some text, to serve as
  * the win screen for the game
  */
-export function winMessage(jl: JetLagApi, message: string, callback: () => void = null) {
+export function winMessage(jl: JetLagApi, message: string, callback?: () => void) {
     jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
         overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
             jl.nav.nextLevel();
             return true;
         });
         overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
-        if (callback !== null)
+        if (callback)
             callback();
     });
 }
@@ -3457,14 +3457,14 @@ export function winMessage(jl: JetLagApi, message: string, callback: () => void 
  * This is a standard way of drawing a black screen with some text, to serve as
  * the lose screen for the game
  */
-export function loseMessage(jl: JetLagApi, message: string, callback: () => void = null) {
+export function loseMessage(jl: JetLagApi, message: string, callback?: () => void) {
     jl.nav.setLoseSceneBuilder((overlay: OverlayApi) => {
         overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
             jl.nav.repeatLevel();
             return true;
         });
         overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
-        if (callback !== null)
+        if (callback)
             callback();
     });
 }

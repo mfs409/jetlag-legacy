@@ -7,10 +7,7 @@ import { Animation } from "../support/Animation"
 import { JetLagRenderer, JetLagSound, JetLagDebugSprite, JetLagDevice } from "../internal/support/Interfaces"
 import { TimedEvent } from "../internal/support/TimedEvent"
 import { Camera } from "../internal/support/Camera"
-import {
-    b2Body, b2BodyType, b2PolygonShape,
-    b2BodyDef, b2FixtureDef, b2CircleShape, b2Vec2, b2Transform
-} from "box2d.ts";
+import { b2Body, b2BodyType, b2PolygonShape, b2CircleShape, b2Vec2, b2Transform } from "@box2d/core";
 
 /**
  * BodyStyles makes it easier for us to figure out how to clone, resize, and
@@ -33,16 +30,16 @@ export class BaseActor implements Renderable {
     private enabled: boolean = true;
 
     /** Physics body for this WorldActor */
-    protected body: b2Body;
+    protected body!: b2Body;
 
     /** The type of body for this actor */
-    private bodyStyle: BodyStyle;
+    private bodyStyle!: BodyStyle;
 
     /** The dimensions of the WorldActor... x is width, y is height */
     private size: { w: number, h: number };
 
     /** The vertices, if this is a polygon */
-    private verts: b2Vec2[];
+    private vertices?: b2Vec2[];
 
     /** The z index of this actor. Valid range is [-2, 2] */
     private zIndex: number;
@@ -51,57 +48,57 @@ export class BaseActor implements Renderable {
      * Does this WorldActor follow a path?  If so, the Driver will be used to
      * advance the  actor along its path.
      */
-    private path: PathDriver = null;
+    private path?: PathDriver;
 
     /** Sound to play when the actor disappears */
-    private disappearSound: JetLagSound;
+    private disappearSound?: JetLagSound;
 
     /** A debug render context */
     private debug: JetLagDebugSprite;
 
     /** Code to run when this actor is tapped */
-    private tapHandler: (worldX: number, worldY: number) => boolean = null;
+    private tapHandler?: (worldX: number, worldY: number) => boolean;
 
     /** handler for pan start event */
-    private panStartHandler: (worldX: number, worldY: number) => boolean = null;
+    private panStartHandler?: (worldX: number, worldY: number) => boolean;
 
     /** handler for pan move event */
-    private panMoveHandler: (worldX: number, worldY: number) => boolean = null;
+    private panMoveHandler?: (worldX: number, worldY: number) => boolean;
 
     /** handler for pan stop event */
-    private panStopHandler: (worldX: number, worldY: number) => boolean = null;
+    private panStopHandler?: (worldX: number, worldY: number) => boolean;
 
     /** handler for downpress event */
-    private touchDownHandler: (worldX: number, worldY: number) => boolean = null;
+    private touchDownHandler?: (worldX: number, worldY: number) => boolean;
 
     /** handler for release event */
-    private touchUpHandler: (worldX: number, worldY: number) => boolean = null;
+    private touchUpHandler?: (worldX: number, worldY: number) => boolean;
 
     /** handler for swipe event */
-    private swipeHandler: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean = null;
+    private swipeHandler?: (worldX0: number, worldY0: number, worldX1: number, worldY1: number, time: number) => boolean;
 
     /** Animation support: this tracks the current state of the active animation (if any) */
     protected animator: AnimationDriver;
 
     /** Animation support: the cells of the default animation */
-    protected defaultAnimation: Animation;
+    protected defaultAnimation?: Animation;
 
     /** 
      * Animation support: the cells of the animation to use when moving backwards 
      */
-    protected defaultReverseAnimation: Animation;
+    protected defaultReverseAnimation?: Animation;
 
     /** Animation support: the cells of the disappearance animation */
-    private disapperAnimation: Animation;
+    private disappearAnimation?: Animation;
 
     /** Animation support: the dimensions of the disappearance animation */
-    private disappearAnimateSize: b2Vec2;
+    private readonly disappearAnimateSize = new b2Vec2(0, 0);
 
     /** 
      * Animation support: the offset for placing the disappearance animation
      * relative to the disappearing actor 
      */
-    private disappearAnimateOffset: b2Vec2;
+    private readonly disappearAnimateOffset = new b2Vec2(0, 0);
 
     /** Extra data for the game designer to attach to the actor */
     private extra: any = {};
@@ -117,12 +114,9 @@ export class BaseActor implements Renderable {
      * @param height  The height of the actor's image and body, in meters
      * @param z       The z index of the actor
      */
-    constructor(private scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number, z: number) {
+    constructor(private readonly scene: BaseScene, private device: JetLagDevice, imgName: string, width: number, height: number, z: number) {
         this.animator = new AnimationDriver(device.getRenderer(), imgName);
         this.debug = device.getRenderer().makeDebugContext();
-        this.disappearAnimateSize = new b2Vec2(0, 0);
-        this.disappearAnimateOffset = new b2Vec2(0, 0);
-        this.scene = scene;
         this.size = { w: width, h: height };
         this.zIndex = z;
     }
@@ -138,7 +132,7 @@ export class BaseActor implements Renderable {
      * 
      * @param handler The code to run
      */
-    public setTapHandler(handler: (worldX: number, worldY: number) => boolean) { this.tapHandler = handler; }
+    public setTapHandler(handler?: (worldX: number, worldY: number) => boolean) { this.tapHandler = handler; }
 
     /** Ge the code to run when a pan event starts on this actor */
     public getPanStartHandler() { return this.panStartHandler; }
@@ -190,11 +184,11 @@ export class BaseActor implements Renderable {
      */
     public setTouchUpHandler(handler: (worldX: number, worldY: number) => boolean) { this.touchUpHandler = handler; }
 
-    /** Get the code to run when a swip event happens on this actor */
+    /** Get the code to run when a swipe event happens on this actor */
     public getSwipeHandler() { return this.swipeHandler; }
 
     /**
-     * Set the code to run when a swip event happens on this actor
+     * Set the code to run when a swipe event happens on this actor
      * 
      * @param handler The code to run
      */
@@ -204,14 +198,14 @@ export class BaseActor implements Renderable {
     public getAnimator() { return this.animator; }
 
     /** Get the number of vertices of this actor, if it is a Polygon */
-    public getNumVerts() { return this.verts.length; }
+    public getNumVertices() { return this.vertices ? this.vertices.length : -1; }
 
     /**
      * Get one of the values from the actor's set of vertexes
      * 
      * @param index The index of the vertex to get
      */
-    public getVert(index: number) { return new b2Vec2(this.verts[index].x, this.verts[index].y); }
+    public getVert(index: number) { return !this.vertices ? undefined : new b2Vec2(this.vertices[index].x, this.vertices[index].y); }
 
     /** Return true if this actor is a Polygon */
     public isPoly() { return this.bodyStyle === BodyStyle.POLYGON; }
@@ -234,7 +228,7 @@ export class BaseActor implements Renderable {
      */
     public setEnabled(val: boolean) {
         this.enabled = val;
-        this.body.SetActive(val);
+        this.body.SetEnabled(val);
     }
 
     /** Return the current enabled/disabled state of this actor */
@@ -250,21 +244,11 @@ export class BaseActor implements Renderable {
     setBoxPhysics(type: b2BodyType, x: number, y: number) {
         let shape = new b2PolygonShape();
         shape.SetAsBox(this.size.w / 2, this.size.h / 2);
-        let boxBodyDef = new b2BodyDef();
-        boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.size.w / 2;
-        boxBodyDef.position.y = y + this.size.h / 2;
-        this.body = this.scene.getWorld().CreateBody(boxBodyDef);
-
-        let fd = new b2FixtureDef();
-        fd.shape = shape;
-        this.body.CreateFixture(fd);
-        this.setPhysics(0, 0, 0);
-
+        this.body = this.scene.getWorld().CreateBody({ type, position: { x: x + this.size.w / 2, y: y + this.size.h / 2 } });
+        this.body.CreateFixture({ shape });
+        this.setPhysics(1, 0, 0);
         this.body.SetUserData(this);
-
-        // remember this is a box
-        this.bodyStyle = BodyStyle.RECTANGLE;
+        this.bodyStyle = BodyStyle.RECTANGLE; // remember this is a box
     }
 
     /**
@@ -282,23 +266,16 @@ export class BaseActor implements Renderable {
      */
     setPolygonPhysics(type: b2BodyType, x: number, y: number, vertices: number[]) {
         let shape = new b2PolygonShape();
-        this.verts = [];
+        this.vertices = [];
         for (let i = 0; i < vertices.length; i += 2)
-            this.verts[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
+            this.vertices[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
         // print some debug info, since vertices are tricky
-        for (let vert of this.verts)
+        for (let vert of this.vertices)
             this.device.getConsole().info("vert at " + vert.x + "," + vert.y);
-        shape.Set(this.verts);
-        let boxBodyDef = new b2BodyDef();
-        boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.size.w / 2;
-        boxBodyDef.position.y = y + this.size.h / 2;
-        this.body = this.scene.getWorld().CreateBody(boxBodyDef);
-
-        let fd = new b2FixtureDef();
-        fd.shape = shape;
-        this.body.CreateFixture(fd);
-        this.setPhysics(0, 0, 0);
+        shape.Set(this.vertices);
+        this.body = this.scene.getWorld().CreateBody({ type, position: { x: x + this.size.w / 2, y: y + this.size.h / 2 } });
+        this.body.CreateFixture({ shape });
+        this.setPhysics(1, 0, 0);
 
         // link the body to the actor
         this.body.SetUserData(this);
@@ -319,16 +296,9 @@ export class BaseActor implements Renderable {
         let shape = new b2CircleShape();
         shape.m_radius = radius;
 
-        let boxBodyDef = new b2BodyDef();
-        boxBodyDef.type = type;
-        boxBodyDef.position.x = x + this.size.w / 2;
-        boxBodyDef.position.y = y + this.size.h / 2;
-        this.body = this.scene.getWorld().CreateBody(boxBodyDef);
-
-        let fd = new b2FixtureDef();
-        fd.shape = shape;
-        this.body.CreateFixture(fd);
-        this.setPhysics(0, 0, 0);
+        this.body = this.scene.getWorld().CreateBody({ type, position: { x: x + this.size.w / 2, y: y + this.size.h / 2 } });
+        this.body.CreateFixture({ shape });
+        this.setPhysics(1, 0, 0);
 
         // link the body to the actor
         this.body.SetUserData(this);
@@ -365,28 +335,28 @@ export class BaseActor implements Renderable {
     breakJoints() { }
 
     /**
-     * Every time the world advances by a timestep, we call this code to update
+     * Every time the world advances by a time step, we call this code to update
      * the actor path and animation, and then draw the actor
      * 
-     * @param renderer The game's renderer
-     * @param camera   The camera for the current stage
-     * @param elapsedMillis The milliseconds since the last render event
+     * @param renderer  The game's renderer
+     * @param camera    The camera for the current stage
+     * @param elapsedMs The milliseconds since the last render event
      */
-    render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
+    render(renderer: JetLagRenderer, camera: Camera, elapsedMs: number) {
         if (!this.getEnabled())
             return;
         if (this.path) this.path.drive();
 
         // choose the default TextureRegion to show... this is how we animate
-        this.animator.advanceAnimation(elapsedMillis);
+        this.animator.advanceAnimation(elapsedMs);
 
         // Flip the animation?
-        if (this.defaultReverseAnimation != null && this.body.GetLinearVelocity().x < 0) {
+        if (this.defaultReverseAnimation && this.body.GetLinearVelocity().x < 0) {
             if (this.animator.getCurrentAnimation() != this.defaultReverseAnimation)
                 this.animator.setCurrentAnimation(this.defaultReverseAnimation);
-        } else if (this.defaultReverseAnimation != null && this.body.GetLinearVelocity().x > 0) {
+        } else if (this.defaultReverseAnimation && this.body.GetLinearVelocity().x > 0) {
             if (this.animator.getCurrentAnimation() == this.defaultReverseAnimation)
-                if (this.defaultAnimation != null)
+                if (this.defaultAnimation)
                     this.animator.setCurrentAnimation(this.defaultAnimation);
         }
 
@@ -464,9 +434,9 @@ export class BaseActor implements Renderable {
      * @param rotation amount to rotate the actor clockwise (in radians)
      */
     public setRotation(rotation: number) {
-        let xform = new b2Transform();
-        xform.SetPositionAngle(this.body.GetPosition(), rotation);
-        this.body.SetTransform(xform);
+        let transform = new b2Transform();
+        transform.SetPositionAngle(this.body.GetPosition(), rotation);
+        this.body.SetTransform(transform);
     }
 
     /**
@@ -497,14 +467,14 @@ export class BaseActor implements Renderable {
         // To do a disappear animation after we've removed the actor, we draw an
         // actor, so that we have a clean hook into the animation system, but we
         // disable its physics
-        if (this.disapperAnimation != null) {
+        if (this.disappearAnimation) {
             let x = this.getXPosition() + this.disappearAnimateOffset.x;
             let y = this.getYPosition() + this.disappearAnimateOffset.y;
             let o = new BaseActor(this.scene, this.device, "", this.disappearAnimateSize.x, this.disappearAnimateSize.y, this.zIndex);
             o.setBoxPhysics(b2BodyType.b2_staticBody, x, y);
             this.scene.addActor(o, 0);
             o.setCollisionsEnabled(false);
-            o.setDefaultAnimation(this.disapperAnimation);
+            o.setDefaultAnimation(this.disappearAnimation);
         }
     }
 
@@ -563,9 +533,9 @@ export class BaseActor implements Renderable {
      * @param y The new Y position, in pixels
      */
     public setPosition(x: number, y: number) {
-        let xform = new b2Transform();
-        xform.SetPositionAngle(new b2Vec2(x + this.size.w / 2, y + this.size.h / 2), this.body.GetAngle());
-        this.body.SetTransform(xform);
+        let transform = new b2Transform();
+        transform.SetPositionAngle(new b2Vec2(x + this.size.w / 2, y + this.size.h / 2), this.body.GetAngle());
+        this.body.SetTransform(transform);
     }
 
     /**
@@ -611,9 +581,9 @@ export class BaseActor implements Renderable {
                 let x = -this.body.GetLinearVelocity().x;
                 let y = -this.body.GetLinearVelocity().y;
                 let angle = Math.atan2(y, x) + Math.atan2(-1, 0);
-                let xform = new b2Transform();
-                xform.SetPositionAngle(this.body.GetPosition(), angle);
-                this.body.SetTransform(xform);
+                let transform = new b2Transform();
+                transform.SetPositionAngle(this.body.GetPosition(), angle);
+                this.body.SetTransform(transform);
             }
         });
     }
@@ -700,7 +670,7 @@ export class BaseActor implements Renderable {
      *                  as the actor height
      */
     public setDisappearAnimation(animation: Animation, offsetX: number, offsetY: number, width: number, height: number) {
-        this.disapperAnimation = animation;
+        this.disappearAnimation = animation;
         this.disappearAnimateOffset.Set(offsetX, offsetY);
         this.disappearAnimateSize.Set(width, height);
     }
@@ -800,7 +770,7 @@ export class BaseActor implements Renderable {
         // read old body information
         let oldBody = this.body;
         // The default is for all fixtures of a actor have the same sensor state
-        let oldFix = oldBody.GetFixtureList();
+        let oldFix = oldBody.GetFixtureList()!;
         // make a new body
         if (this.bodyStyle === BodyStyle.CIRCLE) {
             this.setCirclePhysics(oldBody.GetType(), x, y, (width > height) ? width / 2 : height / 2);
@@ -811,13 +781,13 @@ export class BaseActor implements Renderable {
             let xScale = height / this.size.h;
             let yScale = width / this.size.w;
             let ps = oldFix.GetShape() as b2PolygonShape;
-            let verts: number[] = [];
+            let vertices: number[] = [];
             for (let i = 0; i < ps.m_vertices.length; ++i) {
                 let mTempVector = ps.m_vertices[i];
-                verts.push(mTempVector.x * xScale);
-                verts.push(mTempVector.y * yScale);
+                vertices.push(mTempVector.x * xScale);
+                vertices.push(mTempVector.y * yScale);
             }
-            this.setPolygonPhysics(oldBody.GetType(), x, y, verts);
+            this.setPolygonPhysics(oldBody.GetType(), x, y, vertices);
         }
         // set new height and width of the image
         this.size.w = width;
@@ -827,16 +797,16 @@ export class BaseActor implements Renderable {
         this.setFastMoving(oldBody.IsBullet());
         // clone forces
         this.body.SetAngularVelocity(oldBody.GetAngularVelocity());
-        let xform = new b2Transform();
-        xform.SetPositionAngle(this.body.GetPosition(), oldBody.GetAngle());
-        this.body.SetTransform(xform);
+        let transform = new b2Transform();
+        transform.SetPositionAngle(this.body.GetPosition(), oldBody.GetAngle());
+        this.body.SetTransform(transform);
         this.body.SetGravityScale(oldBody.GetGravityScale());
         this.body.SetLinearDamping(oldBody.GetLinearDamping());
         this.body.SetLinearVelocity(oldBody.GetLinearVelocity());
         if (oldFix.IsSensor())
             this.setCollisionsEnabled(false);
         // disable the old body
-        oldBody.SetActive(false);
+        oldBody.SetEnabled(false);
     }
 
     /**

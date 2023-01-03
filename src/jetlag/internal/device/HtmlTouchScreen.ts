@@ -1,5 +1,5 @@
 import { JetLagTouchReceiver, JetLagTouchScreen } from "../support/Interfaces";
-import * as Hammer from 'hammerjs';
+import Hammer from 'hammerjs';
 
 /**
  * TouchScreen abstracts away how gestures (pan, swipe, tap, rotate, pinch,
@@ -21,7 +21,9 @@ export class HtmlTouchScreen implements JetLagTouchScreen {
      * @param domId The Id of the DOM element that will receive gesture events
      */
     constructor(domId: string) {
-        this.elt = document.getElementById(domId);
+        let tmp = document.getElementById(domId);
+        if (tmp === null) throw `Element ${domId} cannot be found`;
+        this.elt = tmp;
     }
 
     /** 
@@ -33,7 +35,7 @@ export class HtmlTouchScreen implements JetLagTouchScreen {
     public setTouchReceiver(receiver: JetLagTouchReceiver) {
         // Since we are using gestures, turn off left clicking of the whole page
         this.elt.oncontextmenu =
-            function (this: HTMLElement, ev: PointerEvent) { return false; } as any;
+            function (this: HTMLElement, _ev: PointerEvent) { return false; } as any;
 
         // Set up handlers for all the Hammer events
         let hammer = new Hammer(this.elt);

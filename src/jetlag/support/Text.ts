@@ -1,6 +1,6 @@
 import { Camera } from "../internal/support/Camera"
 import { JetLagText, JetLagRenderer, Renderable } from "../internal/support/Interfaces";
-import { b2Vec2 } from "box2d.ts";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * JetLag's Text object provides a way to generate text and put it onto the

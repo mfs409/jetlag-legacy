@@ -13,7 +13,7 @@ import { JetLagApi } from "../jetlag/api/JetLagApi";
  *              ignore this)
  * @param jl    The JetLag object, for putting stuff into the level
  */
-export function buildSplashScreen(index: number, jl: JetLagApi): void {
+export function buildSplashScreen(_index: number, jl: JetLagApi): void {
     // Based on the values in myconfig.ts, we can expect to have a level that is
     // 1600x900 pixels (16x9 meters), with no default gravitational forces
 

@@ -1,7 +1,7 @@
 import { WorldActor } from "../../actor/WorldActor";
 import { WorldApi } from "../../api/WorldApi";
 import { JetLagConfig } from "../../support/JetLagConfig";
-import { b2Vec2, b2Transform } from "box2d.ts";
+import { b2Vec2, b2Transform } from "@box2d/core";
 
 /**
  * The Svg infrastructure allows the game designer to load SVG line drawings
@@ -13,7 +13,7 @@ import { b2Vec2, b2Transform } from "box2d.ts";
  */
 export class Svg {
     /** A copy of the configuration object for the game */
-    private config: JetLagConfig;
+    private config?: JetLagConfig;
 
     /** The user-specified top left corner */
     private translate = new b2Vec2(0, 0);
@@ -22,10 +22,10 @@ export class Svg {
     private userStretch = { x: 1, y: 1 };
 
     /** The callback to run on each line once it is created */
-    private callback: (actor: WorldActor) => void;
+    private callback?: (actor: WorldActor) => void;
 
     /** The world API, for creating obstacles */
-    private world: WorldApi;
+    private world?: WorldApi;
 
     /** Coordinate of the last point we drew */
     private last = new b2Vec2(0, 0);
@@ -37,7 +37,7 @@ export class Svg {
     private curr = new b2Vec2(0, 0);
 
     /** The computed top and left boundaries of the SVG, in pixels */
-    private topleft: b2Vec2 = null;
+    private top_left?: b2Vec2;
 
     /**
      * The parser is essentially a finite state machine. The states are 0 for 
@@ -51,7 +51,7 @@ export class Svg {
      * field to swallow a fixed number of values, so that the curve definition
      * becomes a line definition
      */
-    private swallow: number;
+    private swallow?: number;
 
     /**
      * Track if we're parsing a curve or a line. Valid values are 0 for 
@@ -105,9 +105,9 @@ export class Svg {
      * @param event The XHR event that fetched the file
      */
     private onFileLoaded(event: ProgressEvent) {
-        let filecontents = (event.currentTarget as XMLHttpRequest).response;
+        let file_contents = (event.currentTarget as XMLHttpRequest).response;
         let dp = new DOMParser();
-        let doc = dp.parseFromString(filecontents, "text/xml"); // consider "image/svg+xml" to get an SVGDocument instead
+        let doc = dp.parseFromString(file_contents, "text/xml"); // consider "image/svg+xml" to get an SVGDocument instead
         let gs = doc.getElementsByTagName("g");
         for (let i = 0; i < gs.length; ++i) {
             let g = gs[i];
@@ -131,11 +131,11 @@ export class Svg {
      * single string, which we parse in this function.
      *
      * @param d            The string that describes the path
-     * @param readonlymode Are we in read-only mode (true), where we are
-     *                     computing the top/left pixel boound, or are we in
-     *                     draw mode (false), where we actually draw the lines
+     * @param readonlyMode Are we in read-only mode (true), where we are
+     *                     computing the top/left pixel bound, or are we in draw
+     *                     mode (false), where we actually draw the lines
      */
-    private processD(d: string, readonlymode: boolean) {
+    private processD(d: string, readonlyMode: boolean) {
         // split the string into characters and floating point values
         // Note: we need to split on ' ' and ',', so we'll do a replace first
         let z = d.replace(/,/g, " ");
@@ -166,7 +166,7 @@ export class Svg {
                 // end of path, relative mode
                 case "z":
                     // draw a connecting line to complete the shape
-                    if (readonlymode)
+                    if (readonlyMode)
                         this.updateTL(this.last, this.first);
                     else
                         this.addLine(this.last, this.first);
@@ -187,7 +187,7 @@ export class Svg {
                 // curve
                 default:
                     // if it's a curve, we might need to swallow this value
-                    if (this.swallow > 0) {
+                    if (this.swallow && this.swallow > 0) {
                         this.swallow--;
                     }
                     // get the next point
@@ -223,7 +223,7 @@ export class Svg {
                             else
                                 this.curr.y = this.last.y - val;
                             // draw the line
-                            if (readonlymode)
+                            if (readonlyMode)
                                 this.updateTL(this.last, this.first);
                             else
                                 this.addLine(this.last, this.curr);
@@ -271,16 +271,16 @@ export class Svg {
         y2 *= this.userStretch.y;
 
         // normalize by top left pixels (0,0)
-        x1 -= this.topleft.x;
-        x2 -= this.topleft.x;
-        y1 -= this.topleft.y;
-        y2 -= this.topleft.y;
+        x1 -= this.top_left!.x;
+        x2 -= this.top_left!.x;
+        y1 -= this.top_left!.y;
+        y2 -= this.top_left!.y;
 
         // convert the coordinates to meters
-        x1 /= this.config.pixelMeterRatio;
-        y1 /= this.config.pixelMeterRatio;
-        x2 /= this.config.pixelMeterRatio;
-        y2 /= this.config.pixelMeterRatio;
+        x1 /= this.config!.pixelMeterRatio;
+        y1 /= this.config!.pixelMeterRatio;
+        x2 /= this.config!.pixelMeterRatio;
+        y2 /= this.config!.pixelMeterRatio;
 
         // add in the user transform in meters and draw it
         x1 += this.translate.x;
@@ -305,12 +305,13 @@ export class Svg {
         let centerY = (y1 + y2) / 2;
         let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         // Make an obstacle and rotate it
-        let o = this.world.makeObstacle({ box: true, x: x1, y: y1, width: len, height: .05, img: "" });
-        let xform = new b2Transform();
-        xform.SetPositionAngle(new b2Vec2(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
-        o.getBody().SetTransform(xform);
+        let o = this.world!.makeObstacle({ box: true, x: x1, y: y1, width: len, height: .05, img: "" });
+        let transform = new b2Transform();
+        transform.SetPositionAngle(new b2Vec2(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
+        o.getBody().SetTransform(transform);
         // let the game code modify this line segment
-        this.callback(o);
+        if (this.callback)
+            this.callback(o);
     }
 
     /**
@@ -337,14 +338,14 @@ export class Svg {
         y2 *= this.userStretch.y;
 
         // If this is the first line, we need to initialize our top/left storage
-        if (this.topleft == null) {
-            this.topleft = new b2Vec2(x1, y1);
+        if (!this.top_left) {
+            this.top_left = new b2Vec2(x1, y1);
         }
 
-        // Update our estimtes of top/left
-        if (x1 < this.topleft.x) this.topleft.x = x1
-        if (y1 < this.topleft.y) this.topleft.y = y1
-        if (x2 < this.topleft.x) this.topleft.x = x2
-        if (y2 < this.topleft.y) this.topleft.y = y2
+        // Update our estimates of top/left
+        if (x1 < this.top_left.x) this.top_left.x = x1
+        if (y1 < this.top_left.y) this.top_left.y = y1
+        if (x2 < this.top_left.x) this.top_left.x = x2
+        if (y2 < this.top_left.y) this.top_left.y = y2
     }
 };

@@ -9,7 +9,7 @@ import { JetLagStage } from "../internal/JetLagStage";
 import { ImageConfig } from "./ImageConfig";
 import { checkImageConfig } from "../internal/support/Functions";
 import { TextConfig } from "./TextConfig";
-import { b2BodyType, b2Vec2 } from "box2d.ts";
+import { b2BodyType, b2Vec2 } from "@box2d/core";
 
 /**
  * OverlayApi provides a way of drawing to the simple screens of a game: the
@@ -17,7 +17,7 @@ import { b2BodyType, b2Vec2 } from "box2d.ts";
  */
 export class OverlayApi {
     /** keep track of the "active" actor, if any */
-    private activeActor: WorldActor = null;
+    private activeActor?: WorldActor;
 
     /**
      * Construct the Overlay API
@@ -60,10 +60,10 @@ export class OverlayApi {
      */
     public addTapControl(cfg: ImageConfig, action: (hudX: number, hudY: number) => boolean) {
         checkImageConfig(cfg);
-        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, cfg.z);
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img!, cfg.width, cfg.height, cfg.z!);
         c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         c.setTapHandler(action);
-        this.overlay.addActor(c, cfg.z);
+        this.overlay.addActor(c, cfg.z!);
         return c;
     }
 
@@ -78,7 +78,7 @@ export class OverlayApi {
      * @param panStop  The action to perform when the pan event stops
      */
     public addPanCallbackControl(cfg: ImageConfig, panStart: (hudX: number, hudY: number) => boolean, panMove: (hudX: number, hudY: number) => boolean, panStop: (hudX: number, hudY: number) => boolean) {
-        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img!, cfg.width, cfg.height, 0);
         c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         c.setPanStartHandler(panStart);
         c.setPanMoveHandler(panMove);
@@ -95,7 +95,7 @@ export class OverlayApi {
      *                 drag zone
      */
     public createDragZone(cfg: ImageConfig) {
-        let foundActor: WorldActor = null;
+        let foundActor: WorldActor | undefined;
         // pan start behavior is to update foundActor if there is an actor where
         // the touch began
         let panstart = (hudX: number, hudY: number) => {
@@ -104,7 +104,7 @@ export class OverlayApi {
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             // If worldactor with draggable, we're good
             let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
-            if (actor == null)
+            if (!actor)
                 return false;
             if (!(actor instanceof WorldActor))
                 return false;
@@ -117,7 +117,7 @@ export class OverlayApi {
         // coord
         let panmove = (hudX: number, hudY: number) => {
             // need an actor, and need coords in pixels
-            if (foundActor == null)
+            if (!foundActor)
                 return false;
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
@@ -125,8 +125,8 @@ export class OverlayApi {
             return true;
         }
         // pan stop behavior is to stop tracking this actor
-        let panstop = (hudX: number, hudY: number) => {
-            foundActor = null; return false;
+        let panstop = (_hudX: number, _hudY: number) => {
+            foundActor = undefined; return false;
         }
         this.addPanCallbackControl(cfg, panstart, panmove, panstop);
     }
@@ -138,7 +138,7 @@ export class OverlayApi {
      *                 swipe region
      */
     public createSwipeZone(cfg: ImageConfig) {
-        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img!, cfg.width, cfg.height, 0);
         c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         this.overlay.addActor(c, 0);
         c.setSwipeHandler((hudX0: number, hudY0: number, hudX1: number, hudY1: number, time: number) => {
@@ -146,7 +146,7 @@ export class OverlayApi {
             let pixels = this.overlay.getCamera().metersToScreen(hudX0, hudY0);
             // If worldactor with flickMultiplier, we're good
             let actor = this.stage.getWorld().actorAt(pixels.x, pixels.y);
-            if (actor == null)
+            if (!actor)
                 return false;
             if (!(actor instanceof WorldActor))
                 return false;
@@ -175,12 +175,12 @@ export class OverlayApi {
     public createPokeToPlaceZone(cfg: ImageConfig) {
         this.stage.setGestureHudFirst(false);
         this.addTapControl(cfg, (hudX: number, hudY: number) => {
-            if (this.activeActor == null)
+            if (!this.activeActor)
                 return false;
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
             this.activeActor.setPosition(meters.x - this.activeActor.getWidth() / 2, meters.y - this.activeActor.getHeight() / 2);
-            this.activeActor = null;
+            this.activeActor = undefined;
             return true;
         })
     }
@@ -198,7 +198,7 @@ export class OverlayApi {
     public createPokeToMoveZone(cfg: ImageConfig, velocity: number, clear: boolean) {
         this.stage.setGestureHudFirst(false);
         this.addTapControl(cfg, (hudX: number, hudY: number) => {
-            if (this.activeActor == null)
+            if (!this.activeActor)
                 return false;
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
@@ -207,7 +207,7 @@ export class OverlayApi {
             this.activeActor.setRotationSpeed(0);
             this.activeActor.setPath(r, velocity, false);
             if (clear)
-                this.activeActor = null;
+                this.activeActor = undefined;
             return true;
         })
     }
@@ -226,7 +226,7 @@ export class OverlayApi {
     public createPokeToRunZone(cfg: ImageConfig, velocity: number, clear: boolean) {
         this.stage.setGestureHudFirst(false);
         this.addTapControl(cfg, (hudX: number, hudY: number) => {
-            if (this.activeActor == null)
+            if (!this.activeActor)
                 return false;
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             let meters = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
@@ -237,7 +237,7 @@ export class OverlayApi {
             this.activeActor.setRotationSpeed(0);
             this.activeActor.setAbsoluteVelocity(-v.x, -v.y);
             if (clear)
-                this.activeActor = null;
+                this.activeActor = undefined;
             return true;
         })
     }
@@ -285,7 +285,7 @@ export class OverlayApi {
      * @return The image that was created
      */
     public addImage(cfg: ImageConfig) {
-        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img!, cfg.width, cfg.height, 0);
         c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         this.overlay.addActor(c, 0);
         return c;
@@ -301,10 +301,10 @@ export class OverlayApi {
      */
     public addText(cfg: TextConfig, producer: () => string): Renderable {
         if (cfg.center) {
-            return this.overlay.addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
+            return this.overlay.addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z!, producer);
         }
         else {
-            return this.overlay.addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
+            return this.overlay.addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z!, producer);
         }
     }
 
@@ -331,11 +331,11 @@ export class OverlayApi {
      *                        released
      * @return The control, so we can do more with it as needed.
      */
-    public addToggleButton(cfg: ImageConfig, whileDownAction: () => void, onUpAction: (hudX: number, hudY: number) => void) {
-        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+    public addToggleButton(cfg: ImageConfig, whileDownAction?: () => void, onUpAction?: (hudX: number, hudY: number) => void) {
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img!, cfg.width, cfg.height, 0);
         c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         let active = false; // will be captured by lambdas below
-        c.setTouchDownHandler((hudX: number, hudY: number) => {
+        c.setTouchDownHandler((_hudX: number, _hudY: number) => {
             active = true;
             return true;
         });
@@ -349,7 +349,7 @@ export class OverlayApi {
         });
         // Put the control and events in the appropriate lists
         this.overlay.addActor(c, 0);
-        this.stage.getWorld().addRepeatEvent(() => { if (active) whileDownAction(); });
+        this.stage.getWorld().addRepeatEvent(() => { if (active && whileDownAction) whileDownAction(); });
         return c;
     }
 
@@ -375,7 +375,7 @@ export class OverlayApi {
      * @return The button that was created
      */
     public addDirectionalThrowButton(cfg: ImageConfig, h: Hero, milliDelay: number, offsetX: number, offsetY: number) {
-        let c = new BaseActor(this.overlay, this.stage.device, cfg.img, cfg.width, cfg.height, 0);
+        let c = new BaseActor(this.overlay, this.stage.device, cfg.img!, cfg.width, cfg.height, 0);
         c.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         let v = new b2Vec2(0, 0);
         let isHolding = false;
@@ -387,7 +387,7 @@ export class OverlayApi {
             v.y = world.y;
             return true;
         });
-        c.setTouchUpHandler((hudX: number, hudY: number) => {
+        c.setTouchUpHandler((_hudX: number, _hudY: number) => {
             isHolding = false;
             return true;
         });
@@ -406,7 +406,7 @@ export class OverlayApi {
                 let now = new Date().getTime();
                 if (mLastThrow + milliDelay < now) {
                     mLastThrow = now;
-                    this.stage.getProjectilePool().throwAt(h.getCenterX(),
+                    this.stage.getProjectilePool()!.throwAt(h.getCenterX(),
                         h.getCenterY(), v.x, v.y, h, offsetX, offsetY);
                 }
             }
@@ -429,8 +429,8 @@ export class OverlayApi {
      * @return The action object
      */
     public ThrowFixedAction(hero: Hero, offsetX: number, offsetY: number, velocityX: number, velocityY: number): (hudX: number, hudY: number) => boolean {
-        return (hudX: number, hudY: number) => {
-            this.stage.getProjectilePool().throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
+        return (_hudX: number, _hudY: number) => {
+            this.stage.getProjectilePool()!.throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
             return true;
         }
     }
@@ -513,7 +513,7 @@ export class OverlayApi {
         return (hudX: number, hudY: number) => {
             let pixels = this.overlay.getCamera().metersToScreen(hudX, hudY);
             let world = this.stage.getWorld().getCamera().screenToMeters(pixels.x, pixels.y);
-            this.stage.getProjectilePool().throwAt(hero.getCenterX(), hero.getCenterY(), world.x, world.y, hero, offsetX, offsetY);
+            this.stage.getProjectilePool()!.throwAt(hero.getCenterX(), hero.getCenterY(), world.x, world.y, hero, offsetX, offsetY);
             return true;
         };
     }
@@ -553,7 +553,7 @@ export class OverlayApi {
             let now = new Date().getTime();
             if (mLastThrow + milliDelay < now) {
                 mLastThrow = now;
-                this.stage.getProjectilePool().throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
+                this.stage.getProjectilePool()!.throwFixed(hero, offsetX, offsetY, velocityX, velocityY);
             }
         }
     }

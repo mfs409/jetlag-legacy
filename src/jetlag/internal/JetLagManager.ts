@@ -21,7 +21,7 @@ export class JetLagManager {
     private stageNum = 1;
 
     /** The currently active stage, if any */
-    private stage: JetLagStage;
+    private stage!: JetLagStage;
 
     /**
      * Create the JetLagManager.  Note that there are many steps to take before
@@ -61,7 +61,7 @@ export class JetLagManager {
         this.stageNum = index;
         this.stageType = StageTypes.SPLASH;
         this.stage.onScreenChange();
-        this.config.splashBuilder(index, new JetLagApi(this, this.stage));
+        this.config.splashBuilder!(index, new JetLagApi(this, this.stage));
     }
 
     /**
@@ -73,7 +73,7 @@ export class JetLagManager {
         this.stageNum = index;
         this.stageType = StageTypes.PLAY;
         this.stage.onScreenChange();
-        this.config.levelBuilder(index, new JetLagApi(this, this.stage));
+        this.config.levelBuilder!(index, new JetLagApi(this, this.stage));
     }
 
     /**
@@ -85,7 +85,7 @@ export class JetLagManager {
         this.stageNum = index;
         this.stageType = StageTypes.HELP;
         this.stage.onScreenChange();
-        this.config.helpBuilder(index, new JetLagApi(this, this.stage));
+        this.config.helpBuilder!(index, new JetLagApi(this, this.stage));
     }
 
     /**
@@ -97,7 +97,7 @@ export class JetLagManager {
         this.stageNum = index;
         this.stageType = StageTypes.STORE;
         this.stage.onScreenChange();
-        this.config.storeBuilder(index, new JetLagApi(this, this.stage));
+        this.config.storeBuilder!(index, new JetLagApi(this, this.stage));
     }
 
     /**
@@ -119,7 +119,7 @@ export class JetLagManager {
         this.stageNum = index;
         this.stageType = StageTypes.CHOOSER;
         this.stage.onScreenChange();
-        this.config.chooserBuilder(index, new JetLagApi(this, this.stage));
+        this.config.chooserBuilder!(index, new JetLagApi(this, this.stage));
     }
 
     /** Quit the game.  Stop the music before quitting. */

@@ -5,7 +5,7 @@ import { Camera } from "../support/Camera"
 import { PointToActorCallback } from "../support/PointToActorCallback"
 import { JetLagRenderer, JetLagDevice, Renderable } from "../support/Interfaces";
 import { JetLagConfig } from "../../support/JetLagConfig";
-import { b2World, b2Vec2 } from "box2d.ts";
+import { b2World, b2Vec2 } from "@box2d/core";
 
 /**
  * BaseScene represents an interactive, dynamic, visible portion of a game.
@@ -58,7 +58,7 @@ export abstract class BaseScene {
     this.camera = new Camera(w, h, this.config.pixelMeterRatio, config, device.getConsole());
 
     // create a world with no default gravitational forces
-    this.world = new b2World(new b2Vec2(0, 0));
+    this.world = b2World.Create(new b2Vec2(0, 0));
 
     // set up the containers for holding anything we can render
     this.renderables = new Array<Array<Renderable>>(5);
@@ -87,11 +87,11 @@ export abstract class BaseScene {
    */
   public tap(screenX: number, screenY: number) {
     let actor = this.actorAt(screenX, screenY);
-    if (actor === null)
+    if (!actor)
       return false;
-    if (actor.getTapHandler() !== null) {
+    if (actor.getTapHandler()) {
       let worldCoords = this.camera.screenToMeters(screenX, screenY);
-      actor.getTapHandler()(worldCoords.x, worldCoords.y);
+      actor.getTapHandler()!(worldCoords.x, worldCoords.y);
       return true;
     }
     return false;
@@ -105,12 +105,12 @@ export abstract class BaseScene {
    */
   public panStart(screenX: number, screenY: number) {
     let actor = this.actorAt(screenX, screenY);
-    if (actor === null)
+    if (!actor)
       return false;
-    if (actor.getPanStartHandler() === null)
+    if (!actor.getPanStartHandler())
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.getPanStartHandler()(worldCoords.x, worldCoords.y);
+    return actor.getPanStartHandler()!(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -121,12 +121,12 @@ export abstract class BaseScene {
    */
   public panMove(screenX: number, screenY: number) {
     let actor = this.actorAt(screenX, screenY);
-    if (actor === null)
+    if (!actor)
       return false;
-    if (actor.getPanMoveHandler() === null)
+    if (!actor.getPanMoveHandler())
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.getPanMoveHandler()(worldCoords.x, worldCoords.y);
+    return actor.getPanMoveHandler()!(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -137,12 +137,12 @@ export abstract class BaseScene {
    */
   public panStop(screenX: number, screenY: number) {
     let actor = this.actorAt(screenX, screenY);
-    if (actor === null)
+    if (!actor)
       return false;
-    if (actor.getPanStopHandler() === null)
+    if (!actor.getPanStopHandler())
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.getPanStopHandler()(worldCoords.x, worldCoords.y);
+    return actor.getPanStopHandler()!(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -153,12 +153,12 @@ export abstract class BaseScene {
    */
   public touchDown(screenX: number, screenY: number) {
     let actor = this.actorAt(screenX, screenY);
-    if (actor === null)
+    if (!actor)
       return false;
-    if (actor.getTouchDownHandler() === null)
+    if (!actor.getTouchDownHandler())
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.getTouchDownHandler()(worldCoords.x, worldCoords.y);
+    return actor.getTouchDownHandler()!(worldCoords.x, worldCoords.y);
   }
 
   /**
@@ -169,12 +169,12 @@ export abstract class BaseScene {
    */
   public touchUp(screenX: number, screenY: number) {
     let actor = this.actorAt(screenX, screenY);
-    if (actor === null)
+    if (!actor)
       return false;
-    if (actor.getTouchUpHandler() === null)
+    if (!actor.getTouchUpHandler())
       return false;
     let worldCoords = this.camera.screenToMeters(screenX, screenY);
-    return actor.getTouchUpHandler()(worldCoords.x, worldCoords.y);
+    return actor.getTouchUpHandler()!(worldCoords.x, worldCoords.y);
   }
 
   /** 
@@ -189,15 +189,15 @@ export abstract class BaseScene {
   public swipe(screenX0: number, screenY0: number, screenX1: number, screenY1: number, time: number) {
     let sActor = this.actorAt(screenX0, screenY0);
     let eActor = this.actorAt(screenX1, screenY1);
-    if (sActor === null)
+    if (!sActor)
       return false;
     if (sActor !== eActor)
       return false;
-    if (sActor.getSwipeHandler() === null)
+    if (!sActor.getSwipeHandler())
       return false;
     let wc1 = this.camera.screenToMeters(screenX0, screenY0);
     let wc2 = this.camera.screenToMeters(screenX1, screenY1);
-    return sActor.getSwipeHandler()(wc1.x, wc1.y, wc2.x, wc2.y, time);
+    return sActor.getSwipeHandler()!(wc1.x, wc1.y, wc2.x, wc2.y, time);
   }
 
   /**
@@ -245,7 +245,7 @@ export abstract class BaseScene {
    * @param positionIterations The number of position update steps to run
    */
   public advanceWorld(dt: number, velocityIterations: number, positionIterations: number) {
-    this.world.Step(dt, velocityIterations, positionIterations);
+    this.world.Step(dt, { velocityIterations, positionIterations });
   }
 
   /**

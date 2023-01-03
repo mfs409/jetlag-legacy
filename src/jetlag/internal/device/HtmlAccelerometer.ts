@@ -1,6 +1,6 @@
 import { JetLagAccelerometer, JetLagAccelerometerMode } from "../support/Interfaces";
 import { HtmlConsole } from "./HtmlConsole";
-import { b2Vec2 } from "box2d.ts";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * HtmlAccelerometer provides access to device orientation and motion events
@@ -49,8 +49,9 @@ export class HtmlAccelerometer implements JetLagAccelerometer {
     // Tilt is supported, so install a listener
     this.tiltSupported = true;
     w.addEventListener('devicemotion', (ev: DeviceMotionEvent) => {
-      this.accel.x = - ev.accelerationIncludingGravity.x;
-      this.accel.y = ev.accelerationIncludingGravity.y;
+      if (ev === null || ev.accelerationIncludingGravity === null) return;
+      this.accel.x = - ev.accelerationIncludingGravity.x!;
+      this.accel.y = ev.accelerationIncludingGravity.y!;
     }, false);
   }
 

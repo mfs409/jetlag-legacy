@@ -3,7 +3,7 @@ import { Hero } from "./Hero"
 import { Obstacle } from "./Obstacle"
 import { Projectile } from "./Projectile"
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2Contact } from "box2d.ts";
+import { b2Contact } from "@box2d/core";
 
 /**
  * Enemies are things to be avoided or defeated by the Hero. Enemies do damage
@@ -12,10 +12,10 @@ import { b2Contact } from "box2d.ts";
  */
 export class Enemy extends WorldActor {
     /** A callback to run when this enemy defeats a hero */
-    private onDefeatHero: (e: Enemy, h: Hero) => void = null;
+    private onDefeatHero?: (e: Enemy, h: Hero) => void;
 
     /** A callback to run when an actor defeats this enemy */
-    private onDefeated: (e: Enemy, a: WorldActor) => void = null;
+    private onDefeated?: (e: Enemy, a?: WorldActor) => void;
 
     /** 
      * Amount of damage this enemy does to a hero on a collision. The default is
@@ -24,22 +24,22 @@ export class Enemy extends WorldActor {
     private damage = 2
 
     /** Does a crawling hero automatically defeat this enemy? */
-    private defeatByCrawl: boolean;
+    private defeatByCrawl = false;
 
     /** Does an in-air hero automatically defeat this enemy */
-    private defeatByJump: boolean;
+    private defeatByJump = false;
 
     /** 
      * When the enemy collides with an invincible hero, does the enemy stay
      * alive? 
      */
-    private immuneToInvincibility: boolean;
+    private immuneToInvincibility = false;
 
     /** 
      * When the enemy collides with an invincible hero, does it stay alive and
      * damage the hero? 
      */
-    private alwaysDoesDamage: boolean;
+    private alwaysDoesDamage = false;
 
     /**
      * Create a basic Enemy.  The enemy won't yet have any physics attached to
@@ -72,7 +72,7 @@ export class Enemy extends WorldActor {
      * 
      * @param callback The code to run
      */
-    public setOnDefeated(callback: (e: Enemy, a: WorldActor) => void) {
+    public setOnDefeated(callback: (e: Enemy, a?: WorldActor) => void) {
         this.onDefeated = callback;
     }
 
@@ -125,16 +125,16 @@ export class Enemy extends WorldActor {
     public setDamage(amount: number) { this.damage = amount; }
 
     /**
-     * When an enemy is defeated, this this code figures out how gameplay should
+     * When an enemy is defeated, this this code figures out how game play should
      * change.
      *
      * @param increaseScore Indicate if we should increase the score when this
      *                      enemy is defeated
      * @param h The hero who defeated this enemy, if it was a hero defeat
      */
-    public defeat(increaseScore: boolean, h: Hero) {
+    public defeat(increaseScore: boolean, h?: Hero) {
         if (this.onDefeated)
-            this.onDefeated(this, h); // Note: h can be null
+            this.onDefeated(this, h);
 
         // remove the enemy from the screen
         this.remove(false);
@@ -153,8 +153,8 @@ export class Enemy extends WorldActor {
      */
     private onCollideWithObstacle(obstacle: Obstacle, contact: b2Contact) {
         // handle any callbacks the obstacle has
-        if (obstacle.getEnemyCollisionCallback() != null)
-            obstacle.getEnemyCollisionCallback()(obstacle, this, contact);
+        if (obstacle.getEnemyCollisionCallback())
+            obstacle.getEnemyCollisionCallback()!(obstacle, this, contact);
     }
 
     /**
@@ -173,7 +173,7 @@ export class Enemy extends WorldActor {
             // be heard
             projectile.remove(true);
             // remove this enemy
-            this.defeat(true, null);
+            this.defeat(true, undefined);
         } else {
             // hide the projectile
             projectile.remove(false);
@@ -206,8 +206,8 @@ export class Enemy extends WorldActor {
     public setDisappearOnTouch() {
         this.setTapHandler(() => {
             this.stage.device.getVibration().vibrate(100);
-            this.defeat(true, null);
-            this.setTapHandler(null);
+            this.defeat(true, undefined);
+            this.setTapHandler(undefined);
             return true;
         });
     }

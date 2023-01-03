@@ -1,4 +1,4 @@
-import { b2Vec2 } from "box2d.ts";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * Path specifies a set of points that an actor will move among, in order, at a

@@ -3,7 +3,7 @@ import { Obstacle } from "./Obstacle"
 import { Camera } from "../internal/support/Camera"
 import { JetLagRenderer } from "../internal/support/Interfaces";
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2BodyType, b2Contact, b2Vec2 } from "box2d.ts";
+import { b2BodyType, b2Contact, b2Vec2 } from "@box2d/core";
 
 /**
  * Projectiles are actors that can be thrown from the hero's location in order to remove enemies.
@@ -18,7 +18,7 @@ export class Projectile extends WorldActor {
      * distance away from the hero that a projectile can travel before we make
      * it disappear.
      */
-    private range: number;
+    private range = 40;
 
     /**
      * When projectiles collide, and they are not sensors, one will disappear.
@@ -27,7 +27,7 @@ export class Projectile extends WorldActor {
     private disappearOnCollide: boolean;
 
     /** How much damage does this projectile do? */
-    private damage: number;
+    private damage = 1;
 
     /**
      * Create a projectile, and give it a physics body
@@ -83,10 +83,10 @@ export class Projectile extends WorldActor {
     public setRange(distance: number) { this.range = distance; }
 
     /**
-     * Indicate if the projectile should disapper when it collides with other
+     * Indicate if the projectile should disappear when it collides with other
      * projectiles
      *
-     * @param val True if the projectile should disapper on collisions
+     * @param val True if the projectile should disappear on collisions
      */
     public setDisappearOnCollide(val: boolean) {
         this.disappearOnCollide = val;
@@ -114,7 +114,7 @@ export class Projectile extends WorldActor {
         if (other instanceof Obstacle) {
             let o: Obstacle = other as Obstacle;
             if (o.getProjectileCollisionCallback()) {
-                o.getProjectileCollisionCallback()(o, this, contact);
+                o.getProjectileCollisionCallback()!(o, this, contact);
                 // return... don't remove the projectile
                 return;
             }
@@ -133,12 +133,12 @@ export class Projectile extends WorldActor {
      * Draw a projectile.  When drawing a projectile, we first check if it is
      * too far from its starting point. We only draw it if it is not.
      * 
-     * @param renderer The renderer for the game
-     * @param camera   The camera for the game
-     * @param elapsedMillis The number of milliseconds since the last render
+     * @param renderer  The renderer for the game
+     * @param camera    The camera for the game
+     * @param elapsedMs The number of milliseconds since the last render
      */
-    public render(renderer: JetLagRenderer, camera: Camera, elapsedMillis: number) {
-        if (!this.body.IsActive())
+    public render(renderer: JetLagRenderer, camera: Camera, elapsedMs: number) {
+        if (!this.body.IsEnabled())
             return;
         // eliminate the projectile quietly if it has traveled too far
         let dx = Math.abs(this.body.GetPosition().x - this.rangeFrom.x);
@@ -147,7 +147,7 @@ export class Projectile extends WorldActor {
             this.remove(true);
             return;
         }
-        super.render(renderer, camera, elapsedMillis);
+        super.render(renderer, camera, elapsedMs);
     }
 
     /**

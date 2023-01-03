@@ -1,7 +1,7 @@
 import { WorldActor } from "./WorldActor"
 import { Hero } from "./Hero"
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2Contact } from "box2d.ts";
+import { b2Contact } from "@box2d/core";
 
 /**
  * Goodies are actors that a hero can collect.
@@ -11,7 +11,7 @@ import { b2Contact } from "box2d.ts";
  */
 export class Goodie extends WorldActor {
   /** A callback to run when the hero collects this goodie */
-  private collectCallback: (g: Goodie, h: Hero) => void = null;
+  private collectCallback?: (g: Goodie, h: Hero) => void;
 
   /**
    * The "score" of this goodie... it is the amount that will be added to the
@@ -64,7 +64,7 @@ export class Goodie extends WorldActor {
    * @param other   Other object involved in this collision
    * @param contact A description of the contact that caused this collision
    */
-  onCollide(other: WorldActor, contact: b2Contact) { }
+  onCollide(_other: WorldActor, _contact: b2Contact) { }
 
   /**
    * Set the score of this goodie.

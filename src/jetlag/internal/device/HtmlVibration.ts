@@ -14,7 +14,7 @@ export class HtmlVibration implements JetLagVibration {
      * vibration API.
      */
     constructor(private console: HtmlConsole) {
-        if (navigator.vibrate) {
+        if (!!navigator.vibrate) {
             this.isSupported = true;
         }
     }

@@ -47,16 +47,16 @@ export class JetLagConfig {
   public enableChooser = true;
 
   /** Key for accessing persistent storage */
-  public storageKey: string = null;
+  public storageKey?: string;
 
   /** The list of image files that can be used by the game */
-  public imageNames: string[] = null;
+  public imageNames?: string[];
 
   /** The list of audio files that can be used as sound effects by the game */
-  public soundNames: string[] = null;
+  public soundNames?: string[];
 
   /** The list of audio files that can be used as (looping) background music */
-  public musicNames: string[] = null;
+  public musicNames?: string[];
 
   /** The prefix for all resources */
   public resourcePrefix = "";
@@ -64,23 +64,20 @@ export class JetLagConfig {
   /** Should we force the accelerometer to be off? */
   public forceAccelerometerOff = false;
 
-  /** Should we force the game to run in mobile mode? */
-  public mobileMode = false;
-
   /** The code that draws the main levels of the game */
-  public levelBuilder: (index: number, jl: JetLagApi) => void = null;
+  public levelBuilder?: (index: number, jl: JetLagApi) => void;
 
   /** The code that draws the level chooser */
-  public chooserBuilder: (index: number, jl: JetLagApi) => void = null;
+  public chooserBuilder?: (index: number, jl: JetLagApi) => void;
 
   /** The code that draws the help screens */
-  public helpBuilder: (index: number, jl: JetLagApi) => void = null;
+  public helpBuilder?: (index: number, jl: JetLagApi) => void;
 
   /** The code that draws the opening "splash" screen */
-  public splashBuilder: (index: number, jl: JetLagApi) => void = null;
+  public splashBuilder?: (index: number, jl: JetLagApi) => void;
 
   /** The code that draws the store screens */
-  public storeBuilder: (index: number, jl: JetLagApi) => void = null;
+  public storeBuilder?: (index: number, jl: JetLagApi) => void;
 
   /** Construct a Config object with default (invalid) settings */
   constructor() { }
@@ -94,7 +91,7 @@ export class JetLagConfig {
   public check(): string[] {
     let errs: string[] = [];
     if (this.verbosity < 0 || this.verbosity > 2) {
-      errs.push("Invalid loglevel in game config object");
+      errs.push("Invalid log level in game config object");
       this.verbosity = 2; // let's show a lot of errors in this case :)
     }
     if (this.pixelMeterRatio <= 0)
@@ -105,25 +102,25 @@ export class JetLagConfig {
       errs.push("height must be greater than zero in game config object");
     if (this.numLevels <= 0)
       errs.push("Invalid numLevels in game config object");
-    if (this.storageKey === null)
+    if (!this.storageKey)
       errs.push("Invalid storageKey in game config object");
-    if (this.imageNames === null)
+    if (!this.imageNames)
       errs.push("Invalid imageNames in game config object");
-    if (this.soundNames === null)
+    if (!this.soundNames)
       errs.push("Invalid soundNames in game config object");
-    if (this.musicNames === null)
+    if (!this.musicNames)
       errs.push("Invalid musicNames in game config object");
-    if (this.resourcePrefix === null)
+    if (!this.resourcePrefix)
       errs.push("Invalid value for resourcePrefix in game config object");
-    if (this.levelBuilder === null)
+    if (!this.levelBuilder)
       errs.push("Invalid levelBuilder in game config object");
-    if (this.chooserBuilder === null)
+    if (!this.chooserBuilder)
       errs.push("Invalid chooserBuilder in game config object");
-    if (this.helpBuilder === null)
+    if (!this.helpBuilder)
       errs.push("Invalid helpBuilder in game config object");
-    if (this.splashBuilder === null)
+    if (!this.splashBuilder)
       errs.push("Invalid splashBuilder in game config object");
-    if (this.storeBuilder === null)
+    if (!this.storeBuilder)
       errs.push("Invalid storeBuilder in game config object");
     return errs;
   }

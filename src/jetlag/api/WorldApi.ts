@@ -13,7 +13,7 @@ import { ActorConfig } from "./ActorConfig"
 import { TextConfig } from "./TextConfig"
 import { ImageConfig } from "./ImageConfig"
 import { checkImageConfig, checkTextConfig, checkActorConfig } from "../internal/support/Functions"
-import { b2BodyType } from "box2d.ts";
+import { b2BodyType } from "@box2d/core";
 
 /**
  * WorldApi provides all of the features needed for creating actors and
@@ -41,7 +41,7 @@ export class WorldApi {
      */
     public drawPicture(cfg: ImageConfig) {
         checkImageConfig(cfg);
-        return this.stage.getWorld().makePicture(cfg.x, cfg.y, cfg.width, cfg.height, cfg.img, cfg.z);
+        return this.stage.getWorld().makePicture(cfg.x, cfg.y, cfg.width, cfg.height, cfg.img!, cfg.z!);
     }
 
     /**
@@ -100,10 +100,10 @@ export class WorldApi {
     public addText(cfg: TextConfig, producer: () => string): Renderable {
         checkTextConfig(cfg);
         if (cfg.center) {
-            return this.stage.getWorld().addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
+            return this.stage.getWorld().addTextCentered(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z!, producer);
         }
         else {
-            return this.stage.getWorld().addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z, producer);
+            return this.stage.getWorld().addText(cfg.x, cfg.y, cfg.face, cfg.color, cfg.size, cfg.z!, producer);
         }
     }
 
@@ -118,20 +118,20 @@ export class WorldApi {
     public makeObstacle(cfg: ActorConfig) {
         checkActorConfig(cfg);
         let o: Obstacle;
-        if (cfg.verts != null) {
-            o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+        if (cfg.verts) {
+            o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             o.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
-            o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            o = new Obstacle(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             o.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius: number = Math.max(cfg.width, cfg.height);
-            o = new Obstacle(this.stage, radius, radius, cfg.img, cfg.z);
+            o = new Obstacle(this.stage, radius, radius, cfg.img!, cfg.z!);
             o.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
-        this.stage.getWorld().addActor(o, cfg.z);
+        this.stage.getWorld().addActor(o, cfg.z!);
         return o;
     }
 
@@ -146,17 +146,17 @@ export class WorldApi {
     public makeHero(cfg: ActorConfig) {
         checkActorConfig(cfg);
         let h: Hero;
-        if (cfg.verts != null) {
-            h = new Hero(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+        if (cfg.verts) {
+            h = new Hero(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             h.setPolygonPhysics(b2BodyType.b2_dynamicBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
-            h = new Hero(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            h = new Hero(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             h.setBoxPhysics(b2BodyType.b2_dynamicBody, cfg.x, cfg.y);
         }
         else {
             let radius: number = Math.max(cfg.width, cfg.height);
-            h = new Hero(this.stage, radius, radius, cfg.img, cfg.z);
+            h = new Hero(this.stage, radius, radius, cfg.img!, cfg.z!);
             h.setCirclePhysics(b2BodyType.b2_dynamicBody, cfg.x, cfg.y, radius / 2);
         }
         this.stage.score.onHeroCreated();
@@ -175,17 +175,17 @@ export class WorldApi {
     public makeEnemy(cfg: ActorConfig) {
         checkActorConfig(cfg);
         let e: Enemy;
-        if (cfg.verts != null) {
-            e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+        if (cfg.verts) {
+            e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             e.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
-            e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            e = new Enemy(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             e.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius = Math.max(cfg.width, cfg.height);
-            e = new Enemy(this.stage, radius, radius, cfg.img, cfg.z);
+            e = new Enemy(this.stage, radius, radius, cfg.img!, cfg.z!);
             e.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         this.stage.score.onEnemyCreated();
@@ -204,17 +204,17 @@ export class WorldApi {
     public makeDestination(cfg: ActorConfig) {
         checkActorConfig(cfg);
         let d: Destination;
-        if (cfg.verts != null) {
-            d = new Destination(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+        if (cfg.verts) {
+            d = new Destination(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             d.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
-            d = new Destination(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            d = new Destination(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             d.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius = Math.max(cfg.width, cfg.height);
-            d = new Destination(this.stage, radius, radius, cfg.img, cfg.z);
+            d = new Destination(this.stage, radius, radius, cfg.img!, cfg.z!);
             d.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         d.setCollisionsEnabled(false);
@@ -233,17 +233,17 @@ export class WorldApi {
     public makeGoodie(cfg: ActorConfig) {
         checkActorConfig(cfg);
         let g: Goodie;
-        if (cfg.verts != null) {
-            g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+        if (cfg.verts) {
+            g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             g.setPolygonPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, cfg.verts);
         }
         else if (cfg.box) {
-            g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img, cfg.z);
+            g = new Goodie(this.stage, cfg.width, cfg.height, cfg.img!, cfg.z!);
             g.setBoxPhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y);
         }
         else {
             let radius: number = Math.max(cfg.width, cfg.height);
-            g = new Goodie(this.stage, radius, radius, cfg.img, cfg.z);
+            g = new Goodie(this.stage, radius, radius, cfg.img!, cfg.z!);
             g.setCirclePhysics(b2BodyType.b2_staticBody, cfg.x, cfg.y, radius / 2);
         }
         g.setCollisionsEnabled(false);
@@ -330,7 +330,7 @@ export class WorldApi {
      */
     public addHorizontalBackgroundLayer(cfg: ImageConfig, xSpeed: number) {
         checkImageConfig(cfg);
-        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed, true, false, cfg.img, this.stage.config, this.stage.device);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed, true, false, cfg.img!, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 
@@ -346,7 +346,7 @@ export class WorldApi {
      */
     public addVerticalBackgroundLayer(cfg: ImageConfig, ySpeed: number) {
         checkImageConfig(cfg);
-        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, ySpeed, false, false, cfg.img, this.stage.config, this.stage.device);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, ySpeed, false, false, cfg.img!, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 
@@ -360,7 +360,7 @@ export class WorldApi {
      */
     public addHorizontalForegroundLayer(cfg: ImageConfig, xSpeed: number) {
         checkImageConfig(cfg);
-        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed, true, false, cfg.img, this.stage.config, this.stage.device);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed, true, false, cfg.img!, this.stage.config, this.stage.device);
         this.stage.getForeground().addLayer(pl);
     }
 
@@ -374,7 +374,7 @@ export class WorldApi {
      */
     public addHorizontalAutoBackgroundLayer(cfg: ImageConfig, xSpeed: number) {
         checkImageConfig(cfg);
-        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed / 1000, true, true, cfg.img, this.stage.config, this.stage.device);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, xSpeed / 1000, true, true, cfg.img!, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 
@@ -388,7 +388,7 @@ export class WorldApi {
      */
     public addVerticalAutoBackgroundLayer(cfg: ImageConfig, ySpeed: number) {
         checkImageConfig(cfg);
-        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, ySpeed / 1000, false, true, cfg.img, this.stage.config, this.stage.device);
+        let pl = new ParallaxLayer(cfg.x, cfg.y, cfg.width, cfg.height, ySpeed / 1000, false, true, cfg.img!, this.stage.config, this.stage.device);
         this.stage.getBackground().addLayer(pl);
     }
 

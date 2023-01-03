@@ -22,10 +22,10 @@ export class HtmlSpeaker implements JetLagSpeaker {
      * @param console A console, for printing error messages
      */
     constructor(config: JetLagConfig, private console: HtmlConsole) {
-        for (let name of config.soundNames) {
+        for (let name of config.soundNames!) {
             this.sounds[name] = new Howl({ src: [config.resourcePrefix + name] });
         }
-        for (let name of config.musicNames) {
+        for (let name of config.musicNames!) {
             this.music[name] = new Howl({ src: [config.resourcePrefix + name], loop: true });
         }
     }

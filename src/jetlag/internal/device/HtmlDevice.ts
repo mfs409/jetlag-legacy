@@ -1,5 +1,3 @@
-import fscreen from "fscreen"
-
 import { JetLagConfig } from "../../support/JetLagConfig"
 import { JetLagDevice, JetLagAccelerometerMode } from "../support/Interfaces"
 import { HtmlTouchScreen } from "./HtmlTouchScreen"
@@ -98,55 +96,12 @@ export class HtmlDevice implements JetLagDevice {
      * @param callback A callback to run once the device is ready
      */
     static initialize(domId: string, logger: HtmlConsole, config: JetLagConfig, callback: (config: JetLagConfig, device: JetLagDevice) => void) {
-        // The addressbar lets us force the game into mobile mode (i.e.,
-        // accelerometer on, full screen)
-        let x = window.location + "";
-        if (x.lastIndexOf("?mobile") == x.length - "?mobile".length) {
-            config.forceAccelerometerOff = false;
-            config.mobileMode = true;
+        // Adjust screen dimensions based on new fullscreen size, then make the
+        // device and run the callback
+        if (config.adaptToScreenSize) {
+            HtmlDevice.adjustScreenDimensions(config);
         }
-
-        // If we're in mobile mode, we need to let the user initiate full screen
-        // before we compute the screen size
-        if (config.mobileMode) {
-            // try to lock orientation... This isn't working yet...
-            (screen as any).orientation.lock((screen as any).orientation.type);
-
-            // Put a message on screen about starting the game
-            let elem = document.getElementById(domId);
-            let d = document.createElement("div");
-            d.innerHTML = "<b>Press Anywhere to Begin</b>";
-            document.body.appendChild(d);
-
-            // When the page is clicked, we will switch to full screen.  Then we
-            // can infer the screen size and finish building the device.
-            document.onclick = () => {
-                // prevent double-touches from doing funny things
-                document.onclick = null;
-                // go full screen
-                fscreen.requestFullscreen(elem);
-                // Remove the message
-                document.body.removeChild(d);
-                // wait a second before finishing up the configuration of the
-                // device
-                setTimeout(() => {
-                    // Adjust screen dimensions based on new fullscreen size,
-                    // then make the device and run the callback
-                    if (config.adaptToScreenSize) {
-                        HtmlDevice.adjustScreenDimensions(config);
-                    }
-                    callback(config, new HtmlDevice(config, domId, logger));
-                }, 1000);
-            }
-        }
-        else {
-            // Adjust screen dimensions based on new fullscreen size, then make
-            // the device and run the callback
-            if (config.adaptToScreenSize) {
-                HtmlDevice.adjustScreenDimensions(config);
-            }
-            callback(config, new HtmlDevice(config, domId, logger));
-        }
+        callback(config, new HtmlDevice(config, domId, logger));
     }
 
     /**

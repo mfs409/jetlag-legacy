@@ -42,7 +42,7 @@ export class ProjectileApi {
      *                 travel
      */
     public setRange(distance: number) {
-        this.stage.getProjectilePool().setProjectileRange(distance);
+        this.stage.getProjectilePool()!.setProjectileRange(distance);
     }
 
     /**
@@ -50,7 +50,7 @@ export class ProjectileApi {
      * they will be (more or less) immune to gravitational forces.
      */
     public setGravityOn() {
-        this.stage.getProjectilePool().setProjectileGravityOn();
+        this.stage.getProjectilePool()!.setProjectileGravityOn();
     }
 
     /**
@@ -60,7 +60,7 @@ export class ProjectileApi {
     * @param factor The value to multiply against the projectile speed.
     */
     public setDampeningFactor(factor: number) {
-        this.stage.getProjectilePool().setProjectileVectorDampeningFactor(factor);
+        this.stage.getProjectilePool()!.setProjectileVectorDampeningFactor(factor);
     }
 
     /**
@@ -68,7 +68,7 @@ export class ProjectileApi {
      * than disappearing when they collide with other actors
      */
     public enableCollisions() {
-        this.stage.getProjectilePool().enableCollisionsForProjectiles();
+        this.stage.getProjectilePool()!.enableCollisionsForProjectiles();
     }
 
     /**
@@ -78,7 +78,7 @@ export class ProjectileApi {
      * @param velocity The magnitude of the velocity for projectiles
      */
     public setFixedVectorThrowVelocity(velocity: number) {
-        this.stage.getProjectilePool().setFixedVectorThrowVelocityForProjectiles(velocity);
+        this.stage.getProjectilePool()!.setFixedVectorThrowVelocityForProjectiles(velocity);
     }
 
     /**
@@ -86,7 +86,7 @@ export class ProjectileApi {
      * be rotated to face in their direction or movement
      */
     public setRotateVectorThrow() {
-        this.stage.getProjectilePool().setRotateVectorThrowForProjectiles();
+        this.stage.getProjectilePool()!.setRotateVectorThrowForProjectiles();
     }
 
     /**
@@ -94,7 +94,7 @@ export class ProjectileApi {
      * screen
      */
     public setCollisionOk() {
-        this.stage.getProjectilePool().setCollisionOkForProjectiles();
+        this.stage.getProjectilePool()!.setCollisionOkForProjectiles();
     }
 
     /**
@@ -105,7 +105,7 @@ export class ProjectileApi {
      * @param factor The value to multiply against the projectile speed.
      */
     public setMultiplier(factor: number) {
-        this.stage.getProjectilePool().setProjectileMultiplier(factor);
+        this.stage.getProjectilePool()!.setProjectileMultiplier(factor);
     }
 
     /**
@@ -114,7 +114,7 @@ export class ProjectileApi {
      * @param num How many projectiles are available
      */
     public setLimitOnThrows(num: number) {
-        this.stage.getProjectilePool().setNumberOfProjectiles(num);
+        this.stage.getProjectilePool()!.setNumberOfProjectiles(num);
     }
 
     /**
@@ -123,7 +123,7 @@ export class ProjectileApi {
      * @param soundName Name of the sound file to play
      */
     public setThrowSound(soundName: string) {
-        this.stage.getProjectilePool().setThrowSound(soundName);
+        this.stage.getProjectilePool()!.setThrowSound(soundName);
     }
 
     /**
@@ -132,7 +132,7 @@ export class ProjectileApi {
      * @param soundName the name of the sound file to play
      */
     public setDisappearSound(soundName: string) {
-        this.stage.getProjectilePool().setProjectileDisappearSound(soundName);
+        this.stage.getProjectilePool()!.setProjectileDisappearSound(soundName);
     }
 
     /**
@@ -142,7 +142,7 @@ export class ProjectileApi {
      *                  thrown
      */
     public setAnimation(animation: Animation) {
-        this.stage.getProjectilePool().setProjectileAnimation(animation);
+        this.stage.getProjectilePool()!.setProjectileAnimation(animation);
     }
 
     /**
@@ -152,11 +152,11 @@ export class ProjectileApi {
      *               random
      */
     public setImageSource(images: string[]) {
-        this.stage.getProjectilePool().setProjectileImageSource(images);
+        this.stage.getProjectilePool()!.setProjectileImageSource(images);
     }
 
     /** Return the number of remaining projectiles */
     public getRemaining() {
-        return this.stage.getProjectilePool().getRemaining();
+        return this.stage.getProjectilePool()!.getRemaining();
     }
 }

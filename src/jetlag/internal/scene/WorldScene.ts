@@ -6,7 +6,7 @@ import { Projectile } from "../../actor/Projectile"
 import { JetLagRenderer, JetLagDevice } from "../support/Interfaces"
 import { JetLagConfig } from "../../support/JetLagConfig";
 import { Obstacle } from "../../actor/Obstacle";
-import { b2Vec2, b2ContactListener, b2Contact, b2ContactImpulse, b2Manifold, b2WorldManifold, b2DistanceJointDef, b2DistanceJoint } from "box2d.ts";
+import { b2Vec2, b2ContactListener, b2Contact, b2ContactImpulse, b2Manifold, b2WorldManifold, b2DistanceJointDef, b2DistanceJoint } from "@box2d/core";
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
@@ -32,7 +32,7 @@ export class WorldScene extends BaseScene {
     private tiltMultiplier: number = 1;
 
     /** This is the WorldActor that the camera chases, if any */
-    private cameraChaseActor: WorldActor = null;
+    private cameraChaseActor?: WorldActor;
 
     /** A temp vector, to avoid allocation in the tilt code */
     private tiltVec = new b2Vec2(0, 0);
@@ -80,20 +80,20 @@ export class WorldScene extends BaseScene {
             // unchanged
             if (this.tiltMax.x == 0) {
                 for (let gfo of this.tiltActors)
-                    if (gfo.getBody().IsActive())
+                    if (gfo.getBody().IsEnabled())
                         gfo.updateVelocity(gfo.getBody().GetLinearVelocity().x, gravity.y);
             }
             // if Y is clipped to zero, set each actor's X velocity, leave Y
             // unchanged
             else if (this.tiltMax.y == 0) {
                 for (let gfo of this.tiltActors)
-                    if (gfo.getBody().IsActive())
+                    if (gfo.getBody().IsEnabled())
                         gfo.updateVelocity(gravity.x, gfo.getBody().GetLinearVelocity().y);
             }
             // otherwise we set X and Y velocity
             else {
                 for (let gfo of this.tiltActors)
-                    if (gfo.getBody().IsActive())
+                    if (gfo.getBody().IsEnabled())
                         gfo.updateVelocity(gravity.x, gravity.y);
             }
         }
@@ -102,7 +102,7 @@ export class WorldScene extends BaseScene {
         else {
             this.tiltVec.Set(gravity.x, gravity.y);
             for (let gfo of this.tiltActors) {
-                if (gfo.getBody().IsActive()) {
+                if (gfo.getBody().IsEnabled()) {
                     gfo.getBody().ApplyForceToCenter(this.tiltVec);
                 }
             }
@@ -185,7 +185,7 @@ export class WorldScene extends BaseScene {
              *
              * @param contact A description of the contact event
              */
-            public EndContact(contact: b2Contact) {
+            public EndContact(_contact: b2Contact) {
             }
 
             /**
@@ -195,7 +195,7 @@ export class WorldScene extends BaseScene {
              * @param contact A description of the contact event
              * @param oldManifold The manifold from the previous world step
              */
-            public PreSolve(contact: b2Contact, oldManifold: b2Manifold) {
+            public PreSolve(contact: b2Contact, _oldManifold: b2Manifold) {
                 // get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData();
                 let b = contact.GetFixtureB().GetBody().GetUserData();
@@ -205,8 +205,8 @@ export class WorldScene extends BaseScene {
                 let gfoB = b as WorldActor;
 
                 // is either one-sided?
-                let oneSided: WorldActor = null;
-                let other: WorldActor = null;
+                let oneSided = undefined as WorldActor | undefined;
+                let other = undefined as WorldActor | undefined;
                 if (gfoA.getOneSided() > -1) {
                     oneSided = gfoA;
                     other = gfoB;
@@ -214,7 +214,7 @@ export class WorldScene extends BaseScene {
                     oneSided = gfoB;
                     other = gfoA;
                 }
-                if (oneSided != null && other != null && !oneSided.getDistJoint() && !other.getDistJoint()) {
+                if (oneSided && other && !oneSided.getDistJoint() && !other.getDistJoint()) {
                     // if we're here, see if we should be disabling a one-sided
                     // obstacle collision
                     let worldManiFold = new b2WorldManifold();
@@ -264,7 +264,7 @@ export class WorldScene extends BaseScene {
              * @param contact A description of the contact event
              * @param impulse The impulse of the contact
              */
-            public PostSolve(contact: b2Contact, impulse: b2ContactImpulse) {
+            public PostSolve(_contact: b2Contact, _impulse: b2ContactImpulse) {
             }
         })(this));
     }

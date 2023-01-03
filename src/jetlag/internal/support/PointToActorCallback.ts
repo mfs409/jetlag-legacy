@@ -1,28 +1,22 @@
 import { BaseActor } from "../../actor/BaseActor"
-import { b2AABB, b2Fixture, b2World, b2QueryCallback, b2Vec2 } from "box2d.ts";
+import { b2AABB, b2Fixture, b2World, b2Vec2 } from "@box2d/core";
 
 /**
- * PointToActorCallback is used by PhysicsType2d to determine if a coordinate in
- * the world corresponds to a BaseActor.
+ * PointToActorCallback queries the world to find the actor at a given
+ * coordinate
  */
-export class PointToActorCallback extends b2QueryCallback {
+export class PointToActorCallback {
     /** If we found an actor, we'll put it here */
-    private foundActor: BaseActor = null;
+    private foundActor?: BaseActor;
 
     /** A helper vector for tracking the location that is being queried */
     private touchVector = new b2Vec2(0, 0);
 
     /** The tolerance when looking in a region around a point */
-    private readonly delta = .1;
+    private readonly tolerance = .1;
 
     /** The bounding box around the point that is being tested */
     private aabb = new b2AABB();
-
-    /** Destructor is a no-op for our use of the IQueryCallback interface */
-    Destructor(): void { }
-
-    /** Default constructor just forwards to super */
-    constructor() { super(); }
 
     /**
      * ReportFixture is used by PhysicsType2d to see if the fixture that was
@@ -49,8 +43,8 @@ export class PointToActorCallback extends b2QueryCallback {
     }
 
     /**
-     * Returns the most recently found actor, or null if the most recent search
-     * failed
+     * Returns the most recently found actor, or undefined if the most recent
+     * search failed
      */
     public getFoundActor() { return this.foundActor; }
 
@@ -62,13 +56,13 @@ export class PointToActorCallback extends b2QueryCallback {
      * @param y The Y coordinate of the search, in meters
      */
     query(x: number, y: number, world: b2World) {
-        this.foundActor = null;
+        this.foundActor = undefined;
         this.touchVector.x = x;
         this.touchVector.y = y;
-        this.aabb.lowerBound.x = x - this.delta;
-        this.aabb.lowerBound.y = y - this.delta;
-        this.aabb.upperBound.x = x + this.delta;
-        this.aabb.upperBound.y = y + this.delta;
-        world.QueryAABB(this, this.aabb);
+        this.aabb.lowerBound.x = x - this.tolerance;
+        this.aabb.lowerBound.y = y - this.tolerance;
+        this.aabb.upperBound.x = x + this.tolerance;
+        this.aabb.upperBound.y = y + this.tolerance;
+        world.QueryAABB(this.aabb, (fixture: b2Fixture) => this.ReportFixture(fixture));
     }
 }

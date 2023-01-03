@@ -1,29 +1,28 @@
 {
     "name": "jetlag",
-    "version": "0.9.0",
+    "version": "0.9.5",
     "description": "TypeScript evolution of LibLOL, using PhysicsType2d and PIXI.js",
     "scripts": {
-        "start": "webpack-dev-server",
-        "test": "echo \"no tests yet\" && exit 1",
-        "doc": "rm -rf ./docs && typedoc src/jetlag && touch ./docs/.nojekyll",
-        "production": "node_modules/.bin/webpack-cli --mode production"
+        "start": "node scripts/dev.js -w",
+        "build": "node scripts/build.js",
+        "clean": "node scripts/clean.js",
+        "check": "tsc",
+        "test": "echo \"no tests yet\" && exit 1"
     },
     "author": "Micah Carlisle, Maximilian Hasselbusch, and Michael Spear",
     "license": "MIT",
-    "devDependencies": {
-        "@types/fscreen": "^1.0.1",
-        "@types/howler": "^2.1.2",
-        "box2d.ts": "^1.0.2",
-        "fscreen": "^1.0.2",
+    "type": "module",
+    "dependencies": {
+        "@box2d/core": "^0.10.0",
         "hammerjs": "^2.0.8",
-        "howler": "^2.1.2",
-        "pixi.js": "^5.2.0",
-        "@types/hammerjs": "^2.0.36",
-        "ts-loader": "^6.2.1",
-        "typedoc": "^0.15.3",
-        "typescript": "3.0.1",
-        "webpack": "^4.41.2",
-        "webpack-cli": "^3.3.10",
-        "webpack-dev-server": "^3.11.3"
+        "howler": "^2.2.3",
+        "pixi.js": "^6.5.8"
+    },
+    "devDependencies": {
+        "@types/hammerjs": "^2.0.41",
+        "@types/howler": "^2.2.7",
+        "esbuild": "^0.16.13",
+        "esbuild-serve": "^1.0.1",
+        "typescript": "^4.9.4"
     }
 }

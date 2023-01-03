@@ -32,25 +32,25 @@ import { ProjectilePool } from "./support/ProjectilePool";
  */
 export class JetLagStage {
     /** The physics world in which all actors exist */
-    private world: WorldScene;
+    private world!: WorldScene;
 
     /** A heads-up display */
-    private hud: OverlayScene;
+    private hud!: OverlayScene;
 
     /** Any pause, win, or lose scene that supercedes the world and hud */
-    private overlay: OverlayScene;
+    private overlay?: OverlayScene;
 
     /** The function for creating this level's pre-scene */
-    private welcomeSceneBuilder: (overlay: OverlayApi) => void = null;
+    private welcomeSceneBuilder?: (overlay: OverlayApi) => void;
 
     /** The function for creating this level's win scene */
-    private winSceneBuilder: (overlay: OverlayApi) => void = null;
+    private winSceneBuilder?: (overlay: OverlayApi) => void;
 
     /** The function for creating this level's lose scene */
-    private loseSceneBuilder: (overlay: OverlayApi) => void = null;
+    private loseSceneBuilder?: (overlay: OverlayApi) => void;
 
     /** The function for creating this level's pause scene */
-    private pauseSceneBuilder: (overlay: OverlayApi) => void = null;
+    private pauseSceneBuilder?: (overlay: OverlayApi) => void;
 
     /** 
      * Background color for the stage being drawn when no overlay. defaults to
@@ -59,22 +59,22 @@ export class JetLagStage {
     private backgroundColor = 0xFFFFFF;
 
     /** The background layers */
-    private background: ParallaxScene;
+    private background!: ParallaxScene;
 
     /** The foreground layers */
-    private foreground: ParallaxScene;
+    private foreground!: ParallaxScene;
 
     /** Track all the scores */
     public readonly score: Score;
 
     /** The music, if any */
-    private music: JetLagSound = null;
+    private music?: JetLagSound;
 
     /** Whether the music is playing or not */
     private musicPlaying = false;
 
     /** A pool of projectiles for use by the hero */
-    private projectilePool: ProjectilePool;
+    private projectilePool?: ProjectilePool;
 
     /** Should gestures go to the HUD first, or to the WORLD first? */
     private gestureHudFirst = true;
@@ -299,7 +299,7 @@ export class JetLagStage {
 
     /** Hide the current overlay scene that is showing */
     public clearOverlayScene() {
-        this.overlay = null;
+        this.overlay = undefined;
     }
 
     /**
@@ -316,12 +316,12 @@ export class JetLagStage {
             this.overlay = new OverlayScene(this.config, this.device);
             this.welcomeSceneBuilder(new OverlayApi(this, this.overlay));
             // null it out so it won't run again
-            this.welcomeSceneBuilder = null;
+            this.welcomeSceneBuilder = undefined;
         }
         if (this.pauseSceneBuilder) {
             this.overlay = new OverlayScene(this.config, this.device);
             this.pauseSceneBuilder(new OverlayApi(this, this.overlay));
-            this.pauseSceneBuilder = null;
+            this.pauseSceneBuilder = undefined;
         }
         // NB: win and lose scenes might already be showing :)
         if (this.overlay) {
@@ -377,7 +377,7 @@ export class JetLagStage {
     public onScreenChange() {
         // reset music
         this.stopMusic();
-        this.music = null;
+        this.music = undefined;
 
         // reset score
         this.score.reset();
@@ -387,13 +387,13 @@ export class JetLagStage {
         this.device.getKeyboard().clearHandlers();
 
         // reset other fields to default values
-        this.projectilePool = null;
+        this.projectilePool = undefined;
         this.gestureHudFirst = true;
         this.backgroundColor = 0xFFFFFF;
-        this.welcomeSceneBuilder = null;
-        this.winSceneBuilder = null;
-        this.loseSceneBuilder = null;
-        this.pauseSceneBuilder = null;
+        this.welcomeSceneBuilder = undefined;
+        this.winSceneBuilder = undefined;
+        this.loseSceneBuilder = undefined;
+        this.pauseSceneBuilder = undefined;
 
         // Just re-make the scenes, instead of clearing the old ones
         this.world = new WorldScene(this.config, this.device);
@@ -413,7 +413,7 @@ export class JetLagStage {
             if (this.winSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
                 this.winSceneBuilder(new OverlayApi(this, this.overlay));
-                this.winSceneBuilder = null;
+                this.winSceneBuilder = undefined;
             }
             else {
                 this.manager.advanceLevel();
@@ -423,7 +423,7 @@ export class JetLagStage {
             if (this.loseSceneBuilder) {
                 this.overlay = new OverlayScene(this.config, this.device);
                 this.loseSceneBuilder(new OverlayApi(this, this.overlay));
-                this.loseSceneBuilder = null;
+                this.loseSceneBuilder = undefined;
             }
             else {
                 this.manager.repeatLevel();
@@ -443,7 +443,7 @@ export class JetLagStage {
     public pauseMusic() {
         if (this.musicPlaying) {
             this.musicPlaying = false;
-            this.music.stop();
+            this.music!.stop();
         }
     }
 
@@ -451,7 +451,7 @@ export class JetLagStage {
     public stopMusic() {
         if (this.musicPlaying) {
             this.musicPlaying = false;
-            this.music.stop();
+            this.music!.stop();
         }
     }
 }

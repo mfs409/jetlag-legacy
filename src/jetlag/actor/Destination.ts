@@ -2,7 +2,7 @@ import { WorldActor } from "./WorldActor"
 import { Hero } from "./Hero"
 import { JetLagSound } from "../internal/support/Interfaces";
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2Contact } from "box2d.ts";
+import { b2Contact } from "@box2d/core";
 
 /**
  * Destinations are actors that the Hero should try to reach. When a Hero
@@ -16,13 +16,13 @@ export class Destination extends WorldActor {
     private holding: number;
 
     /** Sound to play when a hero arrives at this destination */
-    private arrivalSound: JetLagSound;
+    private arrivalSound?: JetLagSound;
 
     /** 
      * A custom, optional check to decide if the Destination is "ready" to
      * accept a Hero 
      */
-    private onAttemptArrival: (h: Hero) => boolean = null;
+    private onAttemptArrival?: (h: Hero) => boolean;
 
     /**
      * Create a basic Destination.  The destination won't yet have any physics
@@ -90,7 +90,7 @@ export class Destination extends WorldActor {
      * @param other   Other actor involved in this collision
      * @param contact A description of the collision
      */
-    onCollide(other: WorldActor, contact: b2Contact) { }
+    onCollide(_other: WorldActor, _contact: b2Contact) { }
 
     /**
      * Change the number of heroes that can be accepted by this destination (the

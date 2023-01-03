@@ -19,7 +19,7 @@ export class Picture implements Renderable {
     private dims = { x: -1, y: -1, w: -1, h: -1 };
 
     /** The sprite to display on screen when the Picture is visible */
-    private sprite: JetLagSprite = null;
+    private sprite?: JetLagSprite;
 
     /**
      * Create a picture and put it at a fixed position in the world
@@ -51,7 +51,7 @@ export class Picture implements Renderable {
      *               image should be drawn
      */
     public render(renderer: JetLagRenderer, camera: Camera): void {
-        if (!this.visible || this.sprite === null)
+        if (!this.visible || !this.sprite)
             return;
         // update world position, because the renderer is free to scale and move
         // the sprite on every render...

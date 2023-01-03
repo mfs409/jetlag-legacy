@@ -35,7 +35,7 @@ export class ActorConfig {
     /** Is the actor a box? */
     box?= false;
     /** Vertices of the actor, if the actor is a polygon */
-    verts?: number[] = null;
+    verts?: number[];
     /** Z index of the actor */
     z?= 0;
 }
