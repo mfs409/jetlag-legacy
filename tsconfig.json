@@ -14,13 +14,15 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules"
   ],
   "include": [
-    "src/game/*"
+    "src/game/*",
+    "src/index.ts"
   ],
   "typedocOptions": {
     "out": "./docs/",

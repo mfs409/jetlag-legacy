@@ -11,6 +11,5 @@ esbuildServe({
     bundle: true,
     outfile: DBG_BUNDLE_FILE,
     minify: false,
-    sourcemap: true,
-});
-
+    sourcemap: true
+}, { port: 7000 });

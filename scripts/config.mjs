@@ -16,7 +16,7 @@ export const SRC_INDEX_FILE = path.join(ROOT_FOLDER, "index.html");
 export const SRC_ASSETS_FOLDER = path.join(ROOT_FOLDER, "assets");
 
 /** The location of the file that serves as the program entry point */
-export const SRC_ENTRY_FILE = path.join(ROOT_FOLDER, "src", "game", "launch.ts");
+export const SRC_ENTRY_FILE = path.join(ROOT_FOLDER, "src", "index.ts");
 
 /** In debug mode, the place where the compiled code should go */
 export const DBG_BUNDLE_FILE = path.join(ROOT_FOLDER, "bundle.js");
