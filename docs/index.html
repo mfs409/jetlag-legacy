@@ -1,0 +1,111 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>JetLag Documentation</title><meta name="description" content="Documentation for JetLag Documentation"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">JetLag Documentation</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<h2>JetLag Documentation</h2></div>
+<div class="tsd-panel tsd-typography"><a id="md:jetlag-2d-games-for-web-and-mobile" class="tsd-anchor"></a><h1><a href="#md:jetlag-2d-games-for-web-and-mobile">JetLag: 2D Games for Web and Mobile</a></h1><p>JetLag is a framework for making 2D games that run in desktop and mobile
+browsers.  It is the evolution of LibLOL, and at a high level, it is faithful
+to the spirit of LibLOL.  In particular:</p>
+<ul>
+<li>JetLag is designed for beginners</li>
+<li>JetLag strives to put all of the code for a level of the game in a single
+section of a single file</li>
+</ul>
+<p>As an HTML5 project, JetLag differs from LibLOL in a few ways:</p>
+<ul>
+<li>It uses PIXI.js and Howler.js, and a different version of Box2D than
+LibGDX, so some names and features are a little bit different</li>
+<li>It uses TypeScript instead of Java, which leads to simpler, cleaner code</li>
+</ul>
+<p>Note that JetLag still is a mobile-first framework.  It uses Hammer.js for
+multi-touch and gesture support, and also enables accelerometer by default.</p>
+<a id="md:getting-started" class="tsd-anchor"></a><h2><a href="#md:getting-started">Getting Started</a></h2><p>Once you have downloaded JetLag, enter the JetLag directory and type <code>npm install</code> to fetch all of the supporting code for JetLag.  Once you have done
+that, you can run <code>npm start</code> to compile your code.  JetLag uses <code>esbuild</code>
+for compilation, so every time you make a change, the code will recompile.
+To test your game, open a browser and navigate to <a href="http://localhost:7000">http://localhost:7000</a>.</p>
+<p>To develop a game, we recommend that you start by reading the code in
+<code>src/game/Levels.ts</code>, to understand how JetLag works.  Then edit the first
+level of that file to start creating your game.</p>
+<p>To add images and sounds to JetLag, follow these steps:</p>
+<ol>
+<li>Copy the image or sound file into the assets folder</li>
+<li>Add the name of the file to the appropriate list in <code>src/game/GameConfig.ts</code></li>
+</ol>
+<p>That&#39;s it.  Once you follow those two steps, you can refer to the asset by its
+filename in your code.</p>
+<a id="md:jetlag-status" class="tsd-anchor"></a><h2><a href="#md:jetlag-status">JetLag Status</a></h2><p>This is the &quot;Entity-Component-System&quot; (ECS) version of the JetLag game
+development framework.  Older versions are available in branches, but will
+not be maintained.  We reserve the right to change any and all APIs and
+interfaces.</p>
+<a id="md:documentation" class="tsd-anchor"></a><h2><a href="#md:documentation">Documentation</a></h2><p>Documentation for JetLag is available on
+<a href="https://mfs409.github.io/jetlag/" title="JetLag GitHub Pages">GitHub Pages</a></p>
+<a id="md:coding-standards" class="tsd-anchor"></a><h2><a href="#md:coding-standards">Coding Standards</a></h2><p>JetLag is supposed to be a library that its users will hack for their own
+purposes.  Consequently, we prefer that programmers preserve the structure we
+have in the repository, where both <code>jetlag</code> and <code>game</code> are sub-folders of the
+<code>src</code> folder.</p>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)" id="icon-chevronDown"></path></svg>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li>
+<ul>
+<li><a href="#md:jetlag-2d-games-for-web-and-mobile"><span>Jet<wbr/>Lag: 2<wbr/>D <wbr/>Games for <wbr/>Web and <wbr/>Mobile</span></a></li>
+<li>
+<ul>
+<li><a href="#md:getting-started"><span>Getting <wbr/>Started</span></a></li>
+<li><a href="#md:jetlag-status"><span>Jet<wbr/>Lag <wbr/>Status</span></a></li>
+<li><a href="#md:documentation"><span>Documentation</span></a></li>
+<li><a href="#md:coding-standards"><span>Coding <wbr/>Standards</span></a></li></ul></li></ul></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>Jet<wbr/>Lag <wbr/>Documentation</span></a>
+<ul class="tsd-small-nested-navigation">
+<li><a href="modules/Components_Appearance.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>Appearance</span></a></li>
+<li><a href="modules/Components_Movement.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>Movement</span></a></li>
+<li><a href="modules/Components_Music.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>Music</span></a></li>
+<li><a href="modules/Components_RigidBody.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>Rigid<wbr/>Body</span></a></li>
+<li><a href="modules/Components_Role.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>Role</span></a></li>
+<li><a href="modules/Components_SoundEffect.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>Sound<wbr/>Effect</span></a></li>
+<li><a href="modules/Components_StateManager.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Components/<wbr/>State<wbr/>Manager</span></a></li>
+<li><a href="modules/Config.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Config</span></a></li>
+<li><a href="modules/Entities_Actor.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Entities/<wbr/>Actor</span></a></li>
+<li><a href="modules/Entities_Scene.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Entities/<wbr/>Scene</span></a></li>
+<li><a href="modules/Services_Accelerometer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Accelerometer</span></a></li>
+<li><a href="modules/Services_AudioService.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Audio<wbr/>Service</span></a></li>
+<li><a href="modules/Services_Console.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Console</span></a></li>
+<li><a href="modules/Services_Gesture.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Gesture</span></a></li>
+<li><a href="modules/Services_ImageService.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Image<wbr/>Service</span></a></li>
+<li><a href="modules/Services_Keyboard.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Keyboard</span></a></li>
+<li><a href="modules/Services_Renderer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Renderer</span></a></li>
+<li><a href="modules/Services_Storage.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Services/<wbr/>Storage</span></a></li>
+<li><a href="modules/Stage.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Stage</span></a></li>
+<li><a href="modules/Systems_Camera.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Camera</span></a></li>
+<li><a href="modules/Systems_Collisions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Collisions</span></a></li>
+<li><a href="modules/Systems_Parallax.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Parallax</span></a></li>
+<li><a href="modules/Systems_Projectiles.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Projectiles</span></a></li>
+<li><a href="modules/Systems_Score.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Score</span></a></li>
+<li><a href="modules/Systems_Svg.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Svg</span></a></li>
+<li><a href="modules/Systems_Tilt.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Tilt</span></a></li>
+<li><a href="modules/Systems_Timer.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>Systems/<wbr/>Timer</span></a></li></ul></nav></div></div></div>
+<div class="overlay"></div></body></html>
