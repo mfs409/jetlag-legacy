@@ -1,4 +1,4 @@
-// Last review: 08-11-2023
+// Last review: Needs Review
 
 import { b2BodyType, b2Transform, b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
@@ -140,7 +140,13 @@ export class PathMovement {
   }
 }
 
-/** A rule for moving based on Tilt / Accelerometer */
+/** 
+ * A rule for moving based on Tilt / Accelerometer 
+ *
+ * TODO:  The aggressive use of tilt in the demo game tends to confuse more than
+ *        it helps.  Consider adding a "KeyboardMovement", perhaps based on
+ *        ExplicitMovement?
+ */
 export class TiltMovement {
   /** The Actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
