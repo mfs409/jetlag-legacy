@@ -1,0 +1,28 @@
+{
+  "name": "markdown-viewer",
+  "version": "1.0.0",
+  "description": "A markdown viewer app based on showdown, highlight, mermaid vega, and katex",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "clean": "node scripts/clean.mjs",
+    "build-watch": "node scripts/build.mjs -w"
+  },
+  "keywords": [
+    "Markdown",
+    "Tutorials"
+  ],
+  "author": "Michael Spear",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.16.14",
+    "esbuild-serve": "^1.0.1"
+  },
+  "dependencies": {
+    "mermaid": "^9.3.0",
+    "showdown": "^1.9.1",
+    "showdown-highlight": "^3.0.0",
+    "showdown-katex": "^0.8.0",
+    "vega-embed": "^6.20.8",
+    "vega-lite": "^5.2.0"
+  }
+}

@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+
+body {
+    font-family: 'Lato';
+    font-size: 16pt;
+}
+
+h1 {
+    font-size: 28pt;
+    text-align: center;
+}
+
+h2 {
+    font-size: 24pt;
+    text-align: center;
+}
+
+h3 {
+    font-size: 18pt;
+}
+
+h4 {
+    font-size: 16pt;
+}
+
+p code,
+li code {
+    background-color: lightgray;
+}
+
+.copy {
+    font-size: 10pt;
+}
+
+@media print {
+    body {
+        margin: 1.6cm;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
