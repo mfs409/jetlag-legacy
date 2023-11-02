@@ -5284,6 +5284,56 @@ export function buildLevelScreen(index: number) {
     );
   }
 
+  // custom games on the end 
+
+  else if (index == 91) {
+    // start with a hero who is controlled via Joystick
+    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    let cfg = { cx: 1, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
+    let h = new Actor(game.world);
+    h.appearance = new ImageSprite(cfg);
+    h.rigidBody = RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 });
+    h.role = new Hero();
+    h.movement = new ExplicitMovement();
+
+    Helpers.addJoystickControl(game.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
+
+    // make a destination that moves, and that requires one goodie to be collected before it
+    // works
+    cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+    let d = new Actor(game.world);
+    d.appearance = new ImageSprite(cfg);
+    d.rigidBody = RigidBodyComponent.Circle(cfg, game.world);
+    d.role = new Destination({ onAttemptArrival: () => { return game.score.goodieCount[0] >= 1; } });
+    d.movement = new PathMovement(new Path().to(15, 8).to(15, 0.25).to(15, 8), 4, true);
+    game.score.setVictoryDestination(1);
+
+    // make an obstacle that moves
+    let boxCfg = { cx: 0, cy: 0, width: 1, height: 1, img: "purple_ball.png" };
+    let o = new Actor(game.world);
+    o.appearance = new ImageSprite(boxCfg);
+    o.rigidBody = RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 100 });
+    o.role = new Obstacle();
+    o.movement = new PathMovement(new Path().to(0, 0).to(8, 8).to(0, 0), 2, true);
+
+    // make a goodie that moves
+    cfg = { cx: 5, cy: 5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+    let g = new Actor(game.world);
+    g.appearance = new ImageSprite(cfg);
+    g.rigidBody = RigidBodyComponent.Circle(cfg, game.world);
+    g.role = new Goodie();
+    g.movement = new PathMovement(new Path().to(3, 3).to(6, 3).to(6, 6).to(3, 6).to(3, 3), 10, true);
+
+    // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
+    let t = new Actor(
+      game.hud);
+    t.appearance = new TextSprite({ cx: 1, cy: 1, center: false, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
+      () => game.score.goodieCount[0] + " Goodies");
+
+    welcomeMessage("Every actor can move...");
+    winMessage("Great Job");
+  }
+
   // You just made it to the last level.  Now it's time to reveal a little
   // secret...  No matter which "if" or "else if" the code did, it eventually
   // got down here, where we do three standard configuration tasks.
