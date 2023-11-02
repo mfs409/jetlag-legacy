@@ -5288,7 +5288,7 @@ export function buildLevelScreen(index: number) {
 
   else if (index == 91) {
     // start with a hero who is controlled via Joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    Helpers.drawBoundingBox(0, 0, 16, 9, 0.1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 1, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = new Actor(game.world);
     h.appearance = new ImageSprite(cfg);
@@ -5298,14 +5298,14 @@ export function buildLevelScreen(index: number) {
 
     Helpers.addJoystickControl(game.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
-    // make a destination that moves, and that requires one goodie to be collected before it
-    // works
+    // make a destination that moves, and that requires one goodie to be collected before it works
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
     let d = new Actor(game.world);
     d.appearance = new ImageSprite(cfg);
     d.rigidBody = RigidBodyComponent.Circle(cfg, game.world);
     d.role = new Destination({ onAttemptArrival: () => { return game.score.goodieCount[0] >= 1; } });
-    d.movement = new PathMovement(new Path().to(15, 8).to(15, 0.25).to(15, 8), 4, true);
+    d.movement = new PathMovement(new Path().to(15, 8).to(15, 0.25).to(15, 8), 4, true); // Reduced speed
+
     game.score.setVictoryDestination(1);
 
     // make an obstacle that moves
@@ -5314,25 +5314,34 @@ export function buildLevelScreen(index: number) {
     o.appearance = new ImageSprite(boxCfg);
     o.rigidBody = RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 100 });
     o.role = new Obstacle();
-    o.movement = new PathMovement(new Path().to(0, 0).to(8, 8).to(0, 0), 2, true);
+    o.movement = new PathMovement(new Path().to(0, 0).to(8, 8).to(0, 0), 3, true); // Reduced speed
 
-    // make a goodie that moves
-    cfg = { cx: 5, cy: 5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    let g = new Actor(game.world);
-    g.appearance = new ImageSprite(cfg);
-    g.rigidBody = RigidBodyComponent.Circle(cfg, game.world);
-    g.role = new Goodie();
-    g.movement = new PathMovement(new Path().to(3, 3).to(6, 3).to(6, 6).to(3, 6).to(3, 3), 10, true);
+    // create three goodies with random paths and starting positions
+    for (let i = 0; i < 3; i++) {
+        cfg = { cx: Math.random() * 12 + 2, cy: Math.random() * 6 + 2, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+        let g = new Actor(game.world);
+        g.appearance = new ImageSprite(cfg);
+        g.rigidBody = RigidBodyComponent.Circle(cfg, game.world);
+        g.role = new Goodie();
+        // Generate a random path for each goodie with slower speed
+        let path = new Path();
+        path.to(Math.random() * 12 + 2, Math.random() * 6 + 2);
+        for (let j = 0; j < 5; j++) {
+            path.to(Math.random() * 12 + 2, Math.random() * 6 + 2);
+        }
+        // path.delay(i * 2); // Add a delay to stagger their movements
+        // make moviment random between 3 to 7
+        g.movement = new PathMovement(path, Math.random() * 4 + 3, true); // Reduced speed
+    }
 
     // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
-    let t = new Actor(
-      game.hud);
-    t.appearance = new TextSprite({ cx: 1, cy: 1, center: false, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
-      () => game.score.goodieCount[0] + " Goodies");
+    let t = new Actor(game.hud);
+    t.appearance = new TextSprite({ cx: 1, cy: 1, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 },
+        () => 3 - game.score.goodieCount[0] + " Remaining Goodies");
 
     welcomeMessage("Every actor can move...");
     winMessage("Great Job");
-  }
+}
 
   // You just made it to the last level.  Now it's time to reveal a little
   // secret...  No matter which "if" or "else if" the code did, it eventually
@@ -5366,7 +5375,7 @@ export function buildLevelScreen(index: number) {
  *
  * @param message The message to display
  */
-export function welcomeMessage(message: string) {
+export function welcomeMessage(message: string, subMessage: string = "") {
   // Immediately install the overlay, to pause the game
   game.installOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
@@ -5374,6 +5383,9 @@ export function welcomeMessage(message: string) {
     // The text goes in the middle
     let t = new Actor(overlay);
     t.appearance = new TextSprite({ center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    // The subtext goes below the main text
+    t = new Actor(overlay);
+    t.appearance = new TextSprite({ center: true, cx: 8, cy: 5.5, face: "Arial", color: "#FFFFFF", size: 24, z: 0 }, () => subMessage);
   });
 }
 
