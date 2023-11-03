@@ -5339,7 +5339,7 @@ export function buildLevelScreen(index: number) {
     t.appearance = new TextSprite({ cx: 1, cy: 1, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 },
         () => 3 - game.score.goodieCount[0] + " Remaining Goodies");
 
-    welcomeMessage("Every actor can move...");
+    welcomeMessage("Every actor can move...", "Collect 3 goodies to unlock the destination, Click to start!");
     winMessage("Great Job");
 }
 
@@ -5384,8 +5384,10 @@ export function welcomeMessage(message: string, subMessage: string = "") {
     let t = new Actor(overlay);
     t.appearance = new TextSprite({ center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     // The subtext goes below the main text
-    t = new Actor(overlay);
-    t.appearance = new TextSprite({ center: true, cx: 8, cy: 5.5, face: "Arial", color: "#FFFFFF", size: 24, z: 0 }, () => subMessage);
+    if(subMessage != "") {
+      t = new Actor(overlay);
+      t.appearance = new TextSprite({ center: true, cx: 8, cy: 6, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage);
+    }
   });
 }
 
