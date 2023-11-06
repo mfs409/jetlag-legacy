@@ -5292,7 +5292,7 @@ export function buildLevelScreen(index: number) {
         "####################",
         "#H                 #",
         "# # ### # # ## # # #",
-        "# #     # #      # #",
+        "# #  G  # #      # #",
         "# # ### ### #      #",
         "# #   #  G         #",
         "# # # # #####      #",
@@ -5345,8 +5345,8 @@ export function buildLevelScreen(index: number) {
       game.score.setVictoryDestination(1);
 
     let t = new Actor(game.hud);
-    t.appearance = new TextSprite({ cx: 1, cy: 0, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 },
-        () => 2 - game.score.goodieCount[0] + " Remaining Goodies");
+    t.appearance = new TextSprite({ cx: 1, cy: 0.25, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 },
+        () => 3 - game.score.goodieCount[0] + " Remaining Goodies");
         
     // Draw a joystick on the HUD to control the hero
     Helpers.addJoystickControl(game.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
