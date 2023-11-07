@@ -5,7 +5,7 @@ import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
 import { AudioService } from "./Services/AudioService";
 import { MusicComponent } from "./Components/Music";
-import { ScoreSystem, StageTypes } from "./Systems/Score";
+import { ScoreSystem } from "./Systems/Score";
 import { GameCfg } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
