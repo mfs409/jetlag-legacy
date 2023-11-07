@@ -1,14 +1,14 @@
 // Last review: 08-10-2023
 
 import { b2BodyType, b2Vec2 } from "@box2d/core";
-import { ImageSprite } from "../jetlag/Components/Appearance";
+import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Scene } from "../jetlag/Entities/Scene";
-import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path } from "../jetlag/Components/Movement";
+import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, InertMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { TimedEvent } from "../jetlag/Systems/Timer";
-import { AnimationSequence, BoxCfgOpts, GestureHandlers, AdvancedRigidBodyCfgOpts, ImgConfigOpts } from "../jetlag/Config";
-import { Enemy, Hero, Obstacle } from "../jetlag/Components/Role";
+import { AnimationSequence, BoxCfgOpts, GestureHandlers, AdvancedRigidBodyCfgOpts, ImgConfigOpts, TxtConfigOpts } from "../jetlag/Config";
+import { Enemy, Hero, Obstacle, Passive } from "../jetlag/Components/Role";
 import { game } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 
@@ -115,33 +115,45 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   // Bottom box:
   let width = Math.abs(x0 - x1);
   let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
-  let bottom = new Actor(game.world);
-  bottom.rigidBody = RigidBodyComponent.Box(cfg, game.world, commonCfg);
+  new Actor({
+    scene: game.world,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    movement: new InertMovement(),
+    role: new Obstacle(),
+  });
   // TODO: we shouldn't need appearance to get debug contexts
-  bottom.appearance = new ImageSprite(cfg);
-  bottom.role = new Obstacle();
 
   // The top only differs by translating the Y from the bottom
   cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
-  let top = new Actor(game.world);
-  top.rigidBody = RigidBodyComponent.Box(cfg, game.world, commonCfg);
-  top.role = new Obstacle();
-  top.appearance = new ImageSprite(cfg);
+  new Actor({
+    scene: game.world,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    movement: new InertMovement(),
+    role: new Obstacle(),
+  });
 
   // Right box:
   let height = Math.abs(y0 - y1);
   cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
-  let left = new Actor(game.world);
-  left.rigidBody = RigidBodyComponent.Box(cfg, game.world, commonCfg);
-  left.appearance = new ImageSprite(cfg);
-  left.role = new Obstacle();
+  new Actor({
+    scene: game.world,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    movement: new InertMovement(),
+    role: new Obstacle(),
+  });
 
   // The left only differs by translating the X
   cfg.cx -= (thickness + Math.abs(x0 - x1));
-  let right = new Actor(game.world);
-  right.rigidBody = RigidBodyComponent.Box(cfg, game.world, commonCfg);
-  right.appearance = new ImageSprite(cfg);
-  right.role = new Obstacle();
+  new Actor({
+    scene: game.world,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    movement: new InertMovement(),
+    role: new Obstacle(),
+  });
 }
 
 /**
@@ -168,9 +180,13 @@ export function overlayToWorldCoords(overlay: Scene, x: number, y: number) {
 export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coords: { x: number; y: number }) => boolean) {
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
-  let c = new Actor(scene);
-  c.appearance = new ImageSprite(cfg);
-  c.rigidBody = RigidBodyComponent.Box(cfg, scene);
+  let c = new Actor({
+    scene,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, scene),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   c.gestures = { tap };
   return c;
 }
@@ -187,9 +203,13 @@ export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap
  */
 export function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
   // TODO: it's probably not worth having this helper function
-  let c = new Actor(scene);
-  c.appearance = new ImageSprite(cfg);
-  c.rigidBody = RigidBodyComponent.Box(cfg, scene);
+  let c = new Actor({
+    scene,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, scene),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   c.gestures = { panStart, panMove, panStop };
   return c;
 }
@@ -210,12 +230,13 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts) {
     // world can convert to its meters
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
     // If world actor with draggable, we're good
-    let actor = game.world.physics!.actorAt(game.world.camera, pixels.x, pixels.y);
-    if (!actor) return false;
-    if (!(actor instanceof Actor)) return false;
-    if (!(actor.movement instanceof Draggable)) return false;
-    foundActor = actor;
-    return true;
+    for (let actor of game.world.physics!.actorsAt(game.world.camera, pixels.x, pixels.y)) {
+      if (actor.movement instanceof Draggable) {
+        foundActor = actor;
+        return true;
+      }
+    }
+    return false;
   };
   // pan move behavior is to change the actor position based on the new
   // coord
@@ -243,26 +264,33 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts) {
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
 export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
-  let c = new Actor(overlay);
-  c.appearance = new ImageSprite(cfgOpts);
-  c.rigidBody = RigidBodyComponent.Box(cfgOpts, overlay);
+  let c = new Actor({
+    scene: overlay,
+    appearance: new ImageSprite(cfgOpts),
+    rigidBody: RigidBodyComponent.Box(cfgOpts, overlay),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
     // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
     let screenCoord1 = overlay.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
     // If world actor with flickMultiplier, we're good
-    let actor = game.world.physics!.actorAt(game.world.camera, screenCoord1.x, screenCoord1.y);
-    if (!actor) return false;
-    if (!(actor instanceof Actor)) return false;
-    if (!(actor.movement instanceof FlickMovement) && !(actor.movement instanceof HoverFlick))
-      return true;
-    if (actor.movement.multiplier === 0) return false;
+    let movement: FlickMovement | HoverFlick | undefined = undefined;
+    for (let actor of game.world.physics!.actorsAt(game.world.camera, screenCoord1.x, screenCoord1.y)) {
+      if (!(actor.movement instanceof FlickMovement) && !(actor.movement instanceof HoverFlick))
+        return true;
+      if (actor.movement.multiplier === 0) return false;
+      movement = actor.movement;
+      break;
+    }
+    if (!movement) return false;
 
     // Figure out the velocity to apply, then apply it
     let v = new b2Vec2(hudCoord2.x, hudCoord2.y)
     v = v.Subtract(hudCoord1);
     v.Normalize();
-    v.Scale(actor.movement.multiplier * 2000 / time);
-    actor.movement.updateVelocity(v.x, v.y);
+    v.Scale(movement.multiplier * 2000 / time);
+    movement.updateVelocity(v.x, v.y);
     return true;
   };
   c.gestures = { swipe };
@@ -309,7 +337,7 @@ export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts, velocity:
     let r = new Path().to(who.rigidBody.getCenter().x, who.rigidBody.getCenter().y).to(meters.x, meters.y);
     who.rigidBody.body.SetLinearVelocity({ x: 0, y: 0 });
     who.rigidBody.body.SetAngularVelocity(0);
-    who.movement = new PathMovement(r, velocity, false);
+    (who.movement as PathMovement).resetPath(r, velocity, false);
     if (clear) game.storage.setLevel("selected_entity", undefined);
     return true;
   });
@@ -391,8 +419,13 @@ export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts, cfg: { 
  *                        released
  */
 export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts, whileDownAction?: () => void, onUpAction?: (coords: { x: number; y: number }) => void) {
-  let c = new Actor(overlay); c.appearance = new ImageSprite(cfg);
-  c.rigidBody = RigidBodyComponent.Box(cfg, overlay);
+  let c = new Actor({
+    scene: overlay,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, overlay),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   let active = false; // will be captured by lambdas below
   let touchDown = () => {
     active = true;
@@ -428,8 +461,13 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
  *                top left of the actor throwing the projectile
  */
 export function addDirectionalThrowButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
-  let c = new Actor(overlay); c.appearance = new ImageSprite(cfg);
-  c.rigidBody = RigidBodyComponent.Box(cfg, overlay);
+  let c = new Actor({
+    scene: overlay,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, overlay),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   let v = new b2Vec2(0, 0);
   let isHolding = false;
   let touchDown = (hudCoords: { x: number; y: number }) => {
@@ -654,4 +692,25 @@ export function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostD
       );
     }
   };
+}
+
+/**
+ * Create an Actor whose appearance is text.  Since every Actor needs to have a
+ * body, this will create a simple body to accompany the actor.
+ *
+ * @param scene     The scene where the Text should be made
+ * @param cfgOpts   Text configuration options
+ * @param producer  A callback for making the text for this Actor
+ *
+ * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
+ */
+export function makeText(scene: Scene, cfgOpts: TxtConfigOpts, producer: () => string): Actor {
+  return new Actor({
+    scene,
+    appearance: new TextSprite(cfgOpts, producer),
+    // TODO: the ".1" options are somewhat arbitrary
+    rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: .1, height: .1 }, scene),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
 }

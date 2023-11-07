@@ -6,6 +6,8 @@ import * as Helpers from "./helpers";
 import { game } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { InertMovement } from "../jetlag/Components/Movement";
+import { Passive } from "../jetlag/Components/Role";
 
 /**
  * buildChooserScreen draws the level chooser screens.
@@ -30,8 +32,13 @@ export function buildChooserScreen(index: number) {
   if (index == 1) {
     // set up background and music
     Helpers.setMusic("tune.ogg");
-    let background = new Actor(game.world);
-    background.appearance = new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "chooser.png" });
+    new Actor({
+      scene: game.world,
+      appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "chooser.png" }),
+      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
 
     // We'll have margins of 1.25 on the left and right, a margin of 1 on
     // the bottom, and three rows of eight buttons each, with each button
@@ -73,8 +80,13 @@ export function buildChooserScreen(index: number) {
   else {
     // set up background and music
     Helpers.setMusic("tune.ogg");
-    let background = new Actor(game.world);
-    background.appearance = new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "chooser.png" });
+    new Actor({
+      scene: game.world,
+      appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "chooser.png" }),
+      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
     for (let row = 0, y = 3.25, l = 24 * (index - 1) + 1; row < 3; ++row, y += 1.75) {
       let x = 1.25;
       for (let i = 0; i < 8; ++i, ++l, x += 1.75) {
@@ -103,16 +115,27 @@ export function buildChooserScreen(index: number) {
 function drawLevelButton(x: number, y: number, width: number, height: number, whichLevel: number) {
   // for each button, start by drawing an obstacle
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "level_tile.png" };
-  let img = new ImageSprite(cfg);
-  let tile = new Actor(game.world); tile.appearance = img;
-  tile.rigidBody = RigidBodyComponent.Box(cfg, game.world);
+  let tile = new Actor({
+    scene: game.world,
+    appearance: new ImageSprite(cfg),
+    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
 
   // attach a callback and print the level number with a touchCallback, and then put text on top of it
-  let tap = () => { game.switchTo(game.config.levelBuilder, whichLevel); return true; };
+  let tap = () => {
+    console.log("tap on " + whichLevel)
+    game.switchTo(game.config.levelBuilder, whichLevel); return true;
+  };
   tile.gestures = { tap };
-  let t = new Actor(game.world);
-  t.appearance = new TextSprite({ center: true, cx: x + width / 2, cy: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
-    () => whichLevel + "");
+  new Actor({
+    scene: game.world,
+    appearance: new TextSprite({ center: true, cx: x + width / 2, cy: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
+    rigidBody: RigidBodyComponent.Box(cfg, game.world, { collisionsEnabled: false }),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
 }
 
 /**
@@ -127,8 +150,13 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
 function drawPrevButton(x: number, y: number, width: number, height: number, chooserLevel: number) {
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "left_arrow.png" };
   let img = new ImageSprite(cfg);
-  let btn = new Actor(game.world); btn.appearance = img;
-  btn.rigidBody = RigidBodyComponent.Box(cfg, game.world);
+  let btn = new Actor({
+    scene: game.world,
+    appearance: img,
+    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   let tap = () => {
     game.switchTo(game.config.chooserBuilder, chooserLevel);
     return true;
@@ -148,8 +176,13 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
 function drawNextButton(x: number, y: number, width: number, height: number, chooserLevel: number) {
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "right_arrow.png" };
   let img = new ImageSprite(cfg);
-  let btn = new Actor(game.world); btn.appearance = img;
-  btn.rigidBody = RigidBodyComponent.Box(cfg, game.world);
+  let btn = new Actor({
+    scene: game.world,
+    appearance: img,
+    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   let tap = () => {
     game.switchTo(game.config.chooserBuilder, chooserLevel);
     return true;
@@ -168,8 +201,13 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
 function drawSplashButton(x: number, y: number, width: number, height: number) {
   let cfg = { box: true, cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "back_arrow.png" };
   let img = new ImageSprite(cfg);
-  let btn = new Actor(game.world); btn.appearance = img;
-  btn.rigidBody = RigidBodyComponent.Box(cfg, game.world);
+  let btn = new Actor({
+    scene: game.world,
+    appearance: img,
+    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    movement: new InertMovement(),
+    role: new Passive(),
+  });
   let tap = () => {
     game.switchTo(game.config.splashBuilder, 1);
     return true;

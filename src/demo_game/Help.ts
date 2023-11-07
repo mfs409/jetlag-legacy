@@ -1,10 +1,13 @@
 // Last review: 08-10-2023
 
 import { Actor } from "../jetlag/Entities/Actor";
-import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { ImageSprite } from "../jetlag/Components/Appearance";
 import * as Helpers from "./helpers";
 import { game } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { InertMovement } from "../jetlag/Components/Movement";
+import { Passive } from "../jetlag/Components/Role";
 
 /**
  * buildHelpScreen draws the help screens.  Technically, a help screen can be
@@ -36,54 +39,81 @@ export function buildHelpScreen(index: number) {
     game.backgroundColor = 0x19698e;
 
     // put some information and pictures on the screen
-    let t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: true, cx: 8, cy: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
+    Helpers.makeText(game.world,
+      { center: true, cx: 8, cy: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "The levels of this game demonstrate JetLag features");
 
-    let cfg = { box: true, cx: 0.75, cy: 2.5, width: 0.75, height: 0.75, img: "green_ball.png" };
-    let img = new ImageSprite(cfg);
-    new Actor(game.world).appearance = img;
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 1.5, cy: 2.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+    let cfg = { cx: 0.75, cy: 2.5, radius: 0.375, width: 0.75, height: 0.75, img: "green_ball.png" };
+    new Actor({
+      scene: game.world,
+      appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, game.world),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    Helpers.makeText(game.world,
+      { center: false, cx: 1.5, cy: 2.25, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "You control the hero");
 
-    cfg = { box: true, cx: 0.75, cy: 3.5, width: 0.75, height: 0.75, img: "blue_ball.png" };
-    img = new ImageSprite(cfg);
-    new Actor(game.world).appearance = img;
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 1.5, cy: 3.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+    cfg = { cx: 0.75, cy: 3.5, radius: 0.375, width: 0.75, height: 0.75, img: "blue_ball.png" };
+    new Actor({
+      scene: game.world, appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, game.world),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    Helpers.makeText(game.world,
+      { center: false, cx: 1.5, cy: 3.25, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Collect these goodies");
 
-    cfg = { box: true, cx: 0.75, cy: 4.5, width: 0.75, height: 0.75, img: "red_ball.png" };
-    img = new ImageSprite(cfg);
-    new Actor(game.world).appearance = img;
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 1.5, cy: 4.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+    cfg = { cx: 0.75, cy: 4.5, radius: 0.375, width: 0.75, height: 0.75, img: "red_ball.png" };
+    new Actor({
+      scene: game.world, appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, game.world),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    Helpers.makeText(game.world,
+      { center: false, cx: 1.5, cy: 4.25, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Avoid or defeat enemies");
 
-    cfg = { box: true, cx: 0.75, cy: 5.5, width: 0.75, height: 0.75, img: "mustard_ball.png" };
-    img = new ImageSprite(cfg);
-    new Actor(game.world).appearance = img;
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 1.5, cy: 5.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+    cfg = { cx: 0.75, cy: 5.5, radius: 0.375, width: 0.75, height: 0.75, img: "mustard_ball.png" };
+    new Actor({
+      scene: game.world,
+      appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, game.world),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    Helpers.makeText(game.world,
+      { center: false, cx: 1.5, cy: 5.25, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Reach the destination");
 
-    cfg = { box: true, cx: 0.75, cy: 6.5, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    img = new ImageSprite(cfg);
-    new Actor(game.world).appearance = img;
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 1.5, cy: 6.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+    cfg = { cx: 0.75, cy: 6.5, radius: 0.375, width: 0.75, height: 0.75, img: "purple_ball.png" };
+    new Actor({
+      scene: game.world, appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, game.world),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    Helpers.makeText(game.world,
+      { center: false, cx: 1.5, cy: 6.25, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "These are walls");
 
-    cfg = { box: true, cx: 0.75, cy: 7.5, width: 0.75, height: 0.75, img: "grey_ball.png" };
-    img = new ImageSprite(cfg);
-    new Actor(game.world).appearance = img;
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 1.5, cy: 7.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+    cfg = { cx: 0.75, cy: 7.5, radius: 0.375, width: 0.75, height: 0.75, img: "grey_ball.png" };
+    new Actor({
+      scene: game.world,
+      appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, game.world),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    Helpers.makeText(game.world,
+      { center: false, cx: 1.5, cy: 7.25, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Throw projectiles");
 
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: false, cx: 11, cy: 8.5, face: "Arial", color: "#FFFFFF", size: 24, z: 0 },
+    Helpers.makeText(game.world,
+      { center: false, cx: 11, cy: 8.5, face: "Arial", color: "#FFFFFF", size: 24, z: 0 },
       () => "(All image files are stored in the assets folder)");
 
     // set up a control to go to the next help level on screen tap
@@ -97,11 +127,11 @@ export function buildHelpScreen(index: number) {
   else if (index == 2) {
     // This is just like the previous screen, but with different text
     game.backgroundColor = 0x19698e;
-    let t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: true, cx: 8, cy: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
+    Helpers.makeText(game.world,
+      { center: true, cx: 8, cy: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "Read, Write, Play");
-    t = new Actor(game.world);
-    t.appearance = new TextSprite({ center: true, cx: 8, cy: 5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
+    Helpers.makeText(game.world,
+      { center: true, cx: 8, cy: 5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
       () => `As you play through the levels of the sample game, be sure to read the code that accompanies
 each world.  The levels aren't meant to be "hard", or even really "fun".  They are meant to show
 you how to use the different features of JetLag, and to show you how the same features can
