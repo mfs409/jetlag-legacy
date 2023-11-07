@@ -47,13 +47,16 @@ build-tut-viewer`.  To clean up, use `npm run clean-tut-viewer`.
 
 ### Tutorial Website
 
-To build the full tutorial website, with all demo games, use `npm run build-all-tutorials`.  To clean up, use `npm run clean-all-tutorials`.
+To build the full tutorial website, with all demo games, use `npm run
+build-tuts`.  To clean up, use `npm run clean-tuts`.  Note that this will build
+the tutorial viewer.  The list of tutorials that will be built is in
+`scripts/build_tuts.js`.
 
 ### Documentation
 
 To build the latest version of the documentation, run `npm run clean-check`.
-This will use `typedoc` to build documentation for everthing in the `src/jetlag`
-folder.
+This will use `typedoc` to build documentation for everything in the
+`src/jetlag` folder.
 
 ### Type Checking
 

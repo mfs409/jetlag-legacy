@@ -9,10 +9,8 @@
         "clean-dev": "cross-env MODE=DEV node scripts/clean_game.js",
         "build-game": "node scripts/build_game.js",
         "clean-game": "cross-env MODE=BUILD node scripts/clean_game.js",
-        "build-viewer": "node scripts/build_viewer.js",
-        "clean-viewer": "node scripts/clean_viewer.js",
-        "build-all-tutorials": "echo ERROR... not implemented yet!",
-        "clean-all-tutorials": "echo ERROR... not implemented yet!",
+        "build-tuts": "node scripts/build_tuts.js",
+        "clean-tuts": "node scripts/clean_tuts.js",
         "check": "tsc",
         "clean-check": "node scripts/clean_check.js",
         "build-docs": "typedoc --cleanOutputDir src/jetlag/*.ts src/jetlag/*/*.ts"

@@ -1,4 +1,4 @@
-// clean_viewer.js:
+// clean_tuts.js:
 //   Clean up by removing the folder into which we built the tutorial viewer and
 //   tutorials
 
