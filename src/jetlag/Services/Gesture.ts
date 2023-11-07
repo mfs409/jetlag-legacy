@@ -33,17 +33,17 @@ export class GestureService {
     let hammer = new Hammer(this.elt);
     hammer.on("tap", (ev: HammerInput) => {
       let e = ev.srcEvent as PointerEvent;
-      // If we have an overlay scene right now, let it handle the tap
-      if (stage.overlay) {
-        this.tap(stage.overlay, e.offsetX, e.offsetY);
-        return;
-      }
       // Log the event?
       if (stage.config.hitBoxes) {
         let world_coords = stage.world.camera.screenToMeters(e.offsetX, e.offsetY);
         let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
         stage.console.info("World Touch: (" + world_coords.x + ", " + world_coords.y + ")");
         stage.console.info("HUD Touch: (" + hud_coords.x + ", " + hud_coords.y + ")");
+      }
+      // If we have an overlay scene right now, let it handle the tap
+      if (stage.overlay) {
+        this.tap(stage.overlay, e.offsetX, e.offsetY);
+        return;
       }
       // Handle in hud or world
       if (this.gestureHudFirst) {
@@ -116,11 +116,10 @@ export class GestureService {
    * @param screenY  The Y coordinate on the screen
    */
   private tap(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.tap) {
-      actor.gestures.tap(scene.camera.screenToMeters(screenX, screenY));
-      return true;
-    }
+    for (let actor of scene.physics!.actorsAt(scene.camera, screenX, screenY))
+      if (actor.gestures?.tap)
+        if (actor.gestures.tap(scene.camera.screenToMeters(screenX, screenY)))
+          return true;
     return false;
   }
 
@@ -132,8 +131,10 @@ export class GestureService {
    * @param screenY  The Y coordinate on the screen
    */
   private panStart(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.panStart) return actor.gestures.panStart(scene.camera.screenToMeters(screenX, screenY));
+    for (let actor of scene.physics!.actorsAt(scene.camera, screenX, screenY))
+      if (actor?.gestures?.panStart)
+        if (actor.gestures.panStart(scene.camera.screenToMeters(screenX, screenY)))
+          return true;
     return false;
   }
 
@@ -145,8 +146,10 @@ export class GestureService {
    * @param screenY  The Y coordinate on the screen
    */
   private panMove(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.panMove) return actor.gestures.panMove(scene.camera.screenToMeters(screenX, screenY));
+    for (let actor of scene.physics!.actorsAt(scene.camera, screenX, screenY))
+      if (actor?.gestures?.panMove)
+        if (actor.gestures.panMove(scene.camera.screenToMeters(screenX, screenY)))
+          return true;
     return false;
   }
 
@@ -158,8 +161,10 @@ export class GestureService {
    * @param screenY  The Y coordinate on the screen
    */
   private panStop(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.panStop) return actor.gestures.panStop(scene.camera.screenToMeters(screenX, screenY));
+    for (let actor of scene.physics!.actorsAt(scene.camera, screenX, screenY))
+      if (actor?.gestures?.panStop)
+        if (actor.gestures.panStop(scene.camera.screenToMeters(screenX, screenY)))
+          return true;
     return false;
   }
 
@@ -171,8 +176,10 @@ export class GestureService {
    * @param screenY  The Y coordinate on the screen
    */
   private touchDown(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.touchDown) return actor.gestures.touchDown(scene.camera.screenToMeters(screenX, screenY));
+    for (let actor of scene.physics!.actorsAt(scene.camera, screenX, screenY))
+      if (actor?.gestures?.touchDown)
+        if (actor.gestures.touchDown(scene.camera.screenToMeters(screenX, screenY)))
+          return true;
     return false;
   }
 
@@ -184,8 +191,10 @@ export class GestureService {
    * @param screenY  The Y coordinate on the screen
    */
   private touchUp(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.touchUp) return actor.gestures.touchUp(scene.camera.screenToMeters(screenX, screenY));
+    for (let actor of scene.physics!.actorsAt(scene.camera, screenX, screenY))
+      if (actor?.gestures?.touchUp)
+        if (actor.gestures.touchUp(scene.camera.screenToMeters(screenX, screenY)))
+          return true;
     return false;
   }
 
@@ -200,11 +209,15 @@ export class GestureService {
    * @param time     The time it took for the swipe to happen
    */
   private swipe(scene: Scene, screenX0: number, screenY0: number, screenX1: number, screenY1: number, time: number) {
-    let sActor = scene.physics!.actorAt(scene.camera, screenX0, screenY0);
-    let eActor = scene.physics!.actorAt(scene.camera, screenX1, screenY1);
-    if (!sActor) return false;
-    if (sActor !== eActor) return false;
-    if (!sActor.gestures?.swipe) return false;
-    return sActor.gestures.swipe(scene.camera.screenToMeters(screenX0, screenY0), scene.camera.screenToMeters(screenX1, screenY1), time);
+    for (let sActor of scene.physics!.actorsAt(scene.camera, screenX0, screenY0)) {
+      for (let eActor of scene.physics!.actorsAt(scene.camera, screenX1, screenY1)) {
+        if (sActor === eActor) {
+          if (sActor.gestures?.swipe)
+            if (sActor.gestures.swipe(scene.camera.screenToMeters(screenX0, screenY0), scene.camera.screenToMeters(screenX1, screenY1), time))
+              return true;
+        }
+      }
+    }
+    return false;
   }
 }

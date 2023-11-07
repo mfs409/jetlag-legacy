@@ -107,10 +107,31 @@ export class PathMovement {
    * @param velocity  The speed at which the actor should move 
    * @param loop      Should the path repeat infinitely, or just run once?
    */
-  constructor(private path: Path, private readonly velocity: number, private readonly loop: boolean) {
+  constructor(private path: Path, private velocity: number, private loop: boolean) {
     if (path.getNumPoints() < 2) {
       game.console.urgent("Error: path must have at least two points");
       this.haltPath();
+    } else {
+      this.startPath();
+    }
+  }
+
+  /**
+   * Assign a new path to an Actor
+   *
+   * @param path      The new path to follow
+   * @param velocity  The velocity while travelling the path
+   * @param loop      Should it loop?
+   */
+  public resetPath(path: Path, velocity: number, loop: boolean) {
+    this.haltPath();
+    this.nextIndex = -1;
+    this.done = false;
+    this.path = path;
+    this.velocity = velocity;
+    this.loop = loop;
+    if (this.path.getNumPoints() < 2) {
+      game.console.urgent("Error: path must have at least two points");
     } else {
       this.startPath();
     }
@@ -629,5 +650,18 @@ export class ExplicitMovement {
   }
 }
 
+/** A rule for things that don't actually move */
+export class InertMovement {
+  /** The Actor to which this movement is attached */
+  public set rigidBody(body: RigidBodyComponent | undefined) {
+    this._rigidBody = body;
+  }
+  public get rigidBody() { return this._rigidBody; }
+  private _rigidBody?: RigidBodyComponent;
+
+  /** Do any last-minute adjustments related to the movement */
+  prerender(_elapsedMs: number, _camera: CameraSystem) { }
+}
+
 /** MovementComponent is the type of any movement rules that an Actor can have */
-export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | ChaseFixed | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | ExplicitMovement;
+export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | ChaseFixed | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | ExplicitMovement | InertMovement;

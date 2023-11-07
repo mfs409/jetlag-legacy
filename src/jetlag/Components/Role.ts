@@ -21,7 +21,8 @@ enum CollisionExemptions {
   PROJECTILE = 5,
   ENEMY = 6,
   SENSOR = 7,
-  OBSTACLE = 8
+  OBSTACLE = 8,
+  // TODO: Does PASSIVE need a different role than SENSOR?
 }
 
 /** Role is the base class for all of the roles that an actor can play */
@@ -39,12 +40,12 @@ class Role {
    * Indicate that when this actor collides with a hero, it should not pass
    * through
    */
-  public enableHeroCollision() { this.collisionRules.ignore = this.collisionRules.ignore.filter(value => value != CollisionExemptions.HERO); console.log(this.collisionRules) }
+  public enableHeroCollision() { this.collisionRules.ignore = this.collisionRules.ignore.filter(value => value != CollisionExemptions.HERO); }
 
   /**
    * Indicate that when this actor collides with a hero, it should pass through
    */
-  public disableHeroCollision() { this.collisionRules.ignore.push(CollisionExemptions.HERO); console.log(this.collisionRules) }
+  public disableHeroCollision() { this.collisionRules.ignore.push(CollisionExemptions.HERO); }
 
   /**
    * Indicate that when this actor collides with a goodie, it should not pass
@@ -893,5 +894,37 @@ export class Projectile extends Role {
   }
 }
 
+/**
+ * A Passive role is for things that barely even count as being part of the
+ * game, like background images, HUD text, etc.
+ */
+export class Passive extends Role {
+  /** The Actor to which this Hero role is attached */
+  public set actor(actor: Actor | undefined) {
+    this._actor = actor;
+    // Turn off collisions
+    actor?.rigidBody?.setCollisionsEnabled(false);
+  }
+  public get actor() { return this._actor; }
+  private _actor?: Actor | undefined;
+
+  /**
+   * Code to run when there is a collision involving this role's Actor.
+   *
+   * NB: The Hero role will handle the collision, so the Goodie doesn't have to
+   * do anything.
+   */
+  onCollide(_other: Actor, _contact: b2Contact) { return false; }
+
+  /** Code to run immediately before rendering this role's Actor */
+  prerender(_elapsedMs: number) { }
+
+  /** Construct a Passive role */
+  constructor() {
+    super();
+    this.collisionRules.role.push(CollisionExemptions.SENSOR);
+  }
+}
+
 /** RoleComponent is the type of any role that an Actor can have */
-export type RoleComponent = Hero | Goodie | Destination | Enemy | Obstacle | Sensor | Projectile;
+export type RoleComponent = Hero | Goodie | Destination | Enemy | Obstacle | Sensor | Projectile | Passive;

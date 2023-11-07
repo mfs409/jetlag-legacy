@@ -11,7 +11,7 @@ import { CameraSystem } from "../Systems/Camera";
  */
 class PointToActorCallback {
   /** If we found an actor, we'll put it here */
-  foundEntity?: Actor;
+  foundEntities: Actor[] = [];
 
   /** A helper vector for tracking the location that is being queried */
   private readonly touchVector = new b2Vec2(0, 0);
@@ -36,8 +36,8 @@ class PointToActorCallback {
     let b = fixture.GetBody().GetUserData() as Actor;
     if (!b.enabled) return true;
     // It's active, so save the Entity
-    this.foundEntity = b;
-    return false;
+    this.foundEntities.push(b);
+    return true;
   }
 
   /**
@@ -47,7 +47,7 @@ class PointToActorCallback {
    * @param world The world in which the check is happening
    */
   query(pt: { x: number, y: number }, world: b2World) {
-    this.foundEntity = undefined;
+    this.foundEntities.length = 0;
     this.touchVector.Set(pt.x, pt.y);
     this.aabb.lowerBound.Set(pt.x - this.tolerance, pt.y - this.tolerance);
     this.aabb.upperBound.Set(pt.x + this.tolerance, pt.y + this.tolerance);
@@ -73,14 +73,14 @@ export class BasicCollisionSystem {
   }
 
   /**
-   * Query to find the actor at a screen coordinate
+   * Query to find the actors at a screen coordinate
    *
    * @param screenX The X coordinate to look up
    * @param screenY The Y coordinate to look up
    */
-  public actorAt(camera: CameraSystem, screenX: number, screenY: number) {
+  public actorsAt(camera: CameraSystem, screenX: number, screenY: number) {
     this.pointQuerier.query(camera.screenToMeters(screenX, screenY), this.world);
-    return this.pointQuerier.foundEntity;
+    return this.pointQuerier.foundEntities;
   }
 }
 

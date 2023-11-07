@@ -1,13 +1,12 @@
 // Last review: 08-10-2023
 
 import { RigidBodyComponent } from "../Components/RigidBody";
-import { AppearanceComponent } from "../Components/Appearance";
+import { AppearanceComponent, TextSprite } from "../Components/Appearance";
 import { StateEvent, StateManagerComponent } from "../Components/StateManager";
 import { SoundEffectComponent } from "../Components/SoundEffect";
 import { RoleComponent } from "../Components/Role";
 import { Scene } from "./Scene";
 import { MovementComponent } from "../Components/Movement";
-import { game } from "../Stage";
 import { GestureHandlers } from "../Config";
 
 /**
@@ -24,56 +23,22 @@ export class Actor {
    * A physical context for the Actor.  This is necessary if the Actor will
    * move, participate in collisions, or receive gesture inputs.
    */
-  set rigidBody(b: RigidBodyComponent | undefined) {
-    this._rigidBody = b;
-    b?.body.SetUserData(this);
-    if (this._movement) this._movement.rigidBody = b;
-    // TODO: The role should know about the body directly
-    if (this._role) this._role.actor = this;
-  }
-  get rigidBody() { return this._rigidBody; }
-  private _rigidBody?: RigidBodyComponent;
+  readonly rigidBody: RigidBodyComponent;
 
   /** A set of functions describing how the Actor should respond to gestures. */
-  public set gestures(gestures: GestureHandlers | undefined) {
-    this._gestures = gestures;
-    if (!this.rigidBody)
-      game.console.urgent("Error: no RigidBody on Actor when attaching Gestures");
-  }
-  public get gestures() { return this._gestures; }
-  private _gestures?: GestureHandlers;
+  public gestures?: GestureHandlers;
 
   /** The rules for how this Actor should move */
-  public set movement(movement: MovementComponent | undefined) {
-    this._movement = movement;
-    if (this._movement && this._rigidBody) this._movement.rigidBody = this._rigidBody;
-  }
-  public get movement() { return this._movement; }
-  private _movement?: MovementComponent;
+  readonly movement: MovementComponent;
 
   /** The packet of information describing the audio aspects of this Actor */
   public sounds?: SoundEffectComponent;
 
   /** The behavioral role that this Actor plays within the game */
-  public set role(val: RoleComponent | undefined) {
-    this._role = val;
-    if (this._role) this._role.actor = this;
-  }
-  public get role() { return this._role; }
-  private _role?: RoleComponent;
+  readonly role: RoleComponent;
 
   /** The visual representation of this Actor within the game */
-  public set appearance(appearance: AppearanceComponent | undefined) {
-    // On a change, remove the old one, then install the new one
-    if (this._appearance)
-      this.scene.camera.removeEntity(this);
-    this._appearance = appearance;
-    if (this._appearance)
-      this.scene.camera.addEntity(this);
-    if (this._appearance) this._appearance.actor = this;
-  }
-  public get appearance() { return this._appearance; }
-  private _appearance?: AppearanceComponent;
+  readonly appearance: AppearanceComponent;
 
   /** Extra data for the game designer to attach to the Actor */
   readonly extra: any = {};
@@ -81,12 +46,33 @@ export class Actor {
   /** The current state of this Actor */
   readonly state = new StateManagerComponent();
 
+  /** The scene where the Actor exists */
+  public scene: Scene;
+
   /**
    * Construct an empty Actor
    *
+   * TODO:  Update the documentation after adding more components to the config
+   *        arg
+   *
    * @param scene The scene where the Actor goes
    */
-  constructor(public scene: Scene) { }
+  constructor(config: { scene: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement: MovementComponent, role: RoleComponent }) {
+    this.scene = config.scene;
+
+    this.appearance = config.appearance;
+    this.scene.camera.addEntity(this);
+    this.appearance.actor = this;
+
+    this.rigidBody = config.rigidBody;
+    this.rigidBody.body.SetUserData(this);
+
+    this.movement = config.movement;
+    this.movement.rigidBody = this.rigidBody;
+
+    this.role = config.role;
+    this.role.actor = this;
+  }
 
   /**
    * Prerender is called on an Actor immediately before it is rendered.  This
@@ -101,7 +87,7 @@ export class Actor {
     this.movement?.prerender(elapsedMs, this.scene.camera);
     this.rigidBody?.prerender(elapsedMs, this);
     this.role?.prerender(elapsedMs);
-    this._appearance?.prerender(elapsedMs);
+    this.appearance.prerender(elapsedMs);
     return true;
   }
 
@@ -136,10 +122,10 @@ export class Actor {
     // set new height and width of the Render context
     //
     // TODO: This won't work for resizing text.  How should we handle that?
-    if (this._appearance) {
-      this._appearance.props.w = width;
-      this._appearance.props.h = height;
+    if (!(this.appearance instanceof TextSprite)) {
+      this.appearance.props.w = width;
+      this.appearance.props.h = height;
     }
-    this.rigidBody = this.rigidBody?.resize(x, y, width, height);
+    this.rigidBody.resize(x, y, width, height);
   }
 }

@@ -142,24 +142,21 @@ export class ProjectileSystem {
 
     // set up the pool of projectiles
     for (let i = 0; i < this.props.size; ++i) {
-      let p = new Actor(scene);
+      let appearance: AnimatedSprite | ImageSprite;
       if (this.props.appearance.hasOwnProperty("idle_right"))
-        p.appearance = new AnimatedSprite(this.props.appearance as AniCfgOpts);
+        appearance = new AnimatedSprite(this.props.appearance as AniCfgOpts);
       else
-        p.appearance = new ImageSprite(this.props.appearance as ImgConfigOpts);
-      if (this.props.body.hasOwnProperty("radius")) {
-        p.rigidBody = RigidBodyComponent.Circle(this.props.body as CircleCfgOpts, scene);
-      } else {
-        p.rigidBody = RigidBodyComponent.Box(this.props.body as BoxCfgOpts, scene, {});
-      }
-      p.movement = new ProjectileMovement();
-      if (this.props.gravityAffectsProjectiles)
-        p.rigidBody.body.SetGravityScale(1);
+        appearance = new ImageSprite(this.props.appearance as ImgConfigOpts);
+      let rigidBody = (this.props.body.hasOwnProperty("radius")) ?
+        RigidBodyComponent.Circle(this.props.body as CircleCfgOpts, scene) :
+        RigidBodyComponent.Box(this.props.body as BoxCfgOpts, scene, {});
       let role = new Projectile({ damage: this.props.strength });
       if (this.props.range)
         role.range = this.props.range;
       role.disappearOnCollide = this.props.disappearOnCollide;
-      p.role = role;
+      let p = new Actor({ scene, appearance, rigidBody, movement: new ProjectileMovement(), role });
+      if (this.props.gravityAffectsProjectiles)
+        p.rigidBody.body.SetGravityScale(1);
       p.sounds = this.props.soundEffects;
       if (!this.props.immuneToCollisions) { role.disappearOnCollide = false; p.rigidBody.setCollisionsEnabled(true); }
       else p.rigidBody.setCollisionsEnabled(true);

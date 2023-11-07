@@ -146,7 +146,7 @@ export class PolygonCfg extends AdvancedRigidBodyCfg {
   }
 }
 
-/** The different shape types that Box2D supports */
+/** The different shape types that JetLag supports */
 enum ShapeType { CIRCLE, BOX, POLYGON };
 
 /**
@@ -155,7 +155,8 @@ enum ShapeType { CIRCLE, BOX, POLYGON };
  */
 export class RigidBodyComponent {
   /** The physics body */
-  readonly body: b2Body;
+  // TODO: Once resize() is fixed, make this private (it was readonly)
+  public body: b2Body;
 
   /** It's useful to have a debug context for drawing the "hit box" */
   readonly debug: DebugSprite;
@@ -180,7 +181,7 @@ export class RigidBodyComponent {
    * @param radius    The radius of a circumscribed circle, for culling
    * @param shapeType The shape type, for quick disambiguation
    */
-  private constructor(protected scene: Scene, public props: BoxCfg | CircleCfg | PolygonCfg, readonly radius: number, private shapeType: ShapeType) {
+  private constructor(protected scene: Scene, public props: BoxCfg | CircleCfg | PolygonCfg, public radius: number, private shapeType: ShapeType) {
     this.debug = game.imageLibrary.makeDebugContext();
     this.body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: this.props.cx, y: this.props.cy } });
   }
@@ -412,7 +413,6 @@ export class RigidBodyComponent {
    * @param cy       The new Y position
    * @param width   The new width
    * @param height  The new height
-   * @returns 
    */
   public resize(cx: number, cy: number, width: number, height: number) {
     // TODO: this code is losing the information about props, instead passing {}
@@ -423,11 +423,28 @@ export class RigidBodyComponent {
     // The default is for all fixtures of a entity have the same sensor state
     let oldFix = oldBody.GetFixtureList()!;
     // make a new body
-    let newBody: RigidBodyComponent;
     if (this.shapeType == ShapeType.CIRCLE) {
-      newBody = RigidBodyComponent.Circle({ cx, cy, radius: width > height ? width / 2 : height / 2 }, this.scene);
+      let new_body = this.scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: cx, y: cy } });
+      this.props.cx = cx;
+      this.props.cy = cy;
+      this.props.w = width;
+      this.props.h = height;
+      this.radius = width > height ? width / 2 : height / 2;
+      let shape = new b2CircleShape();
+      shape.m_radius = this.radius;
+      new_body.CreateFixture({ shape });
+      this.body = new_body;
     } else if (this.shapeType == ShapeType.BOX) {
-      newBody = RigidBodyComponent.Box({ cx, cy, width, height }, this.scene);
+      let new_body = this.scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: cx, y: cy } });
+      this.props.cx = cx;
+      this.props.cy = cy;
+      this.props.w = width;
+      this.props.h = height;
+      this.radius = Math.sqrt(Math.pow(height / 2, 2) + Math.pow(width / 2, 2));
+      let shape = new b2PolygonShape();
+      shape.SetAsBox(this.props.w / 2, this.props.h / 2);
+      new_body.CreateFixture({ shape });
+      this.body = new_body;
     } else {
       // we need to manually scale all the vertices
       // TODO: this isn't tested
@@ -440,9 +457,30 @@ export class RigidBodyComponent {
         vertices.push(mTempVector.x * xScale);
         vertices.push(mTempVector.y * yScale);
       }
-      newBody = RigidBodyComponent.Polygon({ cx, cy, width, height, vertices }, this.scene);
+
+      let r = 0;
+      for (let i = 0; i < vertices.length; i += 2)
+        r = Math.max(r, Math.pow(vertices[i], 2), + Math.pow(vertices[i + 1], 2));
+      let new_body = this.scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: cx, y: cy } });
+      this.props.cx = cx;
+      this.props.cy = cy;
+      this.props.w = width;
+      this.props.h = height;
+      this.radius = r;
+      let vertArray: b2Vec2[] = [];
+      for (let i = 0; i < vertices.length; i += 2)
+        vertArray[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
+      (this.props as PolygonCfg).vertArray = vertArray;
+      let shape = new b2PolygonShape();
+      shape.Set(vertArray);
+      new_body.CreateFixture({ shape });
+      this.body = new_body;
+      // TODO: in Level 79, the debug rendering of polygons isn't quite right
     }
-    newBody.body.SetType(oldBody.GetType());
+    // TODO:  right now, there are too many hidden ways that a body gets
+    //        manipulated, which makes it really hard to get this right.
+    this.body.SetUserData(oldBody.GetUserData());
+    this.body.SetType(oldBody.GetType());
     // Update the user-visible physics values
     this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
     this.body.SetBullet(oldBody.IsBullet());
@@ -457,7 +495,6 @@ export class RigidBodyComponent {
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     // disable the old body
     oldBody.SetEnabled(false);
-    return newBody;
   }
 
   /** Report if this body is a circle */
@@ -517,7 +554,7 @@ export class RigidBodyComponent {
   public static Polygon(polygonCfg: PolygonCfgOpts, scene: Scene, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let r = 0;
     for (let i = 0; i < polygonCfg.vertices.length; i += 2)
-      r = Math.pow(polygonCfg.vertices[i], 2), + Math.pow(polygonCfg.vertices[i + 1], 2);
+      r = Math.max(r, Math.pow(polygonCfg.vertices[i], 2), + Math.pow(polygonCfg.vertices[i + 1], 2));
     let rb = new RigidBodyComponent(scene, new PolygonCfg(polygonCfg, commonCfg), Math.sqrt(r), ShapeType.POLYGON);
     let shape = new b2PolygonShape();
     shape.Set((rb.props as PolygonCfg).vertArray);

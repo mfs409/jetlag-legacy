@@ -4,6 +4,9 @@ import { b2Vec2, b2Transform } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { game } from "../Stage";
 import { RigidBodyComponent } from "../Components/RigidBody";
+import { AppearanceComponent } from "../Components/Appearance";
+import { InertMovement } from "../Components/Movement";
+import { RoleComponent } from "../Components/Role";
 
 /**
  * The Svg System is for loading SVG line drawings into a game.  SVG line
@@ -49,11 +52,15 @@ export class SvgSystem {
   /**
    * Construct an object for drawing entities based on an SVG
    *
-   * @param translate The user-specified top left corner
-   * @param stretch   The requested stretch factors
-   * @param callback  The callback to run on each line once it is created
+   * @param translate       The user-specified top left corner
+   * @param stretch         The requested stretch factors
+   * @param appearanceMaker A callback for making each line's Appearance
+   * @param RoleMaker       A callback for making each line's Role
+   * @param callback        The callback to run on each line once it is created
    */
-  private constructor(private translate: b2Vec2, private callback: (actor: Actor) => void, private userStretch: b2Vec2) { }
+  private constructor(private translate: b2Vec2, private appearanceMaker: (body: RigidBodyComponent) => AppearanceComponent,
+    private roleMaker: () => RoleComponent,
+    private callback: (actor: Actor) => void, private userStretch: b2Vec2) { }
 
   /**
    * Process an SVG file and go through all of the "path" elements in the
@@ -70,11 +77,13 @@ export class SvgSystem {
    *                 box for the SVG
    * @param stretchX The factor by which to stretch in the X dimension
    * @param stretchY The factor by which to stretch in the Y dimension
+   * @param appearanceMaker A callback for making each line's Appearance
+   * @param roleMaker A callback for making each line's Role
    * @param cb       A callback to run on each line segment (Obstacle) that we
    *                 make
    */
-  public static processFile(file: string, x: number, y: number, stretchX: number, stretchY: number, cb: (actor: Actor) => void) {
-    let svg = new SvgSystem(new b2Vec2(x, y), cb, new b2Vec2(stretchX, stretchY));
+  public static processFile(file: string, x: number, y: number, stretchX: number, stretchY: number, appearanceMaker: (body: RigidBodyComponent) => AppearanceComponent, roleMaker: () => RoleComponent, cb: (actor: Actor) => void) {
+    let svg = new SvgSystem(new b2Vec2(x, y), appearanceMaker, roleMaker, cb, new b2Vec2(stretchX, stretchY));
     // send the request.  On completion, we'll be in onFileLoaded
     let xhr = new XMLHttpRequest();
     xhr.addEventListener("load", (aa: ProgressEvent) => svg.onFileLoaded(aa));
@@ -285,8 +294,16 @@ export class SvgSystem {
     let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     // Make an obstacle and rotate it
     let cfg = { box: true, cx: centerX, cy: centerY, width: len, height: 0.05, img: "" };
-    let a = new Actor(game.world);
-    a.rigidBody = RigidBodyComponent.Box(cfg, game.world)
+    let body = RigidBodyComponent.Box(cfg, game.world)
+    let a = new Actor({
+      scene: game.world,
+      appearance: this.appearanceMaker(body),
+      rigidBody: body,
+      // TODO: is this the right approach?  Should we have a MovementMaker?
+      movement: new InertMovement(),
+      // TODO: is this the right approach?  Should we have a RoleMaker?
+      role: this.roleMaker(),
+    });
     let transform = new b2Transform();
     transform.SetPositionAngle(new b2Vec2(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
     a.rigidBody?.body.SetTransform(transform);

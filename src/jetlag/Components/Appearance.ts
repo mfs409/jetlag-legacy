@@ -7,6 +7,9 @@ import { Actor } from "../Entities/Actor";
 import { AniCfgOpts, AnimationSequence, ImgConfigOpts, TxtConfigOpts } from "../Config";
 import { AnimationState as AnimationState, StateEvent, IStateObserver, transitions } from "./StateManager";
 import { game } from "../Stage";
+import { RigidBodyComponent } from "./RigidBody";
+import { InertMovement } from "./Movement";
+import { Passive } from "./Role";
 
 /** 
  * ImageConfig stores the geometry and other configuration information needed
@@ -435,8 +438,15 @@ export class AnimatedSprite implements IStateObserver {
 
       let cx = this.props.cx + this.props.disappear.offset.x;
       let cy = this.props.cy + this.props.disappear.offset.y;
-      let o = new Actor(entity.scene);
-      o.appearance = new AnimatedSprite({ cx, cy, idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z })
+      let o = new Actor({
+        scene: entity.scene,
+        appearance: new AnimatedSprite({ cx, cy, idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
+        rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, entity.scene, { collisionsEnabled: false }),
+        // TODO: will we always want this to be inert, or might we sometimes want to animate it while letting it keep moving / bouncing / etc?
+        movement: new InertMovement(),
+        // TODO: will we always want this to have a Passive role?
+        role: new Passive(),
+      });
       entity.scene.camera.addEntity(o);
       return;
     }
