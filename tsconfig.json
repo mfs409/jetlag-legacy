@@ -3,7 +3,7 @@
     "module": "commonjs",
     "target": "esnext",
     "sourceMap": true,
-    "outDir": "./dist/",
+    "outDir": "./check/",
     "noImplicitAny": true,
     "removeComments": true,
     "strict": true,
@@ -21,8 +21,9 @@
     "node_modules"
   ],
   "include": [
-    "src/game/*",
-    "src/index.ts"
+    "src/demo_game/*",
+    "src/tut_getting_started/*",
+    "src/viewer/*",
   ],
   "typedocOptions": {
     "out": "./docs/",
