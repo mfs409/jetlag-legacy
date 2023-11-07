@@ -5,7 +5,7 @@ import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
 import { AudioService } from "./Services/AudioService";
 import { MusicComponent } from "./Components/Music";
-import { ScoreSystem } from "./Systems/Score";
+import { ScoreSystem, StageTypes } from "./Systems/Score";
 import { GameCfg } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
@@ -239,9 +239,37 @@ export class Stage {
     // make sure the volume is reset to its old value
     this.musicLibrary.resetMusicVolume(parseInt(this.storage.getPersistent("volume") ?? "1"));
 
+    // For the sake of tutorials, we can do a little bit of querystring parsing
+    // to override the default start point, which is to go to splash(1).
+    let runner: ((index: number) => void) | undefined = undefined;
+    let index = 1;
+    let url = window.location.href;
+    if (url.indexOf("?") > 0) {
+      let fields = url.split("?")[1].split("=");
+      switch (fields[0]) {
+        case "SPLASH": runner = config.splashBuilder; break;
+        case "HELP": runner = config.helpBuilder; break;
+        case "CHOOSER": runner = config.chooserBuilder; break;
+        case "STORE": runner = config.storeBuilder; break;
+        case "PLAY": runner = config.levelBuilder; break;
+      }
+      if (runner) {
+        index = parseInt(fields[1]);
+        if (isNaN(index)) index = 1;
+      }
+      else {
+        runner = config.splashBuilder;
+        index = 1;
+      }
+    }
+    else {
+      runner = config.splashBuilder;
+      index = 1;
+    }
+
     // Load the images asynchronously, then start rendering
     this.imageLibrary.loadAssets(() => {
-      this.switchTo(config.splashBuilder, 1);
+      this.switchTo(runner!, index);
       this.renderer.startRenderLoop();
     });
   }
