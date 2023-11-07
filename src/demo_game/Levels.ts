@@ -6214,7 +6214,7 @@ export function buildLevelScreen(index: number) {
 
   // Make sure we go to the correct level when this level is won/lost: for
   // anything but the last level, we go to the next level.  Otherwise, go to the splash screen
-  if (index != 90) {
+  if (index != 91) {
     game.score.levelOnFail = { index, which: StageTypes.PLAY };
     game.score.levelOnWin = { index: index + 1, which: StageTypes.PLAY };
   }
@@ -6266,13 +6266,20 @@ export function welcomeMessage(message: string, subMessage: string = "") {
 export function winMessage(message: string, callback?: () => void) {
   game.score.winSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
+      console.log("tap", game.score)
       // We need to be careful... we might go back to the chooser or splash!
-      if (game.score.levelOnWin.which == StageTypes.PLAY)
+      if (game.score.levelOnWin.which == StageTypes.PLAY) {
+        game.clearOverlay();
         game.switchTo(game.config.levelBuilder, game.score.levelOnWin.index);
-      else if (game.score.levelOnWin.which == StageTypes.CHOOSER)
+      }
+      else if (game.score.levelOnWin.which == StageTypes.CHOOSER) {
+        game.clearOverlay();
         game.switchTo(game.config.chooserBuilder, game.score.levelOnWin.index);
-      else if (game.score.levelOnWin.which == StageTypes.SPLASH)
+      }
+      else if (game.score.levelOnWin.which == StageTypes.SPLASH) {
+        game.clearOverlay();
         game.switchTo(game.config.splashBuilder, game.score.levelOnWin.index);
+      }
       return true;
     });
     Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
@@ -6290,6 +6297,7 @@ export function winMessage(message: string, callback?: () => void) {
 export function loseMessage(message: string, callback?: () => void) {
   game.score.loseSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
+      game.clearOverlay();
       // Just repeat the last level
       //
       // NB: we should be more careful, like in winMessage...
