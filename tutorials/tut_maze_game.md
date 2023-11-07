@@ -1,5 +1,7 @@
 # A Maze Game
 
+## Level 1
+
 ```iframe
 {
     "width": 400,
@@ -7,6 +9,8 @@
     "src": "/tut_maze_game.html?SPLASH=1"
 }
 ```
+
+## Level 2
 
 ```iframe
 {
