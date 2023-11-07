@@ -7,7 +7,8 @@ game up and running.
 
 ## Required Software
 
-You will need the following programs in order to work with JetLag.  Please note that we do not currently support development on a phone:
+You will need the following programs in order to work with JetLag.  Please note
+that we do not currently support development on a phone:
 
 - A terminal and `git`
     - Every major operating system has at least one terminal program (some even

@@ -6,7 +6,7 @@ import { StageTypes } from "../jetlag/Systems/Score";
 import * as Helpers from "./helpers";
 import { ProjectileSystem } from "../jetlag/Systems/Projectiles";
 import { Scene } from "../jetlag/Entities/Scene";
-import { AnimatedSprite, ImageSprite } from "../jetlag/Components/Appearance";
+import { AnimatedSprite, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { b2Vec2 } from "@box2d/core";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
@@ -6116,6 +6116,88 @@ export function buildLevelScreen(index: number) {
     );
   }
 
+  // custom games on the end 
+
+  else if (index == 91) {
+    // Define the maze layout with walls, a hero, a destination, and a goodie
+    const mazeLayout = [
+      "####################",
+      "#H                 #",
+      "# # ### # # ## # # #",
+      "# #  G  # #      # #",
+      "# # ### ### #      #",
+      "# #   #  G         #",
+      "# # # # #####      #",
+      "#   #     G        #",
+      "####################",
+    ];
+
+    // Draw a border around the level
+    Helpers.drawBoundingBox(0, 0, 16, 9, 0.1, { density: 1, elasticity: 0.3, friction: 1 });
+
+    // Create a hero controlled explicitly via special touches
+    let heroCfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    let h = new Actor({
+      scene: game.world,
+      appearance: new ImageSprite(heroCfg),
+      rigidBody: RigidBodyComponent.Circle(heroCfg, game.world, { friction: 0.6 }),
+      role: new Hero(),
+      movement: new ExplicitMovement(),
+    });
+
+    // Create walls for the maze
+    for (let row = 0; row < mazeLayout.length; row++) {
+      for (let col = 0; col < mazeLayout[row].length; col++) {
+        const cell = mazeLayout[row][col];
+        if (cell === "#") {
+          let wallCfg = { cx: col + 0.5, cy: row + 0.5, width: 1, height: 1, img: "noise.png" };
+          new Actor({
+            scene: game.world,
+            rigidBody: RigidBodyComponent.Box(wallCfg, game.world, { friction: 1 }),
+            appearance: new ImageSprite(wallCfg),
+            movement: new InertMovement(),
+            role: new Obstacle(),
+          });
+        } else if (cell === "G") {
+          const goodieCfg = { cx: col + 0.5, cy: row + 0.5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+          new Actor({
+            scene: game.world,
+            appearance: new ImageSprite(goodieCfg),
+            rigidBody: RigidBodyComponent.Circle(goodieCfg, game.world),
+            movement: new InertMovement(),
+            role: new Goodie(),
+          });
+        }
+      }
+    }
+
+
+    // Create a destination for the goodie
+    let destCfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+    new Actor({
+      scene: game.world,
+      appearance: new ImageSprite(destCfg),
+      rigidBody: RigidBodyComponent.Circle(destCfg, game.world),
+      role: new Destination({ onAttemptArrival: () => { return game.score.goodieCount[0] >= 1; } }),
+      movement: new InertMovement(),
+    });
+    game.score.setVictoryDestination(1);
+
+    new Actor({
+      scene: game.hud,
+      appearance: new TextSprite({ cx: 1, cy: 0.25, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
+      role: new Passive(),
+      movement: new InertMovement(),
+      rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, game.hud),
+    });
+
+    // Draw a joystick on the HUD to control the hero
+    Helpers.addJoystickControl(game.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
+
+    winMessage("Great Job");
+  }
+
+
   // You just made it to the last level.  Now it's time to reveal a little
   // secret...  No matter which "if" or "else if" the code did, it eventually
   // got down here, where we do three standard configuration tasks.
@@ -6148,13 +6230,29 @@ export function buildLevelScreen(index: number) {
  *
  * @param message The message to display
  */
-export function welcomeMessage(message: string) {
+export function welcomeMessage(message: string, subMessage: string = "") {
   // Immediately install the overlay, to pause the game
   game.installOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => { game.clearOverlay(); return true; });
     // The text goes in the middle
-    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    new Actor({
+      scene: overlay,
+      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+      appearance: new TextSprite({ center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
+      movement: new InertMovement(),
+      role: new Passive(),
+    });
+    // The subtext goes below the main text
+    if (subMessage != "") {
+      new Actor({
+        scene: overlay,
+        rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 6, width: .1, height: .1 }, overlay),
+        appearance: new TextSprite({ center: true, cx: 8, cy: 6, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage),
+        movement: new InertMovement(),
+        role: new Passive(),
+      });
+    }
   });
 }
 

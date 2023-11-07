@@ -225,7 +225,7 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts) {
   let foundActor: Actor | undefined;
   // pan start behavior is to update foundActor if there is an actor where
   // the touch began
-  let panstart = (hudCoords: { x: number; y: number }) => {
+  let pan_start = (hudCoords: { x: number; y: number }) => {
     // Need to turn the meters of the hud into screen pixels, so that
     // world can convert to its meters
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
@@ -240,7 +240,7 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts) {
   };
   // pan move behavior is to change the actor position based on the new
   // coord
-  let panmove = (hudCoords: { x: number; y: number }) => {
+  let pan_move = (hudCoords: { x: number; y: number }) => {
     // need an actor, and need coords in pixels
     if (!foundActor) return false;
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
@@ -254,7 +254,7 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts) {
     foundActor = undefined;
     return false;
   };
-  addPanCallbackControl(scene, cfg, panstart, panmove, pan_stop);
+  addPanCallbackControl(scene, cfg, pan_start, pan_move, pan_stop);
 }
 
 /**

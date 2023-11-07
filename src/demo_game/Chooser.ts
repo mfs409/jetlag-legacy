@@ -92,7 +92,7 @@ export function buildChooserScreen(index: number) {
       for (let i = 0; i < 8; ++i, ++l, x += 1.75) {
         // Only draw a button if we're less than or equal to 90, since
         // that's our last level
-        if (l <= 90) drawLevelButton(x, y, 1.25, 1.25, l);
+        if (l <= 91) drawLevelButton(x, y, 1.25, 1.25, l);
       }
     }
     // draw the navigation buttons
