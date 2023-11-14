@@ -4,6 +4,7 @@ import { Assets, Graphics, Sprite as PixiSprite, Text as PixiText, Texture } fro
 import { GameCfg } from "../Config";
 import { game } from "../Stage";
 import { b2Vec2 } from "@box2d/core";
+import { CameraSystem } from "../Systems/Camera";
 
 /** DebugSprite is used when we need to render a debug outline on an actor */
 export class DebugSprite {
@@ -99,6 +100,24 @@ export class Text {
 
   /** Report the Y position of the text */
   getYPosition() { return this.text.position.y; }
+
+  /**
+   * Return the width and height of the text
+   *
+   * @param camera      The camera of the scene where the text is being drawn
+   * @param sampleText  Some text whose size we're computing, since the object's
+   *                    real text might not be available yet
+   */
+  getDims(camera: CameraSystem, sampleText: string) {
+    // NB:  When the game starts, text.text will usually be "", which gets us a
+    //      valid height but not a valid width.  Swapping in sampleText gets us
+    //      a better estimate.
+    let t = this.text.text;
+    this.text.text = sampleText;
+    let res = { width: this.text.width / camera.getScale(), height: this.text.height / camera.getScale() };
+    this.text.text = t;
+    return res;
+  }
 
   /**
    * Set the string to display

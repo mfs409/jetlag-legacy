@@ -19,7 +19,7 @@ import { Graphics } from "pixi.js";
  * ImageConfig stores the geometry and other configuration information needed
  * when describing an image that is not animated.
  */
-class ImageConfig {
+export class ImageConfig {
   /** Width of the image */
   w: number;
   /** Height of the image */
@@ -51,7 +51,7 @@ class ImageConfig {
  * FilledBoxConfig stores the configuration information needed when describing
  * an appearance that is achieved using a filled box, not images or text.
  */
-class FilledBoxConfig {
+export class FilledBoxConfig {
   /** Width of the box */
   w: number;
   /** Height of the box */
@@ -106,7 +106,7 @@ class FilledBoxConfig {
  * describing an appearance that is achieved using a filled circle, not images
  * or text
  */
-class FilledCircleConfig {
+export class FilledCircleConfig {
   /** Radius of the circle */
   radius: number;
   /** Width, to simplify some other code */
@@ -163,7 +163,7 @@ class FilledCircleConfig {
  * should provide to JetLag in order to create an entity whose visual
  * representation is a solid polygon.
  */
-class FilledPolyConfig {
+export class FilledPolyConfig {
   /** Z index of the polygon: Must be in the range [-2, 2] */
   z: number;
   /** Amount of rotation */
@@ -232,7 +232,7 @@ class FilledPolyConfig {
  * TextConfig stores the geometry and other configuration information needed
  * when describing on-screen text.
  */
-class TextConfig {
+export class TextConfig {
   /** Width of the text (computed) */
   w = 0;
   /** Height of the text (computed) */
@@ -274,7 +274,7 @@ class TextConfig {
  * AnimationConfig stores the geometry and other configuration information
  * needed when describing an animated image.
  */
-class AnimationConfig {
+export class AnimationConfig {
   /** Width of the animation */
   w: number;
   /** Height of the animation */
@@ -441,6 +441,15 @@ export class TextSprite {
 
   /** Perform any custom updates to the text before displaying it */
   prerender(_elapsedMs: number) { }
+
+  /**
+   * Return the width and height of the text
+   *
+   * @param camera      The camera of the scene where the text is being drawn
+   * @param sampleText  Some text whose size we're computing, since the object's
+   *                    real text might not be available yet
+   */
+  dims(camera: CameraSystem, sampleText: string) { return this.text.getDims(camera, sampleText); }
 }
 
 /**

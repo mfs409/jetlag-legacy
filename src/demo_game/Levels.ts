@@ -2284,7 +2284,7 @@ export function buildLevelScreen(level: number) {
 
     game.world.camera.setCameraChase(h, 6, 0);
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 10.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 10.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // Now we'll say that the destination is as high as the screen, so reaching
     // the end means victory
@@ -2355,7 +2355,7 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryDestination(1);
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // let's draw an enemy, just in case anyone wants to try to go to the bottom
     // right corner
@@ -2402,7 +2402,7 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryDestination(1);
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = new Actor({
       scene: game.world,
@@ -2471,7 +2471,7 @@ export function buildLevelScreen(level: number) {
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
     game.world.camera.setCameraChase(h);
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // to enable crawling, we just draw a crawl button on the screen
     // Be sure to hover over "crawlOn" and "crawlOff" to see what they do
@@ -2498,7 +2498,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 39) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1 });
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     new Actor({
       scene: game.world,
@@ -2556,7 +2556,7 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryDestination(1);
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // place a speed-up obstacle that lasts for 2 seconds
     cfg = { cx: 20, cy: .5, width: 1, height: 1, radius: 0.5, img: "right_arrow.png" };
@@ -2628,9 +2628,9 @@ export function buildLevelScreen(level: number) {
     // set up vertical scrolling backgrounds.  I was lazy and didn't make
     // anything that looks even halfway good.
     game.backgroundColor = 0xff00ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1, isHorizontal: false });
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0, isHorizontal: false });
-      game.background.addLayer({cx: 8, cy: 6.4, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: 0.5, isHorizontal: false });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1, isHorizontal: false });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0, isHorizontal: false });
+    game.background.addLayer({ cx: 8, cy: 6.4, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: 0.5, isHorizontal: false });
 
     welcomeMessage("Vertical scroller demo");
     winMessage("Great Job");
@@ -2644,7 +2644,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 10);
     // Just for fun, we'll have an auto-scrolling background, to make it look
     // like we're moving all the time
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Make a hero and an enemy that slowly moves toward the hero
@@ -2699,7 +2699,7 @@ export function buildLevelScreen(level: number) {
   // HUD for throwing projectiles in two directions
   else if (level == 43) {
     // Set up a scrolling background for the level
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "front.png" }), speed: -5 / 1000, isHorizontal: false, isAuto: true });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "front.png" }), speed: -5 / 1000, isHorizontal: false, isAuto: true });
     Helpers.enableTilt(1, 1, true);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 8, cy: 4.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
@@ -3221,7 +3221,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // The hero must reach this destination
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -5195,7 +5195,7 @@ export function buildLevelScreen(level: number) {
 
     // set up the background
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // draw a turbo boost button that covers the whole screen... make sure its
     // "up" speed matches the hero velocity
@@ -5240,7 +5240,7 @@ export function buildLevelScreen(level: number) {
     game.world.camera.setBounds(64, 9);
 
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // This control has a dampening effect, so that on release, the hero
     // slowly stops
@@ -5931,11 +5931,11 @@ export function buildLevelScreen(level: number) {
 
     // set up our background, with a few layers
     game.backgroundColor = 0x17b4ff;
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
-      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
 
     // Add a foreground layer
-      game.foreground.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.foreground.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // we win by collecting 10 goodies...
     game.score.setVictoryGoodies(10, 0, 0, 0);

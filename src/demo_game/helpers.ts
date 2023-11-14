@@ -705,11 +705,14 @@ export function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostD
  * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
  */
 export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
+  let appearance = new TextSprite(cfgOpts, producer);
+  // NB: Produce the text once, to get a size estimate
+  let dims = appearance.dims(scene.camera, producer());
   return new Actor({
     scene,
-    appearance: new TextSprite(cfgOpts, producer),
+    appearance,
     // TODO: the ".1" options are somewhat arbitrary
-    rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: cfgOpts.width, height: cfgOpts.height }, scene),
+    rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: dims.width, height: dims.height }, scene),
     movement: new InertMovement(),
     role: new Passive(),
   });

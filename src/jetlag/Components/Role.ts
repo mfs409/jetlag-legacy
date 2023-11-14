@@ -12,7 +12,7 @@ import { StateEvent } from "./StateManager";
  *
  * TODO: We could gain some efficiency by switching to a bitmask
  */
-enum CollisionExemptions {
+export enum CollisionExemptions {
   CRAWL_HERO = 0,
   JUMP_HERO = 1,
   DESTINATION = 2,
