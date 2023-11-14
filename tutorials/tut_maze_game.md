@@ -1,12 +1,16 @@
 # A Maze Game
 
+## Outline
+
+- 
+
 ## Level 1
 
 ```iframe
 {
     "width": 400,
     "height": 225,
-    "src": "/tut_maze_game.html?SPLASH=1"
+    "src": "/tut_maze_game.html?1"
 }
 ```
 
@@ -16,6 +20,6 @@
 {
     "width": 400,
     "height": 225,
-    "src": "/tut_maze_game.html?SPLASH=2"
+    "src": "/tut_maze_game.html?2"
 }
 ```
