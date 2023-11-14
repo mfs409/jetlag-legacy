@@ -218,8 +218,8 @@ export class Stage {
     this.console = new ConsoleService(config);
 
     this.pixelMeterRatio = config.pixelMeterRatio;
-    this.screenWidth = config.defaultScreenWidth;
-    this.screenHeight = config.defaultScreenHeight;
+    this.screenWidth = config.screenDimensions.width;
+    this.screenHeight = config.screenDimensions.height;
 
     // Check if the config needs to be adapted, then check for errors
     if (config.pixelMeterRatio <= 0) this.console.urgent("Invalid `pixelMeterRatio` in game config object");
@@ -240,36 +240,18 @@ export class Stage {
     this.musicLibrary.resetMusicVolume(parseInt(this.storage.getPersistent("volume") ?? "1"));
 
     // For the sake of tutorials, we can do a little bit of querystring parsing
-    // to override the default start point, which is to go to splash(1).
-    let runner: ((index: number) => void) | undefined = undefined;
-    let index = 1;
+    // to override the default level
+    let level = 1;
     let url = window.location.href;
-    if (url.indexOf("?") > 0) {
-      let fields = url.split("?")[1].split("=");
-      switch (fields[0]) {
-        case "SPLASH": runner = config.splashBuilder; break;
-        case "HELP": runner = config.helpBuilder; break;
-        case "CHOOSER": runner = config.chooserBuilder; break;
-        case "STORE": runner = config.storeBuilder; break;
-        case "PLAY": runner = config.levelBuilder; break;
-      }
-      if (runner) {
-        index = parseInt(fields[1]);
-        if (isNaN(index)) index = 1;
-      }
-      else {
-        runner = config.splashBuilder;
-        index = 1;
-      }
-    }
-    else {
-      runner = config.splashBuilder;
-      index = 1;
+    let qs_level = url.split("?")[1]; // Level from query string
+    if (qs_level) {
+      level = parseInt(qs_level);
+      if (isNaN(level)) level = 1;
     }
 
     // Load the images asynchronously, then start rendering
     this.imageLibrary.loadAssets(() => {
-      this.switchTo(runner!, index);
+      this.switchTo(this.config.gameBuilder, level!);
       this.renderer.startRenderLoop();
     });
   }

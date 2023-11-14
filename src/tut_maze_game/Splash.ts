@@ -7,8 +7,8 @@ import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
 import { Destination, Goodie, Hero, Obstacle, Passive } from "../jetlag/Components/Role";
 import { Scene } from "../jetlag/Entities/Scene";
-import { StageTypes } from "../jetlag/Systems/Score";
 import { ImgConfigOpts, BoxCfgOpts, TxtConfigOpts } from "../jetlag/Config";
+import { buildSplashScreen } from "../demo_game/Splash";
 
 /**
  * buildSplashScreen is used to draw the scene that we see when the game starts.
@@ -86,7 +86,7 @@ export function tutorial_builder(index: number) {
 
     new Actor({
       scene: game.hud,
-      appearance: new TextSprite({ cx: 1, cy: 0.25, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
       role: new Passive(),
       movement: new InertMovement(),
       rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, game.hud),
@@ -97,11 +97,11 @@ export function tutorial_builder(index: number) {
 
     winMessage("Great Job");
 
-    game.score.levelOnFail = { index: index, which: StageTypes.SPLASH };
-    game.score.levelOnWin = { index: index, which: StageTypes.SPLASH };
+    game.score.onLose = { index: index, which: buildSplashScreen };
+    game.score.onWin = { index: index, which: buildSplashScreen };
   }
   else if (index == 2) {
-    makeText(game.world, { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#000000", size: 28, z: 0 }, () => "Nothing here yet...")
+    makeText(game.world, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 28, z: 0 }, () => "Nothing here yet...")
   }
 }
 
@@ -115,23 +115,11 @@ export function tutorial_builder(index: number) {
 function winMessage(message: string, callback?: () => void) {
   game.score.winSceneBuilder = (overlay: Scene) => {
     addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
-      console.log("tap", game.score)
-      // We need to be careful... we might go back to the chooser or splash!
-      if (game.score.levelOnWin.which == StageTypes.PLAY) {
-        game.clearOverlay();
-        game.switchTo(game.config.levelBuilder, game.score.levelOnWin.index);
-      }
-      else if (game.score.levelOnWin.which == StageTypes.CHOOSER) {
-        game.clearOverlay();
-        game.switchTo(game.config.chooserBuilder, game.score.levelOnWin.index);
-      }
-      else if (game.score.levelOnWin.which == StageTypes.SPLASH) {
-        game.clearOverlay();
-        game.switchTo(game.config.splashBuilder, game.score.levelOnWin.index);
-      }
+      game.clearOverlay();
+      game.switchTo(() => { }, 1);
       return true;
     });
-    makeText(overlay, { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     if (callback) callback();
   };
 }
@@ -148,7 +136,7 @@ function winMessage(message: string, callback?: () => void) {
  *                  joystick
  * @param stopOnUp  Should the actor stop when the joystick is released?
  */
-function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
+function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
   let moving = false;
   function doMove(hudCoords: { x: number; y: number }) {
     moving = true;
@@ -223,7 +211,7 @@ function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coor
  *
  * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
  */
-function makeText(scene: Scene, cfgOpts: TxtConfigOpts, producer: () => string): Actor {
+function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
   return new Actor({
     scene,
     appearance: new TextSprite(cfgOpts, producer),

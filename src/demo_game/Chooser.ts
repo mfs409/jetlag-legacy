@@ -8,6 +8,8 @@ import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
+import { buildSplashScreen } from "./Splash";
+import { buildLevelScreen } from "./Levels";
 
 /**
  * buildChooserScreen draws the level chooser screens.
@@ -23,7 +25,7 @@ export function buildChooserScreen(index: number) {
 
   // This line ensures that, no matter what level we draw, the ESCAPE key is
   // configured to go back to the Splash
-  game.keyboard.setKeyUpHandler(KeyCodes.ESCAPE, () => { game.switchTo(game.config.splashBuilder, 1); });
+  game.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => { game.switchTo(buildSplashScreen, 1); });
 
   // screen 1: show levels 1 --> 24
   //
@@ -34,7 +36,7 @@ export function buildChooserScreen(index: number) {
     Helpers.setMusic("tune.ogg");
     new Actor({
       scene: game.world,
-      appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "chooser.png" }),
+      appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
@@ -82,7 +84,7 @@ export function buildChooserScreen(index: number) {
     Helpers.setMusic("tune.ogg");
     new Actor({
       scene: game.world,
-      appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "chooser.png" }),
+      appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
@@ -126,12 +128,12 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   // attach a callback and print the level number with a touchCallback, and then put text on top of it
   let tap = () => {
     console.log("tap on " + whichLevel)
-    game.switchTo(game.config.levelBuilder, whichLevel); return true;
+    game.switchTo(buildLevelScreen, whichLevel); return true;
   };
   tile.gestures = { tap };
   new Actor({
     scene: game.world,
-    appearance: new TextSprite({ center: true, cx: x + width / 2, cy: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
+    appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
     rigidBody: RigidBodyComponent.Box(cfg, game.world, { collisionsEnabled: false }),
     movement: new InertMovement(),
     role: new Passive(),
@@ -158,7 +160,7 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
     role: new Passive(),
   });
   let tap = () => {
-    game.switchTo(game.config.chooserBuilder, chooserLevel);
+    game.switchTo(buildChooserScreen, chooserLevel);
     return true;
   };
   btn.gestures = { tap };
@@ -184,7 +186,7 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
     role: new Passive(),
   });
   let tap = () => {
-    game.switchTo(game.config.chooserBuilder, chooserLevel);
+    game.switchTo(buildChooserScreen, chooserLevel);
     return true;
   };
   btn.gestures = { tap };
@@ -209,7 +211,7 @@ function drawSplashButton(x: number, y: number, width: number, height: number) {
     role: new Passive(),
   });
   let tap = () => {
-    game.switchTo(game.config.splashBuilder, 1);
+    game.switchTo(buildSplashScreen, 1);
     return true;
   };
   btn.gestures = { tap };

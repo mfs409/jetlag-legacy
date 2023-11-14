@@ -12,8 +12,7 @@ export class GameConfig implements GameCfg {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;
-  defaultScreenWidth = 1600;
-  defaultScreenHeight = 900;
+  screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
 
   // When you deploy your game, you'll want to change all of these
@@ -67,11 +66,6 @@ export class GameConfig implements GameCfg {
     "noise.png", "pause.png",
   ];
 
-  // This is where we tell JetLag about the functions we wrote for configuring
-  // each level.  You probably don't want to change these lines.
-  levelBuilder = () => { };
-  chooserBuilder = () => { };
-  helpBuilder = () => { };
-  splashBuilder = tutorial_builder;
-  storeBuilder = () => { };
+  // The name of the function that builds the initial screen of the game
+  gameBuilder = tutorial_builder;
 }

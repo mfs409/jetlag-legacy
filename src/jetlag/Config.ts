@@ -10,10 +10,6 @@ import { game } from "./Stage";
  * representation is a single image.
  */
 export interface ImgConfigOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
   /** Z index of the image: Must be in the range [-2, 2] */
   z?: number;
   /** Amount of rotation */
@@ -27,15 +23,73 @@ export interface ImgConfigOpts {
 }
 
 /**
+ * FilledBoxConfigOpts expresses the required and optional fields that a
+ * programmer should provide to JetLag in order to create an entity whose visual
+ * representation is a solid rectangle.
+ */
+export interface FilledBoxConfigOpts {
+  /** Z index of the box: Must be in the range [-2, 2] */
+  z?: number;
+  /** Amount of rotation */
+  rotation?: number;
+  /** Width of the box */
+  width: number;
+  /** Height of the box */
+  height: number;
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: number;
+  /** Fill color */
+  fillColor?: number;
+}
+
+/**
+ * FilledCircleConfigOpts expresses the required and optional fields that a
+ * programmer should provide to JetLag in order to create an entity whose visual
+ * representation is a solid circle.
+ */
+export interface FilledCircleConfigOpts {
+  /** Z index of the circle: Must be in the range [-2, 2] */
+  z?: number;
+  /** Amount of rotation */
+  rotation?: number;
+  /** Radius of the circle */
+  radius: number;
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: number;
+  /** Fill color */
+  fillColor?: number;
+}
+
+/**
+ * FilledPolyConfigOpts expresses the required and optional fields that a
+ * programmer should provide to JetLag in order to create an entity whose visual
+ * representation is a solid polygon.
+ */
+export interface FilledPolyConfigOpts {
+  /** Z index of the polygon: Must be in the range [-2, 2] */
+  z?: number;
+  /** Amount of rotation */
+  rotation?: number;
+  /** Vertices of the polygon */
+  vertices: number[];
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: number;
+  /** Fill color */
+  fillColor?: number;
+}
+
+/**
  * TxtConfigOpts expresses the required and optional fields that a programmer
  * should provide to JetLag in order to create an entity whose visual
  * representation is some text.
  */
 export interface TxtConfigOpts {
-  /** X coordinate of the top left corner */
-  cx: number;
-  /** Y coordinate of the top left corner */
-  cy: number;
   /** Z index of the image: Must be in the range [-2, 2] */
   z?: number;
   /** Amount of rotation */
@@ -56,10 +110,6 @@ export interface TxtConfigOpts {
  * representation uses flipbook-style animation.
  */
 export interface AniCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
   /** Z index of the image: Must be in the range [-2, 2] */
   z?: number;
   /** Amount of rotation */
@@ -288,10 +338,7 @@ export interface GameCfg {
   readonly pixelMeterRatio: number;
 
   /** The default game screen width, in pixels */
-  readonly defaultScreenWidth: number;
-
-  /** The default game screen height, in pixels */
-  readonly defaultScreenHeight: number;
+  readonly screenDimensions: { width: number, height: number };
 
   /** Should we adapt the game size based on the size of the browser window? */
   readonly adaptToScreenSize: boolean;
@@ -329,17 +376,5 @@ export interface GameCfg {
   readonly forceAccelerometerOff: boolean;
 
   /** The code that draws the main levels of the game */
-  readonly levelBuilder: (index: number) => void;
-
-  /** The code that draws the level chooser */
-  readonly chooserBuilder: (index: number) => void;
-
-  /** The code that draws the help screens */
-  readonly helpBuilder: (index: number) => void;
-
-  /** The code that draws the opening "splash" screen */
-  readonly splashBuilder: (index: number) => void;
-
-  /** The code that draws the store screens */
-  readonly storeBuilder: (index: number) => void;
+  readonly gameBuilder: (level: number) => void;
 }

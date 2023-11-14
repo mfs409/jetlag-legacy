@@ -2,7 +2,6 @@
 
 import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
 import { game } from "../jetlag/Stage";
-import { StageTypes } from "../jetlag/Systems/Score";
 import * as Helpers from "./helpers";
 import { ProjectileSystem } from "../jetlag/Systems/Projectiles";
 import { Scene } from "../jetlag/Entities/Scene";
@@ -16,6 +15,8 @@ import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { TimedEvent } from "../jetlag/Systems/Timer";
 import { AnimationSequence } from "../jetlag/Config";
 import { SvgSystem } from "../jetlag/Systems/Svg";
+import { buildSplashScreen } from "./Splash";
+import { buildChooserScreen } from "./Chooser";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game
@@ -26,14 +27,14 @@ import { SvgSystem } from "../jetlag/Systems/Svg";
  * Remember that this code creates the initial configuration of the level, after
  * which the physics simulator takes over and starts running the game.
  *
- * @param index Which level should be displayed
+ * @param level Which level should be displayed
  */
-export function buildLevelScreen(index: number) {
+export function buildLevelScreen(level: number) {
   // In this level, all we have is a hero (the green ball) who needs to make it
   // to the destination (a mustard colored ball).  The game is configured to use
   // tilt to control the world.  If your device doesn't have tilt support, the
   // arrow keys can simulate tilting.
-  if (index == 1) {
+  if (level == 1) {
     // Remember that our GameConfig object set some important parameters that
     // affect what we see here.  A particularly important point is that the
     // visible portion of the world is 16 meters wide and 9 meters high.
@@ -56,7 +57,7 @@ export function buildLevelScreen(index: number) {
     // Note:  Don't worry about "game.world" for now :)
     new Actor({
       scene: game.world,
-      appearance: new ImageSprite({ cx: 2, cy: 3, width: 0.8, height: 0.8, img: "green_ball.png" }),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: RigidBodyComponent.Circle({ cx: 2, cy: 3, radius: 0.4 }, game.world),
       // The hero will move via phone tilt
       movement: new TiltMovement(),
@@ -99,7 +100,7 @@ export function buildLevelScreen(index: number) {
   // In the last level, the green ball could go off screen, and there were no
   // instructions when we started.  Let's re-create the level, and make it a
   // little nicer.
-  else if (index == 2) {
+  else if (level == 2) {
     // start by setting everything like in level 1
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -139,7 +140,7 @@ export function buildLevelScreen(index: number) {
   // wall, it just sort of glided along, instead of rolling.  We'll add some
   // density/elasticity/friction to the ball and walls, so we get a nicer
   // behavior.
-  else if (index == 3) {
+  else if (level == 3) {
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     new Actor({
@@ -182,7 +183,7 @@ export function buildLevelScreen(index: number) {
   // destinations, but it is possible.  In this level, there are two heroes and
   // two destinations.  Each destination can only hold one hero, but it doesn't
   // matter which hero goes to which destination.
-  else if (index == 4) {
+  else if (level == 4) {
     // Let's start with the easy stuff:
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 0.9 });
@@ -246,7 +247,7 @@ export function buildLevelScreen(index: number) {
   // This level demonstrates that we can have many heroes that can reach the
   // same destination.  It also has a sound effect when the hero reaches the
   // destination.
-  else if (index == 5) {
+  else if (level == 5) {
     // Configure things like in the previous level
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -291,7 +292,7 @@ export function buildLevelScreen(index: number) {
   // Tilt can be used to directly set an Actor's velocity, instead of applying
   // forces to the Actor.  This technique doesn't always work well, but it's a
   // nice option to have, so let's try it out.
-  else if (index == 6) {
+  else if (level == 6) {
     // To turn on "tilt as velocity", all we need to do is pass in an extra
     // "true" to "enableTilt"
     Helpers.enableTilt(10, 10, true);
@@ -325,7 +326,7 @@ export function buildLevelScreen(index: number) {
   // So far, it has been impossible to lose a level.  In this level, we add an
   // Enemy actor.  If the hero collides with the Enemy, the level will be
   // lost, and there will be an option to try again.
-  else if (index == 7) {
+  else if (level == 7) {
     // Let's start with the familiar stuff
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -374,7 +375,7 @@ export function buildLevelScreen(index: number) {
   // This level explores a bit more of what we can do with enemies, by having
   // an enemy that moves along a fixed path.  Note that every actor can move
   // along a fixed path, not just enemies.
-  else if (index == 8) {
+  else if (level == 8) {
     // Let's set up everything except the enemy, just like in the previous level
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -426,7 +427,7 @@ export function buildLevelScreen(index: number) {
 
   // This level also puts an enemy on a path, but now the path has three
   // points, so that the enemy returns to its starting point
-  else if (index == 9) {
+  else if (level == 9) {
     // Just about everything in this level is the same as the previous level :)
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -470,7 +471,7 @@ export function buildLevelScreen(index: number) {
   // In general, if you can do something to one kind of Actor, you can do it to
   // all the kinds of actors.  In this level, we'll use Tilt to control the
   // enemy, too.  We'll also see that we can make actors rotate.
-  else if (index == 10) {
+  else if (level == 10) {
     // So far, we've set up all our levels like this:
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -522,7 +523,7 @@ export function buildLevelScreen(index: number) {
   // information on the HUD, and we can also draw actors on the hud who we can
   // touch in order to achieve new behaviors.  In this case, we'll put zoom-in
   // and zoom-out buttons on the HUD.
-  else if (index == 11) {
+  else if (level == 11) {
     // make the level really big, and set up tilt
     game.world.camera.setBounds(64, 36);
     Helpers.drawBoundingBox(0, 0, 64, 36, .1, { density: 1, elasticity: .3, friction: .4 });
@@ -586,7 +587,7 @@ export function buildLevelScreen(index: number) {
         // This is kind of neat: a picture is just an actor without a role or rigidBody
         new Actor({
           scene: game.world,
-          appearance: new ImageSprite({ cx: x + 8, cy: y + 4.5, width: 16, height: 9, img: "noise.png", z: -1 }),
+          appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
           rigidBody: RigidBodyComponent.Box({ cx: x + 8, cy: y + 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
           movement: new InertMovement(),
           role: new Passive(),
@@ -608,7 +609,7 @@ export function buildLevelScreen(index: number) {
   //
   // This level also shows how the "welcomeMessage" code works, by building a
   // whole "welcome message" from scratch
-  else if (index == 12) {
+  else if (level == 12) {
     // Put a border around the level, and create a hero and destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -729,7 +730,7 @@ export function buildLevelScreen(index: number) {
     // These alternate hitboxes also work for boxes, of course
     new Actor({
       scene: game.world,
-      appearance: new ImageSprite({ cx: 14, cy: 1, width: 0.7, height: 0.8, img: "noise.png" }),
+      appearance: new ImageSprite({ width: 0.7, height: 0.8, img: "noise.png" }),
       rigidBody: RigidBodyComponent.Box({ cx: 14, cy: 1, width: 0.5, height: 0.6 }, game.world, { friction: 1 }),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -779,7 +780,7 @@ export function buildLevelScreen(index: number) {
       // You might think it's weird that we're using a callback to create the
       // text.  It'll make more sense later.
       Helpers.makeText(overlay,
-        { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
+        { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "An obstacle's appearance may\nnot match its physics");
       // Note that we are putting tap controls and text on 'overlay', but
       // we can still access world.  This means, for example, that you
@@ -792,7 +793,7 @@ export function buildLevelScreen(index: number) {
   // elasticity can do interesting things.
   //
   // It also does some new tricks with the welcome scene overlay
-  else if (index == 13) {
+  else if (level == 13) {
     // Put a border around the level, and create a hero and destination.  Control the hero
     // with a joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -855,10 +856,10 @@ export function buildLevelScreen(index: number) {
         role: new Passive(),
       });
       Helpers.makeText(overlay,
-        { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
+        { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "Obstacles can have different amounts\nof friction and elasticity");
       Helpers.makeText(overlay,
-        { cx: 0.5, cy: 0.5, center: false, face: "Arial", color: "#00FFFF", size: 16, z: 0 },
+        { cx: 0.5, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 16, z: 0 },
         () => "(Releasing the joystick does not stop the hero anymore)");
       overlay.timer.addEvent(new TimedEvent(4, false, () => game.clearOverlay()));
     });
@@ -867,7 +868,7 @@ export function buildLevelScreen(index: number) {
   // This level introduces goodies. Goodies are something that we collect.  We
   // can make the collection of goodies lead to changes in the behavior of the
   // game.  In this example, the collection of goodies "enables" a destination.
-  else if (index == 14) {
+  else if (level == 14) {
     // set up a hero, destination, bounding box, and joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -928,7 +929,7 @@ export function buildLevelScreen(index: number) {
     // collected. This shows why we want a callback for specifying the text to
     // put on the screen
     Helpers.makeText(game.hud,
-      { cx: 0.25, cy: .25, center: false, face: "Arial", color: "#FF00FF", size: 20, z: 2 },
+      { cx: 0.25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 20, z: 2 },
       () => game.score.goodieCount[0] + "/2 Goodies");
 
     welcomeMessage("You must collect two blue balls.\nThen the destination will work");
@@ -938,9 +939,9 @@ export function buildLevelScreen(index: number) {
     game.score.winSceneBuilder = (overlay: Scene) => {
       Helpers.addTapControl(overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
-        () => { game.switchTo(game.config.levelBuilder, 15); return true; });
+        () => { game.switchTo(buildLevelScreen, 15); return true; });
       Helpers.makeText(overlay,
-        { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
+        { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "Great Job");
       game.musicLibrary.getSound("win_sound.ogg").play();
     };
@@ -948,7 +949,7 @@ export function buildLevelScreen(index: number) {
 
   // Earlier, we saw that enemies could move along a path. So can any other
   // actor, so we'll move destinations, goodies, and obstacles, too.
-  else if (index == 15) {
+  else if (level == 15) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 1, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -996,7 +997,7 @@ export function buildLevelScreen(index: number) {
 
     // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
     Helpers.makeText(game.hud,
-      { cx: 1, cy: 1, center: false, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
+      { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
       () => game.score.goodieCount[0] + " Goodies");
 
     welcomeMessage("Every actor can move...");
@@ -1006,7 +1007,7 @@ export function buildLevelScreen(index: number) {
   // Sometimes, we don't want a destination, we just want to say that the player
   // wins by collecting enough goodies.  This level also shows that we can set a
   // time limit for the level, and we can pause the game.
-  else if (index == 16) {
+  else if (level == 16) {
     // Set up a hero who is controlled by the joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -1041,14 +1042,14 @@ export function buildLevelScreen(index: number) {
 
     // put the goodie count on the screen
     Helpers.makeText(game.hud,
-      { cx: .25, cy: .25, center: false, face: "Arial", color: "#3C46FF", size: 14, z: 2 },
+      { cx: .25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 14, z: 2 },
       () => game.score.goodieCount[0] + "/5 Goodies");
 
     // put a simple countdown on the screen.  The first line says "15 seconds", the second
     // actually draws something on the screen showing remaining time
     game.score.loseCountDownRemaining = 15;
     Helpers.makeText(game.world,
-      { cx: .25, cy: 1.25, center: false, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
+      { cx: .25, cy: 1.25, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (game.score.loseCountDownRemaining ?? 0).toFixed(0));
 
     // let's also add a screen for pausing the game. In a real game, every level
@@ -1068,7 +1069,7 @@ export function buildLevelScreen(index: number) {
           () => { game.clearOverlay(); return true; }
         );
         Helpers.makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
+          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
           () => "Game Paused");
       });
       return true;
@@ -1087,7 +1088,7 @@ export function buildLevelScreen(index: number) {
   // gameplay yet.
   //
   // This level also has a Pause scene.
-  else if (index == 17) {
+  else if (level == 17) {
     // start with a hero who is controlled via tilt, and a destination
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -1115,7 +1116,7 @@ export function buildLevelScreen(index: number) {
     // Then draw the stopwatch value onto the HUD
     game.score.stopWatchProgress = 0;
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 0.1, center: false, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
+      { cx: 0.1, cy: 0.1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (game.score.stopWatchProgress ?? 0).toFixed(0) + " seconds");
 
     // Put a button on the HUD to pause the game
@@ -1131,7 +1132,7 @@ export function buildLevelScreen(index: number) {
         );
         // Put some text on the pause scene
         Helpers.makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#000000", size: 32, z: 0 },
+          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 0 },
           () => "Game Paused");
         // Add a button for going back to the main menu
         Helpers.addTapControl(
@@ -1139,7 +1140,7 @@ export function buildLevelScreen(index: number) {
           { cx: 15.5, cy: .5, width: 0.4, height: 0.4, img: "back_arrow.png" },
           () => {
             game.clearOverlay();
-            game.switchTo(game.config.splashBuilder, 1);
+            game.switchTo(buildSplashScreen, 1);
             return true;
           }
         );
@@ -1199,7 +1200,7 @@ export function buildLevelScreen(index: number) {
   // strengths, so that a hero doesn't disappear after a single collision. It
   // also shows that when an enemy defeats a hero, we can customize the message
   // that prints
-  else if (index == 18) {
+  else if (level == 18) {
     // set up a basic world.  Tilt will control one enemy, and also the hero
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -1229,7 +1230,7 @@ export function buildLevelScreen(index: number) {
 
     // draw a strength meter to show this hero's strength
     Helpers.makeText(game.world,
-      { cx: 0.5, cy: .5, center: false, face: "Arial", color: "#000000", size: 32, z: 2 },
+      { cx: 0.5, cy: .5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => (h.role as Hero).strength + " Strength");
 
     // Make a custom lose scene, that makes use of this variable called endText.
@@ -1239,10 +1240,10 @@ export function buildLevelScreen(index: number) {
       Helpers.addTapControl(
         overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
-        () => { game.switchTo(game.config.levelBuilder, 18); return true; }
+        () => { game.switchTo(buildLevelScreen, 18); return true; }
       );
       Helpers.makeText(overlay,
-        { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
+        { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => endText);
     };
 
@@ -1290,7 +1291,7 @@ export function buildLevelScreen(index: number) {
 
   // This level shows that we can win a level by defeating all enemies.  It also
   // shows that we can put a time limit on a level
-  else if (index == 19) {
+  else if (level == 19) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -1326,7 +1327,7 @@ export function buildLevelScreen(index: number) {
     // Start a countdown with 10 seconds, and put a timer on the HUD
     game.score.loseCountDownRemaining = 10;
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (game.score.loseCountDownRemaining ?? 0).toFixed(0));
 
     // indicate that defeating all of the enemies is the way to win this level
@@ -1339,7 +1340,7 @@ export function buildLevelScreen(index: number) {
 
   // This level shows that a goodie can change the hero's strength, and that we
   // can win by defeating a specific number of enemies, instead of all enemies.
-  else if (index == 20) {
+  else if (level == 20) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -1391,7 +1392,7 @@ export function buildLevelScreen(index: number) {
 
     // Display the hero's strength
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#000000", size: 32, z: 2 },
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => (h.role as Hero).strength + " Strength");
 
     // win by defeating one enemy
@@ -1405,7 +1406,7 @@ export function buildLevelScreen(index: number) {
 
   // this level introduces the idea of invincibility. Collecting the goodie
   // makes the hero invincible for a little while...
-  else if (index == 21) {
+  else if (level == 21) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -1466,17 +1467,17 @@ export function buildLevelScreen(index: number) {
     // doesn't increase, since we provided an 'onCollect' that didn't increase
     // the count.
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: .5, center: false, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
+      { cx: 0.1, cy: .5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
       () => game.score.goodieCount[0] + " Goodies");
 
     // Show how much invincibility is remaining
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 1, center: false, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
+      { cx: 0.1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
       () => (h.role as Hero).invincibleRemaining.toFixed(0) + " Invincibility");
 
     // put a frames-per-second display on the screen.
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 1.5, center: false, face: "Arial", color: "#C8C864", size: 16, z: 2 },
+      { cx: 0.1, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#C8C864", size: 16, z: 2 },
       () => game.renderer.getFPS().toFixed(0) + " fps");
 
     welcomeMessage("The blue ball will make you invincible for 15 seconds");
@@ -1486,7 +1487,7 @@ export function buildLevelScreen(index: number) {
 
   // We can make goodies "count" for more than one point... they can even count
   // for negative points.
-  else if (index == 22) {
+  else if (level == 22) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -1534,7 +1535,7 @@ export function buildLevelScreen(index: number) {
 
     // print a goodie count to show how the count goes up and down
     Helpers.makeText(game.hud,
-      { cx: 7, cy: 8.5, center: false, face: "Arial", color: "#3C46FF", size: 18, z: 2 },
+      { cx: 7, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 18, z: 2 },
       () => "Your score is: " + game.score.goodieCount[0]);
 
     welcomeMessage("Collect 'the right' blue balls to activate destination");
@@ -1544,7 +1545,7 @@ export function buildLevelScreen(index: number) {
   // this level demonstrates that we can drag actors (in this case,
   // obstacles), and that we can make rotated obstacles. The latter could be
   // useful for having angled walls in a maze
-  else if (index == 23) {
+  else if (level == 23) {
     // start with a hero who is controlled via tilt, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     Helpers.enableTilt(10, 10);
@@ -1611,7 +1612,7 @@ export function buildLevelScreen(index: number) {
   // This level shows how we can use "poking" to move obstacles. In this case,
   // pressing an obstacle selects it, and pressing the screen moves the obstacle
   // to that location. Double-tapping an obstacle removes it.
-  else if (index == 24) {
+  else if (level == 24) {
     // start with a hero who is controlled via Joystick, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: .75, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -1638,7 +1639,7 @@ export function buildLevelScreen(index: number) {
     // destination
     new Actor({
       scene: game.world,
-      appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "noise.png", z: -1 }),
+      appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
@@ -1719,7 +1720,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // In this level, the enemy chases the hero
-  else if (index == 25) {
+  else if (level == 25) {
     // start with a hero who is controlled via Joystick, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -1751,7 +1752,7 @@ export function buildLevelScreen(index: number) {
     // drawn behind everything else by giving it a z index of -2
     new Actor({
       scene: game.world,
-      appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "noise.png", z: -2 }),
+      appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -2 }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
@@ -1775,7 +1776,7 @@ export function buildLevelScreen(index: number) {
 
   // Sounds are an important part of games.  Here, we'll make an obstacle play
   // sounds when we collide with it or tap it
-  else if (index == 26) {
+  else if (level == 26) {
     // start with a hero who is controlled via Joystick, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -1826,7 +1827,7 @@ export function buildLevelScreen(index: number) {
   // This hero rotates so that it faces in the direction of movement. This can
   // be useful in games where the perspective is from overhead, and the hero is
   // moving in any X or Y direction
-  else if (index == 27) {
+  else if (level == 27) {
     // set up a hero who rotates in the direction of movement, and is controlled by joystick
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
     let h = new Actor({
@@ -1846,7 +1847,7 @@ export function buildLevelScreen(index: number) {
     // We won't add a destination... instead, the level will end in victory after 25 seconds
     game.score.winCountRemaining = 25;
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (game.score.winCountRemaining ?? 0).toFixed(0));
 
     // Let's have an enemy, too
@@ -1867,7 +1868,7 @@ export function buildLevelScreen(index: number) {
   // This level shows two things. The first is that a custom motion path can
   // allow things to violate the laws of physics and pass through other things.
   // The second is that motion paths can go off-screen.
-  else if (index == 28) {
+  else if (level == 28) {
     // set up a hero who rotates in the direction of movement, and is controlled by joystick
     let cfg = { cx: 8, cy: 4.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
     let h = new Actor({
@@ -1912,7 +1913,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // This level shows that we can draw on the screen to create obstacles.
-  else if (index == 29) {
+  else if (level == 29) {
     // Set up a hero and destination, and turn on tilt
     let cfg = { cx: 8, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
     new Actor({
@@ -1965,7 +1966,7 @@ export function buildLevelScreen(index: number) {
   // not enable tilt. Instead, we specified that there is a default gravity in
   // the Y dimension pushing everything down. This is much like gravity on
   // earth. The only way to move things, then, is by flicking them.
-  else if (index == 30) {
+  else if (level == 30) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // This is new: we'll create a level with a constant force downward in the Y
@@ -2020,7 +2021,7 @@ export function buildLevelScreen(index: number) {
   // Note, too, that the hero will fall to the floor, since there is a constant
   // downward force, but there is not any mechanism to apply a Y force to make
   // it move back up.
-  else if (index == 31) {
+  else if (level == 31) {
     // make a long level but not a tall level, and provide a constant downward force:
     game.world.camera.setBounds(3 * 16, 9);
     Helpers.resetGravity(0, 10);
@@ -2066,7 +2067,7 @@ export function buildLevelScreen(index: number) {
   // In the previous level, it was hard to see that the hero was moving.  We can
   // make a background layer to remedy this situation. Notice that the
   // background uses transparency to show the blue color for part of the screen
-  else if (index == 32) {
+  else if (level == 32) {
     // Start with a repeat of the previous level
     game.world.camera.setBounds(128, 9);
     Helpers.resetGravity(0, 10);
@@ -2103,7 +2104,7 @@ export function buildLevelScreen(index: number) {
     //
     // Note that background "layers" are all drawn *before* anything that is
     // drawn with a z index... so the background will be behind the hero
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // make an obstacle that hovers in a fixed place. Note that hovering and
     // zoom do not work together nicely.
@@ -2118,13 +2119,13 @@ export function buildLevelScreen(index: number) {
 
     // Add some text on the HUD to show how far the hero has traveled
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#FF00FF", size: 16, z: 2 },
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 16, z: 2 },
       () => Math.floor(h.rigidBody?.getCenter().x ?? 0) + " m");
 
     // Add some text about the previous best score.  Notice that it's not on the
     // HUD, so we only see it when the hero is at the beginning of the level
     Helpers.makeText(game.world,
-      { cx: 0.1, cy: 8, center: false, face: "Arial", color: "#000000", size: 12, z: 0 },
+      { cx: 0.1, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 12, z: 0 },
       () => "best: " + (game.storage.getPersistent("HighScore32") ?? "0") + "M"),
 
       welcomeMessage("Side Scroller with basic repeating background");
@@ -2147,7 +2148,7 @@ export function buildLevelScreen(index: number) {
 
   // Now let's look at how to add multiple background layers.  Also, let's add
   // jumping
-  else if (index == 33) {
+  else if (level == 33) {
     // Start like in the previous level
     game.world.camera.setBounds(128, 9);
     Helpers.resetGravity(0, 10);
@@ -2182,11 +2183,11 @@ export function buildLevelScreen(index: number) {
     game.backgroundColor = 0x17b4ff;
 
     // this layer has a scroll factor of 0... it won't move
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "back.png" }), speed: 1 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
     // this layer moves at half the speed of the hero
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     // this layer has a negative value... it moves faster than the hero
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 1, width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
+    game.background.addLayer({ cx: 8, cy: 1, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
 
     welcomeMessage("Press the hero to make it jump");
     winMessage("Great Job");
@@ -2195,7 +2196,7 @@ export function buildLevelScreen(index: number) {
 
   // In side-scrolling games, we can have the hero move at a fixed velocity,
   // instead of controlling its velocity with tilt or a joystick.
-  else if (index == 34) {
+  else if (level == 34) {
     // default side-scroller setup.  Note that neither the hero nor the bounding box has
     // friction
     game.world.camera.setBounds(128, 9);
@@ -2234,7 +2235,7 @@ export function buildLevelScreen(index: number) {
     Helpers.addTapControl(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, Helpers.jumpAction(h, 0, -10, 9000));
     // set up the backgrounds
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 0, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    game.background.addLayer({ cx: 0, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // if the hero jumps over the destination, we have a problem. To fix
     // it, let's put an invisible enemy right after the destination, so
@@ -2261,7 +2262,7 @@ export function buildLevelScreen(index: number) {
   // an obstacle (floor or wall). Here, we enable multiple jumps. Coupled with a
   // small jump impulse, this makes jumping feel more like swimming or
   // controlling a helicopter.
-  else if (index == 35) {
+  else if (level == 35) {
     // Note: we can go above the trees
     game.world.camera.setBounds(64, 15);
     Helpers.resetGravity(0, 10);
@@ -2283,7 +2284,7 @@ export function buildLevelScreen(index: number) {
 
     game.world.camera.setCameraChase(h, 6, 0);
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 10.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 10.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // Now we'll say that the destination is as high as the screen, so reaching
     // the end means victory
@@ -2323,7 +2324,7 @@ export function buildLevelScreen(index: number) {
   // This level shows that we can make a hero move based on how we touch the
   // screen.  It also shows that we can use a set of images to animate the
   // appearance of an actor, instead of just using a single image.
-  else if (index == 36) {
+  else if (level == 36) {
     game.world.camera.setBounds(48, 9);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, friction: 1 });
     // We do two new things here.  First, we provide animations in the hero's
@@ -2354,7 +2355,7 @@ export function buildLevelScreen(index: number) {
 
     game.score.setVictoryDestination(1);
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // let's draw an enemy, just in case anyone wants to try to go to the bottom
     // right corner
@@ -2387,7 +2388,7 @@ export function buildLevelScreen(index: number) {
 
   // In the last level, we had complete control of the hero's movement.  Here,
   // we give the hero a fixed velocity, and only control its up/down movement.
-  else if (index == 37) {
+  else if (level == 37) {
     game.world.camera.setBounds(48, 9);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1 });
     let cfg = { cx: 47, cy: 8, radius: 0.5, width: 1, height: 1, img: "mustard_ball.png" };
@@ -2401,7 +2402,7 @@ export function buildLevelScreen(index: number) {
 
     game.score.setVictoryDestination(1);
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = new Actor({
       scene: game.world,
@@ -2445,7 +2446,7 @@ export function buildLevelScreen(index: number) {
   // this level demonstrates crawling heroes. We can use this to simulate
   // crawling, ducking, rolling, spinning, etc. Note, too, that we can use it to
   // make the hero defeat certain enemies via crawl.
-  else if (index == 38) {
+  else if (level == 38) {
     game.world.camera.setBounds(48, 9);
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, elasticity: 0.3 });
@@ -2470,7 +2471,7 @@ export function buildLevelScreen(index: number) {
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
     game.world.camera.setCameraChase(h);
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // to enable crawling, we just draw a crawl button on the screen
     // Be sure to hover over "crawlOn" and "crawlOff" to see what they do
@@ -2494,10 +2495,10 @@ export function buildLevelScreen(index: number) {
   // We can make a hero start moving only when it is pressed. This can even let
   // the hero hover until it is pressed. We could also use this to have a game
   // where the player puts obstacles in place, then starts the hero moving.
-  else if (index == 39) {
+  else if (level == 39) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1 });
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     new Actor({
       scene: game.world,
@@ -2530,7 +2531,7 @@ export function buildLevelScreen(index: number) {
   // In a side-scrolling game, it is useful to be able to change the hero's
   // speed either permanently or temporarily. In JetLag, we can use a collision
   // between a hero and an obstacle to achieve this effect.
-  else if (index == 40) {
+  else if (level == 40) {
     game.world.camera.setBounds(160, 9);
     Helpers.drawBoundingBox(0, 0, 160, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -2555,7 +2556,7 @@ export function buildLevelScreen(index: number) {
 
     game.score.setVictoryDestination(1);
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // place a speed-up obstacle that lasts for 2 seconds
     cfg = { cx: 20, cy: .5, width: 1, height: 1, radius: 0.5, img: "right_arrow.png" };
@@ -2596,7 +2597,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // this level only exists to show that backgrounds can scroll vertically.
-  else if (index == 41) {
+  else if (level == 41) {
     // set up a level where tilt only makes the hero move up and down
     game.world.camera.setBounds(16, 36);
     Helpers.enableTilt(0, 10);
@@ -2627,9 +2628,9 @@ export function buildLevelScreen(index: number) {
     // set up vertical scrolling backgrounds.  I was lazy and didn't make
     // anything that looks even halfway good.
     game.backgroundColor = 0xff00ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "back.png" }), speed: 1, isHorizontal: false });
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0, isHorizontal: false });
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 6.4, width: 16, height: 2.8, img: "front.png" }), speed: 0.5, isHorizontal: false });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1, isHorizontal: false });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0, isHorizontal: false });
+      game.background.addLayer({cx: 8, cy: 6.4, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: 0.5, isHorizontal: false });
 
     welcomeMessage("Vertical scroller demo");
     winMessage("Great Job");
@@ -2639,11 +2640,11 @@ export function buildLevelScreen(index: number) {
   // The next few levels demonstrate support for throwing projectiles. In this
   // level, we throw projectiles by touching the hero, and the projectile always
   // goes in the same direction
-  else if (index == 42) {
+  else if (level == 42) {
     Helpers.enableTilt(10, 10);
     // Just for fun, we'll have an auto-scrolling background, to make it look
     // like we're moving all the time
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Make a hero and an enemy that slowly moves toward the hero
@@ -2673,7 +2674,7 @@ export function buildLevelScreen(index: number) {
     // enemy, it stops being "in flight", so we can throw another.
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 3, strength: 1, body: { radius: 0.125, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }
+      appearance: { width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }
     });
 
     // Touching the hero will throw a projectile
@@ -2696,9 +2697,9 @@ export function buildLevelScreen(index: number) {
   // This is another demo of how throwing projectiles works. In this level, we
   // limit the distance that projectiles travel, and we can put a control on the
   // HUD for throwing projectiles in two directions
-  else if (index == 43) {
+  else if (level == 43) {
     // Set up a scrolling background for the level
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "front.png" }), speed: -5 / 1000, isHorizontal: false, isAuto: true });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "front.png" }), speed: -5 / 1000, isHorizontal: false, isAuto: true });
     Helpers.enableTilt(1, 1, true);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 8, cy: 4.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
@@ -2738,7 +2739,7 @@ export function buildLevelScreen(index: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, strength: 1, range: 9,
       body: { radius: 0.125, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 },
+      appearance: { width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 },
     });
 
     // Add buttons for throwing to the left and right.  Each keeps throwing for
@@ -2754,7 +2755,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // this level shows how to change the amount of damage a projectile can do
-  else if (index == 44) {
+  else if (level == 44) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -2789,7 +2790,7 @@ export function buildLevelScreen(index: number) {
       maxAtOnce: 3, strength: 2, immuneToCollisions: true,
       // Since there isn't a radius or vertices, the body will be a box
       body: { width: .1, height: .4, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 }
+      appearance: { width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 }
     });
 
     // this button only throws one projectile per press...
@@ -2804,7 +2805,7 @@ export function buildLevelScreen(index: number) {
   // This level shows how to throw projectiles in a variety of directions, based
   // on touch. The velocity of the projectile will depend on the distance
   // between the hero and the touch point
-  else if (index == 45) {
+  else if (level == 45) {
     Helpers.resetGravity(0, 3);
 
     // Note: the height of the bounding box is set so that enemies can be drawn off screen
@@ -2831,7 +2832,7 @@ export function buildLevelScreen(index: number) {
     // slow it down a bit
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, body: { radius: 0.125, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }, strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
+      appearance: { width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }, strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
     });
 
     // We'll set up a timer, so that enemies keep falling from the sky
@@ -2856,7 +2857,7 @@ export function buildLevelScreen(index: number) {
   // Continuing our exploration of projectiles, this level shows how projectiles
   // can be affected by gravity.  It also shows that projectiles do not have to
   // disappear when they collide with obstacles.
-  else if (index == 46) {
+  else if (level == 46) {
     // In this level, there is no way to move the hero left and right, but it can jump
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -2923,7 +2924,7 @@ export function buildLevelScreen(index: number) {
       {
         maxAtOnce: 5,
         body: { radius: 0.25, cx: -100, cy: -100 },
-        appearance: { cx: 0, cy: 0, width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 },
+        appearance: { width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 },
         strength: 1,
         multiplier: 2,
         gravityAffectsProjectiles: true,
@@ -2968,7 +2969,7 @@ export function buildLevelScreen(index: number) {
   // future, or at a fixed interval.  In this case, we'll use the timer to make
   // more enemies.  We can use this to simulate bad things that spread, like
   // fire on a building.
-  else if (index == 47) {
+  else if (level == 47) {
     // In this level, we can press the screen to move left and right
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -2997,7 +2998,7 @@ export function buildLevelScreen(index: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 },
+      appearance: { width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 },
       strength: 1,
       throwSound: "flap_flap.ogg",
       soundEffects: new SoundEffectComponent("slow_down.ogg")
@@ -3062,7 +3063,7 @@ export function buildLevelScreen(index: number) {
 
     // put a count of defeated enemies on the screen
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#000000", size: 32, z: 2 },
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => game.score.getEnemiesDefeated() + " Enemies Defeated");
 
     welcomeMessage("Throw balls at the enemies before they reproduce");
@@ -3072,7 +3073,7 @@ export function buildLevelScreen(index: number) {
 
   // This level shows that we can have moveable enemies that reproduce. Be
   // careful... it is possible to make a lot of enemies really quickly
-  else if (index == 48) {
+  else if (level == 48) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -3170,7 +3171,7 @@ export function buildLevelScreen(index: number) {
 
   // this level shows simple animation. Every entity can have a default
   // animation.
-  else if (index == 49) {
+  else if (level == 49) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     new Actor({
@@ -3212,7 +3213,7 @@ export function buildLevelScreen(index: number) {
   // This level introduces jumping animations and disappearance animations.  It
   // also shows an odd way of moving the world.  There's friction on the floor,
   // so the hero can only move by tilting while the hero is in the air
-  else if (index == 50) {
+  else if (level == 50) {
     // In this level, we will have tilt to move left/right, but there is so much
     // friction that tilt will only be effective when the hero is in the air
     Helpers.resetGravity(0, 10);
@@ -3220,7 +3221,7 @@ export function buildLevelScreen(index: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // The hero must reach this destination
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -3296,7 +3297,7 @@ export function buildLevelScreen(index: number) {
 
   // this level shows that projectiles can be animated, and that we can
   // animate the hero while it throws a projectile
-  else if (index == 51) {
+  else if (level == 51) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -3334,7 +3335,7 @@ export function buildLevelScreen(index: number) {
       game.world, {
       maxAtOnce: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 },
+      appearance: { width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 },
       strength: 1,
       immuneToCollisions: true
     });
@@ -3346,7 +3347,7 @@ export function buildLevelScreen(index: number) {
   // This level explores invincibility animation. While we're at it, we
   // make some enemies that aren't affected by invincibility, and some
   // that can even damage the hero while it is invincible.
-  else if (index == 52) {
+  else if (level == 52) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -3441,7 +3442,7 @@ export function buildLevelScreen(index: number) {
     });
 
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
       () => game.score.goodieCount[0] + " Goodies");
 
     // draw a picture when the level is won, and don't print text...
@@ -3450,7 +3451,7 @@ export function buildLevelScreen(index: number) {
       Helpers.addTapControl(
         overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, img: "fade.png" },
-        () => { game.switchTo(game.config.levelBuilder, 53); return true; }
+        () => { game.switchTo(buildLevelScreen, 53); return true; }
       );
     };
     welcomeMessage("The blue ball will make you invincible for 15 seconds");
@@ -3463,7 +3464,7 @@ export function buildLevelScreen(index: number) {
   // One thing you'll notice here is that if you're in crawl-jump and stop
   // crawling, the animation doesn't go back to jump.  If that matters to your
   // game, then States.ts is where you'll want to do some work.
-  else if (index == 53) {
+  else if (level == 53) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3 });
 
@@ -3530,10 +3531,10 @@ export function buildLevelScreen(index: number) {
       Helpers.addTapControl(
         overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, img: "fade.png" },
-        () => { game.switchTo(game.config.levelBuilder, 53); return true; }
+        () => { game.switchTo(buildLevelScreen, 53); return true; }
       );
       Helpers.makeText(overlay,
-        { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
+        { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "Oh well...");
     };
 
@@ -3546,7 +3547,7 @@ export function buildLevelScreen(index: number) {
   // hero to change (e.g., get healthier) by swapping through images as goodies
   // are collected, or allow the hero to switch its animation depending on how
   // many enemies it has collided with.
-  else if (index == 54) {
+  else if (level == 54) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // create 7 goodies, each of which adds 1 to the hero's strength
@@ -3614,7 +3615,7 @@ export function buildLevelScreen(index: number) {
 
   // We can use obstacles to defeat enemies, and we can control which enemies
   // the obstacle can defeat, by using obstacle-enemy collision callbacks
-  else if (index == 55) {
+  else if (level == 55) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
@@ -3671,7 +3672,7 @@ export function buildLevelScreen(index: number) {
 
     // put an enemy defeated count on the screen, in red with a small font
     Helpers.makeText(game.hud,
-      { cx: 0.5, cy: 8, center: false, face: "Arial", color: "#FF0000", size: 10, z: 2 },
+      { cx: 0.5, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#FF0000", size: 10, z: 2 },
       () => game.score.getEnemiesDefeated() + "/4 Enemies Defeated");
 
     // make a moveable obstacle.  We're going to enable it to defeat the "big"
@@ -3717,7 +3718,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // This level shows that we can make entities that shrink or grow over time.
-  else if (index == 56) {
+  else if (level == 56) {
     // Negative gravity... the hero is going to float upward!
     Helpers.resetGravity(0, -10);
     Helpers.enableTilt(10, 0);
@@ -3768,14 +3769,14 @@ export function buildLevelScreen(index: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 3, strength: 2,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: { img: "color_star_1.png", cx: 0, cy: 0, width: 0.5, height: 0.5, z: 0 },
+      appearance: { img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 },
       randomImageSources: ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"]
     });
     game.world.projectiles.setNumberOfProjectiles(20);
 
     // show how many shots are left
     Helpers.makeText(game.hud,
-      { cx: 0.5, cy: 8.5, center: false, face: "Arial", color: "#FF00FF", size: 12, z: 2 },
+      { cx: 0.5, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 12, z: 2 },
       () => game.world.projectiles?.getRemaining() + " projectiles left");
 
     // draw a bunch of enemies to defeat
@@ -3845,7 +3846,7 @@ export function buildLevelScreen(index: number) {
 
   // this level shows that we can make a hero in the air rotate. Rotation
   // doesn't do anything, but it looks nice...
-  else if (index == 57) {
+  else if (level == 57) {
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
@@ -3892,7 +3893,7 @@ export function buildLevelScreen(index: number) {
 
   // we can attach movement buttons to any moveable entity, so in this case, we
   // attach it to an obstacle to get an Arkanoid-like effect.
-  else if (index == 58) {
+  else if (level == 58) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1);
 
     let cfg = { cx: 14, cy: 1, radius: 0.125, width: 0.25, height: 0.25, img: "mustard_ball.png" };
@@ -3944,7 +3945,7 @@ export function buildLevelScreen(index: number) {
 
   // In this level, we'll use some timers that happen after certain amounts of
   // time elapse.
-  else if (index == 59) {
+  else if (level == 59) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Things will appear  and disappear...");
     winMessage("Great Job");
@@ -4000,7 +4001,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // This level uses timers to make more of the level appear over time
-  else if (index == 60) {
+  else if (level == 60) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -4026,7 +4027,7 @@ export function buildLevelScreen(index: number) {
     game.world.timer.addEvent(new TimedEvent(2, false, () => {
       game.installOverlay((overlay: Scene) => {
         Helpers.makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#000000", size: 18, z: 0 },
+          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 18, z: 0 },
           () => "Ooh... a draggable enemy");
         Helpers.addTapControl(overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
@@ -4055,7 +4056,7 @@ export function buildLevelScreen(index: number) {
       // overlay is tapped.
       game.installOverlay((overlay: Scene) => {
         Helpers.makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#00FF00", size: 18, z: 1 },
+          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 18, z: 1 },
           () => "Touch the enemy and it will go away");
         Helpers.addTapControl(overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png", z: -1 },
@@ -4085,7 +4086,7 @@ export function buildLevelScreen(index: number) {
           () => { game.clearOverlay(); return true; }
         );
         Helpers.makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 18, z: 1 },
+          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 18, z: 1 },
           () => "Now you can see the rest of the level");
         cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
         new Actor({
@@ -4140,7 +4141,7 @@ export function buildLevelScreen(index: number) {
   // draw a few screens at a time, and not put the callback obstacle at the end
   // of a screen, so that we'd never see the drawing of stuff taking place, but
   // for this demo, that's actually a nice effect.
-  else if (index == 61) {
+  else if (level == 61) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Keep going right!");
     winMessage("Great Job");
@@ -4159,7 +4160,7 @@ export function buildLevelScreen(index: number) {
 
     game.world.camera.setCameraChase(h);
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => game.score.goodieCount[0] + " Goodies");
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => game.score.goodieCount[0] + " Goodies");
     game.score.setVictoryDestination(1);
 
     // this obstacle is a collision callback... when the hero hits it, we'll run
@@ -4243,7 +4244,7 @@ export function buildLevelScreen(index: number) {
             () => { game.clearOverlay(); return true; }
           );
           Helpers.makeText(overlay,
-            { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
+            { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
             () => "The destination is now available");
 
           cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -4263,7 +4264,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // this level demonstrates callbacks that happen when we touch an obstacle.
-  else if (index == 62) {
+  else if (level == 62) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Touching the obstacle won't work until\nyou collect a goodie");
     winMessage("Great Job");
@@ -4344,7 +4345,7 @@ export function buildLevelScreen(index: number) {
   // ways to defeat an enemy, so we enable all mechanisms in this level,
   // to see if they all work to cause enemy callbacks to run the
   // enemy collision callback code.
-  else if (index == 63) {
+  else if (level == 63) {
     welcomeMessage("There are five ways to defeat an enemy");
     winMessage("You did it!");
 
@@ -4383,7 +4384,7 @@ export function buildLevelScreen(index: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, strength: 1,
       body: { radius: 0.1, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.2, height: 0.21, img: "grey_ball.png" }
+      appearance: { width: 0.2, height: 0.21, img: "grey_ball.png" }
     });
 
     // add an obstacle that has an enemy collision callback, so it can defeat
@@ -4404,7 +4405,7 @@ export function buildLevelScreen(index: number) {
       // Make a fresh pause scene
       game.installOverlay((overlay: Scene) => {
         Helpers.makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#58E2A0", size: 16, z: 0 }, () => "good job, here's a prize");
+          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#58E2A0", size: 16, z: 0 }, () => "good job, here's a prize");
         Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => { game.clearOverlay(); return true; });
 
         // Draw a goodie on the screen somewhat randomly as a reward... picking
@@ -4478,7 +4479,7 @@ export function buildLevelScreen(index: number) {
   // image. We use a collision callback to cause the effect. Furthermore, we can
   // increment scores inside of the callback code, which lets us activate the
   // destination on an obstacle collision
-  else if (index == 64) {
+  else if (level == 64) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Only stars can reach the destination");
     winMessage("Great Job");
@@ -4495,7 +4496,7 @@ export function buildLevelScreen(index: number) {
     });
 
     Helpers.makeText(game.hud,
-      { cx: 0.1, cy: 8.5, center: false, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => game.score.goodieCount[0] + " Goodies");
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => game.score.goodieCount[0] + " Goodies");
 
     // the destination won't work until some goodies are collected...
     cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "color_star_1.png" };
@@ -4541,7 +4542,7 @@ export function buildLevelScreen(index: number) {
   // This level shows how to use countdown timers to win a level, and introduces
   // a way to throw projectiles in an arbitrary direction but with fixed
   // velocity.
-  else if (index == 65) {
+  else if (level == 65) {
     Helpers.resetGravity(0, 10);
     welcomeMessage("Press anywhere to throw a ball");
     winMessage("You Survived!");
@@ -4568,7 +4569,7 @@ export function buildLevelScreen(index: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
       body: { radius: 0.1, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.2, height: 0.2, img: "grey_ball.png" },
+      appearance: { width: 0.2, height: 0.2, img: "grey_ball.png" },
     });
 
     // we're going to win by "surviving" for 25 seconds... with no enemies, that
@@ -4576,7 +4577,7 @@ export function buildLevelScreen(index: number) {
     // knows how much time remains.
     game.score.winCountRemaining = 25;
     Helpers.makeText(game.hud,
-      { cx: 2, cy: 2, center: false, face: "Arial", color: "#C0C0C0", size: 16, z: 2 },
+      { cx: 2, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#C0C0C0", size: 16, z: 2 },
       () => "" + (game.score.winCountRemaining ?? 0).toFixed(2) + "s remaining");
 
     // just to play it safe, let's say that we win on reaching a destination...
@@ -4593,7 +4594,7 @@ export function buildLevelScreen(index: number) {
       () => {
         game.installOverlay((overlay: Scene) => {
           Helpers.makeText(overlay,
-            { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
+            { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
             () => "Game Paused");
           Helpers.addTapControl(overlay,
             { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png", z: -1 },
@@ -4608,7 +4609,7 @@ export function buildLevelScreen(index: number) {
   // We can make a hero hover, and then have it stop hovering when it is flicked
   // or moved. This demonstrates the effect via flick. It also shows that an
   // enemy (or obstacle/goodie/destination) can fall due to gravity.
-  else if (index == 66) {
+  else if (level == 66) {
     Helpers.resetGravity(0, 10);
     welcomeMessage("Flick the hero into the destination");
     winMessage("Great Job");
@@ -4655,7 +4656,7 @@ export function buildLevelScreen(index: number) {
   // altering the pre-solve code in Collisions.ts. Another approach, which is
   // much simpler, is to mark some walls so that the hero doesn't have jump
   // re-enabled upon a collision.
-  else if (index == 67) {
+  else if (level == 67) {
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     welcomeMessage("Press the hero to make it jump");
@@ -4709,7 +4710,7 @@ export function buildLevelScreen(index: number) {
   // When something chases an entity, we might not want it to chase in both the
   // X and Y dimensions... this shows how we can chase in a single direction.
   // It also shows how things can move through walls.
-  else if (index == 68) {
+  else if (level == 68) {
     // set up a simple level
     Helpers.enableTilt(10, 10);
     welcomeMessage("You can walk through the wall");
@@ -4795,7 +4796,7 @@ export function buildLevelScreen(index: number) {
   // In level 24, we poked an actor, then poked the screen, and the actor
   // teleported.  Here, we'll say that when we poke the screen, the actor starts
   // moving toward that point.
-  else if (index == 69) {
+  else if (level == 69) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1);
     welcomeMessage("Poke the hero, then  where you want it to go.");
     winMessage("Great Job");
@@ -4844,7 +4845,7 @@ export function buildLevelScreen(index: number) {
   // It can be useful to make a hero stick to an obstacle. As an example, if the
   // hero should stand on a platform that moves along a path, then we will want
   // the hero to "stick" to it, even as the platform moves downward.
-  else if (index == 70) {
+  else if (level == 70) {
     Helpers.resetGravity(0, 10);
     welcomeMessage("Press screen borders to move the hero");
     winMessage("Great Job");
@@ -4911,7 +4912,7 @@ export function buildLevelScreen(index: number) {
   // When the projectile isn't a circle we might want to rotate it in the
   // direction of travel. Also, this level shows how to do walls that can be
   // passed through in one direction.
-  else if (index == 71) {
+  else if (level == 71) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Press anywhere to shoot a laser beam");
     winMessage("Great Job");
@@ -4950,7 +4951,7 @@ export function buildLevelScreen(index: number) {
       maxAtOnce: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
       immuneToCollisions: true,
       body: { width: 0.02, height: .5, cx: -100, cy: -100 },
-      appearance: { cx: 0, cy: 0, width: 0.02, height: 1, img: "red.png" },
+      appearance: { width: 0.02, height: 1, img: "red.png" },
     });
 
     // Warning!  If you make these projectiles any longer, and if you are not
@@ -5000,7 +5001,7 @@ export function buildLevelScreen(index: number) {
   // This level shows a bit more about using different goodie scores.  It's
   // really mean, because you need to get the exact right number of each goodie
   // type.
-  else if (index == 72) {
+  else if (level == 72) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Green, Red, Blue, and Grey balls are goodies\nBut how many of each are needed?");
     winMessage("Great Job");
@@ -5033,22 +5034,22 @@ export function buildLevelScreen(index: number) {
 
     // Announce how many of each goodie have been collected
     Helpers.makeText(game.hud,
-      { cx: 1, cy: 1, center: false, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
+      { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => game.score.goodieCount[0] + " blue");
     Helpers.makeText(game.hud,
-      { cx: 1, cy: 1.5, center: false, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
+      { cx: 1, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => game.score.goodieCount[1] + " green");
     Helpers.makeText(game.hud,
-      { cx: 1, cy: 2, center: false, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
+      { cx: 1, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => game.score.goodieCount[2] + " red");
     Helpers.makeText(game.hud,
-      { cx: 1, cy: 2.5, center: false, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
+      { cx: 1, cy: 2.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => game.score.goodieCount[3] + " gray");
 
     // You only get 20 seconds to finish the level
     game.score.loseCountDownRemaining = 20;
     Helpers.makeText(game.hud,
-      { cx: 15, cy: 8, center: false, face: "Arial", color: "#000000", size: 32, z: 2 },
+      { cx: 15, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => (game.score.loseCountDownRemaining ?? 0).toFixed() + "");
 
     // draw the goodies
@@ -5110,7 +5111,7 @@ export function buildLevelScreen(index: number) {
 
   // this level shows passthrough objects and chase again, to help
   // get you thinking about chase and dynamic bodies
-  else if (index == 73) {
+  else if (level == 73) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("You can walk through the wall");
     winMessage("Great Job");
@@ -5159,7 +5160,7 @@ export function buildLevelScreen(index: number) {
 
   // We can have a control that increases the hero's speed while pressed,
   // and decreases it upon release
-  else if (index == 74) {
+  else if (level == 74) {
     Helpers.resetGravity(0, 10);
     welcomeMessage("Press anywhere to speed up");
     winMessage("Great Job");
@@ -5194,7 +5195,7 @@ export function buildLevelScreen(index: number) {
 
     // set up the background
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // draw a turbo boost button that covers the whole screen... make sure its
     // "up" speed matches the hero velocity
@@ -5208,7 +5209,7 @@ export function buildLevelScreen(index: number) {
   // Sometimes, we want to make an actor move when we press a control, but when
   // we release we don't want an immediate stop. This shows how to achieve that
   // effect.
-  else if (index == 75) {
+  else if (level == 75) {
     Helpers.resetGravity(0, 10);
     welcomeMessage("Press anywhere to start moving");
     winMessage("Great Job");
@@ -5239,7 +5240,7 @@ export function buildLevelScreen(index: number) {
     game.world.camera.setBounds(64, 9);
 
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // This control has a dampening effect, so that on release, the hero
     // slowly stops
@@ -5253,7 +5254,7 @@ export function buildLevelScreen(index: number) {
   // Here's the start of doodle jump.  The main idea is that the platform is
   // "one-sided", but also has a script that runs when the hero collides with
   // it, to give a jump-like boost.
-  else if (index == 76) {
+  else if (level == 76) {
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     welcomeMessage("One-sided + Callbacks");
@@ -5300,7 +5301,7 @@ export function buildLevelScreen(index: number) {
   // before it can be given a new position. Also, the hero will keep
   // moving after the screen is released. We will also show the Fact
   // interface.
-  else if (index == 77) {
+  else if (level == 77) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1);
     welcomeMessage("Poke the hero, then  where you want it to go.");
     winMessage("Great Job");
@@ -5348,13 +5349,13 @@ export function buildLevelScreen(index: number) {
     // press the buttons to increment the numbers.  Then exit the level or
     // refresh the page, and watch what happens.
     Helpers.makeText(game.hud,
-      { cx: 1.25, cy: 0.5, center: false, face: "Arial", color: "#000000", size: 24, z: 2 },
+      { cx: 1.25, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
       () => "Level: " + (game.storage.getLevel("level test") ?? -1));
     Helpers.makeText(game.hud,
-      { cx: 1.25, cy: 1, center: false, face: "Arial", color: "#000000", size: 24, z: 2 },
+      { cx: 1.25, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
       () => "Session: " + (game.storage.getSession("session test") ?? -1));
     Helpers.makeText(game.hud,
-      { cx: 1.25, cy: 1.5, center: false, face: "Arial", color: "#000000", size: 24, z: 2 },
+      { cx: 1.25, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
       () => "Game: " + (game.storage.getPersistent("game test") ?? "-1"));
 
     Helpers.addTapControl(game.hud,
@@ -5382,7 +5383,7 @@ export function buildLevelScreen(index: number) {
 
   // Sometimes we need to manually force an entity to be immune to
   // gravity.
-  else if (index == 78) {
+  else if (level == 78) {
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     welcomeMessage("Testing Gravity Defy?");
@@ -5424,7 +5425,7 @@ export function buildLevelScreen(index: number) {
   // This level shows that polygons with irregular shapes don't really shrink
   // nicely.  If that's going to be a problem for your game, you might want to
   // work on the shrink code and then share it with me :)
-  else if (index == 79) {
+  else if (level == 79) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("Testing Polygons");
     winMessage("Great Job");
@@ -5466,7 +5467,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // This level shows that we can defeat enemies by jumping on them
-  else if (index == 80) {
+  else if (level == 80) {
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     welcomeMessage("Press the hero to make it jump");
@@ -5503,7 +5504,7 @@ export function buildLevelScreen(index: number) {
   // Joints are a powerful concept.  We'll just do a little demonstration here
   // for revolute joints, which let one rigid body revolve around another.  In
   // this demo, we'll have limits to the joints, kind of like pinball flippers.
-  else if (index == 81) {
+  else if (level == 81) {
     Helpers.enableTilt(10, 10);
     welcomeMessage("The revolving obstacle will move the hero");
     winMessage("Great Job");
@@ -5562,7 +5563,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // Demonstrate one-time callback controls
-  else if (index == 82) {
+  else if (level == 82) {
     // start by setting everything up just like in level 1
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -5601,7 +5602,7 @@ export function buildLevelScreen(index: number) {
             () => { game.clearOverlay(); return true; }
           );
           Helpers.makeText(overlay,
-            { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 20, z: 0 },
+            { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 0 },
             () => "you can only pause once...");
         });
         // When the pause button draws the pause screen, it also disables the
@@ -5615,7 +5616,7 @@ export function buildLevelScreen(index: number) {
   // Here's another joint demo.  In this one, we weld an obstacle to the hero.
   // This might be useful if your hero needs to pick things up and move them
   // places.
-  else if (index == 83) {
+  else if (level == 83) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -5657,7 +5658,7 @@ export function buildLevelScreen(index: number) {
   // let the pause scene be an inventory, or even a mini-game.  In this level,
   // we'll put some buttons on the pause scene, and let them do various
   // interesting things.
-  else if (index == 84) {
+  else if (level == 84) {
     // We have a level that is un-winnable, because you need to defeat the
     // enemy, but don't have enough strength.
     Helpers.enableTilt(10, 10);
@@ -5696,10 +5697,10 @@ export function buildLevelScreen(index: number) {
           // This button goes back to the Chooser
           Helpers.addTapControl(overlay,
             { cx: .75, cy: .75, width: .5, height: .5, img: "red_ball.png" },
-            () => { game.clearOverlay(); game.switchTo(game.config.chooserBuilder, 4); return true; }
+            () => { game.clearOverlay(); game.switchTo(buildChooserScreen, 4); return true; }
           );
           Helpers.makeText(overlay,
-            { cx: 1.25, cy: 0.65, center: false, face: "Arial", color: "#FF0000", size: 24 }, () => "Back to chooser");
+            { cx: 1.25, cy: 0.65, center: false, width: .1, height: .1, face: "Arial", color: "#FF0000", size: 24 }, () => "Back to chooser");
 
           // This one wins instantly
           Helpers.addTapControl(overlay,
@@ -5707,14 +5708,14 @@ export function buildLevelScreen(index: number) {
             () => { game.clearOverlay(); game.score.endLevel(true); return true; }
           );
           Helpers.makeText(overlay,
-            { cx: 1.25, cy: 1.65, center: false, face: "Arial", color: "#0000FF", size: 24 }, () => "Win Instantly");
+            { cx: 1.25, cy: 1.65, center: false, width: .1, height: .1, face: "Arial", color: "#0000FF", size: 24 }, () => "Win Instantly");
 
           // This one loses instantly
           Helpers.addTapControl(overlay,
             { cx: .75, cy: 2.75, width: .5, height: .5, img: "purple_ball.png" },
             () => { game.clearOverlay(); game.score.endLevel(false); return true; });
           Helpers.makeText(overlay,
-            { cx: 1.25, cy: 2.65, center: false, face: "Arial", color: "#FF00FF", size: 24 }, () => "Lose Instantly");
+            { cx: 1.25, cy: 2.65, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 24 }, () => "Lose Instantly");
 
           // This one opens another pause scene, to show how we can chain pause
           // scenes together
@@ -5733,13 +5734,13 @@ export function buildLevelScreen(index: number) {
                   return true;
                 });
                 Helpers.makeText(overlay,
-                  { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
+                  { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
                   () => "You are now powered up!");
               });
               return true;
             });
           Helpers.makeText(overlay,
-            { cx: 1.25, cy: 3.65, center: false, face: "Arial", color: "#00FF00", size: 24 }, () => "Another Pause Scene");
+            { cx: 1.25, cy: 3.65, center: false, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 24 }, () => "Another Pause Scene");
         });
         return true;
       });
@@ -5748,7 +5749,7 @@ export function buildLevelScreen(index: number) {
   // We might want to use heroes for unusual purposes in a game.  Sometimes
   // there is a "real" hero, though, who needs to not be defeated.  This level
   // shows how to do that.
-  else if (index == 85) {
+  else if (level == 85) {
     welcomeMessage("Keep both heroes alive!");
     winMessage("Great Job");
     loseMessage("Try Again");
@@ -5801,7 +5802,7 @@ export function buildLevelScreen(index: number) {
   }
 
   // It is possible for a button to control many Actors at once!
-  else if (index == 86) {
+  else if (level == 86) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { elasticity: 1, friction: 0.1 });
     welcomeMessage("Keep pressing until a hero makes it to the destination");
@@ -5848,7 +5849,7 @@ export function buildLevelScreen(index: number) {
   // We saw revolute joints earlier.  In this level, we'll make a joint without
   // any limits.  We can use it to drive a wheel, which means we can have
   // somewhat realistic physical propulsion.
-  else if (index == 87) {
+  else if (level == 87) {
     Helpers.resetGravity(0, 10);
     // If the ground and wheels don't have friction, then this level won't work!
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
@@ -5899,7 +5900,7 @@ export function buildLevelScreen(index: number) {
 
   // This level shows how to make something that feels "infinite".  It also
   // shows "foreground" layers
-  else if (index == 88) {
+  else if (level == 88) {
     // set up a standard side scroller, but make it really really long, to
     // emulate infinite length
     game.world.camera.setBounds(300000, 9);
@@ -5930,16 +5931,16 @@ export function buildLevelScreen(index: number) {
 
     // set up our background, with a few layers
     game.backgroundColor = 0x17b4ff;
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "back.png" }), speed: 1 });
-    game.background.addLayer({ appearance: new ImageSprite({ cx: 0, cy: 5, width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
+      game.background.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
 
     // Add a foreground layer
-    game.foreground.addLayer({ appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "mid.png" }), speed: 0 });
+      game.foreground.addLayer({cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // we win by collecting 10 goodies...
     game.score.setVictoryGoodies(10, 0, 0, 0);
     Helpers.makeText(game.hud,
-      { cx: 1, cy: 1, center: false, face: "Arial", color: "#FFFFFF", size: 20, z: 2 },
+      { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 },
       () => game.score.goodieCount[0] + " goodies");
 
     // This is a bit tricky... we don't want to create the whole level all at
@@ -6007,7 +6008,7 @@ export function buildLevelScreen(index: number) {
   // you can import it into your game as a set of obstacles. Drawing a picture
   // on top of the obstacle is probably a good idea, though we don't bother in
   // this level
-  else if (index == 89) {
+  else if (level == 89) {
     // We'll use tilt and jump to control the hero in this level
     game.world.camera.setBounds(32, 18);
     Helpers.enableTilt(10, 10);
@@ -6037,7 +6038,7 @@ export function buildLevelScreen(index: number) {
     // draw an obstacle from SVG.  We are stretching it in the X and Y dimensions, and also
     // moving it rightward and upward
     SvgSystem.processFile("shape.svg", 5, 5, 2, 2, (body: RigidBodyComponent) => {
-      return new ImageSprite({ cx: body.props.cx, cy: body.props.cy, width: body.props.w, height: body.props.h, img: "red.png" })
+      return new ImageSprite({ width: body.props.w, height: body.props.h, img: "red.png" })
     }, () => new Obstacle(), (actor: Actor) => {
       // This code is run each time a line of the SVG is drawn.  When we draw a line,
       // we'll give it some density and friction.  Remember that the line is
@@ -6054,7 +6055,7 @@ export function buildLevelScreen(index: number) {
   // to pass through other actors by making only certain sides rigid.  In this
   // example, we make sure they work together, by letting the hero jump through
   // a platform, and then stick to it.
-  else if (index == 90) {
+  else if (level == 90) {
     Helpers.resetGravity(0, 10);
     welcomeMessage("Press screen borders to move the hero");
     winMessage("Great Job");
@@ -6118,7 +6119,7 @@ export function buildLevelScreen(index: number) {
 
   // custom games on the end 
 
-  else if (index == 91) {
+  else if (level == 91) {
     // Define the maze layout with walls, a hero, a destination, and a goodie
     const mazeLayout = [
       "####################",
@@ -6185,7 +6186,7 @@ export function buildLevelScreen(index: number) {
 
     new Actor({
       scene: game.hud,
-      appearance: new TextSprite({ cx: 1, cy: 0.25, center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
       role: new Passive(),
       movement: new InertMovement(),
       rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, game.hud),
@@ -6205,22 +6206,22 @@ export function buildLevelScreen(index: number) {
   // This line ensures that, no matter what level we draw, the ESCAPE key is
   // configured to go back to the Chooser.  index/24 makes sure we go to the
   // correct chooser screen.
-  game.keyboard.setKeyUpHandler(KeyCodes.ESCAPE, () => game.switchTo(game.config.chooserBuilder, Math.ceil(index / 24)));
+  game.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => game.switchTo(buildChooserScreen, Math.ceil(level / 24)));
 
   // Put the level number in the top right corner of every level
   Helpers.makeText(game.hud,
-    { cx: 15, cy: 0.5, center: false, face: "arial", color: "#872436", size: 22, z: 2 },
-    () => "Level " + index);
+    { cx: 15, cy: 0.5, center: false, width: .1, height: .1, face: "arial", color: "#872436", size: 22, z: 2 },
+    () => "Level " + level);
 
   // Make sure we go to the correct level when this level is won/lost: for
   // anything but the last level, we go to the next level.  Otherwise, go to the splash screen
-  if (index != 91) {
-    game.score.levelOnFail = { index, which: StageTypes.PLAY };
-    game.score.levelOnWin = { index: index + 1, which: StageTypes.PLAY };
+  if (level != 91) {
+    game.score.onLose = { index: level, which: buildLevelScreen };
+    game.score.onWin = { index: level + 1, which: buildLevelScreen };
   }
   else {
-    game.score.levelOnFail = { index, which: StageTypes.PLAY };
-    game.score.levelOnWin = { index: 1, which: StageTypes.SPLASH };
+    game.score.onLose = { index: level, which: buildLevelScreen };
+    game.score.onWin = { index: 1, which: buildSplashScreen };
   }
 }
 
@@ -6239,7 +6240,7 @@ export function welcomeMessage(message: string, subMessage: string = "") {
     new Actor({
       scene: overlay,
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
-      appearance: new TextSprite({ center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
+      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -6248,7 +6249,7 @@ export function welcomeMessage(message: string, subMessage: string = "") {
       new Actor({
         scene: overlay,
         rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 6, width: .1, height: .1 }, overlay),
-        appearance: new TextSprite({ center: true, cx: 8, cy: 6, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage),
+        appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage),
         movement: new InertMovement(),
         role: new Passive(),
       });
@@ -6266,23 +6267,11 @@ export function welcomeMessage(message: string, subMessage: string = "") {
 export function winMessage(message: string, callback?: () => void) {
   game.score.winSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
-      console.log("tap", game.score)
-      // We need to be careful... we might go back to the chooser or splash!
-      if (game.score.levelOnWin.which == StageTypes.PLAY) {
-        game.clearOverlay();
-        game.switchTo(game.config.levelBuilder, game.score.levelOnWin.index);
-      }
-      else if (game.score.levelOnWin.which == StageTypes.CHOOSER) {
-        game.clearOverlay();
-        game.switchTo(game.config.chooserBuilder, game.score.levelOnWin.index);
-      }
-      else if (game.score.levelOnWin.which == StageTypes.SPLASH) {
-        game.clearOverlay();
-        game.switchTo(game.config.splashBuilder, game.score.levelOnWin.index);
-      }
+      game.clearOverlay();
+      game.switchTo(game.score.onWin.which, game.score.onWin.index);
       return true;
     });
-    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     if (callback) callback();
   };
 }
@@ -6298,13 +6287,10 @@ export function loseMessage(message: string, callback?: () => void) {
   game.score.loseSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
       game.clearOverlay();
-      // Just repeat the last level
-      //
-      // NB: we should be more careful, like in winMessage...
-      game.switchTo(game.config.levelBuilder, game.score.levelOnFail.index);
+      game.switchTo(game.score.onLose.which, game.score.onLose.index);
       return true;
     });
-    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     if (callback) callback();
   };
 }

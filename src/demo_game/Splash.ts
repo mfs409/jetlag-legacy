@@ -7,6 +7,8 @@ import { game } from "../jetlag/Stage";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
+import { buildChooserScreen } from "./Chooser";
+import { buildHelpScreen } from "./Help";
 
 /**
  * buildSplashScreen is used to draw the scene that we see when the game starts.
@@ -33,7 +35,7 @@ export function buildSplashScreen(_index: number) {
   // so this will be behind everything.
   new Actor({
     scene: game.world,
-    appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "splash.png" }),
+    appearance: new ImageSprite({ width: 16, height: 9, img: "splash.png" }),
     rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
     movement: new InertMovement(),
     role: new Passive(),
@@ -44,13 +46,13 @@ export function buildSplashScreen(_index: number) {
   // chooser.
   // test
   Helpers.addTapControl(game.hud, { cx: 8, cy: 5.625, width: 2.5, height: 1.25, img: "" }, () => {
-    game.switchTo(game.config.chooserBuilder, 1 + 1 - 1);
+    game.switchTo(buildChooserScreen, 1 + 1 - 1);
     return true;
   });
 
   // Do the same, but this button goes to the first help screen
   Helpers.addTapControl(game.hud, { cx: 3.2, cy: 6.15, width: 1.8, height: 0.9, img: "" }, () => {
-    game.switchTo(game.config.helpBuilder, 1);
+    game.switchTo(buildHelpScreen, 1);
     return true;
   });
 

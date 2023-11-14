@@ -4,9 +4,9 @@ import { RigidBodyComponent } from "../Components/RigidBody";
 import { AppearanceComponent, TextSprite } from "../Components/Appearance";
 import { StateEvent, StateManagerComponent } from "../Components/StateManager";
 import { SoundEffectComponent } from "../Components/SoundEffect";
-import { RoleComponent } from "../Components/Role";
+import { Passive, RoleComponent } from "../Components/Role";
 import { Scene } from "./Scene";
-import { MovementComponent } from "../Components/Movement";
+import { InertMovement, MovementComponent } from "../Components/Movement";
 import { GestureHandlers } from "../Config";
 
 /**
@@ -57,7 +57,7 @@ export class Actor {
    *
    * @param scene The scene where the Actor goes
    */
-  constructor(config: { scene: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement: MovementComponent, role: RoleComponent }) {
+  constructor(config: { scene: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent }) {
     this.scene = config.scene;
 
     this.appearance = config.appearance;
@@ -67,10 +67,10 @@ export class Actor {
     this.rigidBody = config.rigidBody;
     this.rigidBody.body.SetUserData(this);
 
-    this.movement = config.movement;
+    this.movement = config.movement ?? new InertMovement();
     this.movement.rigidBody = this.rigidBody;
 
-    this.role = config.role;
+    this.role = config.role ?? new Passive();
     this.role.actor = this;
   }
 

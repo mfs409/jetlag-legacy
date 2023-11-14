@@ -1,25 +1,25 @@
+// TODO: re-review this.  No addPictureToFrame?
 // Last review: 08-11-2023
 
 import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageService";
 import { CameraSystem } from "../Systems/Camera";
 import { Actor } from "../Entities/Actor";
-import { AniCfgOpts, AnimationSequence, ImgConfigOpts, TxtConfigOpts } from "../Config";
+import { AniCfgOpts, AnimationSequence, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolyConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";
 import { AnimationState as AnimationState, StateEvent, IStateObserver, transitions } from "./StateManager";
 import { game } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { InertMovement } from "./Movement";
 import { Passive } from "./Role";
+import { Graphics } from "pixi.js";
+
+// TODO: do we need rot in any of these configs, now that everything has a RigidBody?
 
 /** 
  * ImageConfig stores the geometry and other configuration information needed
  * when describing an image that is not animated.
  */
 class ImageConfig {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
   /** Width of the image */
   w: number;
   /** Height of the image */
@@ -36,8 +36,6 @@ class ImageConfig {
    *             image's configuration
    */
   constructor(opts: ImgConfigOpts) {
-    this.cx = opts.cx;
-    this.cy = opts.cy;
     this.w = opts.width;
     this.h = opts.height;
     this.rot = opts.rotation ?? 0;
@@ -49,15 +47,192 @@ class ImageConfig {
   }
 }
 
+/** 
+ * FilledBoxConfig stores the configuration information needed when describing
+ * an appearance that is achieved using a filled box, not images or text.
+ */
+class FilledBoxConfig {
+  /** Width of the box */
+  w: number;
+  /** Height of the box */
+  h: number;
+  /** Z index of the box */
+  z: -2 | -1 | 0 | 1 | 2;
+  /** Amount of rotation */
+  rot: number;
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: number;
+  /** Fill color */
+  fillColor?: number;
+
+  /**
+   * Construct a FilledBoxConfig object
+   *
+   * @param opts The configuration options that describe how to make this box's
+   *             configuration
+   */
+  constructor(opts: FilledBoxConfigOpts) {
+    this.w = opts.width;
+    this.h = opts.height;
+    this.rot = opts.rotation ?? 0;
+
+    let tmpZ = opts.z ?? 0;
+    if (tmpZ < -2) tmpZ = -2;
+    if (tmpZ > 2) tmpZ = 2;
+    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
+
+    this.lineWidth = opts.lineWidth;
+    this.lineColor = opts.lineColor;
+    this.fillColor = opts.fillColor;
+
+    // Validate: if there's a line width, there needs to be a line color
+    if (this.lineWidth !== undefined && this.lineColor === undefined)
+      game.console.urgent("Error: FilledBox with lineWidth must have lineColor");
+
+    // Validate: if there's a line color, there needs to be a line width
+    else if (this.lineColor !== undefined && this.lineWidth === undefined)
+      game.console.urgent("Error: FilledBox with lineColor must have lineWidth");
+
+    // Validate: if there is no line width or line color, there needs to be a fill color
+    else if (this.lineWidth === undefined && this.fillColor === undefined)
+      game.console.urgent("Error: FilledBox must have lineWidth or fillColor");
+  }
+}
+
+/**
+ * FilledCircleConfig stores the configuration information needed when
+ * describing an appearance that is achieved using a filled circle, not images
+ * or text
+ */
+class FilledCircleConfig {
+  /** Radius of the circle */
+  radius: number;
+  /** Width, to simplify some other code */
+  w: number;
+  /** Height, to simplify some other code */
+  h: number;
+  /** Z index of the circle: Must be in the range [-2, 2] */
+  z: number;
+  /** Amount of rotation */
+  rot: number;
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: number;
+  /** Fill color */
+  fillColor?: number;
+
+  /**
+   * Construct a FilledCircleConfig object
+   *
+   * @param opts The configuration options that describe how to make this
+   *             circle's configuration
+   */
+  constructor(opts: FilledCircleConfigOpts) {
+    this.radius = opts.radius;
+    this.rot = opts.rotation ?? 0;
+    this.w = this.h = 2 * this.radius;
+
+    let tmpZ = opts.z ?? 0;
+    if (tmpZ < -2) tmpZ = -2;
+    if (tmpZ > 2) tmpZ = 2;
+    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
+
+    this.lineWidth = opts.lineWidth;
+    this.lineColor = opts.lineColor;
+    this.fillColor = opts.fillColor;
+
+    // Validate: if there's a line width, there needs to be a line color
+    if (this.lineWidth !== undefined && this.lineColor === undefined)
+      game.console.urgent("Error: FilledCircle with lineWidth must have lineColor");
+
+    // Validate: if there's a line color, there needs to be a line width
+    else if (this.lineColor !== undefined && this.lineWidth === undefined)
+      game.console.urgent("Error: FilledCircle with lineColor must have lineWidth");
+
+    // Validate: if there is no line width or line color, there needs to be a fill color
+    else if (this.lineWidth === undefined && this.fillColor === undefined)
+      game.console.urgent("Error: FilledCircle must have lineWidth or fillColor");
+  }
+}
+
+/**
+ * FilledPolyConfig expresses the required and optional fields that a programmer
+ * should provide to JetLag in order to create an entity whose visual
+ * representation is a solid polygon.
+ */
+class FilledPolyConfig {
+  /** Z index of the polygon: Must be in the range [-2, 2] */
+  z: number;
+  /** Amount of rotation */
+  rot: number;
+  /** Width, to simplify some other code */
+  w: number;
+  /** Height, to simplify some other code */
+  h: number;
+  /** Vertices of the polygon */
+  vertices: { x: number, y: number }[];
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: number;
+  /** Fill color */
+  fillColor?: number;
+
+  /**
+   * Construct a FilledPolyConfig object
+   *
+   * @param opts The configuration options that describe how to make this
+   *             polygon's configuration
+   */
+  constructor(opts: FilledPolyConfigOpts) {
+    this.vertices = [];
+    for (let i = 0; i < opts.vertices.length; i += 2)
+      this.vertices.push({ x: opts.vertices[i], y: opts.vertices[i + 1] });
+    this.rot = opts.rotation ?? 0;
+    let minx = this.vertices[0].x;
+    let miny = this.vertices[0].y;
+    let maxx = minx;
+    let maxy = miny;
+    for (let v of this.vertices) {
+      maxx = Math.max(maxx, v.x)
+      maxy = Math.max(maxy, v.y)
+      minx = Math.min(minx, v.x)
+      miny = Math.min(miny, v.y)
+    }
+    this.w = (Math.abs(maxx) > Math.abs(minx)) ? 2 * maxx : 2 * minx;
+    this.h = (Math.abs(maxy) > Math.abs(miny)) ? 2 * maxy : 2 * miny;
+
+    let tmpZ = opts.z ?? 0;
+    if (tmpZ < -2) tmpZ = -2;
+    if (tmpZ > 2) tmpZ = 2;
+    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
+
+    this.lineWidth = opts.lineWidth;
+    this.lineColor = opts.lineColor;
+    this.fillColor = opts.fillColor;
+
+    // Validate: if there's a line width, there needs to be a line color
+    if (this.lineWidth !== undefined && this.lineColor === undefined)
+      game.console.urgent("Error: FilledPoly with lineWidth must have lineColor");
+
+    // Validate: if there's a line color, there needs to be a line width
+    else if (this.lineColor !== undefined && this.lineWidth === undefined)
+      game.console.urgent("Error: FilledPoly with lineColor must have lineWidth");
+
+    // Validate: if there is no line width or line color, there needs to be a fill color
+    else if (this.lineWidth === undefined && this.fillColor === undefined)
+      game.console.urgent("Error: FilledPoly must have lineWidth or fillColor");
+  }
+}
+
 /**
  * TextConfig stores the geometry and other configuration information needed
  * when describing on-screen text.
  */
 class TextConfig {
-  /** X coordinate of the top left corner or center */
-  cx: number;
-  /** Y coordinate of the top left corner or center */
-  cy: number;
   /** Width of the text (computed) */
   w = 0;
   /** Height of the text (computed) */
@@ -82,8 +257,6 @@ class TextConfig {
    *             configuration
    */
   constructor(opts: TxtConfigOpts) {
-    this.cx = opts.cx;
-    this.cy = opts.cy;
     this.rot = opts.rotation ?? 0;
     this.c = opts.center;
     this.face = opts.face;
@@ -102,10 +275,6 @@ class TextConfig {
  * needed when describing an animated image.
  */
 class AnimationConfig {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
   /** Width of the animation */
   w: number;
   /** Height of the animation */
@@ -143,8 +312,6 @@ class AnimationConfig {
    *             animation's configuration
    */
   constructor(opts: AniCfgOpts) {
-    this.cx = opts.cx;
-    this.cy = opts.cy;
     this.w = opts.width;
     this.h = opts.height;
     this.rot = opts.rotation ?? 0;
@@ -236,7 +403,7 @@ export class TextSprite {
 
   clone() {
     return new TextSprite({
-      cx: this.props.cx, cy: this.props.cy, z: this.props.z, rotation: this.props.rot, center: this.props.c, face: this.props.face, color: this.props.rgb,
+      z: this.props.z, rotation: this.props.rot, center: this.props.c, face: this.props.face, color: this.props.rgb,
       size: this.props.size
     }, this.producer);
   }
@@ -252,7 +419,23 @@ export class TextSprite {
     // Set the world position and the text, then let the renderer decide
     // where to put it...
     this.text.setText(this.producer());
-    this.text.setPosition(this.props.cx, this.props.cy);
+    this.text.setPosition(this.actor?.rigidBody.getCenter().x ?? 0, this.actor?.rigidBody.getCenter().y ?? 0);
+    game.renderer.addTextToFrame(this.text, camera, this.props.c);
+  }
+
+  /**
+   * Render the text when it does not have a rigidBody. This is only used for
+   * Parallax
+   *
+   * @param anchor    The center x/y at which to draw the image
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
+    // Set the world position and the text, then let the renderer decide
+    // where to put it...
+    this.text.setText(this.producer());
+    this.text.setPosition(anchor.cx, anchor.cy);
     game.renderer.addTextToFrame(this.text, camera, this.props.c);
   }
 
@@ -286,7 +469,7 @@ export class ImageSprite {
 
   /** Make a clone of the provided ImageSprite */
   clone() {
-    return new ImageSprite({ cx: this.props.cx, cy: this.props.cy, z: this.props.z, rotation: this.props.rot, width: this.props.w, height: this.props.h, img: this.image.imgName });
+    return new ImageSprite({ z: this.props.z, rotation: this.props.rot, width: this.props.w, height: this.props.h, img: this.image.imgName });
   }
 
   /**
@@ -304,8 +487,18 @@ export class ImageSprite {
     // }
     if (this.actor?.rigidBody)
       game.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera);
-    else
-      game.renderer.addPictureToFrame(this, this.image, camera);
+  }
+
+  /**
+   * Render the image when it does not have a rigidBody. This is only used for
+   * Parallax
+   *
+   * @param anchor    The center x/y at which to draw the image
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
+    game.renderer.addPictureToFrame(anchor, this, this.image, camera);
   }
 
   /**
@@ -373,7 +566,7 @@ export class AnimatedSprite implements IStateObserver {
   /** Make a copy of this AnimatedSprite */
   clone() {
     return new AnimatedSprite({
-      cx: this.props.cx, cy: this.props.cy, z: this.props.z,
+      z: this.props.z,
       rotation: this.props.rot, width: this.props.w, height: this.props.h,
       idle_right: this.props.animations.get(AnimationState.IDLE_RIGHT)!.clone(),
       idle_left: this.props.animations.get(AnimationState.IDLE_LEFT)?.clone(),
@@ -436,11 +629,11 @@ export class AnimatedSprite implements IStateObserver {
 
       if (!this.props.disappear) return;
 
-      let cx = this.props.cx + this.props.disappear.offset.x;
-      let cy = this.props.cy + this.props.disappear.offset.y;
+      let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.props.disappear.offset.x;
+      let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.props.disappear.offset.y;
       let o = new Actor({
         scene: entity.scene,
-        appearance: new AnimatedSprite({ cx, cy, idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
+        appearance: new AnimatedSprite({ idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
         rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, entity.scene, { collisionsEnabled: false }),
         // TODO: will we always want this to be inert, or might we sometimes want to animate it while letting it keep moving / bouncing / etc?
         movement: new InertMovement(),
@@ -474,13 +667,23 @@ export class AnimatedSprite implements IStateObserver {
    * Render the animated image's current cell
    *
    * @param camera    The camera for the current stage
-   * @param elapsedMS The time since the last render
+   * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor?.rigidBody)
       game.renderer.addBodyToFrame(this, this.actor.rigidBody, this.getCurrent(), camera);
-    else
-      game.renderer.addPictureToFrame(this, this.getCurrent(), camera);
+  }
+
+  /**
+   * Render the animated image's current cell when it does not have a rigidBody.
+   * This is only used for Parallax
+   *
+   * @param anchor    The center x/y at which to draw the image
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
+    game.renderer.addPictureToFrame(anchor, this, this.getCurrent(), camera);
   }
 
   /**
@@ -507,6 +710,176 @@ export class AnimatedSprite implements IStateObserver {
 }
 
 /**
+ * FilledSprite describes any object whose visual representation is a filled
+ * circle/box/polygon shape.
+ *
+ * TODO:  Why does any of this "filledsprite" stuff need cx/cy?  For that
+ *        matter, why do any of the Configs need x/y?  Won't that always come
+ *        from the body?
+ */
+export class FilledSprite {
+  /** The Actor to which this ImageSprite is attached */
+  public actor?: Actor;
+
+  private graphics = new Graphics();
+
+  /**
+   * Build a filled-geometry sprite that can be rendered
+   *
+   * @param props  The configuration options for this FilledSprite
+   */
+  private constructor(public props: FilledBoxConfig | FilledCircleConfig | FilledPolyConfig) {
+  }
+
+  /**
+   * Construct a FilledSprite as a Box
+   *
+   * @param cfg The configuration of this FilledBox
+   */
+  public static Box(cfg: FilledBoxConfigOpts) {
+    return new FilledSprite(new FilledBoxConfig(cfg));
+  }
+
+  /**
+   * Construct a FilledSprite as a Circle
+   *
+   * @param cfg The configuration of this FilledCircle
+   */
+  public static Circle(cfg: FilledCircleConfigOpts) {
+    return new FilledSprite(new FilledCircleConfig(cfg));
+  }
+
+  /**
+   * Construct a FilledSprite as a Polygon
+   *
+   * @param cfg The configuration of this FilledPolygon
+   */
+  public static Poly(cfg: FilledPolyConfigOpts) {
+    return new FilledSprite(new FilledPolyConfig(cfg));
+  }
+
+  /** Make a clone of the provided FilledSprite */
+  clone() {
+    if (this.props instanceof FilledBoxConfig) {
+      return new FilledSprite(new FilledBoxConfig({
+        width: this.props.w, height: this.props.h,
+        z: this.props.z, rotation: this.props.rot, lineWidth: this.props.lineWidth,
+        lineColor: this.props.lineColor, fillColor: this.props.fillColor
+      }));
+    }
+    else if (this.props instanceof FilledCircleConfig) {
+      return new FilledSprite(new FilledCircleConfig({
+        radius: this.props.radius, z: this.props.z, rotation: this.props.rot, lineWidth: this.props.lineWidth,
+        lineColor: this.props.lineColor, fillColor: this.props.fillColor
+      }));
+    }
+    else if (this.props instanceof FilledPolyConfig) {
+      let vertices = [] as number[];
+      for (let v of this.props.vertices) {
+        vertices.push(v.x);
+        vertices.push(v.y);
+      }
+      return new FilledSprite(new FilledPolyConfig({
+        vertices, z: this.props.z, rotation: this.props.rot, lineWidth: this.props.lineWidth,
+        lineColor: this.props.lineColor, fillColor: this.props.fillColor
+      }));
+
+    }
+    else {
+      throw "Unrecognized prop type";
+    }
+  }
+
+  /**
+   * Render the FilledSprite
+   *
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  render(camera: CameraSystem, _elapsedMs: number) {
+    // TODO: This code is probably in the wrong place.  We're moving the
+    //       image because the body position is centered, not top-left.
+    // if (this.body) {
+    //   this.props.x -= this.props.w / 2;
+    //   this.props.y -= this.props.h / 2;
+    // }
+    if (this.actor) {
+      this.graphics.clear();
+      if (this.props instanceof FilledBoxConfig) {
+        if (this.props.lineWidth)
+          this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
+        if (this.props.fillColor)
+          this.graphics.beginFill(this.props.fillColor);
+        let s = camera.getScale();
+        let x = s * (this.actor.rigidBody.getCenter().x - camera.getOffsetX());
+        let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
+        let w = s * this.props.w;
+        let h = s * this.props.h;
+        this.graphics.drawRect(x, y, w, h);
+        this.graphics.position.set(x, y);
+        this.graphics.pivot.set(x + w / 2, y + h / 2);
+        this.graphics.rotation = this.props.rot;
+        game.renderer.addGraphic(this.graphics);
+      }
+      else if (this.props instanceof FilledCircleConfig) {
+        if (this.props.lineWidth)
+          this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
+        if (this.props.fillColor)
+          this.graphics.beginFill(this.props.fillColor);
+        let s = camera.getScale();
+        let x = s * (this.actor.rigidBody.getCenter().x - camera.getOffsetX());
+        let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
+        let radius = s * this.props.radius;
+        this.graphics.drawCircle(x, y, radius);
+        game.renderer.addGraphic(this.graphics);
+
+      }
+      else if (this.props instanceof FilledPolyConfig) {
+        if (this.props.lineWidth)
+          this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
+        if (this.props.fillColor)
+          this.graphics.beginFill(this.props.fillColor);
+        let s = camera.getScale();
+        let x = s * (this.actor.rigidBody.getCenter().x - camera.getOffsetX());
+        let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
+        // For polygons, we need to translate the points (they are 0-relative in
+        // Box2d, we need them to be relative to (x,y))
+        let pts: number[] = [];
+        for (let pt of this.props.vertices) {
+          pts.push(s * pt.x + x);
+          pts.push(s * pt.y + y);
+        }
+        // NB: must repeat start point of polygon in PIXI
+        pts.push(pts[0]);
+        pts.push(pts[1]);
+        this.graphics.drawPolygon(pts);
+        // rotation
+        this.graphics.position.set(x, y);
+        this.graphics.pivot.set(x, y);
+        this.graphics.rotation = this.props.rot;
+        game.renderer.addGraphic(this.graphics);
+      }
+      else {
+        throw "Error: unrecognized FilledSprite props type"
+      }
+    }
+  }
+
+  /**
+   * Render the FilledSprite
+   *
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  renderAt(_anchor: { cx: number, cy: number }, _camera: CameraSystem, _elapsedMs: number) {
+    throw "Cannot use FilledSprite as parallax background";
+  }
+
+  /** Perform any custom updates to the text before displaying it */
+  prerender(_elapsedMs: number) { }
+}
+
+/**
  * AppearanceComponent is the type of anything that can be drawn to the screen.
  */
-export type AppearanceComponent = TextSprite | ImageSprite | AnimatedSprite;
+export type AppearanceComponent = TextSprite | ImageSprite | AnimatedSprite | FilledSprite;

@@ -5,9 +5,6 @@ import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
 import { game } from "../Stage";
 
-/** Types of stages in the game */
-export enum StageTypes { SPLASH = 0, HELP = 1, CHOOSER = 2, STORE = 3, PLAY = 4 }
-
 /**
  * These are the ways a level can be won: by enough heroes reaching a
  * destination, by collecting enough goodies, or defeating enough enemies.
@@ -20,10 +17,10 @@ enum VictoryType { DESTINATION, GOODIE_COUNT, ENEMY_COUNT }
 /** Score tracks the progress of a player through a level of the game */
 export class ScoreSystem {
   /** The level to go to if the current level ends in failure */
-  public levelOnFail = { index: 0, which: StageTypes.PLAY };
+  public onLose = { index: 0, which: (_level: number) => { } };
 
   /** The level to go to if the current level ends in success */
-  public levelOnWin = { index: 0, which: StageTypes.PLAY };
+  public onWin = { index: 0, which: (_level: number) => { } };
 
   /** Describes how a level is won. */
   private victoryType = VictoryType.DESTINATION;
@@ -228,21 +225,11 @@ export class ScoreSystem {
    */
   public endLevel(win: boolean) {
     if (win) {
-      if (this.winSceneBuilder) {
-        game.installOverlay(this.winSceneBuilder);
-      } else {
-        if (this.levelOnWin.which == StageTypes.PLAY) game.switchTo(game.config.levelBuilder, this.levelOnWin.index);
-        else if (this.levelOnWin.which == StageTypes.CHOOSER) game.switchTo(game.config.chooserBuilder, this.levelOnWin.index);
-        else game.switchTo(game.config.splashBuilder, this.levelOnWin.index);
-      }
+      if (this.winSceneBuilder) game.installOverlay(this.winSceneBuilder);
+      else game.switchTo(this.onWin.which, this.onWin.index);
     } else {
-      if (this.loseSceneBuilder) {
-        game.installOverlay(this.loseSceneBuilder);
-      } else {
-        if (this.levelOnFail.which == StageTypes.PLAY) game.switchTo(game.config.levelBuilder, this.levelOnFail.index);
-        else if (this.levelOnFail.which == StageTypes.CHOOSER) game.switchTo(game.config.chooserBuilder, this.levelOnFail.index);
-        else game.switchTo(game.config.splashBuilder, this.levelOnFail.index);
-      }
+      if (this.loseSceneBuilder) game.installOverlay(this.loseSceneBuilder);
+      else game.switchTo(this.onLose.which, this.onLose.index);
     }
   }
 

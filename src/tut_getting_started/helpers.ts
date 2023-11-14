@@ -75,15 +75,15 @@ export function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity:
   game.world.tilt!.tiltMax.Set(xGravityMax, yGravityMax);
 
   if (!game.accelerometer.tiltSupported) {
-    game.keyboard.setKeyUpHandler(KeyCodes.UP, () => (game.accelerometer.accel.y = 0));
-    game.keyboard.setKeyUpHandler(KeyCodes.DOWN, () => (game.accelerometer.accel.y = 0));
-    game.keyboard.setKeyUpHandler(KeyCodes.LEFT, () => (game.accelerometer.accel.x = 0));
-    game.keyboard.setKeyUpHandler(KeyCodes.RIGHT, () => (game.accelerometer.accel.x = 0));
+    game.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (game.accelerometer.accel.y = 0));
+    game.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (game.accelerometer.accel.y = 0));
+    game.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (game.accelerometer.accel.x = 0));
+    game.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (game.accelerometer.accel.x = 0));
 
-    game.keyboard.setKeyDownHandler(KeyCodes.UP, () => (game.accelerometer.accel.y = -5));
-    game.keyboard.setKeyDownHandler(KeyCodes.DOWN, () => (game.accelerometer.accel.y = 5));
-    game.keyboard.setKeyDownHandler(KeyCodes.LEFT, () => (game.accelerometer.accel.x = -5));
-    game.keyboard.setKeyDownHandler(KeyCodes.RIGHT, () => (game.accelerometer.accel.x = 5));
+    game.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (game.accelerometer.accel.y = -5));
+    game.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (game.accelerometer.accel.y = 5));
+    game.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (game.accelerometer.accel.x = -5));
+    game.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (game.accelerometer.accel.x = 5));
   }
 
   game.world.tilt!.tiltVelocityOverride = asVelocity;
@@ -221,7 +221,7 @@ export function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgO
  * @param scene Where to draw the region
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
-export function createDragZone(scene: Scene, cfg: ImgConfigOpts) {
+export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
   let foundActor: Actor | undefined;
   // pan start behavior is to update foundActor if there is an actor where
   // the touch began
@@ -304,7 +304,7 @@ export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgO
  * @param scene Where to draw the region
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
-export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts) {
+export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
   game.gestures.gestureHudFirst = false;
   addTapControl(scene, cfgOpts, (hudCoords: { x: number; y: number }) => {
     let who = game.storage.getLevel("selected_entity") as Actor | undefined;
@@ -327,7 +327,7 @@ export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts) {
  * @param clear     Should the active actor be cleared (so that subsequent
  *                  touches won't change its trajectory)
  */
-export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts, velocity: number, clear: boolean) {
+export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, velocity: number, clear: boolean) {
   game.gestures.gestureHudFirst = false;
   addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
     let who = game.storage.getLevel("selected_entity") as Actor | undefined;
@@ -354,7 +354,7 @@ export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts, velocity:
  * @param clear     Should the active actor be cleared (so that subsequent
  *                  touches won't change its trajectory)
  */
-export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts, velocity: number, clear: boolean) {
+export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, velocity: number, clear: boolean) {
   game.gestures.gestureHudFirst = false;
   addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
     let who = game.storage.getLevel("selected_entity") as Actor | undefined;
@@ -385,7 +385,7 @@ export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts, velocity: 
  *                  joystick
  * @param stopOnUp  Should the actor stop when the joystick is released?
  */
-export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
+export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
   let moving = false;
   function doMove(hudCoords: { x: number; y: number }) {
     moving = true;
@@ -704,7 +704,7 @@ export function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostD
  *
  * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
  */
-export function makeText(scene: Scene, cfgOpts: TxtConfigOpts, producer: () => string): Actor {
+export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
   return new Actor({
     scene,
     appearance: new TextSprite(cfgOpts, producer),

@@ -28,8 +28,8 @@ class ParallaxLayer {
    * @param isHorizontal  True for X scrolling, false for Y scrolling
    * @param isAuto        True if this should scroll regardless of camera
    */
-  constructor(defaultImage: AppearanceComponent, private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
-    this.last.Set(defaultImage.props.cx - defaultImage.props.w / 2, defaultImage.props.cy - defaultImage.props.h / 2);
+  constructor(anchor: { cx: number, cy: number }, defaultImage: AppearanceComponent, private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
+    this.last.Set(anchor.cx - defaultImage.props.w / 2, anchor.cy - defaultImage.props.h / 2);
     // figure out how many sprites we need to properly tile the image
     let num = 1;
     if (this.isHorizontal) {
@@ -133,9 +133,9 @@ class ParallaxLayer {
       let i = 0;
       let plx = this.last.x;
       while (plx < x + camW) {
-        this.images[i].props.cx = plx + this.images[i].props.w / 2;
-        this.images[i].props.cy = this.last.y + this.images[i].props.h / 2;
-        this.images[i].render(camera, elapsedMs);
+        let cx = plx + this.images[i].props.w / 2;
+        let cy = this.last.y + this.images[i].props.h / 2;
+        this.images[i].renderAt({ cx, cy }, camera, elapsedMs);
         plx += this.images[i].props.w;
         i++;
       }
@@ -144,9 +144,9 @@ class ParallaxLayer {
       let i = 0;
       let ply = this.last.y;
       while (ply < y + camH) {
-        this.images[i].props.cx = this.last.x + this.images[i].props.w / 2;
-        this.images[i].props.cy = ply + this.images[i].props.h / 2;;
-        this.images[i].render(camera, elapsedMs);
+        let cx = this.last.x + this.images[i].props.w / 2;
+        let cy = ply + this.images[i].props.h / 2;;
+        this.images[i].renderAt({ cx, cy }, camera, elapsedMs);
         ply += this.images[i].props.h;
         i++;
       }
@@ -177,8 +177,8 @@ export class ParallaxSystem {
    * @param isAuto        Should the image scroll automatically, or in relation
    *                      to the camera position?
    */
-  public addLayer(cfg: { appearance: AppearanceComponent, speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
-    this.layers.push(new ParallaxLayer(cfg.appearance, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
+  public addLayer(anchor: { cx: number, cy: number }, cfg: { appearance: AppearanceComponent, speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
+    this.layers.push(new ParallaxLayer(anchor, cfg.appearance, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
   }
 
   /**

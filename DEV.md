@@ -72,7 +72,9 @@ this branch
 
 ### Contributing a Feature to JetLag
 
-To contribute a feature to JetLag, you will typically make changes to the `src/jetlag` folder.  Then add a new level to the demo game in `src/demo_game`, demonstrating how to use the new feature.
+To contribute a feature to JetLag, you will typically make changes to the
+`src/jetlag` folder.  Then add a new level to the demo game in `src/demo_game`,
+demonstrating how to use the new feature.
 
 ### Contributing a Tutorial
 

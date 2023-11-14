@@ -400,8 +400,7 @@ export class RigidBodyComponent {
 
     // Now adjust the image position based on the body position
     if (entity.appearance) {
-      entity.appearance.props.cx = this.body.GetPosition().x;
-      entity.appearance.props.cy = this.body.GetPosition().y;
+      // TODO: We probably don't need rot on props anymore...
       entity.appearance.props.rot = this.body.GetAngle();
     }
   }

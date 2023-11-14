@@ -183,6 +183,10 @@ export class RenderService {
     this.main.addChild(sprite.sprite);
   }
 
+  public addGraphic(graphic: Graphics) {
+    this.main.addChild(graphic);
+  }
+
   /**
    * Add an actor (physics+image) to the next frame
    *
@@ -192,7 +196,7 @@ export class RenderService {
    * @param camera      The camera that determines which actors to show, and
    *                    where
    */
-  public addBodyToFrame(appearance: AppearanceComponent, body: RigidBodyComponent, sprite: Sprite | undefined, camera: CameraSystem) {
+  public addBodyToFrame(appearance: AppearanceComponent, body: RigidBodyComponent, sprite: Sprite, camera: CameraSystem) {
     // If the actor isn't on screen, skip it
     if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
 
@@ -205,7 +209,7 @@ export class RenderService {
     let r = body.getRotation();
 
     // Add the sprite
-    if (sprite) this.addSprite(sprite, x, y, w, h, r);
+    this.addSprite(sprite, x, y, w, h, r);
 
     // Debug rendering: switch to the body's width/height
     w = s * body.props.w;
@@ -227,15 +231,15 @@ export class RenderService {
    * @param camera      The camera that determines which actors to show, and
    *                    where
    */
-  public addPictureToFrame(appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem) {
+  public addPictureToFrame(anchor: { cx: number, cy: number }, appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem) {
     // If the picture isn't on screen, skip it
     let radius = Math.sqrt(Math.pow(appearance.props.w / 2, 2) + Math.pow(appearance.props.h / 2, 2))
-    if (!camera.inBounds(appearance.props.cx, appearance.props.cy, radius)) return;
+    if (!camera.inBounds(anchor.cx, anchor.cy, radius)) return;
 
     // Convert from meters to pixels
     let s = camera.getScale();
-    let x = s * (appearance.props.cx - camera.getOffsetX());
-    let y = s * (appearance.props.cy - camera.getOffsetY());
+    let x = s * (anchor.cx - camera.getOffsetX());
+    let y = s * (anchor.cy - camera.getOffsetY());
     let w = s * appearance.props.w;
     let h = s * appearance.props.h;
 

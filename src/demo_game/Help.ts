@@ -8,6 +8,7 @@ import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
+import { buildSplashScreen } from "./Splash";
 
 /**
  * buildHelpScreen draws the help screens.  Technically, a help screen can be
@@ -24,7 +25,7 @@ export function buildHelpScreen(index: number) {
   // This line ensures that, no matter what level we draw, the ESCAPE key is
   // configured to go back to the Splash.  We don't go to Splash on down-press
   // of ESCAPE, but when the key is released.
-  game.keyboard.setKeyUpHandler(KeyCodes.ESCAPE, () => game.switchTo(game.config.splashBuilder, 1));
+  game.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => game.switchTo(buildSplashScreen, 1));
 
   // Our first scene describes the color coding that we use for the different
   // entities in the game
@@ -40,7 +41,7 @@ export function buildHelpScreen(index: number) {
 
     // put some information and pictures on the screen
     Helpers.makeText(game.world,
-      { center: true, cx: 8, cy: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
+      { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "The levels of this game demonstrate JetLag features");
 
     let cfg = { cx: 0.75, cy: 2.5, radius: 0.375, width: 0.75, height: 0.75, img: "green_ball.png" };
@@ -52,7 +53,7 @@ export function buildHelpScreen(index: number) {
       role: new Passive(),
     });
     Helpers.makeText(game.world,
-      { center: false, cx: 1.5, cy: 2.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+      { center: false, cx: 1.5, cy: 2.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "You control the hero");
 
     cfg = { cx: 0.75, cy: 3.5, radius: 0.375, width: 0.75, height: 0.75, img: "blue_ball.png" };
@@ -63,7 +64,7 @@ export function buildHelpScreen(index: number) {
       role: new Passive(),
     });
     Helpers.makeText(game.world,
-      { center: false, cx: 1.5, cy: 3.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+      { center: false, cx: 1.5, cy: 3.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Collect these goodies");
 
     cfg = { cx: 0.75, cy: 4.5, radius: 0.375, width: 0.75, height: 0.75, img: "red_ball.png" };
@@ -74,7 +75,7 @@ export function buildHelpScreen(index: number) {
       role: new Passive(),
     });
     Helpers.makeText(game.world,
-      { center: false, cx: 1.5, cy: 4.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+      { center: false, cx: 1.5, cy: 4.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Avoid or defeat enemies");
 
     cfg = { cx: 0.75, cy: 5.5, radius: 0.375, width: 0.75, height: 0.75, img: "mustard_ball.png" };
@@ -86,7 +87,7 @@ export function buildHelpScreen(index: number) {
       role: new Passive(),
     });
     Helpers.makeText(game.world,
-      { center: false, cx: 1.5, cy: 5.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+      { center: false, cx: 1.5, cy: 5.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Reach the destination");
 
     cfg = { cx: 0.75, cy: 6.5, radius: 0.375, width: 0.75, height: 0.75, img: "purple_ball.png" };
@@ -97,7 +98,7 @@ export function buildHelpScreen(index: number) {
       role: new Passive(),
     });
     Helpers.makeText(game.world,
-      { center: false, cx: 1.5, cy: 6.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+      { center: false, cx: 1.5, cy: 6.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "These are walls");
 
     cfg = { cx: 0.75, cy: 7.5, radius: 0.375, width: 0.75, height: 0.75, img: "grey_ball.png" };
@@ -109,16 +110,16 @@ export function buildHelpScreen(index: number) {
       role: new Passive(),
     });
     Helpers.makeText(game.world,
-      { center: false, cx: 1.5, cy: 7.25, face: "Arial", color: "#000000", size: 24, z: 0 },
+      { center: false, cx: 1.5, cy: 7.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Throw projectiles");
 
     Helpers.makeText(game.world,
-      { center: false, cx: 11, cy: 8.5, face: "Arial", color: "#FFFFFF", size: 24, z: 0 },
+      { center: false, cx: 11, cy: 8.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 24, z: 0 },
       () => "(All image files are stored in the assets folder)");
 
     // set up a control to go to the next help level on screen tap
     Helpers.addTapControl(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
-      game.switchTo(game.config.helpBuilder, 2);
+      game.switchTo(buildHelpScreen, 2);
       return true;
     });
   }
@@ -128,10 +129,10 @@ export function buildHelpScreen(index: number) {
     // This is just like the previous screen, but with different text
     game.backgroundColor = 0x19698e;
     Helpers.makeText(game.world,
-      { center: true, cx: 8, cy: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
+      { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "Read, Write, Play");
     Helpers.makeText(game.world,
-      { center: true, cx: 8, cy: 5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
+      { center: true, cx: 8, cy: 5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
       () => `As you play through the levels of the sample game, be sure to read the code that accompanies
 each world.  The levels aren't meant to be "hard", or even really "fun".  They are meant to show
 you how to use the different features of JetLag, and to show you how the same features can
@@ -147,7 +148,7 @@ until you have a plan for how to build your next game.`);
 
     // set up a control to go to the splash screen on screen tap
     Helpers.addTapControl(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
-      game.switchTo(game.config.splashBuilder, 1);
+      game.switchTo(buildSplashScreen, 1);
       return true;
     });
   }
