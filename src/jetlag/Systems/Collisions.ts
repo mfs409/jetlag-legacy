@@ -131,6 +131,9 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
          */
         public EndContact(_contact: b2Contact) {
           // NB: For now, we don't do anything here
+          //
+          // TODO:  Add EndContact event handlers, so we can do things like
+          //        remove a text bubble when a hero walks away from an NPC.
         }
 
         /**
