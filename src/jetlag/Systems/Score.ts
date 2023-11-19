@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { Enemy, Hero } from "../Components/Role";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
@@ -17,10 +15,10 @@ enum VictoryType { DESTINATION, GOODIE_COUNT, ENEMY_COUNT }
 /** Score tracks the progress of a player through a level of the game */
 export class ScoreSystem {
   /** The level to go to if the current level ends in failure */
-  public onLose = { index: 0, which: (_level: number) => { } };
+  public onLose = { index: 0, builder: (_level: number) => { } };
 
   /** The level to go to if the current level ends in success */
-  public onWin = { index: 0, which: (_level: number) => { } };
+  public onWin = { level: 0, builder: (_level: number) => { } };
 
   /** Describes how a level is won. */
   private victoryType = VictoryType.DESTINATION;
@@ -226,10 +224,10 @@ export class ScoreSystem {
   public endLevel(win: boolean) {
     if (win) {
       if (this.winSceneBuilder) game.installOverlay(this.winSceneBuilder);
-      else game.switchTo(this.onWin.which, this.onWin.index);
+      else game.switchTo(this.onWin.builder, this.onWin.level);
     } else {
       if (this.loseSceneBuilder) game.installOverlay(this.loseSceneBuilder);
-      else game.switchTo(this.onLose.which, this.onLose.index);
+      else game.switchTo(this.onLose.builder, this.onLose.index);
     }
   }
 

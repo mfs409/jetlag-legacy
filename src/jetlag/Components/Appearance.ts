@@ -1,6 +1,3 @@
-// TODO: re-review this.  No addPictureToFrame?
-// Last review: 08-11-2023
-
 import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageService";
 import { CameraSystem } from "../Systems/Camera";
@@ -26,8 +23,6 @@ export class ImageConfig {
   h: number;
   /** Z index of the image */
   z: -2 | -1 | 0 | 1 | 2;
-  /** Amount of rotation */
-  rot: number;
 
   /**
    * Construct an ImageConfig object
@@ -38,7 +33,6 @@ export class ImageConfig {
   constructor(opts: ImgConfigOpts) {
     this.w = opts.width;
     this.h = opts.height;
-    this.rot = opts.rotation ?? 0;
 
     let tmpZ = opts.z ?? 0;
     if (tmpZ < -2) tmpZ = -2;
@@ -58,14 +52,12 @@ export class FilledBoxConfig {
   h: number;
   /** Z index of the box */
   z: -2 | -1 | 0 | 1 | 2;
-  /** Amount of rotation */
-  rot: number;
   /** Line width */
   lineWidth?: number;
   /** Line color */
-  lineColor?: number;
+  lineColor?: string;
   /** Fill color */
-  fillColor?: number;
+  fillColor?: string;
 
   /**
    * Construct a FilledBoxConfig object
@@ -76,7 +68,6 @@ export class FilledBoxConfig {
   constructor(opts: FilledBoxConfigOpts) {
     this.w = opts.width;
     this.h = opts.height;
-    this.rot = opts.rotation ?? 0;
 
     let tmpZ = opts.z ?? 0;
     if (tmpZ < -2) tmpZ = -2;
@@ -115,14 +106,12 @@ export class FilledCircleConfig {
   h: number;
   /** Z index of the circle: Must be in the range [-2, 2] */
   z: number;
-  /** Amount of rotation */
-  rot: number;
   /** Line width */
   lineWidth?: number;
   /** Line color */
-  lineColor?: number;
+  lineColor?: string;
   /** Fill color */
-  fillColor?: number;
+  fillColor?: string;
 
   /**
    * Construct a FilledCircleConfig object
@@ -132,7 +121,6 @@ export class FilledCircleConfig {
    */
   constructor(opts: FilledCircleConfigOpts) {
     this.radius = opts.radius;
-    this.rot = opts.rotation ?? 0;
     this.w = this.h = 2 * this.radius;
 
     let tmpZ = opts.z ?? 0;
@@ -166,8 +154,6 @@ export class FilledCircleConfig {
 export class FilledPolyConfig {
   /** Z index of the polygon: Must be in the range [-2, 2] */
   z: number;
-  /** Amount of rotation */
-  rot: number;
   /** Width, to simplify some other code */
   w: number;
   /** Height, to simplify some other code */
@@ -177,9 +163,9 @@ export class FilledPolyConfig {
   /** Line width */
   lineWidth?: number;
   /** Line color */
-  lineColor?: number;
+  lineColor?: string;
   /** Fill color */
-  fillColor?: number;
+  fillColor?: string;
 
   /**
    * Construct a FilledPolyConfig object
@@ -191,19 +177,18 @@ export class FilledPolyConfig {
     this.vertices = [];
     for (let i = 0; i < opts.vertices.length; i += 2)
       this.vertices.push({ x: opts.vertices[i], y: opts.vertices[i + 1] });
-    this.rot = opts.rotation ?? 0;
-    let minx = this.vertices[0].x;
-    let miny = this.vertices[0].y;
-    let maxx = minx;
-    let maxy = miny;
+    let minX = this.vertices[0].x;
+    let minY = this.vertices[0].y;
+    let maxX = minX;
+    let maxY = minY;
     for (let v of this.vertices) {
-      maxx = Math.max(maxx, v.x)
-      maxy = Math.max(maxy, v.y)
-      minx = Math.min(minx, v.x)
-      miny = Math.min(miny, v.y)
+      maxX = Math.max(maxX, v.x)
+      maxY = Math.max(maxY, v.y)
+      minX = Math.min(minX, v.x)
+      minY = Math.min(minY, v.y)
     }
-    this.w = (Math.abs(maxx) > Math.abs(minx)) ? 2 * maxx : 2 * minx;
-    this.h = (Math.abs(maxy) > Math.abs(miny)) ? 2 * maxy : 2 * miny;
+    this.w = (Math.abs(maxX) > Math.abs(minX)) ? 2 * maxX : 2 * minX;
+    this.h = (Math.abs(maxY) > Math.abs(minY)) ? 2 * maxY : 2 * minY;
 
     let tmpZ = opts.z ?? 0;
     if (tmpZ < -2) tmpZ = -2;
@@ -239,8 +224,6 @@ export class TextConfig {
   h = 0;
   /** Z index of the image */
   z: -2 | -1 | 0 | 1 | 2;
-  /** Amount of rotation */
-  rot: number;
   /** Should the text be centered at X,Y (true) or is (X,Y) top-left (false) */
   c: boolean;
   /** Font to use */
@@ -257,7 +240,6 @@ export class TextConfig {
    *             configuration
    */
   constructor(opts: TxtConfigOpts) {
-    this.rot = opts.rotation ?? 0;
     this.c = opts.center;
     this.face = opts.face;
     this.rgb = opts.color;
@@ -281,8 +263,6 @@ export class AnimationConfig {
   h: number;
   /** Z index of the image */
   z: -2 | -1 | 0 | 1 | 2;
-  /** Amount of rotation */
-  rot: number;
   /**
    * The animation sequences to use (they correspond to different
    * AnimationStates) 
@@ -314,7 +294,6 @@ export class AnimationConfig {
   constructor(opts: AniCfgOpts) {
     this.w = opts.width;
     this.h = opts.height;
-    this.rot = opts.rotation ?? 0;
 
     let tmpZ = opts.z ?? 0;
     if (tmpZ < -2) tmpZ = -2;
@@ -392,9 +371,9 @@ export class TextSprite {
    * Build some text that can be rendered
    * 
    * @param cfgOpts  The configuration options for this TextSprite
-   * @param producer A function that creates the text to display
+   * @param producer A function that creates the text to display, or a String
    */
-  constructor(cfgOpts: TxtConfigOpts, public producer: () => string) {
+  constructor(cfgOpts: TxtConfigOpts, public producer: string | (() => string)) {
     this.props = new TextConfig(cfgOpts);
     this.text = game.imageLibrary.makeText("", { fontFamily: this.props.face, fontSize: this.props.size, fill: this.props.rgb });
     this.props.w = this.text.getRenderObject().width;
@@ -403,7 +382,7 @@ export class TextSprite {
 
   clone() {
     return new TextSprite({
-      z: this.props.z, rotation: this.props.rot, center: this.props.c, face: this.props.face, color: this.props.rgb,
+      z: this.props.z, center: this.props.c, face: this.props.face, color: this.props.rgb,
       size: this.props.size
     }, this.producer);
   }
@@ -418,7 +397,7 @@ export class TextSprite {
   render(camera: CameraSystem, _elapsedMs: number) {
     // Set the world position and the text, then let the renderer decide
     // where to put it...
-    this.text.setText(this.producer());
+    this.text.setText((typeof this.producer == "string") ? this.producer : this.producer());
     this.text.setPosition(this.actor?.rigidBody.getCenter().x ?? 0, this.actor?.rigidBody.getCenter().y ?? 0);
     game.renderer.addTextToFrame(this.text, camera, this.props.c);
   }
@@ -434,7 +413,7 @@ export class TextSprite {
   renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
     // Set the world position and the text, then let the renderer decide
     // where to put it...
-    this.text.setText(this.producer());
+    this.text.setText((typeof this.producer == "string") ? this.producer : this.producer());
     this.text.setPosition(anchor.cx, anchor.cy);
     game.renderer.addTextToFrame(this.text, camera, this.props.c);
   }
@@ -478,7 +457,7 @@ export class ImageSprite {
 
   /** Make a clone of the provided ImageSprite */
   clone() {
-    return new ImageSprite({ z: this.props.z, rotation: this.props.rot, width: this.props.w, height: this.props.h, img: this.image.imgName });
+    return new ImageSprite({ z: this.props.z, width: this.props.w, height: this.props.h, img: this.image.imgName });
   }
 
   /**
@@ -575,8 +554,7 @@ export class AnimatedSprite implements IStateObserver {
   /** Make a copy of this AnimatedSprite */
   clone() {
     return new AnimatedSprite({
-      z: this.props.z,
-      rotation: this.props.rot, width: this.props.w, height: this.props.h,
+      z: this.props.z, width: this.props.w, height: this.props.h,
       idle_right: this.props.animations.get(AnimationState.IDLE_RIGHT)!.clone(),
       idle_left: this.props.animations.get(AnimationState.IDLE_LEFT)?.clone(),
       move_right: this.props.animations.get(AnimationState.MOVE_RIGHT)?.clone(),
@@ -640,7 +618,7 @@ export class AnimatedSprite implements IStateObserver {
 
       let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.props.disappear.offset.x;
       let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.props.disappear.offset.y;
-      let o = new Actor({
+      let o = Actor.Make({
         scene: entity.scene,
         appearance: new AnimatedSprite({ idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
         rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, entity.scene, { collisionsEnabled: false }),
@@ -721,10 +699,6 @@ export class AnimatedSprite implements IStateObserver {
 /**
  * FilledSprite describes any object whose visual representation is a filled
  * circle/box/polygon shape.
- *
- * TODO:  Why does any of this "filledsprite" stuff need cx/cy?  For that
- *        matter, why do any of the Configs need x/y?  Won't that always come
- *        from the body?
  */
 export class FilledSprite {
   /** The Actor to which this ImageSprite is attached */
@@ -763,7 +737,7 @@ export class FilledSprite {
    *
    * @param cfg The configuration of this FilledPolygon
    */
-  public static Poly(cfg: FilledPolyConfigOpts) {
+  public static Polygon(cfg: FilledPolyConfigOpts) {
     return new FilledSprite(new FilledPolyConfig(cfg));
   }
 
@@ -772,13 +746,13 @@ export class FilledSprite {
     if (this.props instanceof FilledBoxConfig) {
       return new FilledSprite(new FilledBoxConfig({
         width: this.props.w, height: this.props.h,
-        z: this.props.z, rotation: this.props.rot, lineWidth: this.props.lineWidth,
+        z: this.props.z, lineWidth: this.props.lineWidth,
         lineColor: this.props.lineColor, fillColor: this.props.fillColor
       }));
     }
     else if (this.props instanceof FilledCircleConfig) {
       return new FilledSprite(new FilledCircleConfig({
-        radius: this.props.radius, z: this.props.z, rotation: this.props.rot, lineWidth: this.props.lineWidth,
+        radius: this.props.radius, z: this.props.z, lineWidth: this.props.lineWidth,
         lineColor: this.props.lineColor, fillColor: this.props.fillColor
       }));
     }
@@ -789,7 +763,7 @@ export class FilledSprite {
         vertices.push(v.y);
       }
       return new FilledSprite(new FilledPolyConfig({
-        vertices, z: this.props.z, rotation: this.props.rot, lineWidth: this.props.lineWidth,
+        vertices, z: this.props.z, lineWidth: this.props.lineWidth,
         lineColor: this.props.lineColor, fillColor: this.props.fillColor
       }));
 
@@ -827,7 +801,7 @@ export class FilledSprite {
         this.graphics.drawRect(x, y, w, h);
         this.graphics.position.set(x, y);
         this.graphics.pivot.set(x + w / 2, y + h / 2);
-        this.graphics.rotation = this.props.rot;
+        this.graphics.rotation = this.actor.rigidBody.getRotation();
         game.renderer.addGraphic(this.graphics);
       }
       else if (this.props instanceof FilledCircleConfig) {
@@ -865,7 +839,7 @@ export class FilledSprite {
         // rotation
         this.graphics.position.set(x, y);
         this.graphics.pivot.set(x, y);
-        this.graphics.rotation = this.props.rot;
+        this.graphics.rotation = this.actor.rigidBody.getRotation();
         game.renderer.addGraphic(this.graphics);
       }
       else {

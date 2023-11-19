@@ -1,5 +1,3 @@
-// Last review: 08-11-2023
-
 import { b2AABB, b2Contact, b2ContactImpulse, b2ContactListener, b2DistanceJoint, b2DistanceJointDef, b2Fixture, b2Manifold, b2Vec2, b2World, b2WorldManifold } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";

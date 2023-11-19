@@ -1,5 +1,3 @@
-// Last review: 08-11-2023
-
 import { b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { game } from "../Stage";
@@ -56,7 +54,7 @@ export class CameraSystem {
    * @param x     Amount of x distance to add to actor center
    * @param y     Amount of y distance to add to actor center
    */
-  public setCameraChase(actor: Actor | undefined, x: number = 0, y: number = 0) {
+  public setCameraFocus(actor: Actor | undefined, x: number = 0, y: number = 0) {
     this.cameraChaseActor = actor;
     this.cameraOffset.Set(x, y);
   }
@@ -221,8 +219,7 @@ export class CameraSystem {
    * @param actor The actor to add
    */
   addEntity(actor: Actor) {
-    if (actor.appearance)
-      this.renderables[actor.appearance.props.z + 2].push(actor);
+    this.renderables[actor.appearance.props.z + 2].push(actor);
   }
 
   /**
@@ -231,7 +228,6 @@ export class CameraSystem {
    * @param actor The actor to remove
    */
   removeEntity(actor: Actor) {
-    if (!actor.appearance) return;
     let z = actor.appearance.props.z
     let i = this.renderables[z + 2].indexOf(actor);
     this.renderables[z + 2].splice(i, 1);

@@ -1,8 +1,8 @@
-// Last review: 08-10-2023
-
 /**
  * The keys that we currently support.  We represent each with its `ev.code`
  * value.
+ *
+ * TODO: Can we find a way to handle TAB?
  */
 export enum KeyCodes {
   KEY_ESCAPE = 'Escape', KEY_HOME = 'Home', KEY_END = 'End', KEY_INSERT = 'Insert',

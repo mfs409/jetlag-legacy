@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 /**
  * StorageService provides three key/value stores
  *
@@ -13,6 +11,8 @@
  *
  * Note that Session and Level can story any data type.  Persistent can only
  * store strings.
+ *
+ * TODO:  We need to abstract Persistent so it can work on phones?
  */
 export class StorageService {
   /** The "session" storage */

@@ -55,7 +55,7 @@ export function buildLevelScreen(level: number) {
     // will look right.
     //
     // Note:  Don't worry about "game.world" for now :)
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: RigidBodyComponent.Circle({ cx: 2, cy: 3, radius: 0.4 }, game.world),
@@ -72,7 +72,7 @@ export function buildLevelScreen(level: number) {
     // Note that in most cases, if you aren't sure what something means, you can
     // hover your mouse over it to get some help
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, img: "mustard_ball.png", radius: 0.4 };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -104,7 +104,7 @@ export function buildLevelScreen(level: number) {
     // start by setting everything like in level 1
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -114,7 +114,7 @@ export function buildLevelScreen(level: number) {
 
     // notice that when we want to change cfg, we don't put a "let" in front
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -143,7 +143,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 3) {
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -157,7 +157,7 @@ export function buildLevelScreen(level: number) {
 
     // notice that when we want to change cfg, we don't put a "let" in front
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -196,7 +196,7 @@ export function buildLevelScreen(level: number) {
     // have density and friction. Note that we lower the density, so they
     // move faster than in the previous level
     let hero_cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(hero_cfg),
       rigidBody: RigidBodyComponent.Circle(hero_cfg, game.world, { density: 2, friction: 0.6 }),
@@ -207,7 +207,7 @@ export function buildLevelScreen(level: number) {
     // As we make the second hero, notice that it doesn't matter what order we
     // assign the role, movement, rigidBody, or appearance.
     hero_cfg = { cx: 6, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(hero_cfg),
       rigidBody: RigidBodyComponent.Circle(hero_cfg, game.world, { density: 2, friction: 0.6 }),
@@ -223,7 +223,7 @@ export function buildLevelScreen(level: number) {
     // same "z" will be drawn on top of each other based on the order in which
     // their "appearances" were created.
     let dest_cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png", z: 1 };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(dest_cfg),
       rigidBody: RigidBodyComponent.Circle(dest_cfg, game.world),
@@ -232,7 +232,7 @@ export function buildLevelScreen(level: number) {
     });
 
     dest_cfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png", z: -1 };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(dest_cfg),
       rigidBody: RigidBodyComponent.Circle(dest_cfg, game.world),
@@ -255,7 +255,7 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
 
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -264,7 +264,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 6, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -276,7 +276,7 @@ export function buildLevelScreen(level: number) {
     // Let's also say that whenever a hero reaches the destination, a sound
     // will play
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -303,7 +303,7 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
 
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -312,7 +312,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -332,7 +332,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 0.6 }),
@@ -341,7 +341,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -356,7 +356,7 @@ export function buildLevelScreen(level: number) {
     // Make an enemy.  You're probably starting to notice that there's a lot of
     // similarity in how we make all of these different actors.
     cfg = { cx: 14, cy: 1.5, radius: 0.4, width: 0.8, height: 0.8, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -380,7 +380,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: .3 }),
@@ -389,7 +389,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -409,7 +409,7 @@ export function buildLevelScreen(level: number) {
     // the start point", so the enemy teleports back to the starting point after
     // it reaches (14, -0.4).
     cfg = { cx: 14, cy: 9.4, radius: 0.4, width: 0.8, height: 0.8, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -432,7 +432,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: .3 }),
@@ -441,7 +441,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -456,7 +456,7 @@ export function buildLevelScreen(level: number) {
     // forth, and the points keep it on screen.  Paths can be made extremely
     // complex.  Be sure to try a lot of variations.
     cfg = { cx: 14, cy: 8.6, radius: 0.4, width: 0.8, height: 0.8, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -477,7 +477,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: .3 }),
@@ -486,7 +486,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       // If we want to make something rotate, we can do it like this.  The ".5"
@@ -499,7 +499,7 @@ export function buildLevelScreen(level: number) {
 
     // Make an enemy who moves due to tilt
     cfg = { cx: 14, cy: 1.5, radius: 0.4, width: 0.8, height: 0.8, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, elasticity: 0.3, friction: 0.6 }),
@@ -531,7 +531,7 @@ export function buildLevelScreen(level: number) {
 
     // put the hero and destination far apart
     let cfg = { cx: 1, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 0.6 }),
@@ -540,7 +540,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 63, cy: 35, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -555,7 +555,7 @@ export function buildLevelScreen(level: number) {
     // hero as it moves around the world.  Note that this is the most
     // rudimentary way to follow the hero's movement, and it's not going to look
     // good when the hero is close to the level's boundaries.
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // add zoom buttons. We are using blank images, which means that the buttons
     // will be invisible... that's nice, because we can make the buttons big
@@ -585,7 +585,7 @@ export function buildLevelScreen(level: number) {
     for (let x = 0; x < 64; x += 16) {
       for (let y = 0; y < 36; y += 9) {
         // This is kind of neat: a picture is just an actor without a role or rigidBody
-        new Actor({
+        Actor.Make({
           scene: game.world,
           appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
           rigidBody: RigidBodyComponent.Box({ cx: x + 8, cy: y + 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
@@ -614,7 +614,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1, cy: 5, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 0.6 }),
@@ -625,7 +625,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -657,7 +657,7 @@ export function buildLevelScreen(level: number) {
 
     // This one looks like a purple ball, but its shape is a box.
     let boxCfg = { cx: 5, cy: 5, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { friction: 1 }),
@@ -667,7 +667,7 @@ export function buildLevelScreen(level: number) {
 
     // This one looks like a ball, and it is a ball
     cfg = { cx: 7, cy: 2, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 1 }),
@@ -677,7 +677,7 @@ export function buildLevelScreen(level: number) {
 
     // This one looks like a square, but it's really a ball
     cfg = { cx: 9, cy: 4, radius: 1.5, width: 3, height: 3, img: "noise.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 1 }),
@@ -687,7 +687,7 @@ export function buildLevelScreen(level: number) {
 
     // And finally, a box that looks like a box
     boxCfg = { cx: 9, cy: 7, width: 0.5, height: 2, img: "noise.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { friction: 1 }),
@@ -699,7 +699,7 @@ export function buildLevelScreen(level: number) {
     // and width match the radius.  Look at what happens when the width and
     // height of the image aren't the same, but there's a radius.
     let oval_cfg = { cx: 13, cy: 3, width: 2, height: .5, radius: 1, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(oval_cfg),
       rigidBody: RigidBodyComponent.Circle(oval_cfg, game.world),
@@ -709,7 +709,7 @@ export function buildLevelScreen(level: number) {
 
     // This one has a bigger body than its image
     cfg = { cx: 1, cy: 1, radius: 0.5, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 1 }),
@@ -719,7 +719,7 @@ export function buildLevelScreen(level: number) {
 
     // This one has a smaller body than its image
     cfg = { cx: 8, cy: 1, radius: 0.25, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { friction: 1 }),
@@ -728,7 +728,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // These alternate hitboxes also work for boxes, of course
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite({ width: 0.7, height: 0.8, img: "noise.png" }),
       rigidBody: RigidBodyComponent.Box({ cx: 14, cy: 1, width: 0.5, height: 0.6 }, game.world, { friction: 1 }),
@@ -745,7 +745,7 @@ export function buildLevelScreen(level: number) {
       cx: 3, cy: 3, width: 2, height: 2, img: "blue_ball.png",
       vertices: [-1, 0, -.5, .866, .5, .866, 1, 0, .5, -.866, -.5, -.866]
     };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(polyCfg),
       rigidBody: RigidBodyComponent.Polygon(polyCfg, game.world, { rotationSpeed: .25 }),
@@ -798,7 +798,7 @@ export function buildLevelScreen(level: number) {
     // with a joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 1, cy: 5, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -807,7 +807,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -822,7 +822,7 @@ export function buildLevelScreen(level: number) {
 
     // These obstacles have interesting elasticity and friction values
     cfg = { cx: 4, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { elasticity: 100 }),
@@ -831,7 +831,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 4, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 10, friction: 100 }),
@@ -848,7 +848,7 @@ export function buildLevelScreen(level: number) {
     // callback
     game.installOverlay((overlay: Scene) => {
       let opts = { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" };
-      new Actor({
+      Actor.Make({
         scene: overlay,
         appearance: new ImageSprite(opts),
         rigidBody: RigidBodyComponent.Box(opts, overlay),
@@ -873,7 +873,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1, cy: 5, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 2, friction: 0.6 }),
@@ -882,7 +882,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -908,7 +908,7 @@ export function buildLevelScreen(level: number) {
     // Note that JetLag tracks four different scores for goodies.  By default,
     // collecting a goodie increases the "first" score by 1.
     cfg = { cx: 2, cy: 2, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -917,7 +917,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 6, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -953,7 +953,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 1, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -966,7 +966,7 @@ export function buildLevelScreen(level: number) {
     // make a destination that moves, and that requires one goodie to be collected before it
     // works
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -977,7 +977,7 @@ export function buildLevelScreen(level: number) {
 
     // make an obstacle that moves
     let boxCfg = { cx: 0, cy: 0, width: 1, height: 1, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 100 }),
@@ -987,7 +987,7 @@ export function buildLevelScreen(level: number) {
 
     // make a goodie that moves
     cfg = { cx: 5, cy: 5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1011,7 +1011,7 @@ export function buildLevelScreen(level: number) {
     // Set up a hero who is controlled by the joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1028,7 +1028,7 @@ export function buildLevelScreen(level: number) {
     // draw 5 goodies
     for (let p = 0; p < 5; p++) {
       cfg = { cx: p + 1, cy: p + 4, radius: 0.125, width: 0.25, height: 0.25, img: "blue_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1093,7 +1093,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 3, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1102,7 +1102,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1164,7 +1164,7 @@ export function buildLevelScreen(level: number) {
 
     // This pad effect multiplies by -1, causing a "bounce off" effect
     cfg = { cx: 5, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1174,7 +1174,7 @@ export function buildLevelScreen(level: number) {
 
     // This pad multiplies by five, causing a speedup
     cfg = { cx: 7, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1184,7 +1184,7 @@ export function buildLevelScreen(level: number) {
 
     // A fraction causes a slowdown, and we'll make this one spin
     cfg = { cx: 9, cy: 3, width: 0.8, height: 0.8, radius: 0.4, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { rotationSpeed: 2 }),
@@ -1206,7 +1206,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1220,7 +1220,7 @@ export function buildLevelScreen(level: number) {
     // have "2" units of damage, and heroes to have "1" unit of strength, so
     // that any collision defeats the hero without removing the enemy.
     cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1255,7 +1255,7 @@ export function buildLevelScreen(level: number) {
 
     // our first enemy stands still:
     cfg = { cx: 8, cy: 8, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
@@ -1265,7 +1265,7 @@ export function buildLevelScreen(level: number) {
 
     // our second enemy moves along a path
     cfg = { cx: 7, cy: 7, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
@@ -1275,7 +1275,7 @@ export function buildLevelScreen(level: number) {
 
     // our third enemy moves with tilt, which makes it hardest to avoid
     cfg = { cx: 15, cy: 1, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 15, elasticity: 0.3, friction: 0.6 }),
@@ -1295,7 +1295,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1307,7 +1307,7 @@ export function buildLevelScreen(level: number) {
 
     // draw two enemies.  Remember, each does 2 units of damage
     cfg = { cx: 6, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1316,7 +1316,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1344,7 +1344,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1356,7 +1356,7 @@ export function buildLevelScreen(level: number) {
     // draw an enemy.  By default, it does 2 units of damage.  If it disappears,
     // it will make a sound
     cfg = { cx: 10, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1366,7 +1366,7 @@ export function buildLevelScreen(level: number) {
 
     // draw another enemy.  It is too deadly for us to ever defeat.
     cfg = { cx: 7, cy: 7, radius: 1, width: 2, height: 2, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1376,7 +1376,7 @@ export function buildLevelScreen(level: number) {
 
     // this goodie gives an extra "2" units of strength:
     cfg = { cx: 14, cy: 7, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1410,7 +1410,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1426,7 +1426,7 @@ export function buildLevelScreen(level: number) {
     // draw a few enemies, and make them rotate
     for (let i = 0; i < 5; ++i) {
       cfg = { cx: i + 4, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
@@ -1437,7 +1437,7 @@ export function buildLevelScreen(level: number) {
 
     // this goodie makes the hero invincible
     cfg = { cx: 15, cy: 8, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { rotationSpeed: .25 }),
@@ -1454,7 +1454,7 @@ export function buildLevelScreen(level: number) {
 
     // We'll require 5 enemies to be defeated before the destination works
     cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1491,7 +1491,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1503,7 +1503,7 @@ export function buildLevelScreen(level: number) {
 
     // Set up a destination that requires 7 type-1 goodies
     cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1515,7 +1515,7 @@ export function buildLevelScreen(level: number) {
 
     // This goodie **reduces** your score
     cfg = { cx: 9, cy: 1, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1525,7 +1525,7 @@ export function buildLevelScreen(level: number) {
 
     // This goodie **increases** your score
     cfg = { cx: 9, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1550,7 +1550,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1559,7 +1559,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1574,7 +1574,7 @@ export function buildLevelScreen(level: number) {
 
     // draw two obstacles that we can drag
     let boxCfg = { cx: 15, cy: 2, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 1 }),
@@ -1583,7 +1583,7 @@ export function buildLevelScreen(level: number) {
     });
 
     boxCfg = { cx: 14, cy: 1, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 1 }),
@@ -1594,7 +1594,7 @@ export function buildLevelScreen(level: number) {
     // draw an obstacle that is oblong (due to its width and height) and that is rotated.
     // Note that this should be a box, or it will not have the right underlying shape.
     boxCfg = { cx: 3, cy: 3, width: 0.75, height: 0.15, img: "purple_ball.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -1616,7 +1616,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: .75, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1625,7 +1625,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1637,7 +1637,7 @@ export function buildLevelScreen(level: number) {
 
     // draw a picture on the -1 plane, so it is a background behind the hero and
     // destination
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
@@ -1647,7 +1647,7 @@ export function buildLevelScreen(level: number) {
 
     // make a few obstacles that we can poke
     let boxCfg = { cx: 14, cy: 1, width: 0.25, height: 2, img: "purple_ball.png" };
-    let vertical_obstacle = new Actor({
+    let vertical_obstacle = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 100 }),
@@ -1684,7 +1684,7 @@ export function buildLevelScreen(level: number) {
     Helpers.createPokeToPlaceZone(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
 
     boxCfg = { cx: 14, cy: 2, width: 2, height: 0.25, img: "purple_ball.png" };
-    let horizontal_obstacle = new Actor({
+    let horizontal_obstacle = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { elasticity: 100 }),
@@ -1724,7 +1724,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1738,7 +1738,7 @@ export function buildLevelScreen(level: number) {
     );
 
     cfg = { cx: 14, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1750,7 +1750,7 @@ export function buildLevelScreen(level: number) {
 
     // draw a picture late within this block of code, but still cause the picture to be
     // drawn behind everything else by giving it a z index of -2
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -2 }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
@@ -1761,7 +1761,7 @@ export function buildLevelScreen(level: number) {
     // create an enemy who chases the hero
     // Note: z is -2, but it was drawn after the noise, so we can still see it
     let zCfg = { z: -2, cx: 15, cy: 1, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png", };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(zCfg),
       rigidBody: RigidBodyComponent.Circle(zCfg, game.world, { density: 0.1, elasticity: 0.3, friction: 0.6 }),
@@ -1780,7 +1780,7 @@ export function buildLevelScreen(level: number) {
     // start with a hero who is controlled via Joystick, and a destination
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1794,7 +1794,7 @@ export function buildLevelScreen(level: number) {
     );
 
     cfg = { cx: 14, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1806,7 +1806,7 @@ export function buildLevelScreen(level: number) {
 
     // set up our obstacle so that collision and touch make it play sounds
     cfg = { cx: 5, cy: 5, width: 0.8, height: 0.8, radius: 0.4, img: "purple_ball.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 1 }),
@@ -1830,7 +1830,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 27) {
     // set up a hero who rotates in the direction of movement, and is controlled by joystick
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1852,7 +1852,7 @@ export function buildLevelScreen(level: number) {
 
     // Let's have an enemy, too
     cfg = { cx: 8, cy: 4.5, radius: 1, width: 2, height: 2, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1871,7 +1871,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 28) {
     // set up a hero who rotates in the direction of movement, and is controlled by joystick
     let cfg = { cx: 8, cy: 4.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1887,7 +1887,7 @@ export function buildLevelScreen(level: number) {
 
     // the destination is right below the hero
     cfg = { cx: 8, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1899,7 +1899,7 @@ export function buildLevelScreen(level: number) {
 
     // this enemy starts from off-screen... you've got to be quick to survive!
     cfg = { cx: 8, cy: -8, radius: 4, width: 8, height: 8, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1916,7 +1916,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 29) {
     // Set up a hero and destination, and turn on tilt
     let cfg = { cx: 8, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -1927,7 +1927,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     Helpers.enableTilt(10, 10);
     cfg = { cx: 8, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1942,7 +1942,7 @@ export function buildLevelScreen(level: number) {
       // Always convert the hud coordinates to world coordinates
       let pixels = Helpers.overlayToWorldCoords(game.hud, hudCoords.x, hudCoords.y);
       cfg = { cx: pixels.x, cy: pixels.y, radius: .25, width: .5, height: .5, img: "purple_ball.png" };
-      let o = new Actor({
+      let o = Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world, { elasticity: 2 }),
@@ -1975,7 +1975,7 @@ export function buildLevelScreen(level: number) {
 
     // draw a destination
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -1987,7 +1987,7 @@ export function buildLevelScreen(level: number) {
 
     // create a hero that can be flicked
     cfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6, disableRotation: true }),
@@ -2002,7 +2002,7 @@ export function buildLevelScreen(level: number) {
 
     // create an obstacle that can be flicked
     cfg = { cx: 6, cy: 6, width: 0.8, height: 0.8, radius: 0.4, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2032,7 +2032,7 @@ export function buildLevelScreen(level: number) {
 
     // Add a hero and destination
     let cfg = { cx: 0.25, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2041,7 +2041,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 47, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2053,7 +2053,7 @@ export function buildLevelScreen(level: number) {
 
     // This is very important: we need the camera to follow the hero, or it will
     // go off screen.
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // When you test this level, it's going to be hard to see that the ball is
     // actually moving.  If you have the "Developer Console" open, you can tap
@@ -2074,7 +2074,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 7.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2083,7 +2083,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 127, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2092,7 +2092,7 @@ export function buildLevelScreen(level: number) {
     });
 
     game.score.setVictoryDestination(1);
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // Paint the background blue
     game.backgroundColor = 0x17b4ff;
@@ -2109,7 +2109,7 @@ export function buildLevelScreen(level: number) {
     // make an obstacle that hovers in a fixed place. Note that hovering and
     // zoom do not work together nicely.
     cfg = { cx: 8, cy: 1, radius: 0.5, width: 1, height: 1, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2155,7 +2155,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2164,7 +2164,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 127, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2173,7 +2173,7 @@ export function buildLevelScreen(level: number) {
     });
 
     game.score.setVictoryDestination(1);
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // this says that touching makes the hero jump.  -10 is the force of the
     // jump in the y dimension (up is negative)
@@ -2204,7 +2204,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0, disableRotation: true }),
@@ -2215,7 +2215,7 @@ export function buildLevelScreen(level: number) {
     (h.movement as ExplicitMovement).addVelocity(10, 0);
 
     cfg = { cx: 124, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2227,7 +2227,7 @@ export function buildLevelScreen(level: number) {
 
     // center the camera a little ahead of the hero, so we can see more of the
     // world during gameplay
-    game.world.camera.setCameraChase(h, 6, 0);
+    game.world.camera.setCameraFocus(h, 6, 0);
     // Put a button on screen that makes the hero jump. Note that we can put a
     // delay (in this case, 9000 milliseconds) to prevent rapid re-jumping.  If
     // you make it 0, you still can't jump while in the air, but you can jump as
@@ -2245,7 +2245,7 @@ export function buildLevelScreen(level: number) {
     let boxCfg = { cx: 127, cy: 4.5, width: 0.5, height: 9, img: "" };
     // Note: to debug this, you might want to temporarily move the hero to x=100
     // or so, so it doesn't take so long to get to it :)
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2268,7 +2268,7 @@ export function buildLevelScreen(level: number) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 64, 15, .1, { density: 1 });
     let boxCfg = { cx: 0.25, cy: 10, width: 0.75, height: 0.75, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 0, disableRotation: true }),
@@ -2282,7 +2282,7 @@ export function buildLevelScreen(level: number) {
     // add the velocity after we make the movement.
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
-    game.world.camera.setCameraChase(h, 6, 0);
+    game.world.camera.setCameraFocus(h, 6, 0);
     game.backgroundColor = 0x17b4ff;
     game.background.addLayer({ cx: 8, cy: 10.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
@@ -2290,7 +2290,7 @@ export function buildLevelScreen(level: number) {
     // the end means victory
     Helpers.addTapControl(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, Helpers.jumpAction(h, 0, -5, 0));
     boxCfg = { cx: 63.5, cy: 7.5, width: 0.5, height: 15, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2304,7 +2304,7 @@ export function buildLevelScreen(level: number) {
     // and between 0 and 14 in the Y
     for (let i = 0; i < 30; ++i) {
       let cfg = { cx: 10 + Helpers.getRandom(50), cy: Helpers.getRandom(14), radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2334,7 +2334,7 @@ export function buildLevelScreen(level: number) {
       idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }),
       idle_left: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_1.png", "flip_leg_star_1.png"] }),
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       // Then, here, we make an *AnimatedSprite*, which uses that configuration.
       appearance: new AnimatedSprite(h_cfg),
@@ -2342,10 +2342,10 @@ export function buildLevelScreen(level: number) {
       movement: new ExplicitMovement(),
       role: new Hero(),
     });
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     let cfg = { cx: 47, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2360,7 +2360,7 @@ export function buildLevelScreen(level: number) {
     // let's draw an enemy, just in case anyone wants to try to go to the bottom
     // right corner
     cfg = { cx: .5, cy: 8.5, radius: 0.5, width: 1, height: 1, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2392,7 +2392,7 @@ export function buildLevelScreen(level: number) {
     game.world.camera.setBounds(48, 9);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1 });
     let cfg = { cx: 47, cy: 8, radius: 0.5, width: 1, height: 1, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2404,7 +2404,7 @@ export function buildLevelScreen(level: number) {
     game.backgroundColor = 0x17b4ff;
     game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0, disableRotation: true }),
@@ -2413,11 +2413,11 @@ export function buildLevelScreen(level: number) {
     });
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // draw an enemy to avoid, and one at the end
     cfg = { cx: 30, cy: 6, radius: 0.5, width: 1, height: 1, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2426,7 +2426,7 @@ export function buildLevelScreen(level: number) {
     });
 
     let boxCfg = { cx: 47.9, cy: 4.5, width: 0.1, height: 9, img: "" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2451,7 +2451,7 @@ export function buildLevelScreen(level: number) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, elasticity: 0.3 });
     let cfg = { cx: 47, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2461,7 +2461,7 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryDestination(1);
     let boxCfg = { cx: 0, cy: 7, width: 0.75, height: 1.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 5 }),
@@ -2470,7 +2470,7 @@ export function buildLevelScreen(level: number) {
     });
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
     game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // to enable crawling, we just draw a crawl button on the screen
@@ -2479,7 +2479,7 @@ export function buildLevelScreen(level: number) {
 
     // make an enemy who we can only defeat by colliding with it while crawling
     cfg = { cx: 40, cy: 8, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2500,7 +2500,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1 });
     game.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2512,14 +2512,14 @@ export function buildLevelScreen(level: number) {
 
     // make a hero who doesn't start moving until it is touched
     let boxCfg = { cx: 0, cy: 8.25, width: 0.75, height: 0.75, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 0, disableRotation: true }),
       movement: new ExplicitMovement(),
       role: new Hero(),
     });
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     Helpers.setTouchAndGo(h, 5, 0);
 
@@ -2535,7 +2535,7 @@ export function buildLevelScreen(level: number) {
     game.world.camera.setBounds(160, 9);
     Helpers.drawBoundingBox(0, 0, 160, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6, disableRotation: true }),
@@ -2544,9 +2544,9 @@ export function buildLevelScreen(level: number) {
     });
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
     cfg = { cx: 159, cy: .5, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2560,7 +2560,7 @@ export function buildLevelScreen(level: number) {
 
     // place a speed-up obstacle that lasts for 2 seconds
     cfg = { cx: 20, cy: .5, width: 1, height: 1, radius: 0.5, img: "right_arrow.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2570,7 +2570,7 @@ export function buildLevelScreen(level: number) {
 
     // place a slow-down obstacle that lasts for 3 seconds
     cfg = { cx: 60, cy: .5, width: 1, height: 1, radius: 0.5, img: "left_arrow.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2580,7 +2580,7 @@ export function buildLevelScreen(level: number) {
 
     // place a permanent +3 speedup obstacle... the -1 means "forever"
     cfg = { cx: 80, cy: .5, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2603,7 +2603,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 36, .1, { density: 1, friction: 1 });
     let cfg = { cx: 2, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2611,11 +2611,11 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // Win by reaching the bottom
     let boxCfg = { cx: 8, cy: 35.5, width: 16, height: 1, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2649,7 +2649,7 @@ export function buildLevelScreen(level: number) {
 
     // Make a hero and an enemy that slowly moves toward the hero
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2659,7 +2659,7 @@ export function buildLevelScreen(level: number) {
 
     // This enemy will slowly move toward the hero
     cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2674,7 +2674,7 @@ export function buildLevelScreen(level: number) {
     // enemy, it stops being "in flight", so we can throw another.
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 3, strength: 1, body: { radius: 0.125, cx: -100, cy: -100 },
-      appearance: { width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }
+      appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }),
     });
 
     // Touching the hero will throw a projectile
@@ -2703,7 +2703,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(1, 1, true);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 8, cy: 4.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6, disableRotation: true }),
@@ -2716,7 +2716,7 @@ export function buildLevelScreen(level: number) {
 
     // draw two enemies, on either side of the screen
     let boxCfg = { cx: .25, cy: 4.5, width: 0.5, height: 9, img: "red_ball.png" };
-    let left_enemy = new Actor({
+    let left_enemy = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2725,7 +2725,7 @@ export function buildLevelScreen(level: number) {
     });
     (left_enemy.role as Enemy).damage = 10;
     boxCfg = { cx: 15.75, cy: 4.5, width: 0.5, height: 9, img: "red_ball.png" };
-    let right_enemy = new Actor({
+    let right_enemy = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2739,7 +2739,7 @@ export function buildLevelScreen(level: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, strength: 1, range: 9,
       body: { radius: 0.125, cx: -100, cy: -100 },
-      appearance: { width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 },
+      appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }),
     });
 
     // Add buttons for throwing to the left and right.  Each keeps throwing for
@@ -2759,7 +2759,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 0.6 }),
@@ -2773,7 +2773,7 @@ export function buildLevelScreen(level: number) {
     // projectiles are needed to defeat it
     for (let i = 1; i <= 6; i++) {
       cfg = { cx: 2 * i, cy: 7 - i, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-      let e = new Actor({
+      let e = Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
@@ -2790,7 +2790,7 @@ export function buildLevelScreen(level: number) {
       maxAtOnce: 3, strength: 2, immuneToCollisions: true,
       // Since there isn't a radius or vertices, the body will be a box
       body: { width: .1, height: .4, cx: -100, cy: -100 },
-      appearance: { width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 }
+      appearance: new ImageSprite({ width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 })
     });
 
     // this button only throws one projectile per press...
@@ -2813,7 +2813,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, -2, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 8.5, cy: 0.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2832,7 +2832,7 @@ export function buildLevelScreen(level: number) {
     // slow it down a bit
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, body: { radius: 0.125, cx: -100, cy: -100 },
-      appearance: { width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }, strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
+      appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }), strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
     });
 
     // We'll set up a timer, so that enemies keep falling from the sky
@@ -2840,7 +2840,7 @@ export function buildLevelScreen(level: number) {
       // get a random number between 0.0 and 15.0
       let x = Helpers.getRandom(151) / 10;
       cfg = { cx: x, cy: -1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2862,7 +2862,7 @@ export function buildLevelScreen(level: number) {
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: .4, cy: 0.4, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 1 }),
@@ -2874,7 +2874,7 @@ export function buildLevelScreen(level: number) {
 
     // draw a bucket, as three rectangles
     let boxCfg = { cx: 8.95, cy: 3.95, width: 0.1, height: 1, img: "red.png" };
-    let leftBucket = new Actor({
+    let leftBucket = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2883,7 +2883,7 @@ export function buildLevelScreen(level: number) {
     });
 
     boxCfg = { cx: 10.05, cy: 3.95, width: 0.1, height: 1, img: "red.png" };
-    let rightBucket = new Actor({
+    let rightBucket = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2892,7 +2892,7 @@ export function buildLevelScreen(level: number) {
     });
 
     boxCfg = { cx: 9.5, cy: 4.4, width: 1.2, height: 0.1, img: "red.png" };
-    let bottomBucket = new Actor({
+    let bottomBucket = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -2902,7 +2902,7 @@ export function buildLevelScreen(level: number) {
 
     // Place an enemy in the bucket, and require that it be defeated
     cfg = { cx: 9.5, cy: 3.9, width: 0.8, height: 0.8, radius: 0.4, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -2924,7 +2924,7 @@ export function buildLevelScreen(level: number) {
       {
         maxAtOnce: 5,
         body: { radius: 0.25, cx: -100, cy: -100 },
-        appearance: { width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 },
+        appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
         strength: 1,
         multiplier: 2,
         gravityAffectsProjectiles: true,
@@ -2949,7 +2949,7 @@ export function buildLevelScreen(level: number) {
     // projectiles hit the enemy
     game.world.timer.addEvent(new TimedEvent(15, false, () => {
       cfg = { cx: 2.75, cy: 2.4, width: 0.2, height: 0.2, radius: 0.1, img: "purple_ball.png" };
-      let hint = new Actor({
+      let hint = Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world, { collisionsEnabled: false }),
@@ -2974,7 +2974,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 0.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -2998,7 +2998,7 @@ export function buildLevelScreen(level: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: { width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 },
+      appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
       strength: 1,
       throwSound: "flap_flap.ogg",
       soundEffects: new SoundEffectComponent("slow_down.ogg")
@@ -3014,7 +3014,7 @@ export function buildLevelScreen(level: number) {
 
     // draw an enemy that makes a sound when it disappears
     cfg = { cx: 8, cy: 4, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    let e = new Actor({
+    let e = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3034,7 +3034,7 @@ export function buildLevelScreen(level: number) {
         let y = (e.rigidBody?.getCenter().y ?? 0) + counter;
         // make an enemy to the left and down
         let cfg = { cx: (e.rigidBody?.getCenter().x ?? 0) - counter, cy: y, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-        let left = new Actor({
+        let left = Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3046,7 +3046,7 @@ export function buildLevelScreen(level: number) {
         cfg = {
           cx: (e.rigidBody?.getCenter().x ?? 0) + counter, cy: y, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png"
         };
-        let right = new Actor({
+        let right = Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3079,7 +3079,7 @@ export function buildLevelScreen(level: number) {
 
     // Make a hero who moves via tilt
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3089,7 +3089,7 @@ export function buildLevelScreen(level: number) {
 
     // Make a destination
     cfg = { cx: 10, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3100,7 +3100,7 @@ export function buildLevelScreen(level: number) {
 
     // make our initial enemy
     cfg = { cx: 14, cy: 7, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    let e = new Actor({
+    let e = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, elasticity: 0.3, friction: 0.6 }),
@@ -3145,7 +3145,7 @@ export function buildLevelScreen(level: number) {
             radius: .25,
             img: "red_ball.png",
           };
-          let e2 = new Actor({
+          let e2 = Actor.Make({
             scene: game.world,
             appearance: new ImageSprite(cfg),
             rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, elasticity: 0.3, friction: 0.6 }),
@@ -3174,7 +3174,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 49) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3195,7 +3195,7 @@ export function buildLevelScreen(level: number) {
       idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_2.png", "leg_star_3.png", "leg_star_4.png"] }),
     };
 
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3225,7 +3225,7 @@ export function buildLevelScreen(level: number) {
 
     // The hero must reach this destination
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3255,7 +3255,7 @@ export function buildLevelScreen(level: number) {
         .to("leg_star_7.png", 200)
         .to("leg_star_8.png", 200),
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world, { density: 5, friction: 0.6, disableRotation: true }),
@@ -3283,7 +3283,7 @@ export function buildLevelScreen(level: number) {
       disappearOffset: new b2Vec2(0, 0),
       disappearDims: new b2Vec2(0.5, 0.5),
     };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(g_cfg),
       rigidBody: RigidBodyComponent.Circle(g_cfg, game.world),
@@ -3302,7 +3302,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3319,7 +3319,7 @@ export function buildLevelScreen(level: number) {
       // set up an animation when the hero throws:
       throw_right: new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400)
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3335,7 +3335,7 @@ export function buildLevelScreen(level: number) {
       game.world, {
       maxAtOnce: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: { width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 },
+      appearance: new AnimatedSprite({ width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 }),
       strength: 1,
       immuneToCollisions: true
     });
@@ -3352,7 +3352,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 15, cy: 1, width: 0.5, height: 0.5, radius: 0.25, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3381,7 +3381,7 @@ export function buildLevelScreen(level: number) {
         .to("color_star_7.png", 100)
         .to("color_star_8.png", 100),
     };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3406,7 +3406,7 @@ export function buildLevelScreen(level: number) {
       else
         role = new Enemy({ disableHeroCollision: true, damage: 4, onDefeated: () => game.musicLibrary.getSound("high_pitch.ogg").play() });
 
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
@@ -3418,7 +3418,7 @@ export function buildLevelScreen(level: number) {
     // neat trick: this enemy does zero damage, but is still annoying because it
     // slows the hero down.
     cfg = { cx: 12, cy: 7, width: 0.8, height: 0.8, radius: 0.4, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 10, elasticity: 0.3, friction: 0.6 }),
@@ -3428,7 +3428,7 @@ export function buildLevelScreen(level: number) {
 
     // add a goodie that makes the hero invincible
     cfg = { cx: 15, cy: 7, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { rotationSpeed: .25 }),
@@ -3469,7 +3469,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3 });
 
     let cfg = { cx: 15, cy: 8.5, width: 0.5, height: 0.5, radius: 0.25, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3496,7 +3496,7 @@ export function buildLevelScreen(level: number) {
         .to("leg_star_4.png", 100)
 
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 5 }),
@@ -3505,7 +3505,7 @@ export function buildLevelScreen(level: number) {
     });
     (h.movement as ExplicitMovement).addVelocity(2, 0);
 
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // enable hero jumping and crawling
     Helpers.addTapControl(game.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.jumpAction(h, 0, -8, 0));
@@ -3518,7 +3518,7 @@ export function buildLevelScreen(level: number) {
     // add an enemy we can defeat via crawling. It should be defeated even by a
     // "jump crawl"
     let eBoxCfg = { cx: 13, cy: 6.5, width: 1, height: 5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(eBoxCfg),
       rigidBody: RigidBodyComponent.Box(eBoxCfg, game.world, { density: 5, elasticity: 0.3, friction: 0.6 }),
@@ -3553,7 +3553,7 @@ export function buildLevelScreen(level: number) {
     // create 7 goodies, each of which adds 1 to the hero's strength
     for (let i = 0; i < 7; ++i) {
       let cfg = { cx: 1 + i, cy: 1 + i, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3568,7 +3568,7 @@ export function buildLevelScreen(level: number) {
     }
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3582,7 +3582,7 @@ export function buildLevelScreen(level: number) {
     // way up to 8 and back down again
     for (let i = 0; i < 8; ++i) {
       cfg = { cx: 2 + i, cy: 1 + i, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3592,7 +3592,7 @@ export function buildLevelScreen(level: number) {
     }
 
     cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "color_star_1.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3620,7 +3620,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3630,7 +3630,7 @@ export function buildLevelScreen(level: number) {
 
     // make four enemies
     cfg = { cx: 10, cy: 2, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3639,7 +3639,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 10, cy: 4, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3648,7 +3648,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 10, cy: 6, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3657,7 +3657,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 10, cy: 8, radius: 1, width: 2, height: 2, img: "red_ball.png" };
-    let big_enemy = new Actor({
+    let big_enemy = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3678,7 +3678,7 @@ export function buildLevelScreen(level: number) {
     // make a moveable obstacle.  We're going to enable it to defeat the "big"
     // enemy
     cfg = { cx: 14, cy: 2, width: 1, height: 1, radius: 0.5, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3698,7 +3698,7 @@ export function buildLevelScreen(level: number) {
 
     // make a small obstacle that can defeat the enemies that aren't "big"
     cfg = { cx: 0.5, cy: 0.5, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3726,7 +3726,7 @@ export function buildLevelScreen(level: number) {
 
     // Make a hero who is blocked from moving upward by a shrinking ceiling
     let cfg = { cx: 2, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3735,7 +3735,7 @@ export function buildLevelScreen(level: number) {
     });
 
     let boxCfg = { cx: 1, cy: 1, width: 8, height: 1, img: "red.png" };
-    let ceiling = new Actor({
+    let ceiling = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -3751,7 +3751,7 @@ export function buildLevelScreen(level: number) {
     // but it's good to realize that all these different behaviors are really
     // the same.
     cfg = { cx: 15, cy: 2, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { collisionsEnabled: false }),
@@ -3769,7 +3769,7 @@ export function buildLevelScreen(level: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 3, strength: 2,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: { img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 },
+      appearance: new ImageSprite({ img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 }),
       randomImageSources: ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"]
     });
     game.world.projectiles.setNumberOfProjectiles(20);
@@ -3781,7 +3781,7 @@ export function buildLevelScreen(level: number) {
 
     // draw a bunch of enemies to defeat
     cfg = { cx: 4, cy: 5, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
@@ -3791,7 +3791,7 @@ export function buildLevelScreen(level: number) {
 
     for (let i = 1; i < 20; i += 5) {
       cfg = { cx: 1 + i / 2, cy: 7, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3804,7 +3804,7 @@ export function buildLevelScreen(level: number) {
     // boxes work, we can shrink the X and Y rates independently, and we can opt
     // to center things as they shrink or grow
     boxCfg = { cx: 2, cy: 8, width: 1, height: 1, img: "red.png" };
-    let grow_box = new Actor({
+    let grow_box = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -3814,7 +3814,7 @@ export function buildLevelScreen(level: number) {
     Helpers.setShrinkOverTime(grow_box, -1, 0, false);
 
     cfg = { cx: 3, cy: 7, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-    let small_shrink_ball = new Actor({
+    let small_shrink_ball = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3824,7 +3824,7 @@ export function buildLevelScreen(level: number) {
     Helpers.setShrinkOverTime(small_shrink_ball, 0.1, 0.2, true);
 
     cfg = { cx: 11, cy: 6, radius: 1, width: 2, height: 2, img: "purple_ball.png" };
-    let big_shrink_ball = new Actor({
+    let big_shrink_ball = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3856,7 +3856,7 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
 
     let cfg = { cx: 15, cy: 4, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3868,7 +3868,7 @@ export function buildLevelScreen(level: number) {
 
     // make the hero jump on tap, so that we can see it spin in the air
     cfg = { cx: 4, cy: 8, width: 0.5, height: 0.5, radius: 0.25, img: "leg_star_1.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 0.6 }),
@@ -3897,7 +3897,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1);
 
     let cfg = { cx: 14, cy: 1, radius: 0.125, width: 0.25, height: 0.25, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3910,7 +3910,7 @@ export function buildLevelScreen(level: number) {
     // make a hero who is always moving... note there is no friction,
     // anywhere, and the hero is elastic... it won't ever stop...
     cfg = { cx: 4, cy: 4, width: 0.5, height: 0.5, radius: 0.25, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { elasticity: 1, friction: 0.1 }),
@@ -3921,7 +3921,7 @@ export function buildLevelScreen(level: number) {
 
     // make an obstacle and then connect it to some controls
     let boxCfg = { cx: 2, cy: 8.75, width: 1, height: 0.5, img: "red.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 100, elasticity: 1, friction: 0.1 }),
@@ -3953,7 +3953,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -3962,7 +3962,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -3974,7 +3974,7 @@ export function buildLevelScreen(level: number) {
 
     // create an enemy that will quietly disappear after 2 seconds
     cfg = { cx: 1, cy: 1, radius: 1, width: 2, height: 2, img: "red_ball.png" };
-    let disappear_enemy = new Actor({
+    let disappear_enemy = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
@@ -3985,7 +3985,7 @@ export function buildLevelScreen(level: number) {
 
     // create an enemy that will appear after 3 seconds
     cfg = { cx: 5, cy: 5, radius: 1, width: 2, height: 2, img: "red_ball.png" };
-    let appear_enemy = new Actor({
+    let appear_enemy = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
@@ -4006,7 +4006,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -4036,7 +4036,7 @@ export function buildLevelScreen(level: number) {
         // make a draggable enemy
         // don't forget drag zone
         cfg = { cx: 8, cy: 7, radius: 1, width: 2, height: 2, img: "red_ball.png" };
-        new Actor({
+        Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
@@ -4064,7 +4064,7 @@ export function buildLevelScreen(level: number) {
         );
         // add an enemy that is touch-to-defeat
         cfg = { cx: 9, cy: 5, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-        let touch_enemy = new Actor({
+        let touch_enemy = Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
@@ -4089,7 +4089,7 @@ export function buildLevelScreen(level: number) {
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 18, z: 1 },
           () => "Now you can see the rest of the level");
         cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-        new Actor({
+        Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4098,7 +4098,7 @@ export function buildLevelScreen(level: number) {
         });
 
         cfg = { cx: 3, cy: 3, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-        new Actor({
+        Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
@@ -4107,7 +4107,7 @@ export function buildLevelScreen(level: number) {
         });
 
         cfg = { cx: 10, cy: 1, radius: 1, width: 2, height: 2, img: "blue_ball.png" };
-        new Actor({
+        Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4122,7 +4122,7 @@ export function buildLevelScreen(level: number) {
     let spawnLoc = 0;
     game.world.timer.addEvent(new TimedEvent(2, true, () => {
       let cfg = { cx: spawnLoc % 16 + .5, cy: Math.floor(spawnLoc / 16) + .5, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4150,7 +4150,7 @@ export function buildLevelScreen(level: number) {
     game.world.camera.setBounds(64, 9);
 
     let cfg = { cx: 2, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -4158,7 +4158,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
     Helpers.makeText(game.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => game.score.goodieCount[0] + " Goodies");
     game.score.setVictoryDestination(1);
@@ -4166,7 +4166,7 @@ export function buildLevelScreen(level: number) {
     // this obstacle is a collision callback... when the hero hits it, we'll run
     // a script to build the next part of the level.
     let boxCfg = { cx: 14, cy: 4.5, width: 1, height: 9, img: "purple_ball.png" };
-    let callback_obstacle = new Actor({
+    let callback_obstacle = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 1 }),
@@ -4180,7 +4180,7 @@ export function buildLevelScreen(level: number) {
     // Here's a script for making goodies
     let makeGoodie = function (x: number) {
       cfg = { cx: x, cy: 8, width: 1, height: 1, radius: 0.5, img: "blue_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4248,7 +4248,7 @@ export function buildLevelScreen(level: number) {
             () => "The destination is now available");
 
           cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-          new Actor({
+          Actor.Make({
             scene: game.world,
             appearance: new ImageSprite(cfg),
             rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4272,7 +4272,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -4283,7 +4283,7 @@ export function buildLevelScreen(level: number) {
     // make a destination... notice that it needs a lot more goodies
     // than are on the screen...
     cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4295,7 +4295,7 @@ export function buildLevelScreen(level: number) {
 
     // draw an obstacle, attach some code to it
     cfg = { cx: 10, cy: 5, width: 0.5, height: 0.5, radius: 0.25, img: "purple_ball.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 1 }),
@@ -4313,7 +4313,7 @@ export function buildLevelScreen(level: number) {
         // Draw a bunch of goodies!
         for (let i = 0; i < 3; ++i) {
           cfg = { cx: 3 * i + 1, cy: 7 - i, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-          new Actor({
+          Actor.Make({
             scene: game.world,
             appearance: new ImageSprite(cfg),
             rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4326,7 +4326,7 @@ export function buildLevelScreen(level: number) {
     };
 
     cfg = { cx: 2, cy: 2, radius: 1, width: 2, height: 2, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4359,7 +4359,7 @@ export function buildLevelScreen(level: number) {
       idle_right: Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["green_ball.png"] }),
       invincible_right: new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100)
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world),
@@ -4370,7 +4370,7 @@ export function buildLevelScreen(level: number) {
     // Make a goodie that will turn the hero invincible, so we can test
     // invincibility
     let cfg = { cx: 10, cy: 5, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4384,13 +4384,13 @@ export function buildLevelScreen(level: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, strength: 1,
       body: { radius: 0.1, cx: -100, cy: -100 },
-      appearance: { width: 0.2, height: 0.21, img: "grey_ball.png" }
+      appearance: new ImageSprite({ width: 0.2, height: 0.21, img: "grey_ball.png" })
     });
 
     // add an obstacle that has an enemy collision callback, so it can defeat
     // enemies by colliding with them (but only the one we mark as "weak")
     cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1000 }),
@@ -4412,7 +4412,7 @@ export function buildLevelScreen(level: number) {
         // in the range 0-8,0-15 ensures that with width and height of 1, the
         // goodie stays on screen
         cfg = { cx: Helpers.getRandom(15) + .5, cy: Helpers.getRandom(8) + .5, radius: 0.5, width: 1, height: 1, img: "blue_ball.png" };
-        new Actor({
+        Actor.Make({
           scene: game.world,
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4425,7 +4425,7 @@ export function buildLevelScreen(level: number) {
     // now draw our enemies... we need enough to be able to test that all five
     // defeat mechanisms work.
     cfg = { cx: 1, cy: 1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4434,7 +4434,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 1, cy: 3, width: .5, height: .5, radius: 0.25, img: "red_ball.png" };
-    let e2 = new Actor({
+    let e2 = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4444,7 +4444,7 @@ export function buildLevelScreen(level: number) {
     e2.extra.info = "weak";
 
     cfg = { cx: 1, cy: 5, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4453,7 +4453,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 1, cy: 6.5, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    let e4 = new Actor({
+    let e4 = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4463,7 +4463,7 @@ export function buildLevelScreen(level: number) {
     Helpers.defeatOnTouch(e4.role as Enemy);
 
     cfg = { cx: 1, cy: 8, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4487,7 +4487,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -4500,7 +4500,7 @@ export function buildLevelScreen(level: number) {
 
     // the destination won't work until some goodies are collected...
     cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "color_star_1.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4516,7 +4516,7 @@ export function buildLevelScreen(level: number) {
 
     // Colliding with this star will make the hero into a star
     let boxCfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "leg_star_1.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 1 }),
@@ -4554,7 +4554,7 @@ export function buildLevelScreen(level: number) {
     // covering the bottom of the screen, so that anything that falls to the
     // bottom counts against the player
     let boxCfg = { cx: 8, cy: 8.74, width: 15.9, height: 0.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -4569,7 +4569,7 @@ export function buildLevelScreen(level: number) {
     game.world.projectiles = new ProjectileSystem(game.world, {
       maxAtOnce: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
       body: { radius: 0.1, cx: -100, cy: -100 },
-      appearance: { width: 0.2, height: 0.2, img: "grey_ball.png" },
+      appearance: new ImageSprite({ width: 0.2, height: 0.2, img: "grey_ball.png" }),
     });
 
     // we're going to win by "surviving" for 25 seconds... with no enemies, that
@@ -4617,7 +4617,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let boxCfg = { cx: 1, cy: 7, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -4628,7 +4628,7 @@ export function buildLevelScreen(level: number) {
 
     // place an enemy, let it fall
     let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4639,7 +4639,7 @@ export function buildLevelScreen(level: number) {
     // A destination.  You might need to flick the hero *while it's in the air*
     // to reach the destination
     cfg = { cx: 4, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4665,7 +4665,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4676,7 +4676,7 @@ export function buildLevelScreen(level: number) {
     game.score.setVictoryDestination(1);
 
     cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 0.5, friction: 0.6 }),
@@ -4688,7 +4688,7 @@ export function buildLevelScreen(level: number) {
 
     // the hero can jump while on this obstacle
     let boxCfg = { cx: 6, cy: 7, width: 3, height: 0.1, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 0.5 }),
@@ -4698,7 +4698,7 @@ export function buildLevelScreen(level: number) {
 
     // the hero can't jump while on this obstacle
     boxCfg = { cx: 10, cy: 7, width: 3, height: 0.1, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 0.5 }),
@@ -4720,7 +4720,7 @@ export function buildLevelScreen(level: number) {
 
     // Make a hero who moves via tilt
     let cfg = { cx: 5.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { passThroughId: 7 }),
@@ -4729,7 +4729,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 14, cy: 2, radius: 1, width: 2, height: 2, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4741,7 +4741,7 @@ export function buildLevelScreen(level: number) {
 
     // These obstacles chase the hero, but only in one dimension
     cfg = { cx: .5, cy: 2.5, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { collisionsEnabled: true }),
@@ -4750,7 +4750,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 2.5, cy: .5, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       // There is a very important concept hiding here.  There are three types of
@@ -4771,7 +4771,7 @@ export function buildLevelScreen(level: number) {
 
     // Here's a wall, and a movable round obstacle
     let boxCfg = { cx: 7, cy: 1, width: 0.5, height: 5, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { passThroughId: 7 }),
@@ -4782,7 +4782,7 @@ export function buildLevelScreen(level: number) {
     // passthrough value.  Try changing the value to see what happens.
 
     cfg = { cx: 8, cy: 8, radius: 1, width: 2, height: 2, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4808,7 +4808,7 @@ export function buildLevelScreen(level: number) {
       idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }),
       idle_left: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] })
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world),
@@ -4826,7 +4826,7 @@ export function buildLevelScreen(level: number) {
     Helpers.createPokeToMoveZone(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, false);
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4852,7 +4852,7 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 2, disableRotation: true }),
@@ -4865,7 +4865,7 @@ export function buildLevelScreen(level: number) {
     // shouldn't just race to the destination.  You'll want to try out the
     // platforms
     cfg = { cx: 15.5, cy: 8.5, radius: .5, width: 1, height: 1, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4876,7 +4876,7 @@ export function buildLevelScreen(level: number) {
 
     // This platform is sticky on top... Jump onto it and watch what happens
     let platform_cfg = { cx: 2, cy: 6, width: 2, height: 0.25, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(platform_cfg),
       rigidBody: RigidBodyComponent.Box(platform_cfg, game.world, { topSticky: true, density: 100, friction: 0.1 }),
@@ -4890,7 +4890,7 @@ export function buildLevelScreen(level: number) {
     // It's tempting to think "I'll use some friction here", but isn't the
     // sticky platform nicer?
     platform_cfg = { cx: 11, cy: 6, width: 2, height: 0.25, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(platform_cfg),
       rigidBody: RigidBodyComponent.Box(platform_cfg, game.world, { density: 100, friction: 1 }),
@@ -4920,7 +4920,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6, disableRotation: true }),
@@ -4929,7 +4929,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15.25, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -4951,7 +4951,7 @@ export function buildLevelScreen(level: number) {
       maxAtOnce: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
       immuneToCollisions: true,
       body: { width: 0.02, height: .5, cx: -100, cy: -100 },
-      appearance: { width: 0.02, height: 1, img: "red.png" },
+      appearance: new ImageSprite({ width: 0.02, height: 1, img: "red.png" }),
     });
 
     // Warning!  If you make these projectiles any longer, and if you are not
@@ -4962,7 +4962,7 @@ export function buildLevelScreen(level: number) {
     // create a box that is easy to fall into, but hard to get out of,
     // by making its sides each "one-sided"
     let boxCfg = { cx: 4.5, cy: 3.1, width: 3, height: 0.2, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { bottomRigidOnly: true }),
@@ -4971,7 +4971,7 @@ export function buildLevelScreen(level: number) {
     });
 
     boxCfg = { cx: 3.1, cy: 4.5, width: 0.2, height: 3, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { rightRigidOnly: true }),
@@ -4980,7 +4980,7 @@ export function buildLevelScreen(level: number) {
     });
 
     boxCfg = { cx: 5.9, cy: 4.5, width: 0.2, height: 3, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { leftRigidOnly: true }),
@@ -4989,7 +4989,7 @@ export function buildLevelScreen(level: number) {
     });
 
     boxCfg = { cx: 4.5, cy: 7.5, width: 3, height: 0.2, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { topRigidOnly: true }),
@@ -5009,7 +5009,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 8.25, radius: 0.4, width: 0.8, height: 0.8, img: "leg_star_1.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5021,7 +5021,7 @@ export function buildLevelScreen(level: number) {
     //
     // Remember that we start counting from 0, so the four types are 0, 1, 2, 3
     cfg = { cx: 15.25, cy: 0.75, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5055,7 +5055,7 @@ export function buildLevelScreen(level: number) {
     // draw the goodies
     for (let i = 0; i < 3; ++i) {
       cfg = { cx: 5 + i + .5, cy: 1, radius: 0.125, width: 0.25, height: 0.25, img: "blue_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5064,7 +5064,7 @@ export function buildLevelScreen(level: number) {
       });
 
       cfg = { cx: 5 + i + .5, cy: 2, radius: 0.125, width: 0.25, height: 0.25, img: "green_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5073,7 +5073,7 @@ export function buildLevelScreen(level: number) {
       });
 
       cfg = { cx: 5 + i + .5, cy: 3, radius: 0.125, width: 0.25, height: 0.25, img: "red_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5082,7 +5082,7 @@ export function buildLevelScreen(level: number) {
       });
 
       cfg = { cx: 5 + i + .5, cy: 4, radius: 0.125, width: 0.25, height: 0.25, img: "grey_ball.png" };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5094,7 +5094,7 @@ export function buildLevelScreen(level: number) {
     // When the hero collides with this obstacle, we'll increase the
     // time remaining
     let boxCfg = { cx: 14, cy: 8, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Circle(boxCfg, game.world),
@@ -5118,7 +5118,7 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { passThroughId: 7 }),
@@ -5127,7 +5127,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 14, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5139,7 +5139,7 @@ export function buildLevelScreen(level: number) {
 
     // the enemy chases the hero, but can't get through the wall
     cfg = { cx: 14, cy: 2, width: 0.5, height: 0.5, radius: 0.25, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { dynamic: true }),
@@ -5149,7 +5149,7 @@ export function buildLevelScreen(level: number) {
     // Remember to make it dynamic, or it *will* go through the wall
 
     let boxCfg = { cx: 12, cy: 1, width: 0.1, height: 7, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { passThroughId: 7 }),
@@ -5168,7 +5168,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
 
     let cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5179,7 +5179,7 @@ export function buildLevelScreen(level: number) {
     game.score.setVictoryDestination(1);
 
     let boxCfg = { cx: 2, cy: 4, width: 0.75, height: 1.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 0, disableRotation: true }),
@@ -5190,7 +5190,7 @@ export function buildLevelScreen(level: number) {
     (h.movement as ExplicitMovement).addVelocity(4, 0);
 
     // center the camera a little ahead of the hero
-    game.world.camera.setCameraChase(h, 5, 0);
+    game.world.camera.setCameraFocus(h, 5, 0);
     game.world.camera.setBounds(64, 9);
 
     // set up the background
@@ -5217,7 +5217,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
 
     let cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5228,7 +5228,7 @@ export function buildLevelScreen(level: number) {
     game.score.setVictoryDestination(1);
 
     let boxCfg = { cx: 2, cy: 4, width: 0.75, height: 1.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, friction: 0, disableRotation: true }),
@@ -5236,7 +5236,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    game.world.camera.setCameraChase(h, 5, 0);
+    game.world.camera.setCameraFocus(h, 5, 0);
     game.world.camera.setBounds(64, 9);
 
     game.backgroundColor = 0x17b4ff;
@@ -5263,7 +5263,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 0.5, disableRotation: true }),
@@ -5274,7 +5274,7 @@ export function buildLevelScreen(level: number) {
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
 
     cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5286,7 +5286,7 @@ export function buildLevelScreen(level: number) {
 
     // create a platform that we can jump through from below
     let platform_cfg = { z: -1, cx: 3, cy: 7.5, width: 2, height: 0.2, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(platform_cfg),
       rigidBody: RigidBodyComponent.Box(platform_cfg, game.world, { collisionsEnabled: true, topRigidOnly: true }),
@@ -5312,7 +5312,7 @@ export function buildLevelScreen(level: number) {
       idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }),
       idle_left: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] }),
     };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, game.world, { density: 1, friction: 0.5 }),
@@ -5325,7 +5325,7 @@ export function buildLevelScreen(level: number) {
     Helpers.createPokeToRunZone(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, true);
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5392,7 +5392,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 0.6, disableRotation: true }),
@@ -5402,7 +5402,7 @@ export function buildLevelScreen(level: number) {
 
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -15); return true; } }
     cfg = { cx: 15, cy: 4, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    let d = new Actor({
+    let d = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { dynamic: true }),
@@ -5433,7 +5433,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { disableRotation: true }),
@@ -5442,7 +5442,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 4, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5455,7 +5455,7 @@ export function buildLevelScreen(level: number) {
     // create a polygon obstacle
     // Be sure to turn on debug boxes in GameConfig.ts to see the true shape
     let polyCfg = { cx: 2, cy: 2, width: 2, height: 5, img: "blue_ball.png", vertices: [-1, 2, -1, 0, 0, -3, 1, 0, 1, 1] };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(polyCfg),
       rigidBody: RigidBodyComponent.Polygon(polyCfg, game.world),
@@ -5478,7 +5478,7 @@ export function buildLevelScreen(level: number) {
 
     // set up a simple jumping hero
     let boxCfg = { cx: 1, cy: 8, width: 1, height: 0.5, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -5492,7 +5492,7 @@ export function buildLevelScreen(level: number) {
     // the enemy's center.  If you want different conditions, you'll probably
     // want to change the Hero's onCollideWithEnemy function, in Role.ts.
     let cfg = { cx: 15, cy: 7, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5512,7 +5512,7 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     let cfg = { cx: 5, cy: 8, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5522,7 +5522,7 @@ export function buildLevelScreen(level: number) {
 
     // Note: you must give density to the revolving part...
     let boxCfg = { cx: 1.5, cy: 4, width: 5, height: 1, img: "red.png" };
-    let revolving = new Actor({
+    let revolving = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1 }),
@@ -5531,7 +5531,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 7.5, cy: 4, width: 1, height: 1, radius: 0.5, img: "blue_ball.png" };
-    let anchor = new Actor({
+    let anchor = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1 }),
@@ -5544,7 +5544,7 @@ export function buildLevelScreen(level: number) {
     revolving.rigidBody!.setRevoluteJointLimits(1.7, -1.7);
     revolving.rigidBody!.setRevoluteJointMotor(0.5, Number.POSITIVE_INFINITY);
     cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5567,7 +5567,7 @@ export function buildLevelScreen(level: number) {
     // start by setting everything up just like in level 1
     Helpers.enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5576,7 +5576,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5620,7 +5620,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 10);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5632,7 +5632,7 @@ export function buildLevelScreen(level: number) {
 
     // set up a hero and fuse an obstacle to it
     cfg = { cx: 4, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -5641,7 +5641,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 1, cy: 1, width: 1, height: 1, radius: 0.5, img: "blue_ball.png" };
-    let o = new Actor({
+    let o = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       // Note that for the weld joint to work, you probably want the obstacle to
@@ -5667,7 +5667,7 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
@@ -5676,7 +5676,7 @@ export function buildLevelScreen(level: number) {
     });
 
     cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5759,7 +5759,7 @@ export function buildLevelScreen(level: number) {
 
     // This hero must survive
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let must_survive_hero = new Actor({
+    let must_survive_hero = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 0.6 }),
@@ -5770,7 +5770,7 @@ export function buildLevelScreen(level: number) {
     // This hero is expendable, but if it makes it to the destination, it's
     // still a win
     cfg = { cx: 2.25, cy: 5.25, width: 0.8, height: 0.8, radius: .4, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Box(cfg, game.world),
@@ -5780,7 +5780,7 @@ export function buildLevelScreen(level: number) {
 
     // An enemy who chases the hero who must survive
     cfg = { cx: 15, cy: 0.1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5790,7 +5790,7 @@ export function buildLevelScreen(level: number) {
 
     // A regular destination
     cfg = { cx: 15, cy: 7, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5814,7 +5814,7 @@ export function buildLevelScreen(level: number) {
     let heroes: Actor[] = [];
     for (let i = 0; i < 16; ++i) {
       let boxCfg = { cx: i + 0.2, cy: 8, width: 0.25, height: 0.25, img: "green_ball.png" };
-      let h = new Actor({
+      let h = Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(boxCfg),
         rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1, elasticity: 1, friction: 5 }),
@@ -5826,7 +5826,7 @@ export function buildLevelScreen(level: number) {
 
     // Here's a destination.  We need one hero to reach it
     let cfg = { cx: 7.5, cy: 0.25, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5856,7 +5856,7 @@ export function buildLevelScreen(level: number) {
 
     // We'll make the body of our car as a hero with just a red square
     let boxCfg = { cx: 1, cy: 8, width: 2, height: 0.5, img: "red.png" };
-    let truck = new Actor({
+    let truck = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 1 }),
@@ -5865,7 +5865,7 @@ export function buildLevelScreen(level: number) {
     });
 
     let cfg = { cx: 0.75, cy: 8.5, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-    let backWheel = new Actor({
+    let backWheel = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 3, friction: 1 }),
@@ -5876,7 +5876,7 @@ export function buildLevelScreen(level: number) {
     backWheel.rigidBody.setRevoluteJointMotor(10, 10);
 
     cfg = { cx: 2.75, cy: 8.5, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
-    let frontWheel = new Actor({
+    let frontWheel = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 3, friction: 1 }),
@@ -5887,7 +5887,7 @@ export function buildLevelScreen(level: number) {
     frontWheel.rigidBody.setRevoluteJointMotor(10, 10);
 
     cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5912,7 +5912,7 @@ export function buildLevelScreen(level: number) {
 
     // make a hero, have the camera follow it
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 0.1, friction: 0, disableRotation: true }),
@@ -5920,7 +5920,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
     (h.movement as ExplicitMovement).setAbsoluteVelocity(5, 0);
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     // touching the screen makes the hero go upwards
     Helpers.addToggleButton(game.hud,
@@ -5949,7 +5949,7 @@ export function buildLevelScreen(level: number) {
     // sensor, we'll draw the next part of the world, and move the obstacle
     // forward some more.
     let boxCfg = { cx: 16, cy: 4.5, width: 1, height: 9, img: "" };
-    let sensor = new Actor({
+    let sensor = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world),
@@ -5972,7 +5972,7 @@ export function buildLevelScreen(level: number) {
         cy: .25 + Helpers.getRandom(8),
         width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png",
       };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -5986,7 +5986,7 @@ export function buildLevelScreen(level: number) {
         cy: .25 + Helpers.getRandom(8),
         width: 0.5, radius: 0.25, height: 0.5, img: "blue_ball.png",
       };
-      new Actor({
+      Actor.Make({
         scene: game.world,
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -6015,17 +6015,17 @@ export function buildLevelScreen(level: number) {
 
     Helpers.drawBoundingBox(0, 0, 32, 18, .1, { density: 1, elasticity: .3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 5, friction: 0.6 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
-    game.world.camera.setCameraChase(h);
+    game.world.camera.setCameraFocus(h);
 
     cfg = { cx: 31, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 1, friction: 0.1 }),
@@ -6063,7 +6063,7 @@ export function buildLevelScreen(level: number) {
 
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world, { density: 2, friction: 0.5, disableRotation: true }),
@@ -6074,7 +6074,7 @@ export function buildLevelScreen(level: number) {
 
     // create a destination
     cfg = { cx: 14, cy: 4, radius: 1, width: 2, height: 2, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -6086,7 +6086,7 @@ export function buildLevelScreen(level: number) {
 
     // This obstacle is sticky on top, and only rigid on its top
     let boxCfg = { cx: 2, cy: 6, width: 2, height: 0.25, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { topSticky: true, topRigidOnly: true, density: 100, friction: 0.1 }),
@@ -6096,7 +6096,7 @@ export function buildLevelScreen(level: number) {
 
     // This obstacle is not sticky, and it is rigid on all sides
     boxCfg = { cx: 11, cy: 6, width: 2, height: 0.25, img: "red.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, game.world, { density: 100, friction: 1 }),
@@ -6138,7 +6138,7 @@ export function buildLevelScreen(level: number) {
 
     // Create a hero controlled explicitly via special touches
     let heroCfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(heroCfg),
       rigidBody: RigidBodyComponent.Circle(heroCfg, game.world, { friction: 0.6 }),
@@ -6152,7 +6152,7 @@ export function buildLevelScreen(level: number) {
         const cell = mazeLayout[row][col];
         if (cell === "#") {
           let wallCfg = { cx: col + 0.5, cy: row + 0.5, width: 1, height: 1, img: "noise.png" };
-          new Actor({
+          Actor.Make({
             scene: game.world,
             rigidBody: RigidBodyComponent.Box(wallCfg, game.world, { friction: 1 }),
             appearance: new ImageSprite(wallCfg),
@@ -6161,7 +6161,7 @@ export function buildLevelScreen(level: number) {
           });
         } else if (cell === "G") {
           const goodieCfg = { cx: col + 0.5, cy: row + 0.5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-          new Actor({
+          Actor.Make({
             scene: game.world,
             appearance: new ImageSprite(goodieCfg),
             rigidBody: RigidBodyComponent.Circle(goodieCfg, game.world),
@@ -6175,7 +6175,7 @@ export function buildLevelScreen(level: number) {
 
     // Create a destination for the goodie
     let destCfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(destCfg),
       rigidBody: RigidBodyComponent.Circle(destCfg, game.world),
@@ -6184,7 +6184,7 @@ export function buildLevelScreen(level: number) {
     });
     game.score.setVictoryDestination(1);
 
-    new Actor({
+    Actor.Make({
       scene: game.hud,
       appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
       role: new Passive(),
@@ -6216,12 +6216,12 @@ export function buildLevelScreen(level: number) {
   // Make sure we go to the correct level when this level is won/lost: for
   // anything but the last level, we go to the next level.  Otherwise, go to the splash screen
   if (level != 91) {
-    game.score.onLose = { index: level, which: buildLevelScreen };
-    game.score.onWin = { index: level + 1, which: buildLevelScreen };
+    game.score.onLose = { index: level, builder: buildLevelScreen };
+    game.score.onWin = { level: level + 1, builder: buildLevelScreen };
   }
   else {
-    game.score.onLose = { index: level, which: buildLevelScreen };
-    game.score.onWin = { index: 1, which: buildSplashScreen };
+    game.score.onLose = { index: level, builder: buildLevelScreen };
+    game.score.onWin = { level: 1, builder: buildSplashScreen };
   }
 }
 
@@ -6237,7 +6237,7 @@ export function welcomeMessage(message: string, subMessage: string = "") {
     // Pressing anywhere on the black background will make the overlay go away
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => { game.clearOverlay(); return true; });
     // The text goes in the middle
-    new Actor({
+    Actor.Make({
       scene: overlay,
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
@@ -6246,7 +6246,7 @@ export function welcomeMessage(message: string, subMessage: string = "") {
     });
     // The subtext goes below the main text
     if (subMessage != "") {
-      new Actor({
+      Actor.Make({
         scene: overlay,
         rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 6, width: .1, height: .1 }, overlay),
         appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage),
@@ -6268,7 +6268,7 @@ export function winMessage(message: string, callback?: () => void) {
   game.score.winSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
       game.clearOverlay();
-      game.switchTo(game.score.onWin.which, game.score.onWin.index);
+      game.switchTo(game.score.onWin.builder, game.score.onWin.level);
       return true;
     });
     Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
@@ -6287,7 +6287,7 @@ export function loseMessage(message: string, callback?: () => void) {
   game.score.loseSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
       game.clearOverlay();
-      game.switchTo(game.score.onLose.which, game.score.onLose.index);
+      game.switchTo(game.score.onLose.builder, game.score.onLose.index);
       return true;
     });
     Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);

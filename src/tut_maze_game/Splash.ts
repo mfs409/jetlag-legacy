@@ -38,7 +38,7 @@ export function tutorial_builder(index: number) {
 
     // Create a hero controlled explicitly via special touches
     let heroCfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = new Actor({
+    let h = Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(heroCfg),
       rigidBody: RigidBodyComponent.Circle(heroCfg, game.world, { friction: 0.6 }),
@@ -52,7 +52,7 @@ export function tutorial_builder(index: number) {
         const cell = mazeLayout[row][col];
         if (cell === "#") {
           let wallCfg = { cx: col + 0.5, cy: row + 0.5, width: 1, height: 1, img: "noise.png" };
-          new Actor({
+          Actor.Make({
             scene: game.world,
             rigidBody: RigidBodyComponent.Box(wallCfg, game.world, { friction: 1 }),
             appearance: new ImageSprite(wallCfg),
@@ -61,7 +61,7 @@ export function tutorial_builder(index: number) {
           });
         } else if (cell === "G") {
           const goodieCfg = { cx: col + 0.5, cy: row + 0.5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-          new Actor({
+          Actor.Make({
             scene: game.world,
             appearance: new ImageSprite(goodieCfg),
             rigidBody: RigidBodyComponent.Circle(goodieCfg, game.world),
@@ -75,7 +75,7 @@ export function tutorial_builder(index: number) {
 
     // Create a destination for the goodie
     let destCfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(destCfg),
       rigidBody: RigidBodyComponent.Circle(destCfg, game.world),
@@ -84,7 +84,7 @@ export function tutorial_builder(index: number) {
     });
     game.score.setVictoryDestination(1);
 
-    new Actor({
+    Actor.Make({
       scene: game.hud,
       appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
       role: new Passive(),
@@ -97,8 +97,8 @@ export function tutorial_builder(index: number) {
 
     winMessage("Great Job");
 
-    game.score.onLose = { index: index, which: buildSplashScreen };
-    game.score.onWin = { index: index, which: buildSplashScreen };
+    game.score.onLose = { index: index, builder: buildSplashScreen };
+    game.score.onWin = { level: index, builder: buildSplashScreen };
   }
   else if (index == 2) {
     makeText(game.world, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 28, z: 0 }, () => "Nothing here yet...")
@@ -169,7 +169,7 @@ function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts, c
  */
 function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
   // TODO: it's probably not worth having this helper function
-  let c = new Actor({
+  let c = Actor.Make({
     scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
@@ -190,7 +190,7 @@ function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, pa
 function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coords: { x: number; y: number }) => boolean) {
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
-  let c = new Actor({
+  let c = Actor.Make({
     scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
@@ -212,7 +212,7 @@ function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coor
  * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
  */
 function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
-  return new Actor({
+  return Actor.Make({
     scene,
     appearance: new TextSprite(cfgOpts, producer),
     // TODO: the ".1" options are somewhat arbitrary

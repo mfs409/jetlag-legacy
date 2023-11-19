@@ -34,7 +34,7 @@ export function buildChooserScreen(index: number) {
   if (index == 1) {
     // set up background and music
     Helpers.setMusic("tune.ogg");
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
@@ -82,7 +82,7 @@ export function buildChooserScreen(index: number) {
   else {
     // set up background and music
     Helpers.setMusic("tune.ogg");
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
@@ -117,7 +117,7 @@ export function buildChooserScreen(index: number) {
 function drawLevelButton(x: number, y: number, width: number, height: number, whichLevel: number) {
   // for each button, start by drawing an obstacle
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "level_tile.png" };
-  let tile = new Actor({
+  let tile = Actor.Make({
     scene: game.world,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, game.world),
@@ -131,7 +131,7 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
     game.switchTo(buildLevelScreen, whichLevel); return true;
   };
   tile.gestures = { tap };
-  new Actor({
+  Actor.Make({
     scene: game.world,
     appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
     rigidBody: RigidBodyComponent.Box(cfg, game.world, { collisionsEnabled: false }),
@@ -152,7 +152,7 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
 function drawPrevButton(x: number, y: number, width: number, height: number, chooserLevel: number) {
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "left_arrow.png" };
   let img = new ImageSprite(cfg);
-  let btn = new Actor({
+  let btn = Actor.Make({
     scene: game.world,
     appearance: img,
     rigidBody: RigidBodyComponent.Box(cfg, game.world),
@@ -178,7 +178,7 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
 function drawNextButton(x: number, y: number, width: number, height: number, chooserLevel: number) {
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "right_arrow.png" };
   let img = new ImageSprite(cfg);
-  let btn = new Actor({
+  let btn = Actor.Make({
     scene: game.world,
     appearance: img,
     rigidBody: RigidBodyComponent.Box(cfg, game.world),
@@ -203,7 +203,7 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
 function drawSplashButton(x: number, y: number, width: number, height: number) {
   let cfg = { box: true, cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "back_arrow.png" };
   let img = new ImageSprite(cfg);
-  let btn = new Actor({
+  let btn = Actor.Make({
     scene: game.world,
     appearance: img,
     rigidBody: RigidBodyComponent.Box(cfg, game.world),

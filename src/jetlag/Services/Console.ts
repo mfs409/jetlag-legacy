@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { GameCfg } from "../Config";
 
 /**

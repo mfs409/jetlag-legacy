@@ -1,5 +1,3 @@
-// Last review: 08-11-2023
-
 import { b2Contact, b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { game } from "../Stage";

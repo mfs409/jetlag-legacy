@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { game } from "../Stage";
 import { ISound } from "../Services/AudioService";
 

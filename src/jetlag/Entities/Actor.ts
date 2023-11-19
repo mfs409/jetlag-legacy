@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { RigidBodyComponent } from "../Components/RigidBody";
 import { AppearanceComponent, TextSprite } from "../Components/Appearance";
 import { StateEvent, StateManagerComponent } from "../Components/StateManager";
@@ -8,6 +6,7 @@ import { Passive, RoleComponent } from "../Components/Role";
 import { Scene } from "./Scene";
 import { InertMovement, MovementComponent } from "../Components/Movement";
 import { GestureHandlers } from "../Config";
+import { game } from "../Stage";
 
 /**
  * Actor is the core entity of the game.  Pretty much everything on the stage is
@@ -50,15 +49,27 @@ export class Actor {
   public scene: Scene;
 
   /**
-   * Construct an empty Actor
+   * Create an Actor
    *
    * TODO:  Update the documentation after adding more components to the config
    *        arg
    *
-   * @param scene The scene where the Actor goes
+   * @param scene The scene where the Actor goes (defaults to game.world)
    */
-  constructor(config: { scene: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent }) {
-    this.scene = config.scene;
+  static Make(config: { scene?: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
+    return new Actor(config);
+  }
+
+  /**
+   * Construct an Actor
+   *
+   * TODO:  Update the documentation after adding more components to the config
+   *        arg
+   *
+   * @param scene The scene where the Actor goes (defaults to game.world)
+   */
+  private constructor(config: { scene?: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
+    this.scene = config.scene ?? game.world;
 
     this.appearance = config.appearance;
     this.scene.camera.addEntity(this);
@@ -72,6 +83,9 @@ export class Actor {
 
     this.role = config.role ?? new Passive();
     this.role.actor = this;
+
+    if (config.gestures)
+      this.gestures = config.gestures;
   }
 
   /**

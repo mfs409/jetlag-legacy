@@ -20,7 +20,7 @@ import { game } from "../jetlag/Stage";
  */
 export function build_game(_level: number) {
   // TODO: Replace this line with a grid builder for debug mode?
-  // new Actor({
+  // Actor.Make({
   //   scene: game.world,
   //   rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world),
   //   appearance: new ImageSprite({ cx: 8, cy: 4.5, width: 16, height: 9, img: "grid.png" })
@@ -39,54 +39,54 @@ export function build_game(_level: number) {
   game.world.tilt!.tiltVelocityOverride = false;
 
   for (let x = 0; x <= 16; x += 1) {
-    new Actor({
+    Actor.Make({
       scene: game.world,
       rigidBody: RigidBodyComponent.Box({ cx: x, cy: 4.5, width: 0.01, height: 9 }, game.world),
-      appearance: FilledSprite.Box({ width: 0.01, height: 9, lineWidth: 1, lineColor: 0x000000 })
+      appearance: FilledSprite.Box({ width: 0.01, height: 9, lineWidth: 1, lineColor: "#000000" })
     });
 
     if (x < 16)
-      new Actor({
+      Actor.Make({
         scene: game.world,
         rigidBody: RigidBodyComponent.Box({ cx: x + .5, cy: 4.5, width: 0.01, height: 9 }, game.world),
-        appearance: FilledSprite.Box({ width: 0.01, height: 9, lineWidth: 0.5, lineColor: 0x1100DC })
+        appearance: FilledSprite.Box({ width: 0.01, height: 9, lineWidth: 0.5, lineColor: "#1100DC" })
       });
   }
 
   for (let y = 0; y <= 9; y += 1) {
-    new Actor({
+    Actor.Make({
       scene: game.world,
       rigidBody: RigidBodyComponent.Box({ cx: 8, cy: y, width: 16, height: 0.01 }, game.world),
-      appearance: FilledSprite.Box({ width: 16, height: 0.01, lineWidth: 1, lineColor: 0x000000 })
+      appearance: FilledSprite.Box({ width: 16, height: 0.01, lineWidth: 1, lineColor: "#000000" })
     });
 
     if (y < 9)
-      new Actor({
+      Actor.Make({
         scene: game.world,
         rigidBody: RigidBodyComponent.Box({ cx: 8, cy: y + .5, width: 16, height: 0.01 }, game.world),
-        appearance: FilledSprite.Box({ width: 16, height: 0.01, lineWidth: 0.5, lineColor: 0x1100DC })
+        appearance: FilledSprite.Box({ width: 16, height: 0.01, lineWidth: 0.5, lineColor: "#1100DC" })
       });
   }
 
-  new Actor({
+  Actor.Make({
     scene: game.world,
     rigidBody: RigidBodyComponent.Box({ cx: 3, cy: 4, width: 1, height: 1 }, game.world),
-    appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: 0xFF0000, lineWidth: 4, lineColor: 0x00FF00 }),
+    appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
     role: new Obstacle(),
   })
 
-  new Actor({
+  Actor.Make({
     scene: game.world,
     rigidBody: RigidBodyComponent.Circle({ cx: 5, cy: 2, radius: .5 }, game.world),
-    appearance: FilledSprite.Circle({ radius: .5, fillColor: 0xFF0000, lineWidth: 4, lineColor: 0x00FF00 }),
+    appearance: FilledSprite.Circle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
     role: new Hero(),
     movement: new TiltMovement(),
   })
 
-  new Actor({
+  Actor.Make({
     scene: game.world,
     rigidBody: RigidBodyComponent.Polygon({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], width: 1, height: 1 }, game.world),
-    appearance: FilledSprite.Poly({ vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], fillColor: 0xFF0000, lineWidth: 4, lineColor: 0x00FF00 }),
+    appearance: FilledSprite.Polygon({ vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
     role: new Obstacle(),
   })
 }

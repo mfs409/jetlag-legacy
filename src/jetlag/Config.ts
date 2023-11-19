@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { Sprite } from "./Services/ImageService";
 import { ErrorVerbosity } from "./Services/Console";
 import { game } from "./Stage";
@@ -12,8 +10,6 @@ import { game } from "./Stage";
 export interface ImgConfigOpts {
   /** Z index of the image: Must be in the range [-2, 2] */
   z?: number;
-  /** Amount of rotation */
-  rotation?: number;
   /** Width of the image */
   width: number;
   /** Height of the image */
@@ -26,12 +22,12 @@ export interface ImgConfigOpts {
  * FilledBoxConfigOpts expresses the required and optional fields that a
  * programmer should provide to JetLag in order to create an entity whose visual
  * representation is a solid rectangle.
+ *
+ * TODO: Support gradients?
  */
 export interface FilledBoxConfigOpts {
   /** Z index of the box: Must be in the range [-2, 2] */
   z?: number;
-  /** Amount of rotation */
-  rotation?: number;
   /** Width of the box */
   width: number;
   /** Height of the box */
@@ -39,9 +35,9 @@ export interface FilledBoxConfigOpts {
   /** Line width */
   lineWidth?: number;
   /** Line color */
-  lineColor?: number;
+  lineColor?: string;
   /** Fill color */
-  fillColor?: number;
+  fillColor?: string;
 }
 
 /**
@@ -52,16 +48,14 @@ export interface FilledBoxConfigOpts {
 export interface FilledCircleConfigOpts {
   /** Z index of the circle: Must be in the range [-2, 2] */
   z?: number;
-  /** Amount of rotation */
-  rotation?: number;
   /** Radius of the circle */
   radius: number;
   /** Line width */
   lineWidth?: number;
   /** Line color */
-  lineColor?: number;
+  lineColor?: string;
   /** Fill color */
-  fillColor?: number;
+  fillColor?: string;
 }
 
 /**
@@ -72,16 +66,14 @@ export interface FilledCircleConfigOpts {
 export interface FilledPolyConfigOpts {
   /** Z index of the polygon: Must be in the range [-2, 2] */
   z?: number;
-  /** Amount of rotation */
-  rotation?: number;
   /** Vertices of the polygon */
   vertices: number[];
   /** Line width */
   lineWidth?: number;
   /** Line color */
-  lineColor?: number;
+  lineColor?: string;
   /** Fill color */
-  fillColor?: number;
+  fillColor?: string;
 }
 
 /**
@@ -92,8 +84,6 @@ export interface FilledPolyConfigOpts {
 export interface TxtConfigOpts {
   /** Z index of the image: Must be in the range [-2, 2] */
   z?: number;
-  /** Amount of rotation */
-  rotation?: number;
   /** Should the text be centered at (cx,cy) (true) or is (cx,cy) top-left (false) */
   center: boolean;
   /** Font to use */
@@ -112,8 +102,6 @@ export interface TxtConfigOpts {
 export interface AniCfgOpts {
   /** Z index of the image: Must be in the range [-2, 2] */
   z?: number;
-  /** Amount of rotation */
-  rotation?: number;
   /** Width of the animation */
   width: number;
   /** Height of the animation */

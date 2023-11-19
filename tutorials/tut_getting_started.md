@@ -7,7 +7,7 @@ computer set up to start writing games.
 ## Required Software
 
 You will need the following programs in order to work with JetLag.  Please note
-that we do not currently support development on a phone:
+that we do not currently support development on phones or ChromeBooks.:
 
 - A terminal and `git`
     - Every major operating system has at least one terminal program (some even
@@ -18,7 +18,7 @@ that we do not currently support development on a phone:
       as you develop it.
 - Node.js (`node`) and the Node Package Manager (`npm`)
     - JetLag uses `node` and `npm` to transform your code into a format that can
-      be run inside a browser.
+      be tested inside a browser.
 - A web browser
     - Any modern browser should suffice.  JetLag has been tested on Chrome,
       Edge, and Firefox.
@@ -38,6 +38,12 @@ Be sure to include screenshots
 ### Installation Instructions for Linux
 
 Be sure to include screenshots
+
+## Software Config
+
+- There's the git stuff, like your name and merge strategy
+- VSCode extensions
+- Run `npx http-server` maybe?
 
 ## Getting the JetLag Code
 
@@ -67,7 +73,7 @@ In order to make games using liblol, there are two programs you will need.  The 
 Setting up Android Studio
 To set up Android Studio, visit the Android Studio page.  Make sure to download the appropriate installer for your platform.  The installation will take a long time, and use a lot of space.  When everything is installed, you should be able to run Android Studio, and see a window similar to the following:
 
-<screenshot goes here>
+A **screenshot goes here**
 
 Just close it for now... we need to install git and download the liblol code first.
 
@@ -95,9 +101,7 @@ Working Directory: navigate to your android/assets folder
 Use classpath of mod...: select "desktop"
 In the menu bar, to the left of the green "run" triangle, you should now be able to choose between "android" and "Desktop".  Choose "Desktop" and then click the run triangle.  If everything is configured correctly, you should see your game start running after a few seconds.  It should look like this:
 
-
-<screenshot goes here>
-
+A **screenshot goes here**
 
 Going Farther
 This setup will enable you to target Android, and to run your code on the desktop without connecting to a phone.  If you wish to add iOS support, you will need to do set up your project from scratch, using the LibGDX project setup guide.

@@ -4,9 +4,9 @@ JetLag is built on top of Pixi.js (for graphics) and Box2D (for physics
 simulation).  Pixi.js and Box2D are general-purpose libraries... they can be
 used to make games, but also for many other purposes.  The main goal of JetLag
 is to provide a clean and easy way to develop games, by providing a
-game-specific interface to Pixi.js and Box2D. Its main goal is to provide common
-game abstractions on top of these powerful libraries, and to make those
-abstractions easy to use.
+game-specific interface to Pixi.js and Box2D.  JetLag tries to give you common
+building blocks for making games that are easy to use, and that still let you
+reach down into the full power of Pixi.js and Box2D when you need to.
 
 The following picture gives a sense for how everything fits together:
 

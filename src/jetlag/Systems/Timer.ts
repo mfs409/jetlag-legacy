@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 /**
  * TimedEvent is an action that needs to happen after some amount of time has
  * passed.

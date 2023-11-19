@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { b2Vec2 } from "@box2d/core";
 import { game } from "../Stage";
 

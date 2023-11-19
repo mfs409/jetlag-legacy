@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { Howl, Howler } from "howler";
 import { GameCfg } from "../Config";
 import { game } from "../Stage";

@@ -115,7 +115,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   // Bottom box:
   let width = Math.abs(x0 - x1);
   let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
-  new Actor({
+  Actor.Make({
     scene: game.world,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
@@ -126,7 +126,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
 
   // The top only differs by translating the Y from the bottom
   cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
-  new Actor({
+  Actor.Make({
     scene: game.world,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
@@ -137,7 +137,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   // Right box:
   let height = Math.abs(y0 - y1);
   cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
-  new Actor({
+  Actor.Make({
     scene: game.world,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
@@ -147,7 +147,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
 
   // The left only differs by translating the X
   cfg.cx -= (thickness + Math.abs(x0 - x1));
-  new Actor({
+  Actor.Make({
     scene: game.world,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
@@ -180,7 +180,7 @@ export function overlayToWorldCoords(overlay: Scene, x: number, y: number) {
 export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coords: { x: number; y: number }) => boolean) {
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
-  let c = new Actor({
+  let c = Actor.Make({
     scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
@@ -203,7 +203,7 @@ export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap
  */
 export function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
   // TODO: it's probably not worth having this helper function
-  let c = new Actor({
+  let c = Actor.Make({
     scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
@@ -264,7 +264,7 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
 export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
-  let c = new Actor({
+  let c = Actor.Make({
     scene: overlay,
     appearance: new ImageSprite(cfgOpts),
     rigidBody: RigidBodyComponent.Box(cfgOpts, overlay),
@@ -419,7 +419,7 @@ export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfg
  *                        released
  */
 export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts, whileDownAction?: () => void, onUpAction?: (coords: { x: number; y: number }) => void) {
-  let c = new Actor({
+  let c = Actor.Make({
     scene: overlay,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, overlay),
@@ -461,7 +461,7 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
  *                top left of the actor throwing the projectile
  */
 export function addDirectionalThrowButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
-  let c = new Actor({
+  let c = Actor.Make({
     scene: overlay,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, overlay),
@@ -708,7 +708,7 @@ export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, prod
   let appearance = new TextSprite(cfgOpts, producer);
   // NB: Produce the text once, to get a size estimate
   let dims = appearance.dims(scene.camera, producer());
-  return new Actor({
+  return Actor.Make({
     scene,
     appearance,
     // TODO: the ".1" options are somewhat arbitrary

@@ -1,12 +1,10 @@
-// Last review: 08-11-2023
-
 import { b2Transform } from "@box2d/core";
 import { game } from "../Stage";
 import { ISound } from "../Services/AudioService";
-import { AnimatedSprite, ImageSprite } from "../Components/Appearance";
+import { AnimatedSprite, AppearanceComponent, ImageSprite } from "../Components/Appearance";
 import { Actor } from "../Entities/Actor";
 import { Projectile } from "../Components/Role";
-import { AniCfgOpts, BoxCfgOpts, CircleCfgOpts, ImgConfigOpts } from "../Config";
+import { BoxCfgOpts, CircleCfgOpts } from "../Config";
 import { Scene } from "../Entities/Scene";
 import { StateEvent } from "../Components/StateManager";
 import { ProjectileMovement } from "../Components/Movement";
@@ -23,7 +21,8 @@ export interface ProjectileSystemConfigOpts {
   /** Configuration for the shape of projectiles' rigid bodies */
   body: CircleCfgOpts | BoxCfgOpts,
   /** Configuration for the appearance of projectiles */
-  appearance: ImgConfigOpts | AniCfgOpts,
+  // TODO: Why not text?
+  appearance: AppearanceComponent,
   /** The amount of damage a projectile can do to enemies */
   strength: number,
   /* A multiplier on projectile speed */
@@ -58,7 +57,7 @@ class ProjectileSystemConfig {
   /** Configuration for the shape of projectiles' rigid bodies */
   body: CircleCfgOpts | BoxCfgOpts;
   /** Configuration for the appearance of projectiles */
-  appearance: ImgConfigOpts | AniCfgOpts;
+  appearance: AppearanceComponent;
   /** The amount of damage a projectile can do to enemies */
   strength: number;
   /* A multiplier on projectile speed */
@@ -142,11 +141,7 @@ export class ProjectileSystem {
 
     // set up the pool of projectiles
     for (let i = 0; i < this.props.size; ++i) {
-      let appearance: AnimatedSprite | ImageSprite;
-      if (this.props.appearance.hasOwnProperty("idle_right"))
-        appearance = new AnimatedSprite(this.props.appearance as AniCfgOpts);
-      else
-        appearance = new ImageSprite(this.props.appearance as ImgConfigOpts);
+      let appearance = this.props.appearance.clone();
       let rigidBody = (this.props.body.hasOwnProperty("radius")) ?
         RigidBodyComponent.Circle(this.props.body as CircleCfgOpts, scene) :
         RigidBodyComponent.Box(this.props.body as BoxCfgOpts, scene, {});
@@ -154,7 +149,7 @@ export class ProjectileSystem {
       if (this.props.range)
         role.range = this.props.range;
       role.disappearOnCollide = this.props.disappearOnCollide;
-      let p = new Actor({ scene, appearance, rigidBody, movement: new ProjectileMovement(), role });
+      let p = Actor.Make({ scene, appearance, rigidBody, movement: new ProjectileMovement(), role });
       if (this.props.gravityAffectsProjectiles)
         p.rigidBody.body.SetGravityScale(1);
       p.sounds = this.props.soundEffects;

@@ -1,8 +1,8 @@
-// Last review: 08-11-2023
-
 import { Scene } from "../Entities/Scene";
 import { Stage } from "../Stage";
 import Hammer from "hammerjs";
+
+// TODO: Review this file
 
 /** GestureService routes gesture events (as defined by hammerjs) to a Stage. */
 export class GestureService {

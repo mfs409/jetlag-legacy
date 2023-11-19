@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { Application, Container, Graphics, BlurFilter, ColorMatrixFilter, NoiseFilter } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
 import { game } from "../Stage";
@@ -244,11 +242,11 @@ export class RenderService {
     let h = s * appearance.props.h;
 
     // Put it on screen
-    this.addSprite(sprite, x, y, w, h, appearance.props.rot);
+    this.addSprite(sprite, x, y, w, h, appearance.actor?.rigidBody.getRotation() ?? 0);
 
     // Debug rendering: draw a box around the image
     if (this.debug)
-      this.drawDebugBox(x, y, w, h, appearance.props.rot, sprite.debug, 0xff0000);
+      this.drawDebugBox(x, y, w, h, appearance.actor?.rigidBody.getRotation() ?? 0, sprite.debug, 0xff0000);
   }
 
   /**
@@ -299,7 +297,7 @@ export class RenderService {
   private godray_filter = new GodrayFilter();
 
   /** in-progress support for an old sepia TV filter.  Part 3: sepia. */
-  private oldfilm_filter = new OldFilmFilter();
+  private old_film_filter = new OldFilmFilter();
 
   /**
    * Apply one of our pre-made filters to the world.  All filter stuff is
@@ -324,16 +322,16 @@ export class RenderService {
       let f = new ColorMatrixFilter();
       f.sepia(true);
       this.noise_filter.seed = Math.random();
-      this.oldfilm_filter.sepia = .3;
-      this.oldfilm_filter.noise = .3;
-      this.oldfilm_filter.noiseSize = 1;
-      this.oldfilm_filter.scratch = .5;
-      this.oldfilm_filter.scratchDensity = .3;
-      this.oldfilm_filter.scratchWidth = 1;
-      this.oldfilm_filter.vignetting = .3;
-      this.oldfilm_filter.vignettingAlpha = 1;
-      this.oldfilm_filter.vignettingBlur = .3;
-      this.main.filters = [f, this.noise_filter, this.godray_filter, this.oldfilm_filter];
+      this.old_film_filter.sepia = .3;
+      this.old_film_filter.noise = .3;
+      this.old_film_filter.noiseSize = 1;
+      this.old_film_filter.scratch = .5;
+      this.old_film_filter.scratchDensity = .3;
+      this.old_film_filter.scratchWidth = 1;
+      this.old_film_filter.vignetting = .3;
+      this.old_film_filter.vignettingAlpha = 1;
+      this.old_film_filter.vignettingBlur = .3;
+      this.main.filters = [f, this.noise_filter, this.godray_filter, this.old_film_filter];
     }
   }
 }

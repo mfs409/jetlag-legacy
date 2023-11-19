@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { b2Vec2, b2Transform } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { game } from "../Stage";
@@ -295,7 +293,7 @@ export class SvgSystem {
     // Make an obstacle and rotate it
     let cfg = { box: true, cx: centerX, cy: centerY, width: len, height: 0.05, img: "" };
     let body = RigidBodyComponent.Box(cfg, game.world)
-    let a = new Actor({
+    let a = Actor.Make({
       scene: game.world,
       appearance: this.appearanceMaker(body),
       rigidBody: body,

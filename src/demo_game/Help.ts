@@ -45,7 +45,7 @@ export function buildHelpScreen(index: number) {
       () => "The levels of this game demonstrate JetLag features");
 
     let cfg = { cx: 0.75, cy: 2.5, radius: 0.375, width: 0.75, height: 0.75, img: "green_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -57,7 +57,7 @@ export function buildHelpScreen(index: number) {
       () => "You control the hero");
 
     cfg = { cx: 0.75, cy: 3.5, radius: 0.375, width: 0.75, height: 0.75, img: "blue_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world, appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
       movement: new InertMovement(),
@@ -68,7 +68,7 @@ export function buildHelpScreen(index: number) {
       () => "Collect these goodies");
 
     cfg = { cx: 0.75, cy: 4.5, radius: 0.375, width: 0.75, height: 0.75, img: "red_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world, appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
       movement: new InertMovement(),
@@ -79,7 +79,7 @@ export function buildHelpScreen(index: number) {
       () => "Avoid or defeat enemies");
 
     cfg = { cx: 0.75, cy: 5.5, radius: 0.375, width: 0.75, height: 0.75, img: "mustard_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
@@ -91,7 +91,7 @@ export function buildHelpScreen(index: number) {
       () => "Reach the destination");
 
     cfg = { cx: 0.75, cy: 6.5, radius: 0.375, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world, appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),
       movement: new InertMovement(),
@@ -102,7 +102,7 @@ export function buildHelpScreen(index: number) {
       () => "These are walls");
 
     cfg = { cx: 0.75, cy: 7.5, radius: 0.375, width: 0.75, height: 0.75, img: "grey_ball.png" };
-    new Actor({
+    Actor.Make({
       scene: game.world,
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, game.world),

@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { Assets, Graphics, Sprite as PixiSprite, Text as PixiText, Texture } from "pixi.js";
 import { GameCfg } from "../Config";
 import { game } from "../Stage";
@@ -86,7 +84,11 @@ export class Sprite {
   }
 }
 
-/** Text provides its functionality via the PIXI.text type. */
+/**
+ * Text provides its functionality via the PIXI.text type.
+ *
+ * TODO: Support rotated text?
+ */
 export class Text {
   /**
    * Create a Text object by wrapping a PIXI text

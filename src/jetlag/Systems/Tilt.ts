@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { game } from "../Stage";
 import { b2Vec2 } from "@box2d/core";
 import { TiltMovement } from "../Components/Movement";

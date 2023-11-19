@@ -1,5 +1,3 @@
-// Last review: 08-11-2023
-
 import { b2Body, b2BodyType, b2CircleShape, b2DistanceJoint, b2DistanceJointDef, b2PolygonShape, b2RevoluteJoint, b2RevoluteJointDef, b2Transform, b2Vec2, b2WeldJointDef } from "@box2d/core";
 import { BoxCfgOpts, CircleCfgOpts, PolygonCfgOpts, AdvancedRigidBodyCfgOpts } from "../Config";
 import { game } from "../Stage";
@@ -397,12 +395,6 @@ export class RigidBodyComponent {
     if (v.x < 0) entity.state.changeState(entity, StateEvent.MOVE_L);
     else if (v.x > 0) entity.state.changeState(entity, StateEvent.MOVE_R);
     else entity.state.changeState(entity, StateEvent.MOVE_STOP);
-
-    // Now adjust the image position based on the body position
-    if (entity.appearance) {
-      // TODO: We probably don't need rot on props anymore...
-      entity.appearance.props.rot = this.body.GetAngle();
-    }
   }
 
   /**
@@ -512,7 +504,7 @@ export class RigidBodyComponent {
    * @param scene     The world in which to create the body
    * @param commonCfg Additional configuration
    */
-  public static Circle(circleCfg: CircleCfgOpts, scene: Scene, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Circle(circleCfg: CircleCfgOpts, scene: Scene = game.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let rb = new RigidBodyComponent(scene, new CircleCfg(circleCfg, commonCfg), circleCfg.radius, ShapeType.CIRCLE);
     let shape = new b2CircleShape();
     shape.m_radius = circleCfg.radius;
@@ -529,10 +521,11 @@ export class RigidBodyComponent {
    * Construct a RigidBody as a Box
    *
    * @param boxCfg    The configuration of this BoxBody
-   * @param scene     The world in which to create the body
+   * @param scene     The world in which to create the body (defaults to
+   *                  game.world)
    * @param commonCfg Additional configuration
    */
-  public static Box(boxCfg: BoxCfgOpts, scene: Scene, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Box(boxCfg: BoxCfgOpts, scene: Scene = game.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let rb = new RigidBodyComponent(scene, new BoxCfg(boxCfg, commonCfg), Math.sqrt(Math.pow(boxCfg.height / 2, 2) + Math.pow(boxCfg.width / 2, 2)), ShapeType.BOX);
     let shape = new b2PolygonShape();
     shape.SetAsBox(rb.props.w / 2, rb.props.h / 2);
@@ -550,7 +543,7 @@ export class RigidBodyComponent {
    * @param scene       The world in which to create the body
    * @param commonCfg   Additional configuration
    */
-  public static Polygon(polygonCfg: PolygonCfgOpts, scene: Scene, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Polygon(polygonCfg: PolygonCfgOpts, scene: Scene = game.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let r = 0;
     for (let i = 0; i < polygonCfg.vertices.length; i += 2)
       r = Math.max(r, Math.pow(polygonCfg.vertices[i], 2), + Math.pow(polygonCfg.vertices[i + 1], 2));
@@ -564,7 +557,11 @@ export class RigidBodyComponent {
     return rb;
   }
 
-  /** Apply common properties based on the AdvancedRigidBodyConfig */
+  /**
+   * Apply common properties based on the AdvancedRigidBodyConfig
+   *
+   * TODO: There are better ways to do this
+   */
   private bless() {
     if (this.props.rotationSpeed != 0) {
       // Make the entity continuously rotate

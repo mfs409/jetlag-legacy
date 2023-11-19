@@ -1,10 +1,9 @@
-// Last review: 08-10-2023
-
 import { TimerSystem } from "../Systems/Timer"
 import { ProjectileSystem } from "../Systems/Projectiles";
 import { TiltSystem } from "../Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "../Systems/Collisions";
 import { CameraSystem } from "../Systems/Camera";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * A Scene is a container that represents an interactive, dynamic, visible
@@ -50,5 +49,16 @@ export class Scene {
     let w = screenWidth / pixelMeterRatio;
     let h = screenHeight / pixelMeterRatio;
     this.camera = new CameraSystem(w, h, pixelMeterRatio);
+  }
+
+  /**
+   * Set (or reset) the gravity in this world
+   *
+   * @param x The gravitational force in the x dimension
+   * @param y The gravitational force in the y dimension (remember up is
+   *          negative!)
+   */
+  public setGravity(x: number, y: number) {
+    this.physics?.world.SetGravity(new b2Vec2(x, y));
   }
 }

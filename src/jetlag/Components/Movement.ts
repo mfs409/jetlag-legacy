@@ -1,5 +1,3 @@
-// Last review: Needs Review
-
 import { b2BodyType, b2Transform, b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { game } from "../Stage";

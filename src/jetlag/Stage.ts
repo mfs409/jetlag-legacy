@@ -1,5 +1,3 @@
-// Last review: 08-11-2023
-
 import { Scene } from "./Entities/Scene";
 import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
