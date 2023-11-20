@@ -3,7 +3,7 @@ import { Actor } from "../Entities/Actor";
 import { game } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { CameraSystem } from "../Systems/Camera";
-import { ProjectileSystem } from "../Systems/Projectiles";
+import { ActorPool } from "../Systems/ActorPool";
 import { AnimatedSprite, AppearanceComponent, ImageSprite } from "./Appearance";
 import { Projectile } from "./Role";
 import { StateEvent } from "./StateManager";
@@ -481,18 +481,17 @@ export class HoverFlick {
  */
 export interface ProjectileSystemConfigOpts {
   /** The number of projectiles that can ever be on screen at once */
-  maxAtOnce: number,
+  size: number,
   /** Configuration for the shape of projectiles' rigid bodies */
   body: CircleCfgOpts | BoxCfgOpts,
   /** Configuration for the appearance of projectiles */
-  // TODO: Why not text?
   appearance: AppearanceComponent,
   /** The amount of damage a projectile can do to enemies */
   strength: number,
   /* A multiplier on projectile speed */
   multiplier?: number,
   /** Should projectiles pass through walls */
-  immuneToCollisions?: boolean,
+  immuneToCollisions: boolean,
   /** Should projectiles be subject to gravity */
   gravityAffectsProjectiles?: boolean,
   /** A fixed velocity for all projectiles */
@@ -506,70 +505,15 @@ export interface ProjectileSystemConfigOpts {
   /** A set of image names to randomly assign to projectiles' appearance */
   randomImageSources?: string[],
   /** Limit the range that projectiles can travel? */
-  range?: number,
+  range: number,
   /** Should projectiles disappear when they collide with each other? */
-  disappearOnCollide?: boolean,
-}
-
-/**
- * ProjectileSystemConfig stores all of the verified-and-usable configuration
- * state for projectiles.
- */
-// TODO: Stop needing this
-export class ProjectileSystemConfig {
-  /** The number of projectiles that can ever be on screen at once */
-  size: number;
-  /** Configuration for the shape of projectiles' rigid bodies */
-  body: CircleCfgOpts | BoxCfgOpts;
-  /** Configuration for the appearance of projectiles */
-  appearance: AppearanceComponent;
-  /** The amount of damage a projectile can do to enemies */
-  strength: number;
-  /* A multiplier on projectile speed */
-  multiplier: number;
-  /** Should projectiles pass through walls */
-  immuneToCollisions: boolean;
-  /** Should projectiles be subject to gravity */
-  gravityAffectsProjectiles: boolean;
-  /** A fixed velocity for all projectiles */
-  fixedVectorVelocity?: number;
-  /** Should projectiles be rotated in the direction they are thrown? */
-  rotateVectorThrow?: boolean;
-  /** A sound to play when throwing a projectile */
-  throwSound?: ISound;
-  /** A sound to play when a projectile disappears */
-  soundEffects?: SoundEffectComponent;
-  /** A set of image names to randomly assign to projectiles' appearance */
-  randomImageSources?: string[];
-  /** Limit the range that projectiles can travel? */
-  range?: number;
-  /** Should projectiles disappear when they collide with each other */
-  disappearOnCollide: boolean;
-
-  /** Construct a ProjectileSystemConfig object from its interface */
-  constructor(opts: ProjectileSystemConfigOpts) {
-    this.size = opts.maxAtOnce;
-    this.body = opts.body;
-    this.appearance = opts.appearance;
-    this.strength = opts.strength;
-    // TODO: re-work this based on the new collision code
-    this.immuneToCollisions = !!opts.immuneToCollisions;
-    this.gravityAffectsProjectiles = !!opts.gravityAffectsProjectiles;
-    if (opts.throwSound)
-      this.throwSound = game.musicLibrary.getSound(opts.throwSound);
-    this.multiplier = opts.multiplier ?? 1;
-    this.fixedVectorVelocity = opts.fixedVectorVelocity;
-    this.rotateVectorThrow = opts.rotateVectorThrow;
-    this.soundEffects = opts.soundEffects;
-    this.randomImageSources = opts.randomImageSources;
-    this.range = opts.range;
-    this.disappearOnCollide = opts.disappearOnCollide == undefined ? true : opts.disappearOnCollide;
-  }
+  disappearOnCollide: boolean,
 }
 
 /** A rule for how projectiles move */
 export class ProjectileMovement {
   /** The Actor to which this movement is attached */
+  // TODO: We need a whole actor, not just a body?
   public set rigidBody(body: RigidBodyComponent | undefined) {
     this._rigidBody = body;
     // this can't be a static body
@@ -577,23 +521,34 @@ export class ProjectileMovement {
     if (this.rigidBody.body.GetType() == b2BodyType.b2_staticBody)
       this.rigidBody?.body.SetType(b2BodyType.b2_kinematicBody);
     this.rigidBody.body.SetBullet(true);
-    // TODO: We might want to move these to the ProjectileSystem
     this.rigidBody.body.SetGravityScale(0);
     this.rigidBody.setCollisionsEnabled(false);
     this.rigidBody.body.SetFixedRotation(true); // disable rotation...
   }
-  public get rigidBody() { return this._rigidBody; }
   private _rigidBody?: RigidBodyComponent;
 
-  private props: ProjectileSystemConfig;
+  /* A multiplier on projectile speed */
+  multiplier: number;
+
+  /** A fixed velocity for all projectiles */
+  fixedVectorVelocity?: number;
+
+  /** Should projectiles be rotated in the direction they are thrown? */
+  rotateVectorThrow?: boolean;
+
+  /** A sound to play when throwing a projectile */
+  throwSound?: ISound;
+
+  /** A set of image names to randomly assign to projectiles' appearance */
+  randomImageSources?: string[];
 
   /** Do any last-minute adjustments related to the movement */
   prerender(_elapsedMs: number, _camera: CameraSystem) { }
 
   /** Set a new velocity for the actor */
   updateVelocity(x: number, y: number) {
-    this.rigidBody?.breakJoints();
-    this.rigidBody?.body.SetLinearVelocity({ x, y });
+    this._rigidBody?.breakJoints();
+    this._rigidBody?.body.SetLinearVelocity({ x, y });
   }
 
   /**
@@ -602,7 +557,12 @@ export class ProjectileMovement {
    * @param cfg The requested configuration
    */
   constructor(cfg: ProjectileSystemConfigOpts) {
-    this.props = new ProjectileSystemConfig(cfg);
+    if (cfg.throwSound)
+      this.throwSound = game.musicLibrary.getSound(cfg.throwSound);
+    this.multiplier = cfg.multiplier ?? 1;
+    this.fixedVectorVelocity = cfg.fixedVectorVelocity;
+    this.rotateVectorThrow = cfg.rotateVectorThrow;
+    this.randomImageSources = cfg.randomImageSources;
   }
 
   /**
@@ -618,31 +578,33 @@ export class ProjectileMovement {
    * @param velocityY The Y velocity of the projectile when it is thrown
    */
   // TODO: can we combine the throwing methods?
-  public throwFixed(pool: ProjectileSystem, actor: Actor, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+  // TODO: This should not take a pool
+  // TODO: Images and Sounds are not movement.  Should throwFixed be part of the role, and dispatch accordingly?
+  public throwFixed(pool: ActorPool, actor: Actor, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
     // get the next projectile, set sensor, set image
     let b = pool.get();
     if (!b) return;
     if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
 
-    if (this.props.randomImageSources) {
-      let idx = Math.floor(Math.random() * this.props.randomImageSources!.length);
-      (b.appearance as ImageSprite).setImage(this.props.randomImageSources![idx]);
+    if (this.randomImageSources) {
+      let idx = Math.floor(Math.random() * this.randomImageSources!.length);
+      (b.appearance as ImageSprite).setImage(this.randomImageSources![idx]);
     }
 
     // calculate offset for starting position of projectile, put it on
     // screen
     (b.role as Projectile).rangeFrom.Set(
-      (actor.rigidBody?.getCenter().x ?? 0) + offsetX,
-      (actor.rigidBody?.getCenter().y ?? 0) + offsetY
+      actor.rigidBody.getCenter().x + offsetX,
+      actor.rigidBody.getCenter().y + offsetY
     );
     let transform = new b2Transform();
     transform.SetPositionAngle((b.role as Projectile).rangeFrom, 0);
-    b.rigidBody?.body.SetTransform(transform);
+    b.rigidBody.body.SetTransform(transform);
 
     // give the projectile velocity, show it, and play sound
     (b.movement as ProjectileMovement).updateVelocity(velocityX, velocityY);
     b.enabled = true;
-    this.props.throwSound?.play();
+    this.throwSound?.play();
     actor.state.changeState(actor, StateEvent.THROW_START);
   }
 
@@ -660,7 +622,9 @@ export class ProjectileMovement {
    * @param offsetY The y distance between the top left of the projectile and
    *                the top left of the actor throwing the projectile
    */
-  public throwAt(pool: ProjectileSystem, fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
+  // TODO: This should not take a pool
+  // TODO: Images and Sounds are not movement.  Should throwFixed be part of the role, and dispatch accordingly?
+  public throwAt(pool: ActorPool, fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
     // get the next projectile, set sensor, set image
     let b = pool.get();
     if (!b) return;
@@ -674,36 +638,34 @@ export class ProjectileMovement {
     b.rigidBody?.body.SetTransform(transform);
 
     // give the projectile velocity
-    if (this.props.fixedVectorVelocity) {
+    let dX = toX - fromX - offsetX;
+    let dY = toY - fromY - offsetY;
+    if (this.fixedVectorVelocity) {
       // compute a unit vector
-      let dX = toX - fromX - offsetX;
-      let dY = toY - fromY - offsetY;
       let hypotenuse = Math.sqrt(dX * dX + dY * dY);
       let tmpX = dX / hypotenuse;
       let tmpY = dY / hypotenuse;
       // multiply by fixed velocity
-      tmpX *= this.props.fixedVectorVelocity;
-      tmpY *= this.props.fixedVectorVelocity;
+      tmpX *= this.fixedVectorVelocity;
+      tmpY *= this.fixedVectorVelocity;
       (b.movement as ProjectileMovement).updateVelocity(tmpX, tmpY);
     }
     else {
-      let dX = toX - fromX - offsetX;
-      let dY = toY - fromY - offsetY;
       // compute absolute vector, multiply by dampening factor
-      let tmpX = dX * this.props.multiplier;
-      let tmpY = dY * this.props.multiplier;
+      let tmpX = dX * this.multiplier;
+      let tmpY = dY * this.multiplier;
       (b.movement as ProjectileMovement).updateVelocity(tmpX, tmpY);
     }
 
     // rotate the projectile
-    if (this.props.rotateVectorThrow) {
+    if (this.rotateVectorThrow) {
       let angle = Math.atan2(toY - fromY - offsetY, toX - fromX - offsetX) - Math.atan2(-1, 0);
       b.rigidBody?.setRotation(angle);
     }
 
     // show the projectile, play sound, and animate the hero
     b.enabled = true;
-    this.props.throwSound?.play();
+    this.throwSound?.play();
     actor.state.changeState(actor, StateEvent.THROW_START);
   }
 }

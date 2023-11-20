@@ -3,7 +3,7 @@
 import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { game } from "../jetlag/Stage";
 import * as Helpers from "./helpers";
-import { ProjectileSystem } from "../jetlag/Systems/Projectiles";
+import { ActorPool } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
 import { AnimatedSprite, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -2672,9 +2672,9 @@ export function buildLevelScreen(level: number) {
     // configure a pool of projectiles. We say that there can be no more than 3
     // projectiles in flight at any time.  Once a projectile hits a wall or
     // enemy, it stops being "in flight", so we can throw another.
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 3, strength: 1, body: { radius: 0.125, cx: -100, cy: -100 },
+      size: 3, strength: 1, disappearOnCollide: true, range: 40, immuneToCollisions: true, body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }),
     });
 
@@ -2743,9 +2743,9 @@ export function buildLevelScreen(level: number) {
 
     // set up a pool of projectiles, but now once the projectiles travel more
     // than 9 meters, they disappear
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100, strength: 1, range: 9,
+      size: 100, strength: 1, range: 9, immuneToCollisions: true, disappearOnCollide: true,
       body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }),
     });
@@ -2794,9 +2794,9 @@ export function buildLevelScreen(level: number) {
     // set up our projectiles... note that now projectiles each do 2 units of
     // damage.  Note that we make our projectiles immune to collisions.  This is
     // important if we don't want them colliding with the hero.
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 3, strength: 2, immuneToCollisions: true,
+      size: 3, strength: 2, immuneToCollisions: true, disappearOnCollide: true, range: 40,
       // Since there isn't a radius or vertices, the body will be a box
       body: { width: .1, height: .4, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 })
@@ -2835,9 +2835,10 @@ export function buildLevelScreen(level: number) {
     // Set up our pool of projectiles.  With this throwing mechanism, the farther from the
     // hero we press, the faster the projectile goes, so we multiply the velocity by .8 to
     // slow it down a bit
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100, body: { radius: 0.125, cx: -100, cy: -100 },
+      disappearOnCollide: true,
+      size: 100, body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }), strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
     });
 
@@ -2923,13 +2924,15 @@ export function buildLevelScreen(level: number) {
     game.score.setVictoryEnemyCount();
 
     // Set up a projectile pool with 5 projectiles
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 5,
+      size: 5,
       body: { radius: 0.25, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
       strength: 1,
       multiplier: 2,
+      disappearOnCollide: true,
+      range: 40,
       gravityAffectsProjectiles: true,
       immuneToCollisions: false,
     });
@@ -3005,12 +3008,15 @@ export function buildLevelScreen(level: number) {
 
     // Set up our projectiles.  One thing we add here is a sound when they
     // disappear
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100,
+      size: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
       strength: 1,
+      disappearOnCollide: true,
+      range: 40,
+      immuneToCollisions: true,
       throwSound: "flap_flap.ogg",
       soundEffects: new SoundEffectComponent("slow_down.ogg")
     });
@@ -3342,12 +3348,14 @@ export function buildLevelScreen(level: number) {
     };
 
     // make a projectile pool and give an animation pattern for the projectiles
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100,
+      size: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
       appearance: new AnimatedSprite({ width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 }),
       strength: 1,
+      range: 40,
+      disappearOnCollide: true,
       immuneToCollisions: true
     });
     welcomeMessage("Press the hero to make it throw a ball");
@@ -3777,14 +3785,17 @@ export function buildLevelScreen(level: number) {
     };
 
     // set up our projectiles.  There are only 20... throw them carefully
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 3, strength: 2,
+      size: 3, strength: 2,
       body: { radius: 0.25, cx: -100, cy: -100 },
+      disappearOnCollide: true,
+      range: 40,
+      immuneToCollisions: true,
       appearance: new ImageSprite({ img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 }),
       randomImageSources: ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"]
     });
-    projectiles.setNumberOfProjectiles(20);
+    projectiles.setLimit(20);
 
     // show how many shots are left
     Helpers.makeText(game.hud,
@@ -4392,9 +4403,12 @@ export function buildLevelScreen(level: number) {
 
     // Tapping the hero will throw a projectile, which is another way to defeat
     // enemies
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100, strength: 1,
+      size: 100, strength: 1,
+      immuneToCollisions: true,
+      range: 40,
+      disappearOnCollide: true,
       body: { radius: 0.1, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.2, height: 0.21, img: "grey_ball.png" })
     });
@@ -4578,10 +4592,12 @@ export function buildLevelScreen(level: number) {
 
     // set up our pool of projectiles, then set them to have a fixed
     // velocity when using the vector throw mechanism
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
+      size: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
       body: { radius: 0.1, cx: -100, cy: -100 },
+      disappearOnCollide: true,
+      immuneToCollisions: true,
       appearance: new ImageSprite({ width: 0.2, height: 0.2, img: "grey_ball.png" }),
     });
     Helpers.addDirectionalThrowButton(game.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
@@ -4955,10 +4971,10 @@ export function buildLevelScreen(level: number) {
 
     // set up a pool of projectiles with fixed velocity, and with
     // rotation
-    let projectiles = new ProjectileSystem();
+    let projectiles = new ActorPool();
     Helpers.populateProjectilePool(game.world, projectiles, {
-      maxAtOnce: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
-      immuneToCollisions: true,
+      size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
+      immuneToCollisions: true, disappearOnCollide: true, range: 40,
       body: { width: 0.02, height: .5, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.02, height: 1, img: "red.png" }),
     });

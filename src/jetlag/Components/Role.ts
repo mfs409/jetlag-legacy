@@ -807,27 +807,30 @@ export class Projectile extends Role {
    * distance away from the hero that a projectile can travel before we make
    * it disappear.
    */
-  public range = 40;
+  public range;
 
   /**
    * When projectiles collide, and they are not sensors, one will disappear.
    * We can keep both on screen by setting this false
    */
-  public disappearOnCollide = true;
+  public disappearOnCollide;
 
   /** How much damage does this projectile do? */
-  public damage = 1;
+  public damage;
 
   /**
    * Construct a Projectile role
    *
    * @param damage  How much damage should the projectile do?
    */
-  constructor(cfg: { damage?: number } = {}) {
+  constructor(cfg: { damage?: number, range?: number, disappearOnCollide?: boolean } = {}) {
     super();
 
     this.collisionRules.role.push(CollisionExemptions.PROJECTILE);
     this.damage = cfg.damage ?? 1;
+    // TODO: Is it OK to have a default cap on the range?
+    this.range = cfg.range ?? 40;
+    this.disappearOnCollide = cfg.disappearOnCollide ?? true;
   }
 
   /**

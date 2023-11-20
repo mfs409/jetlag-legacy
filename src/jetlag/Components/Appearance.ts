@@ -10,8 +10,6 @@ import { InertMovement } from "./Movement";
 import { Passive } from "./Role";
 import { Graphics } from "pixi.js";
 
-// TODO: do we need rot in any of these configs, now that everything has a RigidBody?
-
 /** 
  * ImageConfig stores the geometry and other configuration information needed
  * when describing an image that is not animated.
@@ -77,6 +75,8 @@ export class FilledBoxConfig {
     this.lineWidth = opts.lineWidth;
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
+
+    // TODO: Consolidate common code?
 
     // Validate: if there's a line width, there needs to be a line color
     if (this.lineWidth !== undefined && this.lineColor === undefined)
@@ -216,6 +216,9 @@ export class FilledPolyConfig {
 /**
  * TextConfig stores the geometry and other configuration information needed
  * when describing on-screen text.
+ *
+ * TODO:  At some point, would we be better off with a CenteredText and a
+ *        TopLeft Text?
  */
 export class TextConfig {
   /** Width of the text (computed) */
@@ -467,12 +470,6 @@ export class ImageSprite {
    * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
-    // TODO: This code is probably in the wrong place.  We're moving the
-    //       image because the body position is centered, not top-left.
-    // if (this.body) {
-    //   this.props.x -= this.props.w / 2;
-    //   this.props.y -= this.props.h / 2;
-    // }
     if (this.actor?.rigidBody)
       game.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera);
   }
@@ -836,7 +833,6 @@ export class FilledSprite {
         pts.push(pts[0]);
         pts.push(pts[1]);
         this.graphics.drawPolygon(pts);
-        // rotation
         this.graphics.position.set(x, y);
         this.graphics.pivot.set(x, y);
         this.graphics.rotation = this.actor.rigidBody.getRotation();

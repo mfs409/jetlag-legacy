@@ -3,7 +3,7 @@
 import { b2BodyType, b2Vec2 } from "@box2d/core";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Scene } from "../jetlag/Entities/Scene";
-import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, InertMovement, ProjectileMovement, ProjectileSystemConfig, ProjectileSystemConfigOpts } from "../jetlag/Components/Movement";
+import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, InertMovement, ProjectileMovement, ProjectileSystemConfigOpts } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { TimedEvent } from "../jetlag/Systems/Timer";
@@ -11,7 +11,7 @@ import { AnimationSequence, BoxCfgOpts, GestureHandlers, AdvancedRigidBodyCfgOpt
 import { Enemy, Hero, Obstacle, Passive, Projectile } from "../jetlag/Components/Role";
 import { game } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { ProjectileSystem } from "../jetlag/Systems/Projectiles";
+import { ActorPool } from "../jetlag/Systems/ActorPool";
 
 /** Manage the state of Mute */
 export function toggleMute() {
@@ -461,7 +461,7 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
  * @param offsetY The y distance between the top left of the projectile and the
  *                top left of the actor throwing the projectile
  */
-export function addDirectionalThrowButton(overlay: Scene, projectiles: ProjectileSystem, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
+export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
   let c = Actor.Make({
     scene: overlay,
     appearance: new ImageSprite(cfg),
@@ -535,7 +535,7 @@ export function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: n
  * @param offsetY The y distance between the top left of the projectile and the
  *                top left of the actor throwing the projectile
  */
-export function ThrowDirectionalAction(scene: Scene, projectiles: ProjectileSystem, actor: Actor, offsetX: number, offsetY: number) {
+export function ThrowDirectionalAction(scene: Scene, projectiles: ActorPool, actor: Actor, offsetX: number, offsetY: number) {
   return (hudCoords: { x: number; y: number }) => {
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
     let world = game.world.camera.screenToMeters(pixels.x, pixels.y);
@@ -558,7 +558,7 @@ export function ThrowDirectionalAction(scene: Scene, projectiles: ProjectileSyst
  * @param velocityX The X velocity of the projectile when it is thrown
  * @param velocityY The Y velocity of the projectile when it is thrown
  */
-export function makeRepeatThrow(projectiles: ProjectileSystem, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+export function makeRepeatThrow(projectiles: ActorPool, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
   let mLastThrow = 0; // captured by lambda
   return () => {
     let now = new Date().getTime();
@@ -725,27 +725,19 @@ export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, prod
  * @param scene Where the projectiles will be used
  * @param cfg   Configuration options for the projectiles
  */
-export function populateProjectilePool(scene: Scene, pool: ProjectileSystem, cfg: ProjectileSystemConfigOpts) {
-  let props = new ProjectileSystemConfig(cfg);
+export function populateProjectilePool(scene: Scene, pool: ActorPool, cfg: ProjectileSystemConfigOpts) {
   // set up the pool of projectiles
-  for (let i = 0; i < props.size; ++i) {
-    let appearance = props.appearance.clone();
-    let rigidBody = (props.body.hasOwnProperty("radius")) ?
-      RigidBodyComponent.Circle(props.body as CircleCfgOpts, scene) :
-      RigidBodyComponent.Box(props.body as BoxCfgOpts, scene);
-    rigidBody.setCollisionsEnabled(!props.immuneToCollisions);
-
-    let role = new Projectile({ damage: props.strength });
-    if (props.range)
-      role.range = props.range;
-    role.disappearOnCollide = props.disappearOnCollide;
+  for (let i = 0; i < cfg.size; ++i) {
+    let appearance = cfg.appearance.clone();
+    let rigidBody = (cfg.body.hasOwnProperty("radius")) ?
+      RigidBodyComponent.Circle(cfg.body as CircleCfgOpts, scene) :
+      RigidBodyComponent.Box(cfg.body as BoxCfgOpts, scene);
+    if (cfg.gravityAffectsProjectiles)
+      rigidBody.body.SetGravityScale(1);
+    rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
+    let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide });
     let p = Actor.Make({ scene, appearance, rigidBody, movement: new ProjectileMovement(cfg), role });
-    if (props.gravityAffectsProjectiles)
-      p.rigidBody.body.SetGravityScale(1);
-    p.sounds = props.soundEffects;
-    if (!props.immuneToCollisions) { role.disappearOnCollide = false; p.rigidBody.setCollisionsEnabled(true); }
-    else p.rigidBody.setCollisionsEnabled(true);
-    p.enabled = false;
+    p.sounds = cfg.soundEffects;
     pool.put(p);
   }
 }
