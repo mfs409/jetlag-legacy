@@ -1,5 +1,4 @@
 import { TimerSystem } from "../Systems/Timer"
-import { ProjectileSystem } from "../Systems/Projectiles";
 import { TiltSystem } from "../Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "../Systems/Collisions";
 import { CameraSystem } from "../Systems/Camera";
@@ -26,10 +25,8 @@ export class Scene {
   public tilt?: TiltSystem;
 
   /** The physics system for the scene */
+  // TODO: Why would this ever not exist?
   public physics?: AdvancedCollisionSystem | BasicCollisionSystem;
-
-  /** An optional pool of projectiles */
-  public projectiles?: ProjectileSystem;
 
   /** A camera, for making sure important actors are on screen */
   public readonly camera: CameraSystem;

@@ -1,12 +1,12 @@
-// Last review: 08-10-2023
-
-import * as Helpers from "./helpers";
 import { ImageSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { game } from "../jetlag/Stage";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
+
+// TODO: Stop needing this
+import * as Helpers from "../demo_game/helpers";
 
 /**
  * buildSplashScreen is used to draw the scene that we see when the game starts.

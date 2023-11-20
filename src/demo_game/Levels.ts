@@ -1,6 +1,6 @@
 // Last review: 08-10-2023
 
-import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
+import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { game } from "../jetlag/Stage";
 import * as Helpers from "./helpers";
 import { ProjectileSystem } from "../jetlag/Systems/Projectiles";
@@ -2672,7 +2672,8 @@ export function buildLevelScreen(level: number) {
     // configure a pool of projectiles. We say that there can be no more than 3
     // projectiles in flight at any time.  Once a projectile hits a wall or
     // enemy, it stops being "in flight", so we can throw another.
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 3, strength: 1, body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }),
     });
@@ -2684,7 +2685,13 @@ export function buildLevelScreen(level: number) {
         // to look like it's coming out of a certain part of the hero
         // (especially if it's animated). .525 is the sum of the radii, so the
         // projectile won't overlap the hero at all. The speed will be (10,0)
-        game.world.projectiles!.throwFixed(h, .525, 0, 10, 0);
+        //
+        // TODO: There is a lot of copy/paste of code like this, which doesn't work:
+        //    (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .525, 0, 10, 0);
+        // It should be:
+        let p = (projectiles.get()?.movement as ProjectileMovement);
+        if (p != undefined)
+          p.throwFixed(projectiles, h, .525, 0, 10, 0);
         return true;
       }
     };
@@ -2736,7 +2743,8 @@ export function buildLevelScreen(level: number) {
 
     // set up a pool of projectiles, but now once the projectiles travel more
     // than 9 meters, they disappear
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100, strength: 1, range: 9,
       body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }),
@@ -2746,8 +2754,8 @@ export function buildLevelScreen(level: number) {
     // as long as it is held, but only throws once every 100 milliseconds.
     // Throwing to the left flies out of the top of the hero.  Throwing to the
     // right flies out of the bottom.
-    Helpers.addToggleButton(game.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatThrow(h, 100, 0, -.5, -30, 0), undefined);
-    Helpers.addToggleButton(game.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatThrow(h, 100, 0, .5, 30, 0), undefined);
+    Helpers.addToggleButton(game.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatThrow(projectiles, h, 100, 0, -.5, -30, 0), undefined);
+    Helpers.addToggleButton(game.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatThrow(projectiles, h, 100, 0, .5, 30, 0), undefined);
 
     welcomeMessage("Press left and right to throw projectiles");
     winMessage("Great Job");
@@ -2786,7 +2794,8 @@ export function buildLevelScreen(level: number) {
     // set up our projectiles... note that now projectiles each do 2 units of
     // damage.  Note that we make our projectiles immune to collisions.  This is
     // important if we don't want them colliding with the hero.
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 3, strength: 2, immuneToCollisions: true,
       // Since there isn't a radius or vertices, the body will be a box
       body: { width: .1, height: .4, cx: -100, cy: -100 },
@@ -2795,7 +2804,7 @@ export function buildLevelScreen(level: number) {
 
     // this button only throws one projectile per press...
     Helpers.addTapControl(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => { game.world.projectiles!.throwFixed(h, 0, 0, 0, -10); return true; });
+      () => { (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, 0, 0, 0, -10); return true; });
 
     welcomeMessage("Defeat all enemies to win");
     winMessage("Great Job");
@@ -2823,17 +2832,18 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryEnemyCount(20);
 
-    // Draw a button for throwing projectiles in many directions.  Again, note that if we
-    // hold the button, it keeps throwing
-    Helpers.addDirectionalThrowButton(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
-
     // Set up our pool of projectiles.  With this throwing mechanism, the farther from the
     // hero we press, the faster the projectile goes, so we multiply the velocity by .8 to
     // slow it down a bit
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100, body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }), strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
     });
+
+    // Draw a button for throwing projectiles in many directions.  Again, note that if we
+    // hold the button, it keeps throwing
+    Helpers.addDirectionalThrowButton(game.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
 
     // We'll set up a timer, so that enemies keep falling from the sky
     game.world.timer.addEvent(new TimedEvent(1, true, () => {
@@ -2912,24 +2922,24 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryEnemyCount();
 
+    // Set up a projectile pool with 5 projectiles
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
+      maxAtOnce: 5,
+      body: { radius: 0.25, cx: -100, cy: -100 },
+      appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
+      strength: 1,
+      multiplier: 2,
+      gravityAffectsProjectiles: true,
+      immuneToCollisions: false,
+    });
+
     // cover "most" of the screen with a button for throwing projectiles.  This
     // ensures that we can still tap the hero to make it jump
     Helpers.addTapControl(game.hud, { cx: 8.5, cy: 4.5, width: 15, height: 9, img: "" },
-      Helpers.ThrowDirectionalAction(game.hud, h, 0, 0)
+      Helpers.ThrowDirectionalAction(game.hud, projectiles, h, 0, 0)
     );
 
-    // Set up a projectile pool with 5 projectiles
-    game.world.projectiles = new ProjectileSystem(
-      game.world,
-      {
-        maxAtOnce: 5,
-        body: { radius: 0.25, cx: -100, cy: -100 },
-        appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
-        strength: 1,
-        multiplier: 2,
-        gravityAffectsProjectiles: true,
-        immuneToCollisions: false,
-      });
 
     // We want to make it so that when the ball hits the obstacle (the
     // backboard), it doesn't disappear. The only time a projectile does not
@@ -2995,7 +3005,8 @@ export function buildLevelScreen(level: number) {
 
     // Set up our projectiles.  One thing we add here is a sound when they
     // disappear
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
@@ -3007,7 +3018,7 @@ export function buildLevelScreen(level: number) {
     // Touching will throw a projectile downward
     h.gestures = {
       tap: () => {
-        game.world.projectiles!.throwFixed(h, .12, .75, 0, 10);
+        (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .12, .75, 0, 10);
         return true;
       }
     };
@@ -3327,12 +3338,12 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
     h.gestures = {
-      tap: () => { game.world.projectiles!.throwFixed(h, .4, .4, 0, -3); return true; }
+      tap: () => { (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .4, .4, 0, -3); return true; }
     };
 
     // make a projectile pool and give an animation pattern for the projectiles
-    game.world.projectiles = new ProjectileSystem(
-      game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
       appearance: new AnimatedSprite({ width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 }),
@@ -3760,24 +3771,25 @@ export function buildLevelScreen(level: number) {
     });
     o.gestures = {
       tap: () => {
-        game.world.projectiles!.throwFixed(h, .125, .75, 0, 15);
+        (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .125, .75, 0, 15);
         return true;
       }
     };
 
     // set up our projectiles.  There are only 20... throw them carefully
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 3, strength: 2,
       body: { radius: 0.25, cx: -100, cy: -100 },
       appearance: new ImageSprite({ img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 }),
       randomImageSources: ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"]
     });
-    game.world.projectiles.setNumberOfProjectiles(20);
+    projectiles.setNumberOfProjectiles(20);
 
     // show how many shots are left
     Helpers.makeText(game.hud,
       { cx: 0.5, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 12, z: 2 },
-      () => game.world.projectiles?.getRemaining() + " projectiles left");
+      () => projectiles.getRemaining() + " projectiles left");
 
     // draw a bunch of enemies to defeat
     cfg = { cx: 4, cy: 5, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
@@ -4380,12 +4392,13 @@ export function buildLevelScreen(level: number) {
 
     // Tapping the hero will throw a projectile, which is another way to defeat
     // enemies
-    h.gestures = { tap: () => { game.world.projectiles!.throwFixed(h, -.75, 0, -20, 0); return true; } }
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100, strength: 1,
       body: { radius: 0.1, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.2, height: 0.21, img: "grey_ball.png" })
     });
+    h.gestures = { tap: () => { (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, -.75, 0, -20, 0); return true; } }
 
     // add an obstacle that has an enemy collision callback, so it can defeat
     // enemies by colliding with them (but only the one we mark as "weak")
@@ -4562,15 +4575,16 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addDirectionalThrowButton(game.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
 
     // set up our pool of projectiles, then set them to have a fixed
     // velocity when using the vector throw mechanism
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
       body: { radius: 0.1, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.2, height: 0.2, img: "grey_ball.png" }),
     });
+    Helpers.addDirectionalThrowButton(game.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
 
     // we're going to win by "surviving" for 25 seconds... with no enemies, that
     // shouldn't be too hard.  Let's put the timer on the HUD, so the player
@@ -4939,20 +4953,21 @@ export function buildLevelScreen(level: number) {
 
     game.score.setVictoryDestination(1);
 
-    // draw a button for throwing projectiles in many directions. It
-    // only covers half the screen, to show how such an effect would
-    // behave
-    Helpers.addDirectionalThrowButton(game.hud,
-      { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, h, 100, 0, 0);
-
     // set up a pool of projectiles with fixed velocity, and with
     // rotation
-    game.world.projectiles = new ProjectileSystem(game.world, {
+    let projectiles = new ProjectileSystem();
+    Helpers.populateProjectilePool(game.world, projectiles, {
       maxAtOnce: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
       immuneToCollisions: true,
       body: { width: 0.02, height: .5, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.02, height: 1, img: "red.png" }),
     });
+
+    // draw a button for throwing projectiles in many directions. It
+    // only covers half the screen, to show how such an effect would
+    // behave
+    Helpers.addDirectionalThrowButton(game.hud,
+      projectiles, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, h, 100, 0, 0);
 
     // Warning!  If you make these projectiles any longer, and if you are not
     // careful about your offsets, you might find that they seem to "not shoot",

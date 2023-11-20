@@ -2,7 +2,7 @@ import { initializeAndLaunch } from "../jetlag/Stage";
 import { GameCfg } from "../jetlag/Config";
 import { ErrorVerbosity } from "../jetlag/Services/Console";
 import { FilledSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
+import { ExplicitMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { GridSystem } from "../jetlag/Systems/GridSystem";
@@ -11,6 +11,9 @@ import { game } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ProjectileSystem } from "../jetlag/Systems/Projectiles";
 import { TimedEvent } from "../jetlag/Systems/Timer";
+
+// TODO: Stop needing this
+import * as Helpers from "../demo_game/helpers";
 
 /** Configuration information for the tut_jetlag_tour game */
 export class GameConfig implements GameCfg {
@@ -64,7 +67,8 @@ function tut_jetlag_tour(level: number) {
         game.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { h.rigidBody.body.SetAngularVelocity(0); });
 
         // Set up projectiles
-        game.world.projectiles = new ProjectileSystem(game.world, {
+        let projectiles = new ProjectileSystem();
+        Helpers.populateProjectilePool(game.world, projectiles, {
             maxAtOnce: 20, strength: 1, body: { radius: 0.125, cx: -100, cy: -100 },
             appearance: FilledSprite.Circle({ radius: .125, fillColor: "#bbbbbb", z: 0 }), range: 10, immuneToCollisions: true,
         });
@@ -76,7 +80,7 @@ function tut_jetlag_tour(level: number) {
             let x = h.rigidBody.getCenter().x;
             let y = h.rigidBody.getCenter().y;
             let scale = 8;
-            game.world.projectiles?.throwAt(x, y, x + scale * dx, y + scale * dy, h, 0, 0);
+            (projectiles.get()?.movement as ProjectileMovement).throwAt(projectiles, x, y, x + scale * dx, y + scale * dy, h, 0, 0);
         });
 
 
