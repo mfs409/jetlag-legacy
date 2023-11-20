@@ -30,8 +30,8 @@ use `npm run clean-demo`.
 ### Tutorial Live Demos
 
 To run a development server for a tutorial's live demo, use an environment
-variable.  For example, on Linux, you can serve the "getting_started" live demo
-via `TARGET=getting_started npm run start-dev`.  To clean up, use `npm run
+variable.  For example, on Linux, you can serve the "tut_getting_started" live
+demo via `TARGET=tut_getting_started npm run start-dev`.  To clean up, use `npm run
 clean-dev`.
 
 ### Release Versions (Demo Game and Tutorial Live Demos)
