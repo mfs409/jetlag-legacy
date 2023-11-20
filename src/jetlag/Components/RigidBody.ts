@@ -1,6 +1,6 @@
 import { b2Body, b2BodyType, b2CircleShape, b2DistanceJoint, b2DistanceJointDef, b2PolygonShape, b2RevoluteJoint, b2RevoluteJointDef, b2Transform, b2Vec2, b2WeldJointDef } from "@box2d/core";
 import { BoxCfgOpts, CircleCfgOpts, PolygonCfgOpts, AdvancedRigidBodyCfgOpts } from "../Config";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { DebugSprite } from "../Services/ImageService";
 import { Actor } from "../Entities/Actor";
 import { StateEvent } from "./StateManager";
@@ -179,8 +179,8 @@ export class RigidBodyComponent {
    * @param radius    The radius of a circumscribed circle, for culling
    * @param shapeType The shape type, for quick disambiguation
    */
-  private constructor(protected scene: Scene, public props: BoxCfg | CircleCfg | PolygonCfg, public radius: number, private shapeType: ShapeType) {
-    this.debug = game.imageLibrary.makeDebugContext();
+  private constructor(readonly scene: Scene, public props: BoxCfg | CircleCfg | PolygonCfg, public radius: number, private shapeType: ShapeType) {
+    this.debug = stage.imageLibrary.makeDebugContext();
     this.body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: this.props.cx, y: this.props.cy } });
   }
 
@@ -504,7 +504,7 @@ export class RigidBodyComponent {
    * @param scene     The world in which to create the body
    * @param commonCfg Additional configuration
    */
-  public static Circle(circleCfg: CircleCfgOpts, scene: Scene = game.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Circle(circleCfg: CircleCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let rb = new RigidBodyComponent(scene, new CircleCfg(circleCfg, commonCfg), circleCfg.radius, ShapeType.CIRCLE);
     let shape = new b2CircleShape();
     shape.m_radius = circleCfg.radius;
@@ -525,7 +525,7 @@ export class RigidBodyComponent {
    *                  game.world)
    * @param commonCfg Additional configuration
    */
-  public static Box(boxCfg: BoxCfgOpts, scene: Scene = game.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Box(boxCfg: BoxCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let rb = new RigidBodyComponent(scene, new BoxCfg(boxCfg, commonCfg), Math.sqrt(Math.pow(boxCfg.height / 2, 2) + Math.pow(boxCfg.width / 2, 2)), ShapeType.BOX);
     let shape = new b2PolygonShape();
     shape.SetAsBox(rb.props.w / 2, rb.props.h / 2);
@@ -543,7 +543,7 @@ export class RigidBodyComponent {
    * @param scene       The world in which to create the body
    * @param commonCfg   Additional configuration
    */
-  public static Polygon(polygonCfg: PolygonCfgOpts, scene: Scene = game.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Polygon(polygonCfg: PolygonCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
     let r = 0;
     for (let i = 0; i < polygonCfg.vertices.length; i += 2)
       r = Math.max(r, Math.pow(polygonCfg.vertices[i], 2), + Math.pow(polygonCfg.vertices[i + 1], 2));

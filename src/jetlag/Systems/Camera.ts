@@ -1,6 +1,6 @@
 import { b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 
 /**
  * The Camera is used to determine /how much/ of a world to render.  The Camera
@@ -89,7 +89,7 @@ export class CameraSystem {
   constructor(maxX: number, maxY: number, ratio: number) {
     this.max.Set(maxX, maxY)
     this.center.Set((this.max.x - this.min.x) / 2, (this.max.y - this.min.y) / 2);
-    this.screenDims.Set(game.screenWidth, game.screenHeight);
+    this.screenDims.Set(stage.screenWidth, stage.screenHeight);
     this.ratio = ratio;
     this.setScale(this.ratio);
 
@@ -209,8 +209,8 @@ export class CameraSystem {
     // w and h are the visible world's width and height in pixels
     let w = this.ratio * (this.max.x - this.min.x);
     let h = this.ratio * (this.max.y - this.min.y);
-    if (w < this.screenDims.x) game.console.urgent("Warning, the visible game area is less than the screen width");
-    if (h < this.screenDims.y) game.console.urgent("Warning, the visible game area is less than the screen height");
+    if (w < this.screenDims.x) stage.console.log("Warning, the visible game area is less than the screen width");
+    if (h < this.screenDims.y) stage.console.log("Warning, the visible game area is less than the screen height");
   }
 
   /**

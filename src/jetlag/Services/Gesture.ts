@@ -37,8 +37,8 @@ export class GestureService {
       if (stage.config.hitBoxes) {
         let world_coords = stage.world.camera.screenToMeters(e.offsetX, e.offsetY);
         let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
-        stage.console.info("World Touch: (" + world_coords.x + ", " + world_coords.y + ")");
-        stage.console.info("HUD Touch: (" + hud_coords.x + ", " + hud_coords.y + ")");
+        stage.console.log("World Touch: (" + world_coords.x + ", " + world_coords.y + ")");
+        stage.console.log("HUD Touch: (" + hud_coords.x + ", " + hud_coords.y + ")");
       }
       // If we have an overlay scene right now, let it handle the tap
       if (stage.overlay) {

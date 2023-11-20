@@ -1,6 +1,5 @@
 import { Sprite } from "./Services/ImageService";
-import { ErrorVerbosity } from "./Services/Console";
-import { game } from "./Stage";
+import { stage } from "./Stage";
 
 /**
  * ImgConfigOpts expresses the required and optional fields that a programmer
@@ -59,11 +58,11 @@ export interface FilledCircleConfigOpts {
 }
 
 /**
- * FilledPolyConfigOpts expresses the required and optional fields that a
+ * FilledPolygonConfigOpts expresses the required and optional fields that a
  * programmer should provide to JetLag in order to create an entity whose visual
  * representation is a solid polygon.
  */
-export interface FilledPolyConfigOpts {
+export interface FilledPolygonConfigOpts {
   /** Z index of the polygon: Must be in the range [-2, 2] */
   z?: number;
   /** Vertices of the polygon */
@@ -219,7 +218,7 @@ export class AnimationSequence {
     let a = new AnimationSequence(this.loop);
     for (let s of this.steps)
       a.steps.push({
-        cell: game.imageLibrary.getSprite(s.cell.imgName),
+        cell: stage.imageLibrary.getSprite(s.cell.imgName),
         duration: s.duration
       });
     return a;
@@ -234,7 +233,7 @@ export class AnimationSequence {
    * @return         The Animation, so that we can chain calls to "to()"
    */
   public to(imgName: string, duration: number): AnimationSequence {
-    this.steps.push({ cell: game.imageLibrary.getSprite(imgName), duration });
+    this.steps.push({ cell: stage.imageLibrary.getSprite(imgName), duration });
     return this;
   }
 }
@@ -251,7 +250,7 @@ export class GestureHandlers {
    * @param panStart  code to run on a pan start event
    * @param panMove   code to run on a pan move event
    * @param panStop   code to run on a pan stop event
-   * @param touchDown code to run on a downpress event
+   * @param touchDown code to run on a down press event
    * @param touchUp   code to run on a release event
    * @param swipe     code to run on a swipe event
    */
@@ -333,9 +332,6 @@ export interface GameCfg {
 
   /** Should the phone vibrate on certain events? */
   readonly canVibrate: boolean;
-
-  /** How verbose should we be with printing to the console? */
-  readonly verbosity: ErrorVerbosity;
 
   /** Should JetLag print an outline around each actor in the game? */
   readonly hitBoxes: boolean;

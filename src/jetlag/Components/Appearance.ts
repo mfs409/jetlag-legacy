@@ -2,9 +2,9 @@ import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageService";
 import { CameraSystem } from "../Systems/Camera";
 import { Actor } from "../Entities/Actor";
-import { AniCfgOpts, AnimationSequence, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolyConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";
-import { AnimationState as AnimationState, StateEvent, IStateObserver, transitions } from "./StateManager";
-import { game } from "../Stage";
+import { AniCfgOpts, AnimationSequence, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolygonConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";
+import { AnimationState, StateEvent, IStateObserver, transitions } from "./StateManager";
+import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { InertMovement } from "./Movement";
 import { Passive } from "./Role";
@@ -37,6 +37,27 @@ export class ImageConfig {
     if (tmpZ > 2) tmpZ = 2;
     this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
   }
+}
+
+/**
+ * Validate a filledConfig object's line/fill information
+ *
+ * @param cfg     The config object to validate
+ * @param cfgName The type of the object, for error messages
+ */
+function validateFilledConfig(cfg: FilledBoxConfig | FilledCircleConfig | FilledPolygonConfig, cfgName: string) {
+  // Validate: if there's a line width, there needs to be a line color
+  if (cfg.lineWidth !== undefined && cfg.lineColor === undefined)
+    stage.console.log(`Error: ${cfgName} with lineWidth must have lineColor`);
+
+  // Validate: if there's a line color, there needs to be a line width
+  else if (cfg.lineColor !== undefined && cfg.lineWidth === undefined)
+    stage.console.log(`Error: ${cfgName} with lineColor must have lineWidth`);
+
+  // Validate: if there is no line width or line color, there needs to be a fill color
+  else if (cfg.lineWidth === undefined && cfg.fillColor === undefined)
+    stage.console.log(`Error: ${cfgName} must have lineWidth or fillColor`);
+
 }
 
 /** 
@@ -76,19 +97,7 @@ export class FilledBoxConfig {
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
 
-    // TODO: Consolidate common code?
-
-    // Validate: if there's a line width, there needs to be a line color
-    if (this.lineWidth !== undefined && this.lineColor === undefined)
-      game.console.urgent("Error: FilledBox with lineWidth must have lineColor");
-
-    // Validate: if there's a line color, there needs to be a line width
-    else if (this.lineColor !== undefined && this.lineWidth === undefined)
-      game.console.urgent("Error: FilledBox with lineColor must have lineWidth");
-
-    // Validate: if there is no line width or line color, there needs to be a fill color
-    else if (this.lineWidth === undefined && this.fillColor === undefined)
-      game.console.urgent("Error: FilledBox must have lineWidth or fillColor");
+    validateFilledConfig(this, "FilledBox");
   }
 }
 
@@ -132,26 +141,16 @@ export class FilledCircleConfig {
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
 
-    // Validate: if there's a line width, there needs to be a line color
-    if (this.lineWidth !== undefined && this.lineColor === undefined)
-      game.console.urgent("Error: FilledCircle with lineWidth must have lineColor");
-
-    // Validate: if there's a line color, there needs to be a line width
-    else if (this.lineColor !== undefined && this.lineWidth === undefined)
-      game.console.urgent("Error: FilledCircle with lineColor must have lineWidth");
-
-    // Validate: if there is no line width or line color, there needs to be a fill color
-    else if (this.lineWidth === undefined && this.fillColor === undefined)
-      game.console.urgent("Error: FilledCircle must have lineWidth or fillColor");
+    validateFilledConfig(this, "FilledCircle");
   }
 }
 
 /**
- * FilledPolyConfig expresses the required and optional fields that a programmer
+ * FilledPolygonConfig expresses the required and optional fields that a programmer
  * should provide to JetLag in order to create an entity whose visual
  * representation is a solid polygon.
  */
-export class FilledPolyConfig {
+export class FilledPolygonConfig {
   /** Z index of the polygon: Must be in the range [-2, 2] */
   z: number;
   /** Width, to simplify some other code */
@@ -168,12 +167,12 @@ export class FilledPolyConfig {
   fillColor?: string;
 
   /**
-   * Construct a FilledPolyConfig object
+   * Construct a FilledPolygonConfig object
    *
    * @param opts The configuration options that describe how to make this
    *             polygon's configuration
    */
-  constructor(opts: FilledPolyConfigOpts) {
+  constructor(opts: FilledPolygonConfigOpts) {
     this.vertices = [];
     for (let i = 0; i < opts.vertices.length; i += 2)
       this.vertices.push({ x: opts.vertices[i], y: opts.vertices[i + 1] });
@@ -199,26 +198,13 @@ export class FilledPolyConfig {
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
 
-    // Validate: if there's a line width, there needs to be a line color
-    if (this.lineWidth !== undefined && this.lineColor === undefined)
-      game.console.urgent("Error: FilledPoly with lineWidth must have lineColor");
-
-    // Validate: if there's a line color, there needs to be a line width
-    else if (this.lineColor !== undefined && this.lineWidth === undefined)
-      game.console.urgent("Error: FilledPoly with lineColor must have lineWidth");
-
-    // Validate: if there is no line width or line color, there needs to be a fill color
-    else if (this.lineWidth === undefined && this.fillColor === undefined)
-      game.console.urgent("Error: FilledPoly must have lineWidth or fillColor");
+    validateFilledConfig(this, "FilledPolygon");
   }
 }
 
 /**
  * TextConfig stores the geometry and other configuration information needed
  * when describing on-screen text.
- *
- * TODO:  At some point, would we be better off with a CenteredText and a
- *        TopLeft Text?
  */
 export class TextConfig {
   /** Width of the text (computed) */
@@ -378,7 +364,7 @@ export class TextSprite {
    */
   constructor(cfgOpts: TxtConfigOpts, public producer: string | (() => string)) {
     this.props = new TextConfig(cfgOpts);
-    this.text = game.imageLibrary.makeText("", { fontFamily: this.props.face, fontSize: this.props.size, fill: this.props.rgb });
+    this.text = stage.imageLibrary.makeText("", { fontFamily: this.props.face, fontSize: this.props.size, fill: this.props.rgb });
     this.props.w = this.text.getRenderObject().width;
     this.props.h = this.text.getRenderObject().height;
   }
@@ -402,7 +388,7 @@ export class TextSprite {
     // where to put it...
     this.text.setText((typeof this.producer == "string") ? this.producer : this.producer());
     this.text.setPosition(this.actor?.rigidBody.getCenter().x ?? 0, this.actor?.rigidBody.getCenter().y ?? 0);
-    game.renderer.addTextToFrame(this.text, camera, this.props.c);
+    stage.renderer.addTextToFrame(this.text, camera, this.props.c);
   }
 
   /**
@@ -418,7 +404,7 @@ export class TextSprite {
     // where to put it...
     this.text.setText((typeof this.producer == "string") ? this.producer : this.producer());
     this.text.setPosition(anchor.cx, anchor.cy);
-    game.renderer.addTextToFrame(this.text, camera, this.props.c);
+    stage.renderer.addTextToFrame(this.text, camera, this.props.c);
   }
 
   /** Perform any custom updates to the text before displaying it */
@@ -455,7 +441,7 @@ export class ImageSprite {
    */
   constructor(cfg: ImgConfigOpts) {
     this.props = new ImageConfig(cfg);
-    this.image = game.imageLibrary.getSprite(cfg.img);
+    this.image = stage.imageLibrary.getSprite(cfg.img);
   }
 
   /** Make a clone of the provided ImageSprite */
@@ -471,7 +457,7 @@ export class ImageSprite {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor?.rigidBody)
-      game.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera);
+      stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera);
   }
 
   /**
@@ -483,7 +469,7 @@ export class ImageSprite {
    * @param elapsedMs The time since the last render
    */
   renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
-    game.renderer.addPictureToFrame(anchor, this, this.image, camera);
+    stage.renderer.addPictureToFrame(anchor, this, this.image, camera);
   }
 
   /**
@@ -492,7 +478,7 @@ export class ImageSprite {
    * @param imgName The name of the new image file to use
    */
   public setImage(imgName: string) {
-    this.image = game.imageLibrary.getSprite(imgName);
+    this.image = stage.imageLibrary.getSprite(imgName);
   }
 
   /** Perform any custom updates to the text before displaying it */
@@ -511,14 +497,12 @@ export class ImageSprite {
  */
 export class AnimatedSprite implements IStateObserver {
   /** The Actor to which this AnimatedSprite is attached */
-  private _actor?: Actor;
-  /** The Actor to which this AnimatedSprite is attached */
-  get actor() { return this._actor; }
-  /** The Actor to which this AnimatedSprite is attached */
   set actor(a: Actor | undefined) {
     this._actor = a;
     a?.state.registerObserver(this);
   }
+  get actor() { return this._actor; }
+  private _actor?: Actor;
 
   /** The configuration/geometry of this AnimatedSprite */
   public props: AnimationConfig;
@@ -532,7 +516,7 @@ export class AnimatedSprite implements IStateObserver {
   /** The amount of time for which the current frame has been displayed */
   private elapsedTime = 0;
 
-  /** The last state of the Entity; determines which animation is showing */
+  /** The last state of the Actor; determines which animation is showing */
   private lastState = AnimationState.IDLE_RIGHT;
 
   /** The amount of time remaining in a throw animation, if one is active */
@@ -616,7 +600,6 @@ export class AnimatedSprite implements IStateObserver {
       let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.props.disappear.offset.x;
       let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.props.disappear.offset.y;
       let o = Actor.Make({
-        scene: entity.scene,
         appearance: new AnimatedSprite({ idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
         rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, entity.scene, { collisionsEnabled: false }),
         // TODO: will we always want this to be inert, or might we sometimes want to animate it while letting it keep moving / bouncing / etc?
@@ -655,7 +638,7 @@ export class AnimatedSprite implements IStateObserver {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor?.rigidBody)
-      game.renderer.addBodyToFrame(this, this.actor.rigidBody, this.getCurrent(), camera);
+      stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.getCurrent(), camera);
   }
 
   /**
@@ -667,7 +650,7 @@ export class AnimatedSprite implements IStateObserver {
    * @param elapsedMs The time since the last render
    */
   renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
-    game.renderer.addPictureToFrame(anchor, this, this.getCurrent(), camera);
+    stage.renderer.addPictureToFrame(anchor, this, this.getCurrent(), camera);
   }
 
   /**
@@ -708,7 +691,7 @@ export class FilledSprite {
    *
    * @param props  The configuration options for this FilledSprite
    */
-  private constructor(public props: FilledBoxConfig | FilledCircleConfig | FilledPolyConfig) {
+  private constructor(public props: FilledBoxConfig | FilledCircleConfig | FilledPolygonConfig) {
   }
 
   /**
@@ -734,8 +717,8 @@ export class FilledSprite {
    *
    * @param cfg The configuration of this FilledPolygon
    */
-  public static Polygon(cfg: FilledPolyConfigOpts) {
-    return new FilledSprite(new FilledPolyConfig(cfg));
+  public static Polygon(cfg: FilledPolygonConfigOpts) {
+    return new FilledSprite(new FilledPolygonConfig(cfg));
   }
 
   /** Make a clone of the provided FilledSprite */
@@ -753,13 +736,13 @@ export class FilledSprite {
         lineColor: this.props.lineColor, fillColor: this.props.fillColor
       }));
     }
-    else if (this.props instanceof FilledPolyConfig) {
+    else if (this.props instanceof FilledPolygonConfig) {
       let vertices = [] as number[];
       for (let v of this.props.vertices) {
         vertices.push(v.x);
         vertices.push(v.y);
       }
-      return new FilledSprite(new FilledPolyConfig({
+      return new FilledSprite(new FilledPolygonConfig({
         vertices, z: this.props.z, lineWidth: this.props.lineWidth,
         lineColor: this.props.lineColor, fillColor: this.props.fillColor
       }));
@@ -777,12 +760,6 @@ export class FilledSprite {
    * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
-    // TODO: This code is probably in the wrong place.  We're moving the
-    //       image because the body position is centered, not top-left.
-    // if (this.body) {
-    //   this.props.x -= this.props.w / 2;
-    //   this.props.y -= this.props.h / 2;
-    // }
     if (this.actor) {
       this.graphics.clear();
       if (this.props instanceof FilledBoxConfig) {
@@ -799,7 +776,7 @@ export class FilledSprite {
         this.graphics.position.set(x, y);
         this.graphics.pivot.set(x + w / 2, y + h / 2);
         this.graphics.rotation = this.actor.rigidBody.getRotation();
-        game.renderer.addGraphic(this.graphics);
+        stage.renderer.addGraphic(this.graphics);
       }
       else if (this.props instanceof FilledCircleConfig) {
         if (this.props.lineWidth)
@@ -811,10 +788,10 @@ export class FilledSprite {
         let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
         let radius = s * this.props.radius;
         this.graphics.drawCircle(x, y, radius);
-        game.renderer.addGraphic(this.graphics);
+        stage.renderer.addGraphic(this.graphics);
 
       }
-      else if (this.props instanceof FilledPolyConfig) {
+      else if (this.props instanceof FilledPolygonConfig) {
         if (this.props.lineWidth)
           this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
         if (this.props.fillColor)
@@ -836,7 +813,7 @@ export class FilledSprite {
         this.graphics.position.set(x, y);
         this.graphics.pivot.set(x, y);
         this.graphics.rotation = this.actor.rigidBody.getRotation();
-        game.renderer.addGraphic(this.graphics);
+        stage.renderer.addGraphic(this.graphics);
       }
       else {
         throw "Error: unrecognized FilledSprite props type"

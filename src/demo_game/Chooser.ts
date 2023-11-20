@@ -3,7 +3,7 @@
 import { Actor } from "../jetlag/Entities/Actor";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import * as Helpers from "./helpers";
-import { game } from "../jetlag/Stage";
+import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
@@ -25,7 +25,7 @@ export function buildChooserScreen(index: number) {
 
   // This line ensures that, no matter what level we draw, the ESCAPE key is
   // configured to go back to the Splash
-  game.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => { game.switchTo(buildSplashScreen, 1); });
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => { stage.switchTo(buildSplashScreen, 1); });
 
   // screen 1: show levels 1 --> 24
   //
@@ -35,9 +35,8 @@ export function buildChooserScreen(index: number) {
     // set up background and music
     Helpers.setMusic("tune.ogg");
     Actor.Make({
-      scene: game.world,
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
-      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
+      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -83,9 +82,8 @@ export function buildChooserScreen(index: number) {
     // set up background and music
     Helpers.setMusic("tune.ogg");
     Actor.Make({
-      scene: game.world,
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
-      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
+      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -118,9 +116,8 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   // for each button, start by drawing an obstacle
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "level_tile.png" };
   let tile = Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -128,13 +125,12 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   // attach a callback and print the level number with a touchCallback, and then put text on top of it
   let tap = () => {
     console.log("tap on " + whichLevel)
-    game.switchTo(buildLevelScreen, whichLevel); return true;
+    stage.switchTo(buildLevelScreen, whichLevel); return true;
   };
   tile.gestures = { tap };
   Actor.Make({
-    scene: game.world,
     appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world, { collisionsEnabled: false }),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world, { collisionsEnabled: false }),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -153,14 +149,13 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "left_arrow.png" };
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
-    scene: game.world,
     appearance: img,
-    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
   let tap = () => {
-    game.switchTo(buildChooserScreen, chooserLevel);
+    stage.switchTo(buildChooserScreen, chooserLevel);
     return true;
   };
   btn.gestures = { tap };
@@ -179,14 +174,13 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "right_arrow.png" };
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
-    scene: game.world,
     appearance: img,
-    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
   let tap = () => {
-    game.switchTo(buildChooserScreen, chooserLevel);
+    stage.switchTo(buildChooserScreen, chooserLevel);
     return true;
   };
   btn.gestures = { tap };
@@ -204,14 +198,13 @@ function drawSplashButton(x: number, y: number, width: number, height: number) {
   let cfg = { box: true, cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "back_arrow.png" };
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
-    scene: game.world,
     appearance: img,
-    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
   let tap = () => {
-    game.switchTo(buildSplashScreen, 1);
+    stage.switchTo(buildSplashScreen, 1);
     return true;
   };
   btn.gestures = { tap };

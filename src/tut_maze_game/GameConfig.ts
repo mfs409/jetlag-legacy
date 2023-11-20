@@ -2,7 +2,6 @@
 
 import { tutorial_builder } from "./Splash";
 import { GameCfg } from "../jetlag/Config";
-import { ErrorVerbosity } from "../jetlag/Services/Console";
 
 /**
  * GameConfig stores things like screen dimensions and other game configuration,
@@ -19,7 +18,6 @@ export class GameConfig implements GameCfg {
   canVibrate = true;
   forceAccelerometerOff = true;
   storageKey = "com.me.my_jetlag_game.storage";
-  verbosity = ErrorVerbosity.LOUD;
   hitBoxes = true;
 
   // Here's where we name all the images/sounds/background music files.  You'll

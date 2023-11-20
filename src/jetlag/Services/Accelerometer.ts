@@ -1,5 +1,5 @@
 import { b2Vec2 } from "@box2d/core";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 
 /**
  * We are probably going to need a way to re-interpret the meaning of
@@ -46,13 +46,13 @@ export class AccelerometerService {
 
     // If the service doesn't exist, disable the accelerometer
     if (!("DeviceMotionEvent" in window)) {
-      game.console.urgent("DeviceMotion API not available... unable to use tilt to control entities");
+      stage.console.log("DeviceMotion API not available... unable to use tilt to control entities");
       this.tiltSupported = false;
       return;
     }
     if (mode != AccelerometerMode.LANDSCAPE) {
       // TODO: start supporting PORTRAIT mode?
-      game.console.urgent("Unsupported device orientation mode");
+      stage.console.log("Unsupported device orientation mode");
       this.tiltSupported = false;
       return;
     }

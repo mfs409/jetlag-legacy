@@ -1,5 +1,5 @@
 import { b2Vec2 } from "@box2d/core";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { CameraSystem } from "../Systems/Camera";
 import { AppearanceComponent } from "../Components/Appearance";
 
@@ -31,10 +31,10 @@ class ParallaxLayer {
     // figure out how many sprites we need to properly tile the image
     let num = 1;
     if (this.isHorizontal) {
-      let screenWidthMeters = game.screenWidth / game.pixelMeterRatio;
+      let screenWidthMeters = stage.screenWidth / stage.pixelMeterRatio;
       num += Math.ceil(screenWidthMeters / defaultImage.props.w);
     } else {
-      let screenHeightMeters = game.screenHeight / game.pixelMeterRatio;
+      let screenHeightMeters = stage.screenHeight / stage.pixelMeterRatio;
       num += Math.ceil(screenHeightMeters / defaultImage.props.h);
     }
     for (let i = 0; i < num; ++i)
@@ -75,8 +75,8 @@ class ParallaxLayer {
   private normalizeAndRender(camera: CameraSystem, elapsedMs: number) {
     let x = camera.getOffsetX(); // left of viewport
     let y = camera.getOffsetY(); // top of viewport
-    let camW = game.screenWidth / game.pixelMeterRatio;
-    let camH = game.screenHeight / game.pixelMeterRatio;
+    let camW = stage.screenWidth / stage.pixelMeterRatio;
+    let camH = stage.screenHeight / stage.pixelMeterRatio;
     // Normalize the reference tile
     // TODO: surely some O(1) algebra would work here?
     if (this.isHorizontal) {
@@ -125,8 +125,8 @@ class ParallaxLayer {
   private renderVisibleTiles(camera: CameraSystem, elapsedMs: number) {
     let x = camera.getOffsetX(); // left of viewport
     let y = camera.getOffsetY(); // top of viewport
-    let camW = game.screenWidth / game.pixelMeterRatio;
-    let camH = game.screenHeight / game.pixelMeterRatio;
+    let camW = stage.screenWidth / stage.pixelMeterRatio;
+    let camH = stage.screenHeight / stage.pixelMeterRatio;
     if (this.isHorizontal) {
       let i = 0;
       let plx = this.last.x;

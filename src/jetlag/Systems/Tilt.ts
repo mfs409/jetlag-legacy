@@ -1,4 +1,4 @@
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { b2Vec2 } from "@box2d/core";
 import { TiltMovement } from "../Components/Movement";
 
@@ -32,7 +32,7 @@ export class TiltSystem {
    */
   public handleTilt() {
     // Get accelerometer reading
-    let gravity = game.accelerometer.accel.Clone();
+    let gravity = stage.accelerometer.accel.Clone();
     // Scale it by the multiplier, then clip it to the GravityMax.x/y range
     gravity.Scale(this.tiltMultiplier);
     gravity.x = gravity.x > this.tiltMax.x ? this.tiltMax.x : gravity.x;

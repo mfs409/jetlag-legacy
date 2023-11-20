@@ -2,7 +2,7 @@
 
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
-import { game } from "../jetlag/Stage";
+import { stage } from "../jetlag/Stage";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
 import { Destination, Goodie, Hero, Obstacle, Passive } from "../jetlag/Components/Role";
@@ -39,9 +39,8 @@ export function tutorial_builder(index: number) {
     // Create a hero controlled explicitly via special touches
     let heroCfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
-      scene: game.world,
       appearance: new ImageSprite(heroCfg),
-      rigidBody: RigidBodyComponent.Circle(heroCfg, game.world, { friction: 0.6 }),
+      rigidBody: RigidBodyComponent.Circle(heroCfg, stage.world, { friction: 0.6 }),
       role: new Hero(),
       movement: new ExplicitMovement(),
     });
@@ -53,8 +52,7 @@ export function tutorial_builder(index: number) {
         if (cell === "#") {
           let wallCfg = { cx: col + 0.5, cy: row + 0.5, width: 1, height: 1, img: "noise.png" };
           Actor.Make({
-            scene: game.world,
-            rigidBody: RigidBodyComponent.Box(wallCfg, game.world, { friction: 1 }),
+            rigidBody: RigidBodyComponent.Box(wallCfg, stage.world, { friction: 1 }),
             appearance: new ImageSprite(wallCfg),
             movement: new InertMovement(),
             role: new Obstacle(),
@@ -62,9 +60,8 @@ export function tutorial_builder(index: number) {
         } else if (cell === "G") {
           const goodieCfg = { cx: col + 0.5, cy: row + 0.5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
           Actor.Make({
-            scene: game.world,
             appearance: new ImageSprite(goodieCfg),
-            rigidBody: RigidBodyComponent.Circle(goodieCfg, game.world),
+            rigidBody: RigidBodyComponent.Circle(goodieCfg, stage.world),
             movement: new InertMovement(),
             role: new Goodie(),
           });
@@ -76,32 +73,30 @@ export function tutorial_builder(index: number) {
     // Create a destination for the goodie
     let destCfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
     Actor.Make({
-      scene: game.world,
       appearance: new ImageSprite(destCfg),
-      rigidBody: RigidBodyComponent.Circle(destCfg, game.world),
-      role: new Destination({ onAttemptArrival: () => { return game.score.goodieCount[0] >= 1; } }),
+      rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] >= 1; } }),
       movement: new InertMovement(),
     });
-    game.score.setVictoryDestination(1);
+    stage.score.setVictoryDestination(1);
 
     Actor.Make({
-      scene: game.hud,
-      appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - game.score.goodieCount[0] + " Remaining Goodies"),
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.goodieCount[0] + " Remaining Goodies"),
       role: new Passive(),
       movement: new InertMovement(),
-      rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, game.hud),
+      rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, stage.hud),
     });
 
     // Draw a joystick on the HUD to control the hero
-    addJoystickControl(game.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
+    addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
 
     winMessage("Great Job");
 
-    game.score.onLose = { index: index, builder: buildSplashScreen };
-    game.score.onWin = { level: index, builder: buildSplashScreen };
+    stage.score.onLose = { index: index, builder: buildSplashScreen };
+    stage.score.onWin = { level: index, builder: buildSplashScreen };
   }
   else if (index == 2) {
-    makeText(game.world, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 28, z: 0 }, () => "Nothing here yet...")
+    makeText(stage.world, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 28, z: 0 }, () => "Nothing here yet...")
   }
 }
 
@@ -113,10 +108,10 @@ export function tutorial_builder(index: number) {
  * @param callback  Code to run when the win message first appears
  */
 function winMessage(message: string, callback?: () => void) {
-  game.score.winSceneBuilder = (overlay: Scene) => {
+  stage.score.winSceneBuilder = (overlay: Scene) => {
     addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
-      game.clearOverlay();
-      game.switchTo(() => { }, 1);
+      stage.clearOverlay();
+      stage.switchTo(() => { }, 1);
       return true;
     });
     makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
@@ -170,7 +165,6 @@ function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts, c
 function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
   // TODO: it's probably not worth having this helper function
   let c = Actor.Make({
-    scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
     movement: new InertMovement(),
@@ -191,7 +185,6 @@ function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coor
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
   let c = Actor.Make({
-    scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
     movement: new InertMovement(),
@@ -213,7 +206,6 @@ function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coor
  */
 function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
   return Actor.Make({
-    scene,
     appearance: new TextSprite(cfgOpts, producer),
     // TODO: the ".1" options are somewhat arbitrary
     rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: .1, height: .1 }, scene),

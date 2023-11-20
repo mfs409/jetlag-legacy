@@ -1,6 +1,6 @@
 import { b2Vec2, b2Transform } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { RigidBodyComponent } from "../Components/RigidBody";
 import { AppearanceComponent } from "../Components/Appearance";
 import { InertMovement } from "../Components/Movement";
@@ -85,7 +85,7 @@ export class SvgSystem {
     // send the request.  On completion, we'll be in onFileLoaded
     let xhr = new XMLHttpRequest();
     xhr.addEventListener("load", (aa: ProgressEvent) => svg.onFileLoaded(aa));
-    xhr.open("GET", game.config.resourcePrefix + file, true);
+    xhr.open("GET", stage.config.resourcePrefix + file, true);
     xhr.send();
   }
 
@@ -263,10 +263,10 @@ export class SvgSystem {
     y2 -= this.top_left!.y;
 
     // convert the coordinates to meters
-    x1 /= game.pixelMeterRatio;
-    y1 /= game.pixelMeterRatio;
-    x2 /= game.pixelMeterRatio;
-    y2 /= game.pixelMeterRatio;
+    x1 /= stage.pixelMeterRatio;
+    y1 /= stage.pixelMeterRatio;
+    x2 /= stage.pixelMeterRatio;
+    y2 /= stage.pixelMeterRatio;
 
     // add in the user transform in meters and draw it
     x1 += this.translate.x;
@@ -292,9 +292,8 @@ export class SvgSystem {
     let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     // Make an obstacle and rotate it
     let cfg = { box: true, cx: centerX, cy: centerY, width: len, height: 0.05, img: "" };
-    let body = RigidBodyComponent.Box(cfg, game.world)
+    let body = RigidBodyComponent.Box(cfg, stage.world)
     let a = Actor.Make({
-      scene: game.world,
       appearance: this.appearanceMaker(body),
       rigidBody: body,
       // TODO: is this the right approach?  Should we have a MovementMaker?

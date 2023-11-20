@@ -1,6 +1,6 @@
 import { b2BodyType, b2Transform, b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { CameraSystem } from "../Systems/Camera";
 import { ActorPool } from "../Systems/ActorPool";
@@ -114,7 +114,7 @@ export class PathMovement {
    */
   constructor(private path: Path, private velocity: number, private loop: boolean) {
     if (path.getNumPoints() < 2) {
-      game.console.urgent("Error: path must have at least two points");
+      stage.console.log("Error: path must have at least two points");
       this.haltPath();
     } else {
       this.startPath();
@@ -136,7 +136,7 @@ export class PathMovement {
     this.velocity = velocity;
     this.loop = loop;
     if (this.path.getNumPoints() < 2) {
-      game.console.urgent("Error: path must have at least two points");
+      stage.console.log("Error: path must have at least two points");
     } else {
       this.startPath();
     }
@@ -166,13 +166,7 @@ export class PathMovement {
   }
 }
 
-/** 
- * A rule for moving based on Tilt / Accelerometer 
- *
- * TODO:  The aggressive use of tilt in the demo game tends to confuse more than
- *        it helps.  Consider adding a "KeyboardMovement", perhaps based on
- *        ExplicitMovement?
- */
+/** A rule for moving based on Tilt / Accelerometer  */
 export class TiltMovement {
   /** The Actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
@@ -185,7 +179,7 @@ export class TiltMovement {
   private _rigidBody?: RigidBodyComponent;
 
   /** Construct a policy for moving an actor via tilt */
-  constructor() { game.world.tilt?.addTiltActor(this); }
+  constructor() { stage.world.tilt?.addTiltActor(this); }
 
   /** Do any last-minute adjustments related to the movement */
   prerender(_elapsedMs: number, _camera: CameraSystem) { }
@@ -271,15 +265,13 @@ export class BasicChase {
 
     // remove changes for disabled directions, and boost the other
     // dimension a little bit
-    //
-    // TODO: These "multiply by 2" features should be part of the configuration
     if (!this.chaseInX) {
       x = this.rigidBody.body.GetLinearVelocity().x;
-      y *= 2;
+      y *= this.multiplier;
     }
     if (!this.chaseInY) {
       y = this.rigidBody.body.GetLinearVelocity().y;
-      x *= 2;
+      x *= this.multiplier;
     }
     // apply velocity
     this.rigidBody?.breakJoints();
@@ -289,12 +281,13 @@ export class BasicChase {
   /**
    * Specify that this actor is supposed to chase another actor
    *
-   * @param speed    The speed with which it chases the other actor
-   * @param target   The actor to chase
-   * @param chaseInX Should the actor change its x velocity?
-   * @param chaseInY Should the actor change its y velocity?
+   * @param speed       The speed with which it chases the other actor
+   * @param target      The actor to chase
+   * @param chaseInX    Should the actor change its x velocity?
+   * @param chaseInY    Should the actor change its y velocity?
+   * @param multiplier  A scaling factor for changing how fast the actor chases
    */
-  constructor(private speed: number, private target: Actor, private chaseInX: boolean, private chaseInY: boolean) {
+  constructor(private speed: number, private target: Actor, private chaseInX: boolean, private chaseInY: boolean, private multiplier: number = 2) {
   }
 }
 
@@ -322,8 +315,8 @@ export class ChaseFixed {
     let yDir = this.target.rigidBody.getCenter().x > this.rigidBody.getCenter().x ? 1 : -1;
 
     // Compute and apply velocity
-    let x = this.ignoreX ? this.rigidBody.body.GetLinearVelocity().x : xDir * this.xMagnitude;
-    let y = this.ignoreY ? this.rigidBody.body.GetLinearVelocity().y : yDir * this.yMagnitude;
+    let x = this.xMagnitude == undefined ? this.rigidBody.body.GetLinearVelocity().x : xDir * this.xMagnitude;
+    let y = this.yMagnitude == undefined ? this.rigidBody.body.GetLinearVelocity().y : yDir * this.yMagnitude;
     this.rigidBody.body.SetLinearVelocity({ x, y });
   }
 
@@ -331,18 +324,13 @@ export class ChaseFixed {
    * Specify that this actor is supposed to chase another actor, but using fixed
    * X/Y velocities
    *
-   * TODO: We can probably get rid of ignoreX and ignoreY, and instead use
-   * undefined?
-   *
-   * @param target     The actor to chase
-   * @param xMagnitude The magnitude in the x direction, if ignoreX is false
-   * @param yMagnitude The magnitude in the y direction, if ignoreY is false
-   * @param ignoreX    False if we should apply xMagnitude, true if we should
-   *                   keep the hero's existing X velocity
-   * @param ignoreY    False if we should apply yMagnitude, true if we should
-   *                   keep the hero's existing Y velocity
+   * @param target      The actor to chase
+   * @param xMagnitude  The magnitude in the x direction, overrides target's
+   *                    current x velocity
+   * @param yMagnitude  The magnitude in the y direction, overrides target's
+   *                    current y velocity
    */
-  constructor(private target: Actor, private xMagnitude: number, private yMagnitude: number, private ignoreX: boolean, private ignoreY: boolean) { }
+  constructor(private target: Actor, private xMagnitude: number | undefined, private yMagnitude: number | undefined) { }
 }
 
 /** A rule for moving via flick */
@@ -389,8 +377,7 @@ export class HoverMovement {
   /** Do any last-minute adjustments related to the movement */
   prerender(_elapsedMs: number, camera: CameraSystem) {
     if (!this.rigidBody) return;
-    // TODO: is it better to get the PMR here, or just in the constructor?
-    let pmr = game.pixelMeterRatio;
+    let pmr = stage.pixelMeterRatio;
     this.hover.Set(this.hoverX * pmr, this.hoverY * pmr);
     let a = camera.screenToMeters(this.hover.x, this.hover.y);
     this.hover.Set(a.x, a.y);
@@ -411,7 +398,7 @@ export class HoverMovement {
    * @param hoverY the Y coordinate (in pixels) where the actor should appear
    */
   constructor(private hoverX: number, private hoverY: number) {
-    let pmr = game.pixelMeterRatio;
+    let pmr = stage.pixelMeterRatio;
     this.hover = new b2Vec2(hoverX * pmr, hoverY * pmr);
   }
 
@@ -436,7 +423,7 @@ export class HoverFlick {
     if (!this.hover) return;
     if (!this.rigidBody) return;
 
-    let pmr = game.pixelMeterRatio;
+    let pmr = stage.pixelMeterRatio;
     this.hover.Set(this.hoverX * pmr, this.hoverY * pmr);
     let a = camera.screenToMeters(this.hover.x, this.hover.y);
     this.hover.Set(a.x, a.y);
@@ -461,7 +448,7 @@ export class HoverFlick {
    *                    to affect speed
    */
   constructor(private hoverX: number, private hoverY: number, public multiplier: number) {
-    let pmr = game.pixelMeterRatio;
+    let pmr = stage.pixelMeterRatio;
     this.hover = new b2Vec2(this.hoverX * pmr, this.hoverY * pmr);
   }
 
@@ -558,7 +545,7 @@ export class ProjectileMovement {
    */
   constructor(cfg: ProjectileSystemConfigOpts) {
     if (cfg.throwSound)
-      this.throwSound = game.musicLibrary.getSound(cfg.throwSound);
+      this.throwSound = stage.musicLibrary.getSound(cfg.throwSound);
     this.multiplier = cfg.multiplier ?? 1;
     this.fixedVectorVelocity = cfg.fixedVectorVelocity;
     this.rotateVectorThrow = cfg.rotateVectorThrow;

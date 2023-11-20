@@ -57,7 +57,7 @@ export class Stage {
   public foreground!: ParallaxSystem;
 
   /** Everything related to music */
-  readonly stageMusic = new MusicComponent();
+  readonly music = new MusicComponent();
 
   /** The Score, suitable for use throughout JetLag */
   readonly score = new ScoreSystem();
@@ -138,7 +138,7 @@ export class Stage {
 
     // Only set the color and play music if we don't have an overlay showing
     this.renderer.setFrameColor(this.backgroundColor);
-    this.stageMusic.playMusic();
+    this.music.playMusic();
 
     // Update the win/lose countdown timers and the stopwatch
     let t = this.score.onClockTick(elapsedMs);
@@ -177,8 +177,8 @@ export class Stage {
    */
   public switchTo(builder: (index: number, stage: Stage) => void, index: number) {
     // reset music
-    this.stageMusic.stopMusic();
-    this.stageMusic.clear();
+    this.music.stopMusic();
+    this.music.clear();
 
     // reset score
     this.score.reset();
@@ -220,10 +220,10 @@ export class Stage {
     this.screenHeight = config.screenDimensions.height;
 
     // Check if the config needs to be adapted, then check for errors
-    if (config.pixelMeterRatio <= 0) this.console.urgent("Invalid `pixelMeterRatio` in game config object");
+    if (config.pixelMeterRatio <= 0) this.console.log("Invalid `pixelMeterRatio` in game config object");
     if (config.adaptToScreenSize) this.adjustScreenDimensions();
-    if (this.screenWidth <= 0) this.console.urgent("`width` must be greater than zero in game config object");
-    if (this.screenHeight <= 0) this.console.urgent("`height` must be greater than zero in game config object");
+    if (this.screenWidth <= 0) this.console.log("`width` must be greater than zero in game config object");
+    if (this.screenHeight <= 0) this.console.log("`height` must be greater than zero in game config object");
 
     // Configure the services
     this.storage = new StorageService();
@@ -294,7 +294,7 @@ export class Stage {
     if (!!navigator.vibrate)
       navigator.vibrate(ms);
     else
-      this.console.info("Simulating " + ms + "ms of vibrate");
+      this.console.log("Simulating " + ms + "ms of vibrate");
   }
 }
 
@@ -305,8 +305,8 @@ export class Stage {
  * @param config The game configuration object
  */
 export function initializeAndLaunch(domId: string, config: GameCfg) {
-  game = new Stage(config, domId);
+  stage = new Stage(config, domId);
 }
 
 /** A global reference to the Stage, suitable for use throughout JetLag */
-export let game: Stage;
+export let stage: Stage;

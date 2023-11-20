@@ -1,7 +1,7 @@
 import { Enemy, Hero } from "../Components/Role";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 
 /**
  * These are the ways a level can be won: by enough heroes reaching a
@@ -223,17 +223,17 @@ export class ScoreSystem {
    */
   public endLevel(win: boolean) {
     if (win) {
-      if (this.winSceneBuilder) game.installOverlay(this.winSceneBuilder);
-      else game.switchTo(this.onWin.builder, this.onWin.level);
+      if (this.winSceneBuilder) stage.installOverlay(this.winSceneBuilder);
+      else stage.switchTo(this.onWin.builder, this.onWin.level);
     } else {
-      if (this.loseSceneBuilder) game.installOverlay(this.loseSceneBuilder);
-      else game.switchTo(this.onLose.builder, this.onLose.index);
+      if (this.loseSceneBuilder) stage.installOverlay(this.loseSceneBuilder);
+      else stage.switchTo(this.onLose.builder, this.onLose.index);
     }
   }
 
   /** Quit the game.  Stop the music before quitting. */
   public doQuit() {
-    game.stageMusic.stopMusic();
-    game.exit();
+    stage.music.stopMusic();
+    stage.exit();
   }
 }

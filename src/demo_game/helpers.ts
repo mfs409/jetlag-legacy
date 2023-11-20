@@ -9,17 +9,17 @@ import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { TimedEvent } from "../jetlag/Systems/Timer";
 import { AnimationSequence, BoxCfgOpts, GestureHandlers, AdvancedRigidBodyCfgOpts, ImgConfigOpts, TxtConfigOpts, CircleCfgOpts } from "../jetlag/Config";
 import { Enemy, Hero, Obstacle, Passive, Projectile } from "../jetlag/Components/Role";
-import { game } from "../jetlag/Stage";
+import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ActorPool } from "../jetlag/Systems/ActorPool";
 
 /** Manage the state of Mute */
 export function toggleMute() {
   // volume is either 1 or 0, switch it to the other and save it
-  let volume = 1 - parseInt(game.storage.getPersistent("volume") ?? "1");
-  game.storage.setPersistent("volume", "" + volume);
+  let volume = 1 - parseInt(stage.storage.getPersistent("volume") ?? "1");
+  stage.storage.setPersistent("volume", "" + volume);
   // update all music
-  game.musicLibrary.resetMusicVolume(volume);
+  stage.musicLibrary.resetMusicVolume(volume);
 }
 
 /**
@@ -51,7 +51,7 @@ export function makeAnimation(cfg: { timePerFrame: number, repeat: boolean, imag
  * muted, false corresponds to muted.
  */
 export function getVolume() {
-  return (game.storage.getPersistent("volume") ?? "1") === "1";
+  return (stage.storage.getPersistent("volume") ?? "1") === "1";
 }
 
 /**
@@ -61,7 +61,7 @@ export function getVolume() {
  *                  must have been registered as Music, not as a Sound
  */
 export function setMusic(musicName: string) {
-  game.stageMusic.setMusic(game.musicLibrary.getMusic(musicName));
+  stage.music.setMusic(stage.musicLibrary.getMusic(musicName));
 }
 
 /**
@@ -73,21 +73,21 @@ export function setMusic(musicName: string) {
  * @param yGravityMax Max Y force that the accelerometer can produce
  */
 export function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity: boolean = false) {
-  game.world.tilt!.tiltMax.Set(xGravityMax, yGravityMax);
+  stage.world.tilt!.tiltMax.Set(xGravityMax, yGravityMax);
 
-  if (!game.accelerometer.tiltSupported) {
-    game.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (game.accelerometer.accel.y = 0));
-    game.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (game.accelerometer.accel.y = 0));
-    game.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (game.accelerometer.accel.x = 0));
-    game.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (game.accelerometer.accel.x = 0));
+  if (!stage.accelerometer.tiltSupported) {
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
 
-    game.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (game.accelerometer.accel.y = -5));
-    game.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (game.accelerometer.accel.y = 5));
-    game.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (game.accelerometer.accel.x = -5));
-    game.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (game.accelerometer.accel.x = 5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
   }
 
-  game.world.tilt!.tiltVelocityOverride = asVelocity;
+  stage.world.tilt!.tiltVelocityOverride = asVelocity;
 }
 
 /**
@@ -97,7 +97,7 @@ export function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity:
  * @param newYGravity The new Y gravity
  */
 export function resetGravity(newXGravity: number, newYGravity: number) {
-  game.world.physics!.world.SetGravity(new b2Vec2(newXGravity, newYGravity));
+  stage.world.physics!.world.SetGravity(new b2Vec2(newXGravity, newYGravity));
 }
 
 /**
@@ -117,9 +117,8 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   let width = Math.abs(x0 - x1);
   let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
   Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
     movement: new InertMovement(),
     role: new Obstacle(),
   });
@@ -128,9 +127,8 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   // The top only differs by translating the Y from the bottom
   cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
   Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
     movement: new InertMovement(),
     role: new Obstacle(),
   });
@@ -139,9 +137,8 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   let height = Math.abs(y0 - y1);
   cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
   Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
     movement: new InertMovement(),
     role: new Obstacle(),
   });
@@ -149,9 +146,8 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   // The left only differs by translating the X
   cfg.cx -= (thickness + Math.abs(x0 - x1));
   Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world, commonCfg),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
     movement: new InertMovement(),
     role: new Obstacle(),
   });
@@ -167,7 +163,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
  */
 export function overlayToWorldCoords(overlay: Scene, x: number, y: number) {
   let pixels1 = overlay.camera.metersToScreen(x, y);
-  let pixels2 = game.world.camera.screenToMeters(pixels1.x, pixels1.y);
+  let pixels2 = stage.world.camera.screenToMeters(pixels1.x, pixels1.y);
   return pixels2;
 }
 
@@ -182,7 +178,6 @@ export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
   let c = Actor.Make({
-    scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
     movement: new InertMovement(),
@@ -205,7 +200,6 @@ export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap
 export function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
   // TODO: it's probably not worth having this helper function
   let c = Actor.Make({
-    scene,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, scene),
     movement: new InertMovement(),
@@ -231,7 +225,7 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
     // world can convert to its meters
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
     // If world actor with draggable, we're good
-    for (let actor of game.world.physics!.actorsAt(game.world.camera, pixels.x, pixels.y)) {
+    for (let actor of stage.world.physics!.actorsAt(stage.world.camera, pixels.x, pixels.y)) {
       if (actor.movement instanceof Draggable) {
         foundActor = actor;
         return true;
@@ -245,7 +239,7 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
     // need an actor, and need coords in pixels
     if (!foundActor) return false;
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let meters = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     // TODO: appearance or rigidBody?
     foundActor.rigidBody?.setCenter(meters.x, meters.y);
     return true;
@@ -266,7 +260,6 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
  */
 export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
   let c = Actor.Make({
-    scene: overlay,
     appearance: new ImageSprite(cfgOpts),
     rigidBody: RigidBodyComponent.Box(cfgOpts, overlay),
     movement: new InertMovement(),
@@ -277,7 +270,7 @@ export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgO
     let screenCoord1 = overlay.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
     // If world actor with flickMultiplier, we're good
     let movement: FlickMovement | HoverFlick | undefined = undefined;
-    for (let actor of game.world.physics!.actorsAt(game.world.camera, screenCoord1.x, screenCoord1.y)) {
+    for (let actor of stage.world.physics!.actorsAt(stage.world.camera, screenCoord1.x, screenCoord1.y)) {
       if (!(actor.movement instanceof FlickMovement) && !(actor.movement instanceof HoverFlick))
         return true;
       if (actor.movement.multiplier === 0) return false;
@@ -306,14 +299,14 @@ export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgO
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
 export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
-  game.gestures.gestureHudFirst = false;
+  stage.gestures.gestureHudFirst = false;
   addTapControl(scene, cfgOpts, (hudCoords: { x: number; y: number }) => {
-    let who = game.storage.getLevel("selected_entity") as Actor | undefined;
+    let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
     if (!who || !who.rigidBody) return false;
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let meters = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     who.rigidBody?.setCenter(meters.x - who.rigidBody.props.w / 2, meters.y - who.rigidBody.props.h / 2);
-    game.storage.setLevel("selected_entity", undefined);
+    stage.storage.setLevel("selected_entity", undefined);
     return true;
   });
 }
@@ -329,17 +322,17 @@ export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts & Box
  *                  touches won't change its trajectory)
  */
 export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, velocity: number, clear: boolean) {
-  game.gestures.gestureHudFirst = false;
+  stage.gestures.gestureHudFirst = false;
   addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
-    let who = game.storage.getLevel("selected_entity") as Actor | undefined;
+    let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
     if (!who || !who.rigidBody) return false;
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let meters = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     let r = new Path().to(who.rigidBody.getCenter().x, who.rigidBody.getCenter().y).to(meters.x, meters.y);
     who.rigidBody.body.SetLinearVelocity({ x: 0, y: 0 });
     who.rigidBody.body.SetAngularVelocity(0);
     (who.movement as PathMovement).resetPath(r, velocity, false);
-    if (clear) game.storage.setLevel("selected_entity", undefined);
+    if (clear) stage.storage.setLevel("selected_entity", undefined);
     return true;
   });
 }
@@ -356,12 +349,12 @@ export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOp
  *                  touches won't change its trajectory)
  */
 export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, velocity: number, clear: boolean) {
-  game.gestures.gestureHudFirst = false;
+  stage.gestures.gestureHudFirst = false;
   addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
-    let who = game.storage.getLevel("selected_entity") as Actor | undefined;
+    let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
     if (!who || !who.rigidBody) return false;
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let meters = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     // TODO: for dx and dy, appearance or rigidBody?
     let dx = meters.x - who.rigidBody.getCenter().x;
     let dy = meters.y - who.rigidBody.getCenter().y;
@@ -369,7 +362,7 @@ export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpt
     let v = new b2Vec2(dx / hy, dy / hy);
     who.rigidBody.body.SetAngularVelocity(0);
     who.rigidBody.body.SetLinearVelocity(v);
-    if (clear) game.storage.setLevel("selected_entity", undefined);
+    if (clear) stage.storage.setLevel("selected_entity", undefined);
     return true;
   });
 }
@@ -421,7 +414,6 @@ export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfg
  */
 export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts, whileDownAction?: () => void, onUpAction?: (coords: { x: number; y: number }) => void) {
   let c = Actor.Make({
-    scene: overlay,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, overlay),
     movement: new InertMovement(),
@@ -440,7 +432,7 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
   };
   c.gestures = { touchDown, touchUp };
   // Put the control and events in the appropriate lists
-  game.world.timer.repeatEvents.push(() => { if (active && whileDownAction) whileDownAction(); });
+  stage.world.timer.repeatEvents.push(() => { if (active && whileDownAction) whileDownAction(); });
   return c;
 }
 
@@ -463,7 +455,6 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
  */
 export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
   let c = Actor.Make({
-    scene: overlay,
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, overlay),
     movement: new InertMovement(),
@@ -474,7 +465,7 @@ export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool
   let touchDown = (hudCoords: { x: number; y: number }) => {
     isHolding = true;
     let pixels = overlay.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let world = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     v.x = world.x;
     v.y = world.y;
     return true;
@@ -485,7 +476,7 @@ export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool
   };
   let panMove = (hudCoords: { x: number; y: number }) => {
     let pixels = overlay.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let world = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     v.x = world.x;
     v.y = world.y;
     return isHolding;
@@ -493,7 +484,7 @@ export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool
   c.gestures = { touchDown, touchUp, panMove };
 
   let mLastThrow = 0;
-  game.world.timer.repeatEvents.push(() => {
+  stage.world.timer.repeatEvents.push(() => {
     if (isHolding) {
       let now = new Date().getTime();
       if (mLastThrow + msDelay < now) {
@@ -538,7 +529,7 @@ export function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: n
 export function ThrowDirectionalAction(scene: Scene, projectiles: ActorPool, actor: Actor, offsetX: number, offsetY: number) {
   return (hudCoords: { x: number; y: number }) => {
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
-    let world = game.world.camera.screenToMeters(pixels.x, pixels.y);
+    let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     (projectiles.get()?.movement as ProjectileMovement).throwAt(projectiles, actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, world.x, world.y, actor, offsetX, offsetY);
     return true;
   };
@@ -624,7 +615,7 @@ export function setShrinkOverTime(actor: Actor, shrinkX: number, shrinkY: number
       done = true;
     }
   });
-  game.world.timer.addEvent(te);
+  stage.world.timer.addEvent(te);
 }
 
 /**
@@ -637,7 +628,7 @@ export function defeatOnTouch(enemy: Enemy) {
   // TODO: It's probably not worth having this as its own function?
   if (!enemy.actor!.gestures) enemy.actor!.gestures = new GestureHandlers();
   enemy.actor!.gestures.tap = () => {
-    game.vibrate(100);
+    stage.vibrate(100);
     enemy.defeat(true);
     enemy.actor!.gestures!.tap = undefined;
     return true;
@@ -683,7 +674,7 @@ export function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostD
     (h.movement as ExplicitMovement).updateVelocity(x, y);
     // now set a timer to un-boost the speed
     if (boostDuration != undefined) {
-      game.world.timer.addEvent(
+      stage.world.timer.addEvent(
         new TimedEvent(boostDuration, false, () => {
           let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
           let x = v.x - boostAmountX;
@@ -710,7 +701,6 @@ export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, prod
   // NB: Produce the text once, to get a size estimate
   let dims = appearance.dims(scene.camera, producer());
   return Actor.Make({
-    scene,
     appearance,
     // TODO: the ".1" options are somewhat arbitrary
     rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: dims.width, height: dims.height }, scene),
@@ -736,7 +726,7 @@ export function populateProjectilePool(scene: Scene, pool: ActorPool, cfg: Proje
       rigidBody.body.SetGravityScale(1);
     rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
     let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide });
-    let p = Actor.Make({ scene, appearance, rigidBody, movement: new ProjectileMovement(cfg), role });
+    let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role });
     p.sounds = cfg.soundEffects;
     pool.put(p);
   }

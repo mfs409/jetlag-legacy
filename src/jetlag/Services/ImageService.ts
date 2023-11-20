@@ -1,6 +1,6 @@
 import { Assets, Graphics, Sprite as PixiSprite, Text as PixiText, Texture } from "pixi.js";
 import { GameCfg } from "../Config";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { b2Vec2 } from "@box2d/core";
 import { CameraSystem } from "../Systems/Camera";
 
@@ -194,7 +194,7 @@ export class ImageService {
   public getSprite(imgName: string) {
     let texture = this.textures.get(imgName);
     if (!texture) {
-      if (imgName !== "") game.console.info("Unable to find graphics asset '" + imgName + "'");
+      if (imgName !== "") stage.console.log("Unable to find graphics asset '" + imgName + "'");
       return new Sprite("", new PixiSprite());
     }
     // TODO: should we be cloning the texture?
@@ -211,7 +211,7 @@ export class ImageService {
    * @param opts  PIXI options for the text
    */
   public makeText(txt: string, opts: any) {
-    opts.fontSize = Math.floor(opts.fontSize * game.fontScaling);
+    opts.fontSize = Math.floor(opts.fontSize * stage.fontScaling);
     return new Text(new PixiText(txt, opts));
   }
 }

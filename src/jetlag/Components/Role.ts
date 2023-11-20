@@ -1,6 +1,6 @@
 import { b2Contact, b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { ISound } from "../Services/AudioService";
 import { StateEvent } from "./StateManager";
 
@@ -146,7 +146,7 @@ export class Goodie extends Role {
     this.disableGoodieCollision();
 
     // Provide a default onCollect handler
-    this.onCollect = (cfg.onCollect) ? cfg.onCollect : (_g: Actor, _h: Actor) => { game.score.goodieCount[0]++; return true; };
+    this.onCollect = (cfg.onCollect) ? cfg.onCollect : (_g: Actor, _h: Actor) => { stage.score.goodieCount[0]++; return true; };
   }
 
   /**
@@ -202,7 +202,7 @@ export class Destination extends Role {
 
     this.collisionRules.role.push(CollisionExemptions.DESTINATION);
 
-    if (cfg.arrivalSound) this.arrivalSound = game.musicLibrary.getSound(cfg.arrivalSound);
+    if (cfg.arrivalSound) this.arrivalSound = stage.musicLibrary.getSound(cfg.arrivalSound);
     this.capacity = cfg.capacity ?? 1;
     this.onAttemptArrival = cfg.onAttemptArrival;
   }
@@ -318,7 +318,7 @@ export class Enemy extends Role {
     this.disableGoodieCollision();
     this.disableDestinationCollision();
 
-    game.score.enemiesCreated++;
+    stage.score.enemiesCreated++;
     if (cfg.damage != undefined)
       this.damage = cfg.damage;
     this.onDefeatHero = cfg.onDefeatHero;
@@ -357,7 +357,7 @@ export class Enemy extends Role {
     this.actor!.remove(false);
 
     // possibly update score
-    if (increaseScore) game.score.onEnemyDefeated();
+    if (increaseScore) stage.score.onEnemyDefeated();
   }
 }
 
@@ -449,11 +449,11 @@ export class Hero extends Role {
     this.disableGoodieCollision();
     this.disableDestinationCollision();
 
-    game.score.heroesCreated++;
+    stage.score.heroesCreated++;
     if (cfg.strength != undefined)
       this._strength = cfg.strength;
     if (cfg.jumpSound)
-      this.jumpSound = game.musicLibrary.getSound(cfg.jumpSound);
+      this.jumpSound = stage.musicLibrary.getSound(cfg.jumpSound);
     this.allowMultiJump = !!cfg.allowMultiJump;
     this.strengthChangeCallback = cfg.strengthChangeCallback;
     this.mustSurvive = !!cfg.mustSurvive;
@@ -496,7 +496,7 @@ export class Hero extends Role {
     // Destinations try to receive the hero
     else if (other.role instanceof Destination) {
       if (other.role.receive(this.actor!)) {
-        game.score.onDestinationArrive();
+        stage.score.onDestinationArrive();
         // hide the hero quietly, since the destination might make a sound
         this.actor!.remove(true);
       }
@@ -512,7 +512,7 @@ export class Hero extends Role {
     else if (other.role instanceof Goodie) {
       if (!other.role.onCollect(other, this.actor!)) return true;
       other.remove(false);
-      game.score.onGoodieCollected();
+      stage.score.onGoodieCollected();
     }
     return false;
   }
@@ -527,7 +527,7 @@ export class Hero extends Role {
     // hero
     if (enemy.instantDefeat) {
       this.actor!.remove(false);
-      game.score.onDefeatHero(enemy.actor!, this.actor!);
+      stage.score.onDefeatHero(enemy.actor!, this.actor!);
       return;
     }
     // handle hero invincibility
@@ -550,7 +550,7 @@ export class Hero extends Role {
     // when we can't defeat it by losing strength, remove the hero
     else if (enemy.damage >= this._strength) {
       this.actor!.remove(false);
-      game.score.onDefeatHero(enemy.actor!, this.actor!);
+      stage.score.onDefeatHero(enemy.actor!, this.actor!);
     }
     // when we can defeat it by losing strength
     else {

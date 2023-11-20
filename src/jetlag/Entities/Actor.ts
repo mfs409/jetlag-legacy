@@ -6,7 +6,6 @@ import { Passive, RoleComponent } from "../Components/Role";
 import { Scene } from "./Scene";
 import { InertMovement, MovementComponent } from "../Components/Movement";
 import { GestureHandlers } from "../Config";
-import { game } from "../Stage";
 
 /**
  * Actor is the core entity of the game.  Pretty much everything on the stage is
@@ -56,7 +55,7 @@ export class Actor {
    *
    * @param scene The scene where the Actor goes (defaults to game.world)
    */
-  static Make(config: { scene?: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
+  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
     return new Actor(config);
   }
 
@@ -68,8 +67,8 @@ export class Actor {
    *
    * @param scene The scene where the Actor goes (defaults to game.world)
    */
-  private constructor(config: { scene?: Scene, rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
-    this.scene = config.scene ?? game.world;
+  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
+    this.scene = config.rigidBody.scene;
 
     this.appearance = config.appearance;
     this.scene.camera.addEntity(this);

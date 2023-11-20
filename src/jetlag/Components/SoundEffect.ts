@@ -1,4 +1,4 @@
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { ISound } from "../Services/AudioService";
 
 /** All audio-related aspects of an actor get stored here */
@@ -12,6 +12,6 @@ export class SoundEffectComponent {
    * @param soundName The name of the sound file to play
    */
   constructor(soundName: string) {
-    this.disappearSound = game.musicLibrary.getSound(soundName);
+    this.disappearSound = stage.musicLibrary.getSound(soundName);
   }
 }

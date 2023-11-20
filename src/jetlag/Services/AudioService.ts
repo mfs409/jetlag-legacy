@@ -1,18 +1,23 @@
 import { Howl, Howler } from "howler";
 import { GameCfg } from "../Config";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 
 /**
  * An abstract representation of a sound
  *
  * We use ISound so that the rest of JetLag doesn't need to know about Howler,
  * but an ISound is really just a Howl object.
+ *
+ * TODO:  pause() is a reasonable choice for background music, but sound effects
+ *        don't currently pause when a pause screen is showing.
  */
 export interface ISound {
   /** Play the sound */
   play(): void;
   /** Stop playing the sound */
   stop(): void;
+  /** Pause the sound, so we can resume it later */
+  pause(): void;
 }
 
 /**
@@ -47,7 +52,7 @@ export class AudioService {
   getSound(soundName: string) {
     let ret = this.sounds[soundName];
     if (!ret)
-      game.console.info("Error retrieving sound '" + soundName + "'");
+      stage.console.log("Error retrieving sound '" + soundName + "'");
     return ret;
   }
 
@@ -59,7 +64,7 @@ export class AudioService {
   getMusic(musicName: string) {
     let ret = this.music[musicName];
     if (!ret)
-      game.console.info("Error retrieving music '" + musicName + "'");
+      stage.console.log("Error retrieving music '" + musicName + "'");
     return ret;
   }
 

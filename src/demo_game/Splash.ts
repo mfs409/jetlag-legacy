@@ -3,7 +3,7 @@
 import * as Helpers from "./helpers";
 import { ImageSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
-import { game } from "../jetlag/Stage";
+import { stage } from "../jetlag/Stage";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
@@ -34,9 +34,8 @@ export function buildSplashScreen(_index: number) {
   // we'll make its dimensions 16x9, and center it at (8, 4.5).  We use z = -2,
   // so this will be behind everything.
   Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite({ width: 16, height: 9, img: "splash.png" }),
-    rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, game.world, { collisionsEnabled: false }),
+    rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -45,29 +44,28 @@ export function buildSplashScreen(_index: number) {
   // and set it up so that pressing it switches to the first page of the level
   // chooser.
   // test
-  Helpers.addTapControl(game.hud, { cx: 8, cy: 5.625, width: 2.5, height: 1.25, img: "" }, () => {
-    game.switchTo(buildChooserScreen, 1 + 1 - 1);
+  Helpers.addTapControl(stage.hud, { cx: 8, cy: 5.625, width: 2.5, height: 1.25, img: "" }, () => {
+    stage.switchTo(buildChooserScreen, 1 + 1 - 1);
     return true;
   });
 
   // Do the same, but this button goes to the first help screen
-  Helpers.addTapControl(game.hud, { cx: 3.2, cy: 6.15, width: 1.8, height: 0.9, img: "" }, () => {
-    game.switchTo(buildHelpScreen, 1);
+  Helpers.addTapControl(stage.hud, { cx: 3.2, cy: 6.15, width: 1.8, height: 0.9, img: "" }, () => {
+    stage.switchTo(buildHelpScreen, 1);
     return true;
   });
 
   // Set up the quit button
-  Helpers.addTapControl(game.hud, { cx: 12.75, cy: 6.1, width: 2, height: 0.9, img: "" }, () => {
-    game.score.doQuit();
+  Helpers.addTapControl(stage.hud, { cx: 12.75, cy: 6.1, width: 2, height: 0.9, img: "" }, () => {
+    stage.score.doQuit();
     return true;
   });
 
   // Draw a mute button
   let cfg = { box: true, cx: 15, cy: 8, width: 0.75, height: 0.75, img: "audio_off.png" };
   let mute = Actor.Make({
-    scene: game.world,
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, game.world),
+    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });

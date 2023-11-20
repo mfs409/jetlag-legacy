@@ -1,6 +1,6 @@
 import { Application, Container, Graphics, BlurFilter, ColorMatrixFilter, NoiseFilter } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 import { AppearanceComponent, } from "../Components/Appearance";
 import { RigidBodyComponent, PolygonCfg } from "../Components/RigidBody";
 import { CameraSystem } from "../Systems/Camera";
@@ -71,7 +71,7 @@ export class RenderService {
       // Tell the game to advance by a step
       let x = this.pixi.ticker.elapsedMS;
       this._elapsed += x;
-      game.render(x);
+      stage.render(x);
 
       // Add the containers to the renderer, so they'll show on screen
       if (this.debug) this.main.addChild(this.debug);

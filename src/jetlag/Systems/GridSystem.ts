@@ -23,14 +23,12 @@ export class GridSystem {
         let height = bottom_right.y - top_left.y;
         for (let x = top_left.x; x <= bottom_right.x; x += 1) {
             Actor.Make({
-                scene,
                 rigidBody: RigidBodyComponent.Box({ cx: x, cy: top_left.y + height / 2, width: 0.01, height }, scene),
                 appearance: FilledSprite.Box({ width: 0.01, height, lineWidth: 1, lineColor: "#000000", z: -2 })
             });
 
             if (x < bottom_right.x)
                 Actor.Make({
-                    scene,
                     rigidBody: RigidBodyComponent.Box({ cx: x + .5, cy: top_left.y + height / 2, width: 0.01, height }, scene),
                     appearance: FilledSprite.Box({ width: 0.01, height, lineWidth: 0.5, lineColor: "#1100dc", z: -2 })
                 });
@@ -38,14 +36,12 @@ export class GridSystem {
 
         for (let y = top_left.y; y <= bottom_right.y; y += 1) {
             Actor.Make({
-                scene,
                 rigidBody: RigidBodyComponent.Box({ cx: top_left.x + width / 2, cy: y, width, height: 0.01 }, scene),
                 appearance: FilledSprite.Box({ width, height: 0.01, lineWidth: 1, lineColor: "#000000", z: -2 })
             });
 
             if (y < bottom_right.y)
                 Actor.Make({
-                    scene,
                     rigidBody: RigidBodyComponent.Box({ cx: top_left.x + width / 2, cy: y + .5, width, height: 0.01 }, scene),
                     appearance: FilledSprite.Box({ width, height: 0.01, lineWidth: 0.5, lineColor: "#1100dc", z: -2 })
                 });
