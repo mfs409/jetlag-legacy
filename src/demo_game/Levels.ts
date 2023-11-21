@@ -499,7 +499,7 @@ export function buildLevelScreen(level: number) {
   // and zoom-out buttons on the HUD.
   else if (level == 11) {
     // make the level really big, and set up tilt
-    stage.world.camera.setBounds(64, 36);
+    stage.world.camera.setBounds(0, 0, 64, 36);
     Helpers.drawBoundingBox(0, 0, 64, 36, .1, { density: 1, elasticity: .3, friction: .4 });
     Helpers.enableTilt(10, 10);
 
@@ -1915,7 +1915,7 @@ export function buildLevelScreen(level: number) {
   // it move back up.
   else if (level == 31) {
     // make a long level but not a tall level, and provide a constant downward force:
-    stage.world.camera.setBounds(3 * 16, 9);
+    stage.world.camera.setBounds(0, 0, 3 * 16, 9);
     Helpers.resetGravity(0, 10);
     // turn on tilt, but only in the X dimension
     Helpers.enableTilt(10, 0);
@@ -1959,7 +1959,7 @@ export function buildLevelScreen(level: number) {
   // background uses transparency to show the blue color for part of the screen
   else if (level == 32) {
     // Start with a repeat of the previous level
-    stage.world.camera.setBounds(128, 9);
+    stage.world.camera.setBounds(0, 0, 128, 9);
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
@@ -2037,7 +2037,7 @@ export function buildLevelScreen(level: number) {
   // jumping
   else if (level == 33) {
     // Start like in the previous level
-    stage.world.camera.setBounds(128, 9);
+    stage.world.camera.setBounds(0, 0, 128, 9);
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
@@ -2084,7 +2084,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 34) {
     // default side-scroller setup.  Note that neither the hero nor the bounding box has
     // friction
-    stage.world.camera.setBounds(128, 9);
+    stage.world.camera.setBounds(0, 0, 128, 9);
     Helpers.resetGravity(0, 10);
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1 });
@@ -2146,7 +2146,7 @@ export function buildLevelScreen(level: number) {
   // controlling a helicopter.
   else if (level == 35) {
     // Note: we can go above the trees
-    stage.world.camera.setBounds(64, 15);
+    stage.world.camera.setBounds(0, 0, 64, 15);
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 64, 15, .1, { density: 1 });
     let boxCfg = { cx: 0.25, cy: 10, width: 0.75, height: 0.75, img: "green_ball.png" };
@@ -2204,7 +2204,7 @@ export function buildLevelScreen(level: number) {
   // screen.  It also shows that we can use a set of images to animate the
   // appearance of an actor, instead of just using a single image.
   else if (level == 36) {
-    stage.world.camera.setBounds(48, 9);
+    stage.world.camera.setBounds(0, 0, 48, 9);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, friction: 1 });
     // We do two new things here.  First, we provide animations in the hero's
     // configuration
@@ -2265,7 +2265,7 @@ export function buildLevelScreen(level: number) {
   // In the last level, we had complete control of the hero's movement.  Here,
   // we give the hero a fixed velocity, and only control its up/down movement.
   else if (level == 37) {
-    stage.world.camera.setBounds(48, 9);
+    stage.world.camera.setBounds(0, 0, 48, 9);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1 });
     let cfg = { cx: 47, cy: 8, radius: 0.5, width: 1, height: 1, img: "mustard_ball.png" };
     Actor.Make({
@@ -2319,7 +2319,7 @@ export function buildLevelScreen(level: number) {
   // crawling, ducking, rolling, spinning, etc. Note, too, that we can use it to
   // make the hero defeat certain enemies via crawl.
   else if (level == 38) {
-    stage.world.camera.setBounds(48, 9);
+    stage.world.camera.setBounds(0, 0, 48, 9);
     Helpers.resetGravity(0, 10);
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, elasticity: 0.3 });
     let cfg = { cx: 47, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -2399,7 +2399,7 @@ export function buildLevelScreen(level: number) {
   // speed either permanently or temporarily. In JetLag, we can use a collision
   // between a hero and an obstacle to achieve this effect.
   else if (level == 40) {
-    stage.world.camera.setBounds(160, 9);
+    stage.world.camera.setBounds(0, 0, 160, 9);
     Helpers.drawBoundingBox(0, 0, 160, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -2461,7 +2461,7 @@ export function buildLevelScreen(level: number) {
   // this level only exists to show that backgrounds can scroll vertically.
   else if (level == 41) {
     // set up a level where tilt only makes the hero move up and down
-    stage.world.camera.setBounds(16, 36);
+    stage.world.camera.setBounds(0, 0, 16, 36);
     Helpers.enableTilt(0, 10);
     Helpers.drawBoundingBox(0, 0, 16, 36, .1, { density: 1, friction: 1 });
     let cfg = { cx: 2, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -3957,7 +3957,7 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
     loseMessage("Try Again");
     Helpers.drawBoundingBox(0, 0, 64, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    stage.world.camera.setBounds(64, 9);
+    stage.world.camera.setBounds(0, 0, 64, 9);
 
     let cfg = { cx: 2, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -4949,7 +4949,7 @@ export function buildLevelScreen(level: number) {
 
     // center the camera a little ahead of the hero
     stage.world.camera.setCameraFocus(h, 5, 0);
-    stage.world.camera.setBounds(64, 9);
+    stage.world.camera.setBounds(0, 0, 64, 9);
 
     // set up the background
     stage.backgroundColor = 0x17b4ff;
@@ -4993,7 +4993,7 @@ export function buildLevelScreen(level: number) {
     });
 
     stage.world.camera.setCameraFocus(h, 5, 0);
-    stage.world.camera.setBounds(64, 9);
+    stage.world.camera.setBounds(0, 0, 64, 9);
 
     stage.backgroundColor = 0x17b4ff;
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
@@ -5626,7 +5626,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 88) {
     // set up a standard side scroller, but make it really really long, to
     // emulate infinite length
-    stage.world.camera.setBounds(300000, 9);
+    stage.world.camera.setBounds(0, 0, undefined, 9);
     Helpers.resetGravity(0, 10);
     welcomeMessage("Press to make the hero go up");
     winMessage("Great Job");
@@ -5729,7 +5729,7 @@ export function buildLevelScreen(level: number) {
   // this level
   else if (level == 89) {
     // We'll use tilt and jump to control the hero in this level
-    stage.world.camera.setBounds(32, 18);
+    stage.world.camera.setBounds(0, 0, 32, 18);
     Helpers.enableTilt(10, 10);
 
     Helpers.drawBoundingBox(0, 0, 32, 18, .1, { density: 1, elasticity: .3, friction: 1 });

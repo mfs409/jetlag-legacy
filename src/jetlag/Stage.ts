@@ -112,7 +112,7 @@ export class Stage {
    * @param builder Code for creating the overlay
    */
   public installOverlay(builder: (overlay: Scene) => void) {
-    this.overlay = new Scene(this.screenWidth, this.screenHeight, this.pixelMeterRatio);
+    this.overlay = new Scene(this.pixelMeterRatio);
     this.overlay.physics = new BasicCollisionSystem();
     builder(this.overlay);
   }
@@ -194,10 +194,10 @@ export class Stage {
     this.backgroundColor = 0xffffff;
 
     // Just re-make the scenes, instead of clearing the old ones
-    this.world = new Scene(this.screenWidth, this.screenHeight, this.pixelMeterRatio);
+    this.world = new Scene(this.pixelMeterRatio);
     this.world.physics = new AdvancedCollisionSystem(this.world);
     this.world.tilt = new TiltSystem();
-    this.hud = new Scene(this.screenWidth, this.screenHeight, this.pixelMeterRatio);
+    this.hud = new Scene(this.pixelMeterRatio);
     this.hud.physics = new BasicCollisionSystem();
     this.background = new ParallaxSystem();
     this.foreground = new ParallaxSystem();

@@ -19,11 +19,17 @@ export class CameraSystem {
   /** Anything in the world that can be rendered (5 planes [-2, -1, 0, 1, 2]) */
   protected readonly renderables: Actor[][] = [[], [], [], [], []];
 
-  /** The minimum x/y coordinates that can be shown (top left corner) */
-  private readonly min = new b2Vec2(0, 0);
+  /** The minimum x coordinate that can be shown (left) */
+  private minX: number | undefined = undefined;
 
-  /** The maximum x/y coordinates that can be shown (bottom right corner) */
-  private readonly max = new b2Vec2(0, 0);
+  /** The minimum y coordinate that can be shown (top) */
+  private minY: number | undefined = undefined;
+
+  /** The maximum x coordinate that can be shown (right) */
+  private maxX: number | undefined = undefined;
+
+  /** The maximum y coordinate that can be shown (bottom) */
+  private maxY: number | undefined = undefined;
 
   /** The current center point of the camera */
   private readonly center = new b2Vec2(0, 0);
@@ -72,8 +78,8 @@ export class CameraSystem {
 
     // figure out the entity's position + the offset
     let a = this.cameraChaseActor;
-    let x = (a.rigidBody?.body.GetWorldCenter().x ?? 0) + this.cameraOffset.x;
-    let y = (a.rigidBody?.body.GetWorldCenter().y ?? 0) + this.cameraOffset.y;
+    let x = a.rigidBody.body.GetWorldCenter().x + this.cameraOffset.x;
+    let y = a.rigidBody.body.GetWorldCenter().y + this.cameraOffset.y;
 
     // request that the camera center on that point
     this.setCenter(x, y);
@@ -82,13 +88,14 @@ export class CameraSystem {
   /**
    * Create a Camera by setting its bounds and its current pixel/meter ratio
    *
-   * @param maxX The maximum X value (in meters)
-   * @param maxY The maximum Y value (in meters)
    * @param ratio The initial pixel/meter ratio
    */
-  constructor(maxX: number, maxY: number, ratio: number) {
-    this.max.Set(maxX, maxY)
-    this.center.Set((this.max.x - this.min.x) / 2, (this.max.y - this.min.y) / 2);
+  constructor(ratio: number) {
+    // set up the game camera, with (0, 0) in the top left
+    let w = stage.screenWidth / ratio;
+    let h = stage.screenHeight / ratio;
+
+    this.center.Set(w / 2, h / 2);
     this.screenDims.Set(stage.screenWidth, stage.screenHeight);
     this.ratio = ratio;
     this.setScale(this.ratio);
@@ -123,13 +130,14 @@ export class CameraSystem {
   /**
    * Update a camera's bounds by providing a new maximum (X, Y) coordinate
    *
-   * TODO: We should have support for a truly "infinite" level
-   *
    * @param maxX The new maximum X value (in meters)
    * @param maxY The new maximum Y value (in meters)
    */
-  public setBounds(maxX: number, maxY: number) {
-    this.max.Set(maxX, maxY);
+  public setBounds(minX: number | undefined, minY: number | undefined, maxX: number | undefined, maxY: number | undefined) {
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
     // Warn if the new bounds are too small to fill the screen
     this.checkDims();
   }
@@ -153,10 +161,14 @@ export class CameraSystem {
 
     this.center.Set(centerX, centerY);
 
-    if (bottom > this.max.y) this.center.y = this.max.y - this.scaledVisibleRegionDims.y / 2;
-    if (top < this.min.y) this.center.y = this.min.y + this.scaledVisibleRegionDims.y / 2;
-    if (right > this.max.x) this.center.x = this.max.x - this.scaledVisibleRegionDims.x / 2;
-    if (left < this.min.x) this.center.x = this.min.x + this.scaledVisibleRegionDims.x / 2;
+    if (this.maxY != undefined && bottom > this.maxY)
+      this.center.y = this.maxY - this.scaledVisibleRegionDims.y / 2;
+    if (this.minY != undefined && top < this.minY)
+      this.center.y = this.minY + this.scaledVisibleRegionDims.y / 2;
+    if (this.maxX != undefined && right > this.maxX)
+      this.center.x = this.maxX - this.scaledVisibleRegionDims.x / 2;
+    if (this.minX != undefined && left < this.minX)
+      this.center.x = this.minX + this.scaledVisibleRegionDims.x / 2;
   }
 
   /**
@@ -207,10 +219,15 @@ export class CameraSystem {
    */
   private checkDims() {
     // w and h are the visible world's width and height in pixels
-    let w = this.ratio * (this.max.x - this.min.x);
-    let h = this.ratio * (this.max.y - this.min.y);
-    if (w < this.screenDims.x) stage.console.log("Warning, the visible game area is less than the screen width");
-    if (h < this.screenDims.y) stage.console.log("Warning, the visible game area is less than the screen height");
+    if (this.maxX != undefined && this.minX != undefined) {
+      let w = this.ratio * (this.maxX - this.minX);
+      if (w < this.screenDims.x) stage.console.log("Warning, the visible game area is less than the screen width");
+    }
+
+    if (this.maxY != undefined && this.minY != undefined) {
+      let h = this.ratio * (this.maxY - this.minY);
+      if (h < this.screenDims.y) stage.console.log("Warning, the visible game area is less than the screen height");
+    }
   }
 
   /**

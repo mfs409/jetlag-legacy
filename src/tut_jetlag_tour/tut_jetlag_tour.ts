@@ -106,7 +106,7 @@ function tut_jetlag_tour(level: number) {
         // 16 meters by 9 meters.  We'll make the "world" twice as wide.  All
         // this really means is that the camera won't show anything outside of
         // the range (0,0):(32,9):
-        stage.world.camera.setBounds(32, 9);
+        stage.world.camera.setBounds(0, 0, 32, 9);
 
         // This game will be a platformer/side scroller, so we want gravity
         // downward:

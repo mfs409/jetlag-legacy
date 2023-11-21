@@ -37,15 +37,10 @@ export class Scene {
   /**
    * Construct a new scene
    *
-   * @param screenWidth     The width of the screen, in pixels
-   * @param screenHeight    The height of the screen, in pixels
    * @param pixelMeterRatio The pixel-to-meter ratio, possibly adjusted for zoom
    */
-  constructor(screenWidth: number, screenHeight: number, pixelMeterRatio: number) {
-    // set up the game camera, with (0, 0) in the top left
-    let w = screenWidth / pixelMeterRatio;
-    let h = screenHeight / pixelMeterRatio;
-    this.camera = new CameraSystem(w, h, pixelMeterRatio);
+  constructor(pixelMeterRatio: number) {
+    this.camera = new CameraSystem(pixelMeterRatio);
   }
 
   /**
