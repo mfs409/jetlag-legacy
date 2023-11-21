@@ -1,7 +1,9 @@
+// TODO: Code Review
+
 import { b2Contact, b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
-import { ISound } from "../Services/AudioService";
+import { ISound } from "../Services/AudioLibrary";
 import { StateEvent } from "./StateManager";
 
 /**
@@ -146,7 +148,7 @@ export class Goodie extends Role {
     this.disableGoodieCollision();
 
     // Provide a default onCollect handler
-    this.onCollect = (cfg.onCollect) ? cfg.onCollect : (_g: Actor, _h: Actor) => { stage.score.goodieCount[0]++; return true; };
+    this.onCollect = (cfg.onCollect) ? cfg.onCollect : (_g: Actor, _h: Actor) => { stage.score.addToGoodieCount(0, 1); return true; };
   }
 
   /**
@@ -318,7 +320,7 @@ export class Enemy extends Role {
     this.disableGoodieCollision();
     this.disableDestinationCollision();
 
-    stage.score.enemiesCreated++;
+    stage.score.onEnemyCreated();
     if (cfg.damage != undefined)
       this.damage = cfg.damage;
     this.onDefeatHero = cfg.onDefeatHero;
@@ -449,7 +451,7 @@ export class Hero extends Role {
     this.disableGoodieCollision();
     this.disableDestinationCollision();
 
-    stage.score.heroesCreated++;
+    stage.score.onHeroCreated();
     if (cfg.strength != undefined)
       this._strength = cfg.strength;
     if (cfg.jumpSound)
@@ -527,7 +529,11 @@ export class Hero extends Role {
     // hero
     if (enemy.instantDefeat) {
       this.actor!.remove(false);
-      stage.score.onDefeatHero(enemy.actor!, this.actor!);
+      if (enemy.onDefeatHero)
+        enemy.onDefeatHero(enemy.actor!, this.actor!);
+
+      if (this.mustSurvive) stage.score.loseLevel();
+      else stage.score.onDefeatHero();
       return;
     }
     // handle hero invincibility
@@ -550,7 +556,11 @@ export class Hero extends Role {
     // when we can't defeat it by losing strength, remove the hero
     else if (enemy.damage >= this._strength) {
       this.actor!.remove(false);
-      stage.score.onDefeatHero(enemy.actor!, this.actor!);
+      if (enemy.onDefeatHero)
+        enemy.onDefeatHero(enemy.actor!, this.actor!);
+
+      if (this.mustSurvive) stage.score.loseLevel();
+      else stage.score.onDefeatHero();
     }
     // when we can defeat it by losing strength
     else {

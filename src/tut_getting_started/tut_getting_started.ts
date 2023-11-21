@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameCfg } from "../jetlag/Config";
+import { Config } from "../jetlag/Config";
 import { ImageSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
@@ -14,7 +14,7 @@ import * as Helpers from "../demo_game/helpers";
  * GameConfig stores things like screen dimensions and other game configuration,
  * as well as the names of all the assets (images and sounds) used by this game.
  */
-export class GameConfig implements GameCfg {
+export class GameConfig implements Config {
     // It's very unlikely that you'll want to change these next four values.
     // Hover over them to see what they mean.
     pixelMeterRatio = 100;
@@ -123,7 +123,7 @@ export function tut_getting_started(_index: number) {
 
     // Set up the quit button
     Helpers.addTapControl(stage.hud, { cx: 12.75, cy: 6.1, width: 2, height: 0.9, img: "" }, () => {
-        stage.score.doQuit();
+        stage.exit();
         return true;
     });
 

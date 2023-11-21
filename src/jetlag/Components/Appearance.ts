@@ -1,5 +1,7 @@
+// TODO: Code Review
+
 import { b2Vec2 } from "@box2d/core";
-import { Text, Sprite } from "../Services/ImageService";
+import { Text, Sprite } from "../Services/ImageLibrary";
 import { CameraSystem } from "../Systems/Camera";
 import { Actor } from "../Entities/Actor";
 import { AniCfgOpts, AnimationSequence, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolygonConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";

@@ -1,10 +1,12 @@
+// TODO: Code Review
+
 import { Application, Container, Graphics, BlurFilter, ColorMatrixFilter, NoiseFilter } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
 import { stage } from "../Stage";
 import { AppearanceComponent, } from "../Components/Appearance";
 import { RigidBodyComponent, PolygonCfg } from "../Components/RigidBody";
 import { CameraSystem } from "../Systems/Camera";
-import { Sprite, Text } from "./ImageService";
+import { Sprite, Text } from "./ImageLibrary";
 import { b2Vec2 } from "@box2d/core";
 
 /**
@@ -13,7 +15,7 @@ import { b2Vec2 } from "@box2d/core";
  * game to advance the simulation by some number of milliseconds.  Doing this 45
  * times per second is what makes our game work :)
  */
-export class RenderService {
+export class RendererService {
   /** The pixi application object is responsible for drawing onto a canvas */
   private pixi: Application;
 

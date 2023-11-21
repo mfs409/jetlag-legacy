@@ -1,4 +1,6 @@
-import { ISound } from "../Services/AudioService";
+// TODO: Code Review
+
+import { ISound } from "../Services/AudioLibrary";
 
 /**
  * MusicComponent manages the background music for a stage

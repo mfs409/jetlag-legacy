@@ -1,5 +1,7 @@
+// TODO: Code Review
+
 import { Assets, Graphics, Sprite as PixiSprite, Text as PixiText, Texture } from "pixi.js";
-import { GameCfg } from "../Config";
+import { Config } from "../Config";
 import { stage } from "../Stage";
 import { b2Vec2 } from "@box2d/core";
 import { CameraSystem } from "../Systems/Camera";
@@ -153,7 +155,7 @@ export class Text {
  * ImageService provides a library of image objects that can be used at any
  * time.
  */
-export class ImageService {
+export class ImageLibraryService {
   /**
    * A map with all the game's textures in it.  This is slightly easier than
    * PIXI.Assets, since we don't have to deal with promises, but of course that
@@ -179,7 +181,7 @@ export class ImageService {
    *
    * @param config The game-wide configuration
    */
-  constructor(private config: GameCfg) {
+  constructor(private config: Config) {
     // Set the names of the graphics assets, but don't load them yet.
     for (let imgName of config.imageNames!)
       Assets.add(imgName, config.resourcePrefix + imgName);

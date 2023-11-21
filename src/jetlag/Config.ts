@@ -1,4 +1,6 @@
-import { Sprite } from "./Services/ImageService";
+// TODO: Code Review
+
+import { Sprite } from "./Services/ImageLibrary";
 import { stage } from "./Stage";
 
 /**
@@ -317,10 +319,10 @@ export interface AdvancedRigidBodyCfgOpts {
 }
 
 /**
- * GameCfg stores game-specific configuration values.  The programmer makes one
+ * Config stores game-specific configuration values.  The programmer makes one
  * of these to tell JetLag how to run their game.
  */
-export interface GameCfg {
+export interface Config {
   /** How many pixels are equivalent to a meter in the game? */
   readonly pixelMeterRatio: number;
 
@@ -359,6 +361,6 @@ export interface GameCfg {
    */
   readonly forceAccelerometerOff: boolean;
 
-  /** The code that draws the main levels of the game */
+  /** The code that starts drawing levels of the game */
   readonly gameBuilder: (level: number) => void;
 }

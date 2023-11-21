@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameCfg } from "../jetlag/Config";
+import { Config } from "../jetlag/Config";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
@@ -14,7 +14,7 @@ import { buildSplashScreen } from "../demo_game/Splash";
  * GameConfig stores things like screen dimensions and other game configuration,
  * as well as the names of all the assets (images and sounds) used by this game.
  */
-class GameConfig implements GameCfg {
+class GameConfig implements Config {
     // It's very unlikely that you'll want to change these next four values.
     // Hover over them to see what they mean.
     pixelMeterRatio = 100;
@@ -114,13 +114,13 @@ function tut_maze_game(level: number) {
         Actor.Make({
             appearance: new ImageSprite(destCfg),
             rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
-            role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] >= 1; } }),
+            role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 1; } }),
             movement: new InertMovement(),
         });
         stage.score.setVictoryDestination(1);
 
         Actor.Make({
-            appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.goodieCount[0] + " Remaining Goodies"),
+            appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.getGoodieCount(0) + " Remaining Goodies"),
             role: new Passive(),
             movement: new InertMovement(),
             rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, stage.hud),
@@ -131,7 +131,7 @@ function tut_maze_game(level: number) {
 
         winMessage("Great Job");
 
-        stage.score.onLose = { index: level, builder: buildSplashScreen };
+        stage.score.onLose = { level: level, builder: buildSplashScreen };
         stage.score.onWin = { level: level, builder: buildSplashScreen };
     }
     else if (level == 2) {

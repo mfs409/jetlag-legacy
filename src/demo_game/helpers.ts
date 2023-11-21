@@ -1,4 +1,4 @@
-// Last review: 08-10-2023
+// TODO: Code Review
 
 import { b2BodyType, b2Vec2 } from "@box2d/core";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
@@ -73,7 +73,7 @@ export function setMusic(musicName: string) {
  * @param yGravityMax Max Y force that the accelerometer can produce
  */
 export function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity: boolean = false) {
-  stage.world.tilt!.tiltMax.Set(xGravityMax, yGravityMax);
+  stage.tilt.tiltMax.Set(xGravityMax, yGravityMax);
 
   if (!stage.accelerometer.tiltSupported) {
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
@@ -87,7 +87,7 @@ export function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity:
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
   }
 
-  stage.world.tilt!.tiltVelocityOverride = asVelocity;
+  stage.tilt.tiltVelocityOverride = asVelocity;
 }
 
 /**
@@ -224,8 +224,9 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
     // Need to turn the meters of the hud into screen pixels, so that
     // world can convert to its meters
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let world_coords = stage.world.camera.screenToMeters(pixels.x, pixels.y);
     // If world actor with draggable, we're good
-    for (let actor of stage.world.physics!.actorsAt(stage.world.camera, pixels.x, pixels.y)) {
+    for (let actor of stage.world.physics!.actorsAt(world_coords)) {
       if (actor.movement instanceof Draggable) {
         foundActor = actor;
         return true;
@@ -268,9 +269,10 @@ export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgO
   let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
     // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
     let screenCoord1 = overlay.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
+    let worldCoord1 = stage.world.camera.screenToMeters(screenCoord1.x, screenCoord1.y);
     // If world actor with flickMultiplier, we're good
     let movement: FlickMovement | HoverFlick | undefined = undefined;
-    for (let actor of stage.world.physics!.actorsAt(stage.world.camera, screenCoord1.x, screenCoord1.y)) {
+    for (let actor of stage.world.physics!.actorsAt(worldCoord1)) {
       if (!(actor.movement instanceof FlickMovement) && !(actor.movement instanceof HoverFlick))
         return true;
       if (actor.movement.multiplier === 0) return false;

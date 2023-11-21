@@ -1,7 +1,8 @@
+// TODO: Code Review
+
 import { b2AABB, b2Contact, b2ContactImpulse, b2ContactListener, b2DistanceJoint, b2DistanceJointDef, b2Fixture, b2Manifold, b2Vec2, b2World, b2WorldManifold } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
-import { CameraSystem } from "../Systems/Camera";
 
 /**
  * PointToActorCallback queries the world to find the actor at a given
@@ -76,8 +77,8 @@ export class BasicCollisionSystem {
    * @param screenX The X coordinate to look up
    * @param screenY The Y coordinate to look up
    */
-  public actorsAt(camera: CameraSystem, screenX: number, screenY: number) {
-    this.pointQuerier.query(camera.screenToMeters(screenX, screenY), this.world);
+  public actorsAt(coords: { x: number, y: number }) {
+    this.pointQuerier.query(coords, this.world);
     return this.pointQuerier.foundEntities;
   }
 }
@@ -100,8 +101,12 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
   private endContactHandlers: { actor1: Actor, actor2: Actor, callback: (a: Actor, b: Actor) => void }[] = [];
 
   /** Create an AdvancedCollisionSystem */
-  constructor(scene: Scene) {
+  constructor() {
     super();
+  }
+
+  /** Provide a scene, so we can route collision events to it */
+  public setScene(scene: Scene) {
     this.configureCollisionHandlers(scene);
   }
 

@@ -1,7 +1,9 @@
+// TODO: Code Review
+
 import { b2Body, b2BodyType, b2CircleShape, b2DistanceJoint, b2DistanceJointDef, b2PolygonShape, b2RevoluteJoint, b2RevoluteJointDef, b2Transform, b2Vec2, b2WeldJointDef } from "@box2d/core";
 import { BoxCfgOpts, CircleCfgOpts, PolygonCfgOpts, AdvancedRigidBodyCfgOpts } from "../Config";
 import { stage } from "../Stage";
-import { DebugSprite } from "../Services/ImageService";
+import { DebugSprite } from "../Services/ImageLibrary";
 import { Actor } from "../Entities/Actor";
 import { StateEvent } from "./StateManager";
 import { Scene } from "../Entities/Scene";

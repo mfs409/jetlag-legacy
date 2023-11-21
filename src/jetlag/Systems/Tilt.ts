@@ -2,6 +2,11 @@ import { stage } from "../Stage";
 import { b2Vec2 } from "@box2d/core";
 import { TiltMovement } from "../Components/Movement";
 
+/**
+ * TiltSystem stores the configuration for working with Tilt in a game.  This
+ * includes the actors affected by tilt, and the parameters for translating tilt
+ * events into physics interactions for those actors.
+ */
 export class TiltSystem {
   /** All actors whose behavior should change due to tilt */
   private readonly tiltActors: TiltMovement[] = [];
@@ -15,6 +20,14 @@ export class TiltSystem {
   /** A multiplier to apply to tilt (accelerometer) readings */
   public tiltMultiplier: number = 1;
 
+  /** Reset the Tilt System */
+  public reset() {
+    this.tiltActors.length = 0;
+    this.tiltMax.Set(0, 0);
+    this.tiltVelocityOverride = false;
+    this.tiltMultiplier = 1;
+  }
+
   /**
    * Indicate that an actor should be controlled by tilt.
    *
@@ -22,7 +35,7 @@ export class TiltSystem {
    *               via tilt
    */
   public addTiltActor(actor: TiltMovement) {
-    // Don't add things more than once
+    // NB:  Doesn't add things more than once
     if (this.tiltActors.indexOf(actor) < 0) this.tiltActors.push(actor);
   }
 

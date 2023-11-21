@@ -1,5 +1,7 @@
+// TODO: Code Review
+
 import { stage } from "../Stage";
-import { ISound } from "../Services/AudioService";
+import { ISound } from "../Services/AudioLibrary";
 
 /** All audio-related aspects of an actor get stored here */
 export class SoundEffectComponent {

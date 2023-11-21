@@ -1,5 +1,7 @@
+// TODO: Code Review
+
 import { Howl, Howler } from "howler";
-import { GameCfg } from "../Config";
+import { Config } from "../Config";
 import { stage } from "../Stage";
 
 /**
@@ -21,11 +23,11 @@ export interface ISound {
 }
 
 /**
- * AudioService provides a library of sound and music objects that can be played
+ * AudioLibraryService provides a library of sound and music objects that can be played
  * at any time.  The only difference between sounds and music is that music
  * objects will always loop, whereas sound objects never will.
  */
-export class AudioService {
+export class AudioLibraryService {
   /** All of the sounds (non-looping audio) in the game, by name */
   private readonly sounds: { [index: string]: ISound } = {};
 
@@ -37,7 +39,7 @@ export class AudioService {
    *
    * @param config The game-wide configuration
    */
-  constructor(config: GameCfg) {
+  constructor(config: Config) {
     for (let name of config.soundNames!)
       this.sounds[name] = new Howl({ src: [config.resourcePrefix + name] });
     for (let name of config.musicNames!)

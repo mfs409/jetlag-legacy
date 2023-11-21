@@ -1,19 +1,21 @@
+// TODO: Code Review
+
 import { Scene } from "./Entities/Scene";
 import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
-import { AudioService } from "./Services/AudioService";
+import { AudioLibraryService } from "./Services/AudioLibrary";
 import { MusicComponent } from "./Components/Music";
-import { ScoreSystem, VictoryState } from "./Systems/Score";
-import { GameCfg } from "./Config";
+import { ScoreSystem } from "./Systems/Score";
+import { Config } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
-import { RenderService } from "./Services/Renderer";
+import { RendererService } from "./Services/Renderer";
 
 import { AccelerometerMode, AccelerometerService } from "./Services/Accelerometer";
 import { StorageService } from "./Services/Storage";
 import { TiltSystem } from "./Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "./Systems/Collisions";
-import { ImageService } from "./Services/ImageService";
+import { ImageLibraryService } from "./Services/ImageLibrary";
 
 /**
  * Stage is the container for all of the functionality for the playable portion
@@ -43,6 +45,9 @@ export class Stage {
 
   /** A heads-up display */
   public hud!: Scene;
+
+  /** The tilt system for the stage */
+  public readonly tilt: TiltSystem;
 
   /** Any pause, win, or lose scene that supersedes the world and hud */
   public overlay?: Scene;
@@ -75,13 +80,13 @@ export class Stage {
   readonly accelerometer: AccelerometerService;
 
   /** rendering support, for drawing to the screen */
-  readonly renderer: RenderService;
+  readonly renderer: RendererService;
 
   /** A library of sound and music files */
-  readonly musicLibrary: AudioService;
+  readonly musicLibrary: AudioLibraryService;
 
   /** A library of images */
-  readonly imageLibrary: ImageService;
+  readonly imageLibrary: ImageLibraryService;
 
   /**
    * storage interfaces with the device's persistent storage, and also
@@ -112,8 +117,7 @@ export class Stage {
    * @param builder Code for creating the overlay
    */
   public installOverlay(builder: (overlay: Scene) => void) {
-    this.overlay = new Scene(this.pixelMeterRatio);
-    this.overlay.physics = new BasicCollisionSystem();
+    this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
     builder(this.overlay);
   }
 
@@ -140,15 +144,14 @@ export class Stage {
     this.renderer.setFrameColor(this.backgroundColor);
     this.music.playMusic();
 
-    // Update the win/lose countdown timers and the stopwatch
-    let t = this.score.onClockTick(elapsedMs);
-    if (t == VictoryState.LOSE) this.score.endLevel(false);
-    if (t == VictoryState.WIN) this.score.endLevel(true);
+    // Update the win/lose countdown timers and the stopwatch.  This might end
+    // the level.
+    this.score.onClockTick(elapsedMs);
 
     // handle accelerometer stuff... note that accelerometer is effectively
     // disabled during a popup... we could change that by moving this to the
     // top, but that's probably not going to produce logical behavior
-    this.world.tilt?.handleTilt();
+    this.tilt.handleTilt();
 
     // Advance the physics world
     this.world.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 })
@@ -194,11 +197,10 @@ export class Stage {
     this.backgroundColor = 0xffffff;
 
     // Just re-make the scenes, instead of clearing the old ones
-    this.world = new Scene(this.pixelMeterRatio);
-    this.world.physics = new AdvancedCollisionSystem(this.world);
-    this.world.tilt = new TiltSystem();
-    this.hud = new Scene(this.pixelMeterRatio);
-    this.hud.physics = new BasicCollisionSystem();
+    this.world = new Scene(this.pixelMeterRatio, new AdvancedCollisionSystem());
+    (this.world.physics as AdvancedCollisionSystem).setScene(this.world);
+    this.tilt.reset();
+    this.hud = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
     this.background = new ParallaxSystem();
     this.foreground = new ParallaxSystem();
 
@@ -212,7 +214,7 @@ export class Stage {
    * @param config  The game-wide configuration object
    * @param domId   The Id of the DOM element where the game exists
    */
-  constructor(readonly config: GameCfg, domId: string) {
+  constructor(readonly config: Config, domId: string) {
     this.console = new ConsoleService(config);
 
     this.pixelMeterRatio = config.pixelMeterRatio;
@@ -227,12 +229,12 @@ export class Stage {
 
     // Configure the services
     this.storage = new StorageService();
-    this.musicLibrary = new AudioService(config);
+    this.musicLibrary = new AudioLibraryService(config);
     this.gestures = new GestureService(domId, this);
     this.keyboard = new KeyboardService();
     this.accelerometer = new AccelerometerService(AccelerometerMode.LANDSCAPE, config.forceAccelerometerOff);
-    this.renderer = new RenderService(this.screenWidth, this.screenHeight, domId, this.config.hitBoxes);
-    this.imageLibrary = new ImageService(config);
+    this.renderer = new RendererService(this.screenWidth, this.screenHeight, domId, this.config.hitBoxes);
+    this.imageLibrary = new ImageLibraryService(config);
 
     // make sure the volume is reset to its old value
     this.musicLibrary.resetMusicVolume(parseInt(this.storage.getPersistent("volume") ?? "1"));
@@ -252,6 +254,8 @@ export class Stage {
       this.switchTo(this.config.gameBuilder, level!);
       this.renderer.startRenderLoop();
     });
+
+    this.tilt = new TiltSystem;
   }
 
   /**
@@ -282,7 +286,10 @@ export class Stage {
   }
 
   /** Close the window to exit the game */
-  public exit() { window.close(); }
+  public exit() {
+    this.music.stopMusic();
+    window.close();
+  }
 
   /**
    * Cause the device to vibrate for a fixed number of milliseconds, or print
@@ -304,7 +311,7 @@ export class Stage {
  * @param domId  The name of the DIV into which the game should be placed
  * @param config The game configuration object
  */
-export function initializeAndLaunch(domId: string, config: GameCfg) {
+export function initializeAndLaunch(domId: string, config: Config) {
   stage = new Stage(config, domId);
 }
 

@@ -1,5 +1,4 @@
 import { TimerSystem } from "../Systems/Timer"
-import { TiltSystem } from "../Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "../Systems/Collisions";
 import { CameraSystem } from "../Systems/Camera";
 import { b2Vec2 } from "@box2d/core";
@@ -13,21 +12,13 @@ import { b2Vec2 } from "@box2d/core";
  *
  * - World: This is the scene in which all of the action takes place during
  *   gameplay.  It is likely to use an advanced physics world, with a more
- *   robust collision system.  It is also likely to have a projectile system and
- *   a tilt system.
+ *   robust collision system.
  * - Hud: This is the heads-up display that sits on top of the World scene, and
  *   provides a user interface.
  * - Overlay: We use short-lived scenes that obscure the world for situations
  *   like starting a level, winning/losing a level, and pausing a level.
  */
 export class Scene {
-  /** The optional tilt system for the scene */
-  public tilt?: TiltSystem;
-
-  /** The physics system for the scene */
-  // TODO: Why would this ever not exist?
-  public physics?: AdvancedCollisionSystem | BasicCollisionSystem;
-
   /** A camera, for making sure important actors are on screen */
   public readonly camera: CameraSystem;
 
@@ -38,8 +29,9 @@ export class Scene {
    * Construct a new scene
    *
    * @param pixelMeterRatio The pixel-to-meter ratio, possibly adjusted for zoom
+   * @param physics         The physics system for the scene
    */
-  constructor(pixelMeterRatio: number) {
+  constructor(pixelMeterRatio: number, public physics: AdvancedCollisionSystem | BasicCollisionSystem) {
     this.camera = new CameraSystem(pixelMeterRatio);
   }
 

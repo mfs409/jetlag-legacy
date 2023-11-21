@@ -57,7 +57,7 @@ export function buildSplashScreen(_index: number) {
 
   // Set up the quit button
   Helpers.addTapControl(stage.hud, { cx: 12.75, cy: 6.1, width: 2, height: 0.9, img: "" }, () => {
-    stage.score.doQuit();
+    stage.exit();
     return true;
   });
 

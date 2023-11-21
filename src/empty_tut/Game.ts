@@ -23,7 +23,7 @@ export function build_game(_level: number) {
   // Draw a grid on the screen, to help us think about the positions of actors
   GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
-  stage.tilt.tiltMax.Set(10, 10);
+  stage.world.tilt!.tiltMax.Set(10, 10);
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
@@ -33,7 +33,7 @@ export function build_game(_level: number) {
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  stage.tilt.tiltVelocityOverride = false;
+  stage.world.tilt!.tiltVelocityOverride = false;
 
   Actor.Make({
     rigidBody: RigidBodyComponent.Box({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),

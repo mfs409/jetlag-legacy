@@ -846,7 +846,7 @@ export function buildLevelScreen(level: number) {
       // of code to the destination.  The code will run whenever a hero collides
       // with the destination, and returns true only if we want to let the hero
       // in.
-      role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] >= 2; } }),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 2; } }),
     });
 
     stage.score.setVictoryDestination(1);
@@ -881,7 +881,7 @@ export function buildLevelScreen(level: number) {
     // put on the screen
     Helpers.makeText(stage.hud,
       { cx: 0.25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 20, z: 2 },
-      () => stage.score.goodieCount[0] + "/2 Goodies");
+      () => stage.score.getGoodieCount(0) + "/2 Goodies");
 
     welcomeMessage("You must collect two blue balls.\nThen the destination will work");
 
@@ -920,7 +920,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new PathMovement(new Path().to(15, 8).to(15, 0.25).to(15, 8), 4, true),
-      role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] >= 1; } }),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 1; } }),
     });
     stage.score.setVictoryDestination(1);
 
@@ -945,7 +945,7 @@ export function buildLevelScreen(level: number) {
     // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
     Helpers.makeText(stage.hud,
       { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
-      () => stage.score.goodieCount[0] + " Goodies");
+      () => stage.score.getGoodieCount(0) + " Goodies");
 
     welcomeMessage("Every actor can move...");
     winMessage("Great Job");
@@ -988,14 +988,14 @@ export function buildLevelScreen(level: number) {
     // put the goodie count on the screen
     Helpers.makeText(stage.hud,
       { cx: .25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 14, z: 2 },
-      () => stage.score.goodieCount[0] + "/5 Goodies");
+      () => stage.score.getGoodieCount(0) + "/5 Goodies");
 
     // put a simple countdown on the screen.  The first line says "15 seconds", the second
     // actually draws something on the screen showing remaining time
-    stage.score.loseCountDownRemaining = 15;
+    stage.score.setLoseCountdownRemaining(15);
     Helpers.makeText(stage.world,
       { cx: .25, cy: 1.25, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
-      (stage.score.loseCountDownRemaining ?? 0).toFixed(0));
+      (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0));
 
     // let's also add a screen for pausing the game. In a real game, every level
     // should have a button for pausing the game, and the pause scene should
@@ -1057,10 +1057,10 @@ export function buildLevelScreen(level: number) {
 
     // Make the stopwatch start counting, by giving it an initial value of 0
     // Then draw the stopwatch value onto the HUD
-    stage.score.stopWatchProgress = 0;
+    stage.score.setStopwatch(0);
     Helpers.makeText(stage.hud,
       { cx: 0.1, cy: 0.1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
-      (stage.score.stopWatchProgress ?? 0).toFixed(0) + " seconds");
+      (stage.score.getStopwatch() ?? 0).toFixed(0) + " seconds");
 
     // Put a button on the HUD to pause the game
     Helpers.addTapControl(stage.hud, { cx: 1, cy: 8, width: 0.4, height: 0.4, img: "pause.png" }, () => {
@@ -1257,10 +1257,10 @@ export function buildLevelScreen(level: number) {
     });
 
     // Start a countdown with 10 seconds, and put a timer on the HUD
-    stage.score.loseCountDownRemaining = 10;
+    stage.score.setLoseCountdownRemaining(10);
     Helpers.makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
-      (stage.score.loseCountDownRemaining ?? 0).toFixed(0));
+      (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0));
 
     // indicate that defeating all of the enemies is the way to win this level
     stage.score.setVictoryEnemyCount();
@@ -1392,7 +1392,7 @@ export function buildLevelScreen(level: number) {
     // the count.
     Helpers.makeText(stage.hud,
       { cx: 0.1, cy: .5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
-      () => stage.score.goodieCount[0] + " Goodies");
+      () => stage.score.getGoodieCount(0) + " Goodies");
 
     // Show how much invincibility is remaining
     Helpers.makeText(stage.hud,
@@ -1430,7 +1430,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] >= 7; } }),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 7; } }),
     });
 
     stage.score.setVictoryDestination(1);
@@ -1441,7 +1441,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Goodie({ onCollect: () => { stage.score.goodieCount[0] -= 2; return true; } }),
+      role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, -2); return true; } }),
     });
 
     // This goodie **increases** your score
@@ -1450,13 +1450,13 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Goodie({ onCollect: () => { stage.score.goodieCount[0] += 9; return true; } }),
+      role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, 9); return true; } }),
     });
 
     // print a goodie count to show how the count goes up and down
     Helpers.makeText(stage.hud,
       { cx: 7, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 18, z: 2 },
-      () => "Your score is: " + stage.score.goodieCount[0]);
+      () => "Your score is: " + stage.score.getGoodieCount(0));
 
     welcomeMessage("Collect 'the right' blue balls to activate destination");
     winMessage("Great Job");
@@ -1747,10 +1747,10 @@ export function buildLevelScreen(level: number) {
     );
 
     // We won't add a destination... instead, the level will end in victory after 25 seconds
-    stage.score.winCountRemaining = 25;
+    stage.score.setWinCountdownRemaining(25);
     Helpers.makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
-      (stage.score.winCountRemaining ?? 0).toFixed(0));
+      (stage.score.getWinCountdownRemaining() ?? 0).toFixed(0));
 
     // Let's have an enemy, too
     cfg = { cx: 8, cy: 4.5, radius: 1, width: 2, height: 2, img: "red_ball.png" };
@@ -3287,7 +3287,7 @@ export function buildLevelScreen(level: number) {
 
     Helpers.makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
-      () => stage.score.goodieCount[0] + " Goodies");
+      () => stage.score.getGoodieCount(0) + " Goodies");
 
     // draw a picture when the level is won, and don't print text...
     // this particular picture isn't very useful
@@ -3969,7 +3969,7 @@ export function buildLevelScreen(level: number) {
 
     stage.world.camera.setCameraFocus(h);
     Helpers.makeText(stage.hud,
-      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => stage.score.goodieCount[0] + " Goodies");
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => stage.score.getGoodieCount(0) + " Goodies");
     stage.score.setVictoryDestination(1);
 
     // this obstacle is a collision callback... when the hero hits it, we'll run
@@ -4092,7 +4092,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] > 3; } }),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) > 3; } }),
     });
 
     stage.score.setVictoryDestination(1);
@@ -4108,7 +4108,7 @@ export function buildLevelScreen(level: number) {
     o.sounds = new SoundEffectComponent("high_pitch.ogg");
     o.gestures = {
       tap: () => {
-        if (stage.score.goodieCount[0] == 0) return false;
+        if (stage.score.getGoodieCount(0) == 0) return false;
         // note: we could draw a picture of an open chest in the
         // obstacle's place, or even use a disappear animation whose
         // final frame looks like an open treasure chest.
@@ -4135,7 +4135,7 @@ export function buildLevelScreen(level: number) {
       role: new Goodie({
         onCollect: (_g: Actor, _h: Actor) => {
           stage.musicLibrary.getSound("low_pitch.ogg").play();
-          stage.score.goodieCount[0]++;
+          stage.score.addToGoodieCount(0, 1);
           return true;
         }
       }),
@@ -4291,7 +4291,7 @@ export function buildLevelScreen(level: number) {
     });
 
     Helpers.makeText(stage.hud,
-      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => stage.score.goodieCount[0] + " Goodies");
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => stage.score.getGoodieCount(0) + " Goodies");
 
     // the destination won't work until some goodies are collected...
     cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "color_star_1.png" };
@@ -4301,7 +4301,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Destination({
         onAttemptArrival: () => {
-          return stage.score.goodieCount[0] >= 4 && stage.score.goodieCount[1] >= 1 && stage.score.goodieCount[2] >= 3;
+          return stage.score.getGoodieCount(0) >= 4 && stage.score.getGoodieCount(1) >= 1 && stage.score.getGoodieCount(2) >= 3;
         }
       }),
     });
@@ -4319,11 +4319,11 @@ export function buildLevelScreen(level: number) {
 
     (o.role as Obstacle).heroCollision = (thisActor: Actor, collideActor: Actor) => {
       // here's a simple way to increment a goodie count
-      stage.score.goodieCount[1]++;
+      stage.score.addToGoodieCount(1, 1);
       // here's a way to set a goodie count
-      stage.score.goodieCount[2] = 3;
+      stage.score.setGoodieCount(2, 3);
       // here's a way to read and write a goodie count
-      stage.score.goodieCount[0] = 4 + stage.score.goodieCount[0];
+      stage.score.addToGoodieCount(0, 4);
       // get rid of the star, so we know it's been used
       thisActor.remove(true);
       // resize the hero, and change its image
@@ -4370,10 +4370,10 @@ export function buildLevelScreen(level: number) {
     // we're going to win by "surviving" for 25 seconds... with no enemies, that
     // shouldn't be too hard.  Let's put the timer on the HUD, so the player
     // knows how much time remains.
-    stage.score.winCountRemaining = 25;
+    stage.score.setWinCountdownRemaining(25);
     Helpers.makeText(stage.hud,
       { cx: 2, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#C0C0C0", size: 16, z: 2 },
-      () => "" + (stage.score.winCountRemaining ?? 0).toFixed(2) + "s remaining");
+      () => "" + (stage.score.getWinCountdownRemaining() ?? 0).toFixed(2) + "s remaining");
 
     // just to play it safe, let's say that we win on reaching a destination...
     // this ensures that collecting goodies or defeating enemies won't
@@ -4796,7 +4796,7 @@ export function buildLevelScreen(level: number) {
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Destination({
-        onAttemptArrival: () => { return stage.score.goodieCount[0] == 1 && stage.score.goodieCount[1] == 2 && stage.score.goodieCount[2] == 3 && stage.score.goodieCount[3] == 1; }
+        onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 1 && stage.score.getGoodieCount(1) == 2 && stage.score.getGoodieCount(2) == 3 && stage.score.getGoodieCount(3) == 1; }
       }),
     });
     stage.score.setVictoryDestination(1);
@@ -4804,22 +4804,22 @@ export function buildLevelScreen(level: number) {
     // Announce how many of each goodie have been collected
     Helpers.makeText(stage.hud,
       { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
-      () => stage.score.goodieCount[0] + " blue");
+      () => stage.score.getGoodieCount(0) + " blue");
     Helpers.makeText(stage.hud,
       { cx: 1, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
-      () => stage.score.goodieCount[1] + " green");
+      () => stage.score.getGoodieCount(1) + " green");
     Helpers.makeText(stage.hud,
       { cx: 1, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
-      () => stage.score.goodieCount[2] + " red");
+      () => stage.score.getGoodieCount(2) + " red");
     Helpers.makeText(stage.hud,
       { cx: 1, cy: 2.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
-      () => stage.score.goodieCount[3] + " gray");
+      () => stage.score.getGoodieCount(3) + " gray");
 
     // You only get 20 seconds to finish the level
-    stage.score.loseCountDownRemaining = 20;
+    stage.score.setLoseCountdownRemaining(20);
     Helpers.makeText(stage.hud,
       { cx: 15, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
-      () => (stage.score.loseCountDownRemaining ?? 0).toFixed() + "");
+      () => (stage.score.getLoseCountdownRemaining() ?? 0).toFixed() + "");
 
     // draw the goodies
     for (let i = 0; i < 3; ++i) {
@@ -4828,7 +4828,7 @@ export function buildLevelScreen(level: number) {
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
         movement: new InertMovement(),
-        role: new Goodie({ onCollect: () => { stage.score.goodieCount[0]++; return true; } }),
+        role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, 1); return true; } }),
       });
 
       cfg = { cx: 5 + i + .5, cy: 2, radius: 0.125, width: 0.25, height: 0.25, img: "green_ball.png" };
@@ -4836,7 +4836,7 @@ export function buildLevelScreen(level: number) {
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
         movement: new InertMovement(),
-        role: new Goodie({ onCollect: () => { stage.score.goodieCount[1]++; return true; } }),
+        role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(1, 1); return true; } }),
       });
 
       cfg = { cx: 5 + i + .5, cy: 3, radius: 0.125, width: 0.25, height: 0.25, img: "red_ball.png" };
@@ -4844,7 +4844,7 @@ export function buildLevelScreen(level: number) {
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
         movement: new InertMovement(),
-        role: new Goodie({ onCollect: () => { stage.score.goodieCount[2]++; return true; } }),
+        role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(2, 1); return true; } }),
       });
 
       cfg = { cx: 5 + i + .5, cy: 4, radius: 0.125, width: 0.25, height: 0.25, img: "grey_ball.png" };
@@ -4852,7 +4852,7 @@ export function buildLevelScreen(level: number) {
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
         movement: new InertMovement(),
-        role: new Goodie({ onCollect: () => { stage.score.goodieCount[3]++; return true; } }),
+        role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(3, 1); return true; } }),
       });
     }
 
@@ -4866,7 +4866,7 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle({
         heroCollision: () => {
           // add 15 seconds to the timer, remove the obstacle
-          stage.score.loseCountDownRemaining! += 15;
+          stage.score.setLoseCountdownRemaining((stage.score.getLoseCountdownRemaining() ?? 0) + 15);
           o.remove(true);
         }
       }),
@@ -5438,7 +5438,7 @@ export function buildLevelScreen(level: number) {
           // This one wins instantly
           Helpers.addTapControl(overlay,
             { cx: .75, cy: 1.75, width: .5, height: .5, img: "blue_ball.png" },
-            () => { stage.clearOverlay(); stage.score.endLevel(true); return true; }
+            () => { stage.clearOverlay(); stage.score.winLevel(); return true; }
           );
           Helpers.makeText(overlay,
             { cx: 1.25, cy: 1.65, center: false, width: .1, height: .1, face: "Arial", color: "#0000FF", size: 24 }, () => "Win Instantly");
@@ -5446,7 +5446,7 @@ export function buildLevelScreen(level: number) {
           // This one loses instantly
           Helpers.addTapControl(overlay,
             { cx: .75, cy: 2.75, width: .5, height: .5, img: "purple_ball.png" },
-            () => { stage.clearOverlay(); stage.score.endLevel(false); return true; });
+            () => { stage.clearOverlay(); stage.score.loseLevel(); return true; });
           Helpers.makeText(overlay,
             { cx: 1.25, cy: 2.65, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 24 }, () => "Lose Instantly");
 
@@ -5663,7 +5663,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryGoodies(10, 0, 0, 0);
     Helpers.makeText(stage.hud,
       { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 },
-      () => stage.score.goodieCount[0] + " goodies");
+      () => stage.score.getGoodieCount(0) + " goodies");
 
     // This is a bit tricky... we don't want to create the whole level all at
     // once, so what we'll do is draw the first part, and then make a sensor
@@ -5888,13 +5888,13 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(destCfg),
       rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
-      role: new Destination({ onAttemptArrival: () => { return stage.score.goodieCount[0] >= 1; } }),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 1; } }),
       movement: new InertMovement(),
     });
     stage.score.setVictoryDestination(1);
 
     Actor.Make({
-      appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.goodieCount[0] + " Remaining Goodies"),
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.getGoodieCount(0) + " Remaining Goodies"),
       role: new Passive(),
       movement: new InertMovement(),
       rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, stage.hud),
@@ -5936,7 +5936,7 @@ export function buildLevelScreen(level: number) {
             collisions++;
             t.remove(true);
             if (collisions == 3)
-              stage.score.endLevel(true);
+              stage.score.winLevel();
           });
         }
       }),
@@ -5974,11 +5974,11 @@ export function buildLevelScreen(level: number) {
   // Make sure we go to the correct level when this level is won/lost: for
   // anything but the last level, we go to the next level.  Otherwise, go to the splash screen
   if (level != 92) {
-    stage.score.onLose = { index: level, builder: buildLevelScreen };
+    stage.score.onLose = { level: level, builder: buildLevelScreen };
     stage.score.onWin = { level: level + 1, builder: buildLevelScreen };
   }
   else {
-    stage.score.onLose = { index: level, builder: buildLevelScreen };
+    stage.score.onLose = { level: level, builder: buildLevelScreen };
     stage.score.onWin = { level: 1, builder: buildSplashScreen };
   }
 }
@@ -6043,7 +6043,7 @@ export function loseMessage(message: string, callback?: () => void) {
   stage.score.loseSceneBuilder = (overlay: Scene) => {
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
       stage.clearOverlay();
-      stage.switchTo(stage.score.onLose.builder, stage.score.onLose.index);
+      stage.switchTo(stage.score.onLose.builder, stage.score.onLose.level);
       return true;
     });
     Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);

@@ -1,3 +1,5 @@
+// TODO: Code Review
+
 import { b2BodyType, b2Transform, b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
@@ -8,7 +10,7 @@ import { AnimatedSprite, AppearanceComponent, ImageSprite } from "./Appearance";
 import { Projectile } from "./Role";
 import { StateEvent } from "./StateManager";
 import { CircleCfgOpts, BoxCfgOpts } from "../Config";
-import { ISound } from "../Services/AudioService";
+import { ISound } from "../Services/AudioLibrary";
 import { SoundEffectComponent } from "./SoundEffect";
 
 /**
@@ -179,7 +181,7 @@ export class TiltMovement {
   private _rigidBody?: RigidBodyComponent;
 
   /** Construct a policy for moving an actor via tilt */
-  constructor() { stage.world.tilt?.addTiltActor(this); }
+  constructor() { stage.tilt.addTiltActor(this); }
 
   /** Do any last-minute adjustments related to the movement */
   prerender(_elapsedMs: number, _camera: CameraSystem) { }

@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameCfg } from "../jetlag/Config";
+import { Config } from "../jetlag/Config";
 import { FilledSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { ExplicitMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -15,7 +15,7 @@ import { TimedEvent } from "../jetlag/Systems/Timer";
 import * as Helpers from "../demo_game/helpers";
 
 /** Configuration information for the tut_jetlag_tour game */
-export class GameConfig implements GameCfg {
+export class GameConfig implements Config {
     // Standard screen dimensions and scaling
     pixelMeterRatio = 100;
     screenDimensions = { width: 1600, height: 900 };
@@ -96,7 +96,7 @@ function tut_jetlag_tour(level: number) {
         }));
 
         stage.score.onWin = { level: level, builder: tut_jetlag_tour }
-        stage.score.onLose = { index: level, builder: tut_jetlag_tour }
+        stage.score.onLose = { level: level, builder: tut_jetlag_tour }
         stage.score.setVictoryEnemyCount(10);
     }
     // A "side scroller" game
@@ -167,14 +167,14 @@ function tut_jetlag_tour(level: number) {
             rigidBody: RigidBodyComponent.Box({ cx: 8, cy: .75, width: .75, height: .75 }, stage.hud),
         });
         Actor.Make({
-            appearance: new TextSprite({ center: true, face: "Arial", color: "#444444", size: 48 }, () => (stage.score.loseCountDownRemaining ?? 0).toFixed(0)),
+            appearance: new TextSprite({ center: true, face: "Arial", color: "#444444", size: 48 }, () => (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0)),
             rigidBody: RigidBodyComponent.Box({ cx: 8, cy: .75, width: 1.8, height: 1 }, stage.hud),
         });
 
         // Set up the score
         stage.score.onWin = { level: level, builder: tut_jetlag_tour }
-        stage.score.onLose = { index: level, builder: tut_jetlag_tour }
-        stage.score.loseCountDownRemaining = 10;
+        stage.score.onLose = { level: level, builder: tut_jetlag_tour }
+        stage.score.setLoseCountdownRemaining(10);
         stage.score.setVictoryDestination(1);
     }
 }
