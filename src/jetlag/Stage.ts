@@ -3,7 +3,7 @@ import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
 import { AudioService } from "./Services/AudioService";
 import { MusicComponent } from "./Components/Music";
-import { ScoreSystem } from "./Systems/Score";
+import { ScoreSystem, VictoryState } from "./Systems/Score";
 import { GameCfg } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
@@ -142,8 +142,8 @@ export class Stage {
 
     // Update the win/lose countdown timers and the stopwatch
     let t = this.score.onClockTick(elapsedMs);
-    if (t == -1) this.score.endLevel(false);
-    if (t == 1) this.score.endLevel(true);
+    if (t == VictoryState.LOSE) this.score.endLevel(false);
+    if (t == VictoryState.WIN) this.score.endLevel(true);
 
     // handle accelerometer stuff... note that accelerometer is effectively
     // disabled during a popup... we could change that by moving this to the

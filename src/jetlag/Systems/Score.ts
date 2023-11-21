@@ -12,6 +12,9 @@ import { stage } from "../Stage";
  */
 enum VictoryType { DESTINATION, GOODIE_COUNT, ENEMY_COUNT }
 
+/** A score event could mean it's time to win or lose, or to keep playing */
+export enum VictoryState { WIN, LOSE, CONTINUE }
+
 /** Score tracks the progress of a player through a level of the game */
 export class ScoreSystem {
   /** The level to go to if the current level ends in failure */
@@ -114,23 +117,21 @@ export class ScoreSystem {
    *
    * @param elapsedMs The milliseconds that have passed
    *
-   * @returns -1 to lose, 1 to win, 0 otherwise
-   *
-   * TODO: It would be better to return an enum
+   * @returns A VictoryState to indicate whether to win, lose, or continue
    */
   public onClockTick(elapsedMs: number) {
     if (this.loseCountDownRemaining) {
       this.loseCountDownRemaining -= elapsedMs / 1000;
-      if (this.loseCountDownRemaining < 0) return -1;
+      if (this.loseCountDownRemaining < 0) return VictoryState.LOSE;
     }
     if (this.winCountRemaining) {
       this.winCountRemaining -= elapsedMs / 1000;
-      if (this.winCountRemaining < 0) return 1;
+      if (this.winCountRemaining < 0) return VictoryState.WIN;
     }
     if (this.stopWatchProgress != undefined) {
       this.stopWatchProgress += elapsedMs / 1000;
     }
-    return 0;
+    return VictoryState.CONTINUE;
   }
 
   /**
