@@ -770,8 +770,8 @@ export class FilledSprite {
         if (this.props.fillColor)
           this.graphics.beginFill(this.props.fillColor);
         let s = camera.getScale();
-        let x = s * (this.actor.rigidBody.getCenter().x - camera.getOffsetX());
-        let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
+        let x = s * (this.actor.rigidBody.getCenter().x - camera.getLeft());
+        let y = s * (this.actor.rigidBody.getCenter().y - camera.getTop());
         let w = s * this.props.w;
         let h = s * this.props.h;
         this.graphics.drawRect(x, y, w, h);
@@ -786,8 +786,8 @@ export class FilledSprite {
         if (this.props.fillColor)
           this.graphics.beginFill(this.props.fillColor);
         let s = camera.getScale();
-        let x = s * (this.actor.rigidBody.getCenter().x - camera.getOffsetX());
-        let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
+        let x = s * (this.actor.rigidBody.getCenter().x - camera.getLeft());
+        let y = s * (this.actor.rigidBody.getCenter().y - camera.getTop());
         let radius = s * this.props.radius;
         this.graphics.drawCircle(x, y, radius);
         stage.renderer.addGraphic(this.graphics);
@@ -799,8 +799,8 @@ export class FilledSprite {
         if (this.props.fillColor)
           this.graphics.beginFill(this.props.fillColor);
         let s = camera.getScale();
-        let x = s * (this.actor.rigidBody.getCenter().x - camera.getOffsetX());
-        let y = s * (this.actor.rigidBody.getCenter().y - camera.getOffsetY());
+        let x = s * (this.actor.rigidBody.getCenter().x - camera.getLeft());
+        let y = s * (this.actor.rigidBody.getCenter().y - camera.getTop());
         // For polygons, we need to translate the points (they are 0-relative in
         // Box2d, we need them to be relative to (x,y))
         let pts: number[] = [];

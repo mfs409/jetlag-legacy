@@ -202,8 +202,8 @@ export class RendererService {
 
     // Compute the dimensions of the actor, in pixels
     let s = camera.getScale();
-    let x = s * (body.getCenter().x - camera.getOffsetX());
-    let y = s * (body.getCenter().y - camera.getOffsetY());
+    let x = s * (body.getCenter().x - camera.getLeft());
+    let y = s * (body.getCenter().y - camera.getTop());
     let w = s * appearance.props.w;
     let h = s * appearance.props.h;
     let r = body.getRotation();
@@ -238,8 +238,8 @@ export class RendererService {
 
     // Convert from meters to pixels
     let s = camera.getScale();
-    let x = s * (anchor.cx - camera.getOffsetX());
-    let y = s * (anchor.cy - camera.getOffsetY());
+    let x = s * (anchor.cx - camera.getLeft());
+    let y = s * (anchor.cy - camera.getTop());
     let w = s * appearance.props.w;
     let h = s * appearance.props.h;
 
@@ -261,8 +261,8 @@ export class RendererService {
   public addTextToFrame(text: Text, camera: CameraSystem, center: boolean) {
     // TODO: we currently don't support rotating text?
     let s = camera.getScale();
-    let x = s * (text.getXPosition() - camera.getOffsetX());
-    let y = s * (text.getYPosition() - camera.getOffsetY());
+    let x = s * (text.getXPosition() - camera.getLeft());
+    let y = s * (text.getYPosition() - camera.getTop());
 
     if (center) {
       let bounds = text.getBounds();

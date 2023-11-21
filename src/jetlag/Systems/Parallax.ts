@@ -75,8 +75,8 @@ class ParallaxLayer {
    * @param camera  The camera for the world that these layers accompany
    */
   private normalizeAndRender(camera: CameraSystem, elapsedMs: number) {
-    let x = camera.getOffsetX(); // left of viewport
-    let y = camera.getOffsetY(); // top of viewport
+    let x = camera.getLeft(); // left of viewport
+    let y = camera.getTop(); // top of viewport
     let camW = stage.screenWidth / stage.pixelMeterRatio;
     let camH = stage.screenHeight / stage.pixelMeterRatio;
     // Normalize the reference tile
@@ -108,8 +108,8 @@ class ParallaxLayer {
    */
   private renderRelative(camera: CameraSystem, elapsedMs: number) {
     // Determine the change in camera
-    let x = camera.getOffsetX(); // left of viewport
-    let y = camera.getOffsetY(); // top of viewport
+    let x = camera.getLeft(); // left of viewport
+    let y = camera.getTop(); // top of viewport
     let dx = x - this.lastCam.x;
     let dy = y - this.lastCam.y;
     // Determine the relative change to the reference tile
@@ -125,8 +125,8 @@ class ParallaxLayer {
    * @param camera  The camera for the world that these layers accompany
    */
   private renderVisibleTiles(camera: CameraSystem, elapsedMs: number) {
-    let x = camera.getOffsetX(); // left of viewport
-    let y = camera.getOffsetY(); // top of viewport
+    let x = camera.getLeft(); // left of viewport
+    let y = camera.getTop(); // top of viewport
     let camW = stage.screenWidth / stage.pixelMeterRatio;
     let camH = stage.screenHeight / stage.pixelMeterRatio;
     if (this.isHorizontal) {

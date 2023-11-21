@@ -1,13 +1,11 @@
-// TODO: Code Review
-
 import { b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 
 /**
- * The Camera is used to determine /how much/ of a world to render.  The Camera
- * has a minimum X and Y coordinate, and a maximum X and Y coordinate.  It also
- * has a zoom factor, and a current center point.
+ * The Camera is used to determine /how much/ of a world to render, and /which
+ * part/.  The Camera can have a minimum X and Y coordinate, and a maximum X and
+ * Y coordinate.  It also has a zoom factor, and a current center point.
  *
  * The zoom factor and center point give a rectangular region.  The min and max
  * coordinates give another rectangular region.  If the first region is not
@@ -19,19 +17,19 @@ import { stage } from "../Stage";
  */
 export class CameraSystem {
   /** Anything in the world that can be rendered (5 planes [-2, -1, 0, 1, 2]) */
-  protected readonly renderables: Actor[][] = [[], [], [], [], []];
+  protected readonly actors: Actor[][] = [[], [], [], [], []];
 
   /** The minimum x coordinate that can be shown (left) */
-  private minX: number | undefined = undefined;
+  private minX: number | undefined;
 
   /** The minimum y coordinate that can be shown (top) */
-  private minY: number | undefined = undefined;
+  private minY: number | undefined;
 
   /** The maximum x coordinate that can be shown (right) */
-  private maxX: number | undefined = undefined;
+  private maxX: number | undefined;
 
   /** The maximum y coordinate that can be shown (bottom) */
-  private maxY: number | undefined = undefined;
+  private maxY: number | undefined;
 
   /** The current center point of the camera */
   private readonly center = new b2Vec2(0, 0);
@@ -45,8 +43,8 @@ export class CameraSystem {
   /** The visible dimensions of the screen, in meters */
   private readonly scaledVisibleRegionDims = new b2Vec2(0, 0);
 
-  /** The Entity that the camera chases, if any */
-  private cameraChaseActor?: Actor;
+  /** The Entity that the camera follows, if any */
+  private cameraFollowActor?: Actor;
 
   /**
    * When the camera follows the entity without centering on it, this gives us
@@ -63,12 +61,12 @@ export class CameraSystem {
    * @param y     Amount of y distance to add to actor center
    */
   public setCameraFocus(actor: Actor | undefined, x: number = 0, y: number = 0) {
-    this.cameraChaseActor = actor;
+    this.cameraFollowActor = actor;
     this.cameraOffset.Set(x, y);
   }
 
   /**
-   * If the world's camera is supposed to follow an entity, this code will
+   * If the world's camera is supposed to follow an Actor, this code will
    * figure out the point on which the camera should center, and will request
    * that the camera center on that point.
    *
@@ -76,10 +74,10 @@ export class CameraSystem {
    *     and camera bounds.
    */
   public adjustCamera() {
-    if (!this.cameraChaseActor) return;
+    if (!this.cameraFollowActor) return;
 
     // figure out the entity's position + the offset
-    let a = this.cameraChaseActor;
+    let a = this.cameraFollowActor;
     let x = a.rigidBody.body.GetWorldCenter().x + this.cameraOffset.x;
     let y = a.rigidBody.body.GetWorldCenter().y + this.cameraOffset.y;
 
@@ -103,9 +101,9 @@ export class CameraSystem {
     this.setScale(this.ratio);
 
     // set up the containers for holding anything we can render
-    this.renderables = new Array<Array<Actor>>(5);
+    this.actors = new Array<Array<Actor>>(5);
     for (let i = 0; i < 5; ++i)
-      this.renderables[i] = new Array<Actor>();
+      this.actors[i] = new Array<Actor>();
   }
 
   /**
@@ -190,10 +188,10 @@ export class CameraSystem {
   }
 
   /** Return the X coordinate of the left of the camera viewport */
-  public getOffsetX() { return this.center.x - this.scaledVisibleRegionDims.x / 2; }
+  public getLeft() { return this.center.x - this.scaledVisibleRegionDims.x / 2; }
 
   /** Return the Y coordinate of the top of the camera viewport */
-  public getOffsetY() { return this.center.y - this.scaledVisibleRegionDims.y / 2; }
+  public getTop() { return this.center.y - this.scaledVisibleRegionDims.y / 2; }
 
   /**
    * Given screen coordinates, convert them to meter coordinates in the world
@@ -202,7 +200,7 @@ export class CameraSystem {
    * @param screenY The Y coordinate, in pixels
    */
   public screenToMeters(screenX: number, screenY: number) {
-    return { x: screenX / this.ratio + this.getOffsetX(), y: screenY / this.ratio + this.getOffsetY() };
+    return { x: screenX / this.ratio + this.getLeft(), y: screenY / this.ratio + this.getTop() };
   }
 
   /**
@@ -212,7 +210,7 @@ export class CameraSystem {
    * @param worldY  The Y coordinate, in meters
    */
   public metersToScreen(worldX: number, worldY: number) {
-    return { x: (worldX - this.getOffsetX()) * this.ratio, y: (worldY - this.getOffsetY()) * this.ratio };
+    return { x: (worldX - this.getLeft()) * this.ratio, y: (worldY - this.getTop()) * this.ratio };
   }
 
   /**
@@ -238,7 +236,7 @@ export class CameraSystem {
    * @param actor The actor to add
    */
   addEntity(actor: Actor) {
-    this.renderables[actor.appearance.props.z + 2].push(actor);
+    this.actors[actor.appearance.props.z + 2].push(actor);
   }
 
   /**
@@ -248,20 +246,15 @@ export class CameraSystem {
    */
   removeEntity(actor: Actor) {
     let z = actor.appearance.props.z
-    let i = this.renderables[z + 2].indexOf(actor);
-    this.renderables[z + 2].splice(i, 1);
+    let i = this.actors[z + 2].indexOf(actor);
+    this.actors[z + 2].splice(i, 1);
   }
 
-  /**
-   * Render this scene
-   *
-   * @return True if the scene was rendered, false if it was not
-   */
+  /** Render the actors associated with this camera */
   render(elapsedMs: number) {
     // Draw everything
-    for (let zPlane of this.renderables)
+    for (let zPlane of this.actors)
       for (let renderable of zPlane)
         if (renderable.prerender(elapsedMs)) renderable.appearance?.render(this, elapsedMs);
-    return true;
   }
 }
