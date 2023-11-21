@@ -1,4 +1,4 @@
-// serve_game.js: 
+// serve_game.mjs: 
 //   Serve (development mode) the game specified by the TARGET environment
 //   variable.  This script watches for changes to the code and automatically
 //   re-builds / refreshes the browser.  Note that, unfortunately, on changes to
@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import * as chokidar from 'chokidar';
 import esbuildServe from 'esbuild-serve';
+import { DEV_OUTPUT_FOLDER } from './common.mjs';
 
 // Compute the root folder of this project (`import.meta.url` is the path to
 // *this file*, which is assumed to be in the `scripts/` subfolder of the root).
@@ -31,7 +32,7 @@ let src_ts = path.join(src_folder, `${target}.ts`);
 let src_assets = path.join(root_folder, "assets");
 
 // Figure out the paths where everything is going to be put
-let dest_folder = path.join(root_folder, "dev-serve");
+let dest_folder = path.join(root_folder, DEV_OUTPUT_FOLDER);
 let dest_html = path.join(dest_folder, "index.html");
 let dest_js = path.join(dest_folder, `${target}.js`);
 let dest_assets = path.join(dest_folder, "assets");
@@ -57,9 +58,9 @@ esbuildServe({
     root: dest_folder,
 });
 
-// esbuildServe doesn't know that it needs to watch the assets folder for
-// changes, nor does it know that it needs to watch the game's html file.  To
-// get that to work, we'll use chokidar.
+// When used in this way, esbuildServe doesn't know that it needs to watch the
+// assets folder for changes, nor does it know that it needs to watch the game's
+// html file.  To get that to work, we'll use chokidar.
 
 // When chokidar sees a change, it will run this to erase the destination assets
 // folder, re-copy the destination assets folder, and re-copy the html file.

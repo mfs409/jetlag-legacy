@@ -1,4 +1,4 @@
-// build_tuts.js:
+// build_tuts.mjs:
 //   Compile/bundle the web app for viewing tutorials, and also all of the 
 //   tutorials
 
@@ -6,12 +6,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import esbuildServe from 'esbuild-serve';
+import { TUT_DIST_FOLDER } from './common.mjs';
 
 // Compute paths to source and destination files for the tutorial viewer web app
 const root_folder = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const webapp_src_folder = path.join(root_folder, "src", "viewer");
 const webapp_src_ts = path.join(webapp_src_folder, "viewer.ts");
-const dest_folder = path.join(root_folder, "tut-dist");
+const dest_folder = path.join(root_folder, TUT_DIST_FOLDER);
 const webapp_dest_ts = path.join(dest_folder, "viewer.js");
 
 // CSS and HTML files that need to be copied without any translation

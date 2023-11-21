@@ -1,10 +1,11 @@
-// build_game.js: 
+// build_game.mjs: 
 //   Compile/bundle the game specified by the TARGET environment variable
 
 import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import esbuildServe from 'esbuild-serve';
+import { GAME_DIST_FOLDER } from './common.mjs';
 
 // Compute the root folder of this project (`import.meta.url` is the path to
 // *this file*, which is assumed to be in the `scripts/` subfolder of the root).
@@ -28,7 +29,7 @@ let src_assets = path.join(root_folder, "assets");
 
 // Figure out the paths where everything is going to be put.  Note that we
 // preserve the target html name.
-let dest_folder = path.join(root_folder, "dist");
+let dest_folder = path.join(root_folder, GAME_DIST_FOLDER);
 let dest_html = path.join(dest_folder, `${target}.html`);
 let dest_js = path.join(dest_folder, `${target}.js`);
 let dest_assets = path.join(dest_folder, "assets");
