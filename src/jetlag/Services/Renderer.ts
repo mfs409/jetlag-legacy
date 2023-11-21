@@ -314,7 +314,10 @@ export class RenderService {
       this.main.filters = [this.blur_filter];
     }
     else if (use_ascii) {
-      this.main.filters = [this.ascii_filter];
+      // TODO:  The 'as any' cast is due to typing issues in Pixi.js.  Keep
+      //        monitoring to see if it becomes obviated by a future update to
+      //        pixi's typings.
+      this.main.filters = [this.ascii_filter as any];
     }
     else if (use_sepia_tv) {
       // TODO:  Is there a way to avoid re-making the ColorMatrixFilter every
@@ -331,7 +334,10 @@ export class RenderService {
       this.old_film_filter.vignetting = .3;
       this.old_film_filter.vignettingAlpha = 1;
       this.old_film_filter.vignettingBlur = .3;
-      this.main.filters = [f, this.noise_filter, this.godray_filter, this.old_film_filter];
+      // TODO:  The 'as any' casts are due to typing issues in Pixi.js.  Keep
+      //        monitoring to see if they become obviated by a future update to
+      //        pixi's typings.
+      this.main.filters = [f, this.noise_filter, this.godray_filter as any, this.old_film_filter as any];
     }
   }
 }
