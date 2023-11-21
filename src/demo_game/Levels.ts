@@ -17,6 +17,7 @@ import { AnimationSequence } from "../jetlag/Config";
 import { SvgSystem } from "../jetlag/Systems/Svg";
 import { buildSplashScreen } from "./Splash";
 import { buildChooserScreen } from "./Chooser";
+import { AdvancedCollisionSystem } from "../jetlag/Systems/Collisions";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game
@@ -5905,6 +5906,56 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
   }
 
+  else if (level == 92) {
+
+    // start by setting everything like in level 1
+    Helpers.enableTilt(10, 10);
+    let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
+    let h = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      movement: new TiltMovement(),
+      role: new Hero(),
+    });
+
+    // notice that when we want to change cfg, we don't put a "let" in front
+    cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+    let collisions = 0;
+    let messages = ["Please leave me alone", "Why do you bother me so?", "Fine, you win."]
+    let o = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      movement: new InertMovement(),
+      role: new Obstacle({
+        heroCollision: () => {
+          let t = Actor.Make({
+            appearance: new TextSprite({ center: false, face: "Arial", size: 30, color: "#FF00FF" }, () => messages[collisions]),
+            rigidBody: RigidBodyComponent.Box({ cx: 12, cy: 6, width: 1, height: 1 }, stage.world)
+          });
+          (stage.world.physics as AdvancedCollisionSystem).addEndContactHandler(o, h, () => {
+            collisions++;
+            t.remove(true);
+            if (collisions == 3)
+              stage.score.endLevel(true);
+          });
+        }
+      }),
+    });
+
+    winMessage("You made it!");
+
+    // add a bounding box so the hero can't fall off the screen.  Hover your
+    // mouse over 'drawBoundingBox' to learn about what the parameters mean.
+    // This really should have a box width, instead of hard-coding it
+    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+
+    // In the same way that we make "win" messages, we can also make a "welcome"
+    // message to show before the level starts.  Again, there is a lot of code
+    // involved in making a welcome message, which we will explore later on
+    welcomeMessage("Use tilt (or arrows) to reach the destination");
+
+  }
+
 
   // You just made it to the last level.  Now it's time to reveal a little
   // secret...  No matter which "if" or "else if" the code did, it eventually
@@ -5922,7 +5973,7 @@ export function buildLevelScreen(level: number) {
 
   // Make sure we go to the correct level when this level is won/lost: for
   // anything but the last level, we go to the next level.  Otherwise, go to the splash screen
-  if (level != 91) {
+  if (level != 92) {
     stage.score.onLose = { index: level, builder: buildLevelScreen };
     stage.score.onWin = { level: level + 1, builder: buildLevelScreen };
   }

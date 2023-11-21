@@ -87,10 +87,35 @@ export class BasicCollisionSystem {
  * code in response to collisions.
  */
 export class AdvancedCollisionSystem extends BasicCollisionSystem {
+
+  /**
+   * Callbacks to consider running in response to a contact *ending*.  These are
+   * always one-time callbacks.
+   *
+   * TODO:  This could become a performance bottleneck, since we're using an
+   *        array with O(n) search overhead.  The assumption is that the array
+   *        will be small.  If that changes, then this will need to be
+   *        redesigned.
+   */
+  private endContactHandlers: { actor1: Actor, actor2: Actor, callback: (a: Actor, b: Actor) => void }[] = [];
+
   /** Create an AdvancedCollisionSystem */
   constructor(scene: Scene) {
     super();
     this.configureCollisionHandlers(scene);
+  }
+
+  /**
+   * Register a new endContactHandler to run when a collision ends
+   *
+   * @param actor1    One of the actors of the collision.  This actor should be
+   *                  the first argument to `callback`.
+   * @param actor2    The other actor from the collision / the second argument
+   *                  to `callback`.
+   * @param callback  The code to run when the collision ends
+   */
+  public addEndContactHandler(actor1: Actor, actor2: Actor, callback: (a: Actor, b: Actor) => void) {
+    this.endContactHandlers.push({ actor1, actor2, callback });
   }
 
   /** Configure collision handling for the current level */
@@ -127,11 +152,23 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
          *
          * @param contact A description of the contact event
          */
-        public EndContact(_contact: b2Contact) {
-          // NB: For now, we don't do anything here
-          //
-          // TODO:  Add EndContact event handlers, so we can do things like
-          //        remove a text bubble when a hero walks away from an NPC.
+        public EndContact(contact: b2Contact) {
+          // Get the bodies, make sure both are actors
+          let a = contact.GetFixtureA().GetBody().GetUserData();
+          let b = contact.GetFixtureB().GetBody().GetUserData();
+          if (!(a instanceof Actor) || !(b instanceof Actor)) return;
+
+          // If this pair is in the array, splice it out and run the array entry
+          for (let ch of this.collisionSystem.endContactHandlers)
+            if ((ch.actor1 == a && ch.actor2 == b) || (ch.actor1 == b && ch.actor2 == a)) {
+              let i = this.collisionSystem.endContactHandlers.indexOf(ch);
+              this.collisionSystem.endContactHandlers.splice(i, 1);
+              // The world is in mid-render, so we can't really change anything, so
+              // defer handling the event until after the next render.
+              this.scene.timer.oneTimeEvents.push(() => {
+                ch.callback(ch.actor1, ch.actor2);
+              });
+            }
         }
 
         /**

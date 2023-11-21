@@ -92,7 +92,7 @@ export function buildChooserScreen(index: number) {
       for (let i = 0; i < 8; ++i, ++l, x += 1.75) {
         // Only draw a button if we're less than or equal to 90, since
         // that's our last level
-        if (l <= 91) drawLevelButton(x, y, 1.25, 1.25, l);
+        if (l <= 92) drawLevelButton(x, y, 1.25, 1.25, l);
       }
     }
     // draw the navigation buttons
@@ -124,7 +124,6 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
 
   // attach a callback and print the level number with a touchCallback, and then put text on top of it
   let tap = () => {
-    console.log("tap on " + whichLevel)
     stage.switchTo(buildLevelScreen, whichLevel); return true;
   };
   tile.gestures = { tap };
