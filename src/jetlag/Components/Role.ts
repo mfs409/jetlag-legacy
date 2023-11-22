@@ -615,7 +615,7 @@ export class Hero extends Role {
     let v = this.actor!.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
     x += v.x;
     y += v.y;
-    this.actor!.rigidBody?.breakJoints();
+    this.actor!.rigidBody?.breakDistJoints();
     this.actor!.rigidBody?.body.SetLinearVelocity(new b2Vec2(x, y));
 
     if (!this.allowMultiJump) this.inAir = true;
@@ -817,16 +817,16 @@ export class Projectile extends Role {
    * distance away from the hero that a projectile can travel before we make
    * it disappear.
    */
-  public range;
+  public range: number;
 
   /**
    * When projectiles collide, and they are not sensors, one will disappear.
    * We can keep both on screen by setting this false
    */
-  public disappearOnCollide;
+  public disappearOnCollide: boolean;
 
   /** How much damage does this projectile do? */
-  public damage;
+  public damage: number;
 
   /**
    * Construct a Projectile role

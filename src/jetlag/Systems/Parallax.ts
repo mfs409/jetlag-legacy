@@ -3,7 +3,7 @@
 import { b2Vec2 } from "@box2d/core";
 import { stage } from "../Stage";
 import { CameraSystem } from "../Systems/Camera";
-import { AppearanceComponent } from "../Components/Appearance";
+import { AnimatedSprite, ImageSprite } from "../Components/Appearance";
 
 /**
  * A ParallaxLayer is a layer that seems to scroll and repeat at a velocity that
@@ -11,7 +11,7 @@ import { AppearanceComponent } from "../Components/Appearance";
  */
 class ParallaxLayer {
   /** The images to display */
-  private images: AppearanceComponent[] = [];
+  private images: (ImageSprite | AnimatedSprite)[] = [];
 
   /** coords of last render */
   private last = new b2Vec2(0, 0);
@@ -28,7 +28,7 @@ class ParallaxLayer {
    * @param isHorizontal  True for X scrolling, false for Y scrolling
    * @param isAuto        True if this should scroll regardless of camera
    */
-  constructor(anchor: { cx: number, cy: number }, defaultImage: AppearanceComponent, private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
+  constructor(anchor: { cx: number, cy: number }, defaultImage: ImageSprite | AnimatedSprite, private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
     this.last.Set(anchor.cx - defaultImage.props.w / 2, anchor.cy - defaultImage.props.h / 2);
     // figure out how many sprites we need to properly tile the image
     let num = 1;
@@ -135,7 +135,7 @@ class ParallaxLayer {
       while (plx < x + camW) {
         let cx = plx + this.images[i].props.w / 2;
         let cy = this.last.y + this.images[i].props.h / 2;
-        this.images[i].renderAt({ cx, cy }, camera, elapsedMs);
+        this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs);
         plx += this.images[i].props.w;
         i++;
       }
@@ -146,7 +146,7 @@ class ParallaxLayer {
       while (ply < y + camH) {
         let cx = this.last.x + this.images[i].props.w / 2;
         let cy = ply + this.images[i].props.h / 2;;
-        this.images[i].renderAt({ cx, cy }, camera, elapsedMs);
+        this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs);
         ply += this.images[i].props.h;
         i++;
       }
@@ -177,7 +177,7 @@ export class ParallaxSystem {
    * @param isAuto        Should the image scroll automatically, or in relation
    *                      to the camera position?
    */
-  public addLayer(anchor: { cx: number, cy: number }, cfg: { appearance: AppearanceComponent, speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
+  public addLayer(anchor: { cx: number, cy: number }, cfg: { appearance: ImageSprite | AnimatedSprite, speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
     this.layers.push(new ParallaxLayer(anchor, cfg.appearance, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
   }
 

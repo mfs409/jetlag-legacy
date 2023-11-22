@@ -1,4 +1,4 @@
-// TODO: Code Review
+// TODO: Code Review of AnimatedSprite (everything else is good)
 
 import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageLibrary";
@@ -345,7 +345,7 @@ export class AnimationConfig {
 
 /**
  * TextSprite describes any text object that can be drawn to the screen. The
- * text that is displayed is controlled by a callback, so that it can change
+ * text that is displayed can be controlled by a callback, so that it can change
  * over time.
  */
 export class TextSprite {
@@ -366,11 +366,12 @@ export class TextSprite {
    */
   constructor(cfgOpts: TxtConfigOpts, public producer: string | (() => string)) {
     this.props = new TextConfig(cfgOpts);
-    this.text = stage.imageLibrary.makeText("", { fontFamily: this.props.face, fontSize: this.props.size, fill: this.props.rgb });
-    this.props.w = this.text.getRenderObject().width;
-    this.props.h = this.text.getRenderObject().height;
+    this.text = Text.makeText("", { fontFamily: this.props.face, fontSize: this.props.size, fill: this.props.rgb });
+    this.props.w = this.text.text.width;
+    this.props.h = this.text.text.height;
   }
 
+  /** Make another TextSprite that is identical to this one */
   clone() {
     return new TextSprite({
       z: this.props.z, center: this.props.c, face: this.props.face, color: this.props.rgb,
@@ -386,27 +387,11 @@ export class TextSprite {
    * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
-    // Set the world position and the text, then let the renderer decide
-    // where to put it...
-    this.text.setText((typeof this.producer == "string") ? this.producer : this.producer());
-    this.text.setPosition(this.actor?.rigidBody.getCenter().x ?? 0, this.actor?.rigidBody.getCenter().y ?? 0);
-    stage.renderer.addTextToFrame(this.text, camera, this.props.c);
-  }
-
-  /**
-   * Render the text when it does not have a rigidBody. This is only used for
-   * Parallax
-   *
-   * @param anchor    The center x/y at which to draw the image
-   * @param camera    The camera for the current stage
-   * @param elapsedMs The time since the last render
-   */
-  renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
-    // Set the world position and the text, then let the renderer decide
-    // where to put it...
-    this.text.setText((typeof this.producer == "string") ? this.producer : this.producer());
-    this.text.setPosition(anchor.cx, anchor.cy);
-    stage.renderer.addTextToFrame(this.text, camera, this.props.c);
+    if (this.actor) {
+      // Update the text before passing to the renderer!
+      this.text.text.text = (typeof this.producer == "string") ? this.producer : this.producer();
+      stage.renderer.addTextToFrame(this.text, this.actor.rigidBody, camera, this.props.c);
+    }
   }
 
   /** Perform any custom updates to the text before displaying it */
@@ -419,7 +404,16 @@ export class TextSprite {
    * @param sampleText  Some text whose size we're computing, since the object's
    *                    real text might not be available yet
    */
-  dims(camera: CameraSystem, sampleText: string) { return this.text.getDims(camera, sampleText); }
+  dims(camera: CameraSystem, sampleText: string) {
+    // NB:  When the game starts, text.text will usually be "", which gets us a
+    //      valid height but not a valid width.  Swapping in sampleText gets us
+    //      a better estimate.
+    let t = this.text.text.text;
+    this.text.text.text = sampleText;
+    let res = { width: this.text.text.width / camera.getScale(), height: this.text.text.height / camera.getScale() };
+    this.text.text.text = t;
+    return res;
+  }
 }
 
 /**
@@ -458,7 +452,7 @@ export class ImageSprite {
    * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
-    if (this.actor?.rigidBody)
+    if (this.actor)
       stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera);
   }
 
@@ -470,7 +464,7 @@ export class ImageSprite {
    * @param camera    The camera for the current stage
    * @param elapsedMs The time since the last render
    */
-  renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
+  renderWithoutBody(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
     stage.renderer.addPictureToFrame(anchor, this, this.image, camera);
   }
 
@@ -639,7 +633,7 @@ export class AnimatedSprite implements IStateObserver {
    * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
-    if (this.actor?.rigidBody)
+    if (this.actor)
       stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.getCurrent(), camera);
   }
 
@@ -651,7 +645,7 @@ export class AnimatedSprite implements IStateObserver {
    * @param camera    The camera for the current stage
    * @param elapsedMs The time since the last render
    */
-  renderAt(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
+  renderWithoutBody(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
     stage.renderer.addPictureToFrame(anchor, this, this.getCurrent(), camera);
   }
 
@@ -686,7 +680,8 @@ export class FilledSprite {
   /** The Actor to which this ImageSprite is attached */
   public actor?: Actor;
 
-  private graphics = new Graphics();
+  /** The low-level graphics object that we pass to the Renderer */
+  readonly graphics = new Graphics();
 
   /**
    * Build a filled-geometry sprite that can be rendered
@@ -748,7 +743,6 @@ export class FilledSprite {
         vertices, z: this.props.z, lineWidth: this.props.lineWidth,
         lineColor: this.props.lineColor, fillColor: this.props.fillColor
       }));
-
     }
     else {
       throw "Unrecognized prop type";
@@ -762,75 +756,8 @@ export class FilledSprite {
    * @param elapsedMs The time since the last render
    */
   render(camera: CameraSystem, _elapsedMs: number) {
-    if (this.actor) {
-      this.graphics.clear();
-      if (this.props instanceof FilledBoxConfig) {
-        if (this.props.lineWidth)
-          this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
-        if (this.props.fillColor)
-          this.graphics.beginFill(this.props.fillColor);
-        let s = camera.getScale();
-        let x = s * (this.actor.rigidBody.getCenter().x - camera.getLeft());
-        let y = s * (this.actor.rigidBody.getCenter().y - camera.getTop());
-        let w = s * this.props.w;
-        let h = s * this.props.h;
-        this.graphics.drawRect(x, y, w, h);
-        this.graphics.position.set(x, y);
-        this.graphics.pivot.set(x + w / 2, y + h / 2);
-        this.graphics.rotation = this.actor.rigidBody.getRotation();
-        stage.renderer.addGraphic(this.graphics);
-      }
-      else if (this.props instanceof FilledCircleConfig) {
-        if (this.props.lineWidth)
-          this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
-        if (this.props.fillColor)
-          this.graphics.beginFill(this.props.fillColor);
-        let s = camera.getScale();
-        let x = s * (this.actor.rigidBody.getCenter().x - camera.getLeft());
-        let y = s * (this.actor.rigidBody.getCenter().y - camera.getTop());
-        let radius = s * this.props.radius;
-        this.graphics.drawCircle(x, y, radius);
-        stage.renderer.addGraphic(this.graphics);
-
-      }
-      else if (this.props instanceof FilledPolygonConfig) {
-        if (this.props.lineWidth)
-          this.graphics.lineStyle(this.props.lineWidth, this.props.lineColor!);
-        if (this.props.fillColor)
-          this.graphics.beginFill(this.props.fillColor);
-        let s = camera.getScale();
-        let x = s * (this.actor.rigidBody.getCenter().x - camera.getLeft());
-        let y = s * (this.actor.rigidBody.getCenter().y - camera.getTop());
-        // For polygons, we need to translate the points (they are 0-relative in
-        // Box2d, we need them to be relative to (x,y))
-        let pts: number[] = [];
-        for (let pt of this.props.vertices) {
-          pts.push(s * pt.x + x);
-          pts.push(s * pt.y + y);
-        }
-        // NB: must repeat start point of polygon in PIXI
-        pts.push(pts[0]);
-        pts.push(pts[1]);
-        this.graphics.drawPolygon(pts);
-        this.graphics.position.set(x, y);
-        this.graphics.pivot.set(x, y);
-        this.graphics.rotation = this.actor.rigidBody.getRotation();
-        stage.renderer.addGraphic(this.graphics);
-      }
-      else {
-        throw "Error: unrecognized FilledSprite props type"
-      }
-    }
-  }
-
-  /**
-   * Render the FilledSprite
-   *
-   * @param camera    The camera for the current stage
-   * @param elapsedMs The time since the last render
-   */
-  renderAt(_anchor: { cx: number, cy: number }, _camera: CameraSystem, _elapsedMs: number) {
-    throw "Cannot use FilledSprite as parallax background";
+    if (this.actor)
+      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
   }
 
   /** Perform any custom updates to the text before displaying it */

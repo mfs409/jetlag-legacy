@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { b2AABB, b2Contact, b2ContactImpulse, b2ContactListener, b2DistanceJoint, b2DistanceJointDef, b2Fixture, b2Manifold, b2Vec2, b2World, b2WorldManifold } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
@@ -9,7 +7,7 @@ import { Scene } from "../Entities/Scene";
  * coordinate
  */
 class PointToActorCallback {
-  /** If we found an actor, we'll put it here */
+  /** If we found any actors, we'll put them here */
   foundEntities: Actor[] = [];
 
   /** A helper vector for tracking the location that is being queried */
@@ -88,22 +86,15 @@ export class BasicCollisionSystem {
  * code in response to collisions.
  */
 export class AdvancedCollisionSystem extends BasicCollisionSystem {
-
   /**
    * Callbacks to consider running in response to a contact *ending*.  These are
    * always one-time callbacks.
    *
-   * TODO:  This could become a performance bottleneck, since we're using an
-   *        array with O(n) search overhead.  The assumption is that the array
-   *        will be small.  If that changes, then this will need to be
-   *        redesigned.
+   * NB:  This could become a performance bottleneck, since we're using an array
+   *      with O(n) search overhead.  The assumption is that the array will be
+   *      small.  If that changes, then this will need to be redesigned.
    */
   private endContactHandlers: { actor1: Actor, actor2: Actor, callback: (a: Actor, b: Actor) => void }[] = [];
-
-  /** Create an AdvancedCollisionSystem */
-  constructor() {
-    super();
-  }
 
   /** Provide a scene, so we can route collision events to it */
   public setScene(scene: Scene) {
@@ -145,7 +136,7 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
 
           // The world is in mid-render, so we can't really change anything, so
           // defer handling the event until after the next render.
-          this.scene.timer.oneTimeEvents.push(() => {
+          this.scene.oneTimeEvents.push(() => {
             // NB: if `a` handles the collision, don't ask `b` to handle it
             if (!a.role?.onCollide(b, contact)) b.role?.onCollide(a, contact);
           });
@@ -170,7 +161,7 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
               this.collisionSystem.endContactHandlers.splice(i, 1);
               // The world is in mid-render, so we can't really change anything, so
               // defer handling the event until after the next render.
-              this.scene.timer.oneTimeEvents.push(() => {
+              this.scene.oneTimeEvents.push(() => {
                 ch.callback(ch.actor1, ch.actor2);
               });
             }
@@ -290,7 +281,7 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
       let m = new b2WorldManifold();
       contact.GetWorldManifold(m);
       let v = m.points[0];
-      sticky.scene.timer.oneTimeEvents.push(() => {
+      sticky.scene.oneTimeEvents.push(() => {
         let sb = sticky.rigidBody?.body;
         let ob = other.rigidBody?.body;
         if (!sb || !ob) return;

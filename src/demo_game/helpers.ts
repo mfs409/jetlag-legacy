@@ -11,7 +11,7 @@ import { AnimationSequence, BoxCfgOpts, GestureHandlers, AdvancedRigidBodyCfgOpt
 import { Enemy, Hero, Obstacle, Passive, Projectile } from "../jetlag/Components/Role";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { ActorPool } from "../jetlag/Systems/ActorPool";
+import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 
 /** Manage the state of Mute */
 export function toggleMute() {
@@ -434,7 +434,7 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
   };
   c.gestures = { touchDown, touchUp };
   // Put the control and events in the appropriate lists
-  stage.world.timer.repeatEvents.push(() => { if (active && whileDownAction) whileDownAction(); });
+  stage.world.repeatEvents.push(() => { if (active && whileDownAction) whileDownAction(); });
   return c;
 }
 
@@ -455,7 +455,7 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
  * @param offsetY The y distance between the top left of the projectile and the
  *                top left of the actor throwing the projectile
  */
-export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
+export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPoolSystem, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
   let c = Actor.Make({
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, overlay),
@@ -486,7 +486,7 @@ export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool
   c.gestures = { touchDown, touchUp, panMove };
 
   let mLastThrow = 0;
-  stage.world.timer.repeatEvents.push(() => {
+  stage.world.repeatEvents.push(() => {
     if (isHolding) {
       let now = new Date().getTime();
       if (mLastThrow + msDelay < now) {
@@ -528,7 +528,7 @@ export function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: n
  * @param offsetY The y distance between the top left of the projectile and the
  *                top left of the actor throwing the projectile
  */
-export function ThrowDirectionalAction(scene: Scene, projectiles: ActorPool, actor: Actor, offsetX: number, offsetY: number) {
+export function ThrowDirectionalAction(scene: Scene, projectiles: ActorPoolSystem, actor: Actor, offsetX: number, offsetY: number) {
   return (hudCoords: { x: number; y: number }) => {
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
     let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
@@ -551,7 +551,7 @@ export function ThrowDirectionalAction(scene: Scene, projectiles: ActorPool, act
  * @param velocityX The X velocity of the projectile when it is thrown
  * @param velocityY The Y velocity of the projectile when it is thrown
  */
-export function makeRepeatThrow(projectiles: ActorPool, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+export function makeRepeatThrow(projectiles: ActorPoolSystem, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
   let mLastThrow = 0; // captured by lambda
   return () => {
     let now = new Date().getTime();
@@ -699,13 +699,9 @@ export function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostD
  * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
  */
 export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
-  let appearance = new TextSprite(cfgOpts, producer);
-  // NB: Produce the text once, to get a size estimate
-  let dims = appearance.dims(scene.camera, producer());
   return Actor.Make({
-    appearance,
-    // TODO: the ".1" options are somewhat arbitrary
-    rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: dims.width, height: dims.height }, scene),
+    appearance: new TextSprite(cfgOpts, producer),
+    rigidBody: RigidBodyComponent.Box(cfgOpts, scene),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -717,9 +713,11 @@ export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, prod
  * @param scene Where the projectiles will be used
  * @param cfg   Configuration options for the projectiles
  */
-export function populateProjectilePool(scene: Scene, pool: ActorPool, cfg: ProjectileSystemConfigOpts) {
+export function populateProjectilePool(scene: Scene, pool: ActorPoolSystem, cfg: ProjectileSystemConfigOpts) {
   // set up the pool of projectiles
   for (let i = 0; i < cfg.size; ++i) {
+    // TODO:  If we did this differently, then TextSprite and FilledSprite
+    //        wouldn't need clone()
     let appearance = cfg.appearance.clone();
     let rigidBody = (cfg.body.hasOwnProperty("radius")) ?
       RigidBodyComponent.Circle(cfg.body as CircleCfgOpts, scene) :

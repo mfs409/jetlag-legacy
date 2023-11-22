@@ -1,13 +1,11 @@
-// TODO: Code Review
-
 import { Actor } from "../Entities/Actor";
 
 /**
- * ActorPool stores a bunch of actors.  We can get into lots of trouble with
- * Box2d if we make too many single-use actors, so the ActorPool is a useful
- * mechanism for recycling / reusing projectiles.
+ * ActorPool stores a bunch of actors.  We can get into trouble in Box2d if we
+ * make too many single-use actors, so the ActorPool is a useful mechanism for
+ * recycling / reusing actors.
  */
-export class ActorPool {
+export class ActorPoolSystem {
   /** A collection of all the available actors */
   private pool = [] as Actor[];
 
@@ -21,19 +19,21 @@ export class ActorPool {
   public getRemaining() { return this.remaining ?? 0; }
 
   /**
-   * Set a limit on the total number of actors that are available
+   * Set a limit on the total number of actors that can be used
    *
    * @param number How many actors are available
    */
   public setLimit(number: number) { this.remaining = number; }
 
-  /** Create an ActorPool system */
-  constructor() { }
-
-  /** Return an actor from the pool, if there is one available */
+  /**
+   * Return an actor from the pool, if there is one available
+   *
+   * Note that this can return `undefined`.  If you don't want that behavior,
+   * consider adding more actors to the pool.
+   */
   public get(): Actor | undefined {
-    // TODO:  It would be nice to just use pop(), but that will require changes
-    //        to how we put things back into the pool...
+    // NB:  We don't use pop(), because that would require pooled actors to know
+    //      which pool they came from
 
     // have we reached our limit?
     if (this.remaining == 0) return;

@@ -135,6 +135,7 @@ export class Stage {
     if (this.overlay) {
       this.overlay.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
       this.overlay.timer.advance(elapsedMs);
+      this.overlay.runRendertimeEvents();
       // Note that the timer might cancel the overlay, so we can't assume it's still valid...
       this.overlay?.camera.render(elapsedMs);
       return;
@@ -157,7 +158,7 @@ export class Stage {
     this.world.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 })
 
     // Run any pending events, and clear one-time events
-    this.world.timer.runEvents();
+    this.world.runRendertimeEvents();
 
     // Determine the center of the camera's focus
     this.world.camera.adjustCamera();
@@ -169,7 +170,9 @@ export class Stage {
     this.world.camera.render(elapsedMs);
     this.renderer.applyFilter(false, false, false);
     this.foreground.render(this.world.camera, elapsedMs);
+
     this.hud.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
+    this.hud.runRendertimeEvents();
     this.hud.timer.advance(elapsedMs);
     this.hud.camera.render(elapsedMs);
   }

@@ -270,6 +270,8 @@ export class GestureHandlers {
 /**
  * AdvancedRigidBodyCfgOpts describes advanced, optional configuration
  * properties for any rigid body
+ *
+ * TODO: Consider using arrays for the rigid/sticky stuff?
  */
 export interface AdvancedRigidBodyCfgOpts {
   /** The density of the body */

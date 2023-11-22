@@ -40,10 +40,8 @@ export class KeyboardService {
 
   /** Create the service by setting up listeners */
   constructor() {
-    // NB:  `ev.preventDefault()` is necessary, or things like TAB will do their
-    //      default UI interaction (e.g., focus the address bar)
-    document.addEventListener("keydown", (ev: KeyboardEvent) => { ev.preventDefault(); this.keyDownHandler(ev) }, true);
-    document.addEventListener("keyup", (ev: KeyboardEvent) => { ev.preventDefault(); this.keyUpHandler(ev) });
+    document.addEventListener("keydown", (ev: KeyboardEvent) => { this.keyDownHandler(ev) }, true);
+    document.addEventListener("keyup", (ev: KeyboardEvent) => { this.keyUpHandler(ev) });
   }
 
   /**
@@ -75,8 +73,12 @@ export class KeyboardService {
    */
   private keyDownHandler(ev: KeyboardEvent) {
     let handler = this.downHandlers.get(ev.code);
-    if (handler)
+    if (handler) {
+      // NB:  `ev.preventDefault()` is necessary, or things like TAB will do their
+      //      default UI interaction (e.g., focus the address bar)
+      ev.preventDefault();
       handler();
+    }
   }
 
   /**
@@ -86,7 +88,11 @@ export class KeyboardService {
    */
   private keyUpHandler(ev: KeyboardEvent) {
     let handler = this.upHandlers.get(ev.code);
-    if (handler)
+    if (handler) {
+      // NB:  `ev.preventDefault()` is necessary, or things like TAB will do their
+      //      default UI interaction (e.g., focus the address bar)
+      ev.preventDefault();
       handler();
+    }
   }
 }

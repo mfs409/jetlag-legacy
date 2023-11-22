@@ -25,6 +25,19 @@ export class Scene {
   /** A timer, for creating time-based events */
   public readonly timer: TimerSystem = new TimerSystem();
 
+  /** Events that get processed on the next render, then discarded */
+  public readonly oneTimeEvents: (() => void)[] = [];
+
+  /** Events that get processed on every render */
+  public readonly repeatEvents: (() => void)[] = [];
+
+  /** Run any pending events that should happen during a render */
+  public runRendertimeEvents() {
+    for (let e of this.oneTimeEvents) e();
+    this.oneTimeEvents.length = 0;
+    for (let e of this.repeatEvents) e();
+  }
+
   /**
    * Construct a new scene
    *

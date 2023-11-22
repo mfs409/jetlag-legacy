@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import * as Helpers from "./helpers";
 import { ImageSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";

@@ -8,7 +8,7 @@ import { GridSystem } from "../jetlag/Systems/GridSystem";
 import { Destination, Enemy, Hero, Obstacle } from "../jetlag/Components/Role";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { ActorPool } from "../jetlag/Systems/ActorPool";
+import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { TimedEvent } from "../jetlag/Systems/Timer";
 
 // TODO: Stop needing this
@@ -65,7 +65,7 @@ function tut_jetlag_tour(level: number) {
         stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { h.rigidBody.body.SetAngularVelocity(0); });
 
         // Set up projectiles
-        let projectiles = new ActorPool();
+        let projectiles = new ActorPoolSystem();
         Helpers.populateProjectilePool(stage.world, projectiles, {
             size: 20, strength: 1, disappearOnCollide: true, body: { radius: 0.125, cx: -100, cy: -100 },
             appearance: FilledSprite.Circle({ radius: .125, fillColor: "#bbbbbb", z: 0 }), range: 10, immuneToCollisions: true,

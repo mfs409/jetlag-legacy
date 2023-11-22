@@ -3,7 +3,7 @@
 import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
 import * as Helpers from "./helpers";
-import { ActorPool } from "../jetlag/Systems/ActorPool";
+import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
 import { AnimatedSprite, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -2530,7 +2530,7 @@ export function buildLevelScreen(level: number) {
     // configure a pool of projectiles. We say that there can be no more than 3
     // projectiles in flight at any time.  Once a projectile hits a wall or
     // enemy, it stops being "in flight", so we can throw another.
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 3, strength: 1, disappearOnCollide: true, range: 40, immuneToCollisions: true, body: { radius: 0.125, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }),
@@ -2598,7 +2598,7 @@ export function buildLevelScreen(level: number) {
 
     // set up a pool of projectiles, but now once the projectiles travel more
     // than 9 meters, they disappear
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100, strength: 1, range: 9, immuneToCollisions: true, disappearOnCollide: true,
       body: { radius: 0.125, cx: -100, cy: -100 },
@@ -2647,7 +2647,7 @@ export function buildLevelScreen(level: number) {
     // set up our projectiles... note that now projectiles each do 2 units of
     // damage.  Note that we make our projectiles immune to collisions.  This is
     // important if we don't want them colliding with the hero.
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 3, strength: 2, immuneToCollisions: true, disappearOnCollide: true, range: 40,
       // Since there isn't a radius or vertices, the body will be a box
@@ -2687,7 +2687,7 @@ export function buildLevelScreen(level: number) {
     // Set up our pool of projectiles.  With this throwing mechanism, the farther from the
     // hero we press, the faster the projectile goes, so we multiply the velocity by .8 to
     // slow it down a bit
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       disappearOnCollide: true,
       size: 100, body: { radius: 0.125, cx: -100, cy: -100 },
@@ -2770,7 +2770,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryEnemyCount();
 
     // Set up a projectile pool with 5 projectiles
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 5,
       body: { radius: 0.25, cx: -100, cy: -100 },
@@ -2852,7 +2852,7 @@ export function buildLevelScreen(level: number) {
 
     // Set up our projectiles.  One thing we add here is a sound when they
     // disappear
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
@@ -3178,7 +3178,7 @@ export function buildLevelScreen(level: number) {
     };
 
     // make a projectile pool and give an animation pattern for the projectiles
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
@@ -3593,7 +3593,7 @@ export function buildLevelScreen(level: number) {
     };
 
     // set up our projectiles.  There are only 20... throw them carefully
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 3, strength: 2,
       body: { radius: 0.25, cx: -100, cy: -100 },
@@ -4179,7 +4179,7 @@ export function buildLevelScreen(level: number) {
 
     // Tapping the hero will throw a projectile, which is another way to defeat
     // enemies
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100, strength: 1,
       immuneToCollisions: true,
@@ -4314,10 +4314,10 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, stage.world, { density: 1, friction: 1 }),
       movement: new InertMovement(),
-      role: new Obstacle(),
+      role: new Sensor(),
     });
 
-    (o.role as Obstacle).heroCollision = (thisActor: Actor, collideActor: Actor) => {
+    (o.role as Sensor).heroCollision = (thisActor: Actor, collideActor: Actor) => {
       // here's a simple way to increment a goodie count
       stage.score.addToGoodieCount(1, 1);
       // here's a way to set a goodie count
@@ -4357,7 +4357,7 @@ export function buildLevelScreen(level: number) {
 
     // set up our pool of projectiles, then set them to have a fixed
     // velocity when using the vector throw mechanism
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
       body: { radius: 0.1, cx: -100, cy: -100 },
@@ -4715,7 +4715,7 @@ export function buildLevelScreen(level: number) {
 
     // set up a pool of projectiles with fixed velocity, and with
     // rotation
-    let projectiles = new ActorPool();
+    let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
       immuneToCollisions: true, disappearOnCollide: true, range: 40,

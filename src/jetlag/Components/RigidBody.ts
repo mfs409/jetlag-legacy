@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { b2Body, b2BodyType, b2CircleShape, b2DistanceJoint, b2DistanceJointDef, b2PolygonShape, b2RevoluteJoint, b2RevoluteJointDef, b2Transform, b2Vec2, b2WeldJointDef } from "@box2d/core";
 import { BoxCfgOpts, CircleCfgOpts, PolygonCfgOpts, AdvancedRigidBodyCfgOpts } from "../Config";
 import { stage } from "../Stage";
@@ -13,6 +11,14 @@ import { Scene } from "../Entities/Scene";
  * so it can be used to build a RigidBody
  */
 class AdvancedRigidBodyCfg {
+  /** The density of the body */
+  density: number;
+  /** The elasticity of the body */
+  elasticity: number;
+  /** The friction of the body */
+  friction: number;
+  /** Do collisions happen, or do other bodies glide through this? */
+  collisionsEnabled: boolean;
   /** When entities touch the top of this, do they stick? */
   topSticky: boolean;
   /** When entities touch the bottom of this, do they stick? */
@@ -48,6 +54,10 @@ class AdvancedRigidBodyCfg {
    * information
    */
   constructor(cfg: AdvancedRigidBodyCfgOpts) {
+    this.density = cfg.density ?? 1;
+    this.elasticity = cfg.elasticity ?? 0;
+    this.friction = cfg.friction ?? 0;
+    this.collisionsEnabled = cfg.collisionsEnabled == false ? false : true;
     this.topSticky = !!cfg.topSticky;
     this.bottomSticky = !!cfg.bottomSticky;
     this.leftSticky = !!cfg.leftSticky;
@@ -127,11 +137,10 @@ export class PolygonCfg extends AdvancedRigidBodyCfg {
   /** Y coordinate of the center */
   cy: number;
   /** Vertices */
-  public vertArray: b2Vec2[] = []; // TODO: is this really needed?
-  // TODO: Why does a polygon have width and height?
-  /** Width of the polygon */
+  public vertArray: b2Vec2[] = [];
+  /** Width of the bounding box of the polygon */
   w: number;
-  /** Height of the polygon */
+  /** Height of the bounding box of the polygon */
   h: number;
 
   /** Construct a Polygon configuration from a PolygonCfgOpts */
@@ -155,11 +164,10 @@ enum ShapeType { CIRCLE, BOX, POLYGON };
  */
 export class RigidBodyComponent {
   /** The physics body */
-  // TODO: Once resize() is fixed, make this private (it was readonly)
-  public body: b2Body;
+  readonly body: b2Body;
 
   /** It's useful to have a debug context for drawing the "hit box" */
-  readonly debug: DebugSprite;
+  readonly debug = new DebugSprite();
 
   /** A definition for when we attach a revolute joint to this entity */
   revJointDef?: b2RevoluteJointDef;
@@ -182,7 +190,6 @@ export class RigidBodyComponent {
    * @param shapeType The shape type, for quick disambiguation
    */
   private constructor(readonly scene: Scene, public props: BoxCfg | CircleCfg | PolygonCfg, public radius: number, private shapeType: ShapeType) {
-    this.debug = stage.imageLibrary.makeDebugContext();
     this.body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: this.props.cx, y: this.props.cy } });
   }
 
@@ -308,14 +315,13 @@ export class RigidBodyComponent {
     this.scene.physics!.world.CreateJoint(mDistJointDef);
   }
 
-  /** Break any implicit joints connecting this entity */
-  public breakJoints() {
+  /** Break any implicit distance joints connecting this entity */
+  public breakDistJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint) {
       this.scene.physics!.world.DestroyJoint(this.distJoint);
       this.distJoint = undefined;
     }
-    // TODO: should we break weldJoints too?
   }
 
   /**
@@ -400,49 +406,37 @@ export class RigidBodyComponent {
   }
 
   /**
-   * Resize and move a RigidBody
+   * Resize and re-center a RigidBody
    *
-   * @param cx       The new X position
-   * @param cy       The new Y position
+   * @param cx      The new X position
+   * @param cy      The new Y position
    * @param width   The new width
    * @param height  The new height
    */
   public resize(cx: number, cy: number, width: number, height: number) {
-    // TODO: this code is losing the information about props, instead passing {}
-    // to the constructors.  Can we avoid making new bodies, instead?
+    // Get the current fixture, so we can preserve sensor state,
+    // density/elasticity/friction, and vertices when we make a new fixture
+    let oldFix = this.body.GetFixtureList()!;
 
-    // read old body information
-    let oldBody = this.body;
-    // The default is for all fixtures of a entity have the same sensor state
-    let oldFix = oldBody.GetFixtureList()!;
-    // make a new body
+    // make a new circle body?
     if (this.shapeType == ShapeType.CIRCLE) {
-      let new_body = this.scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: cx, y: cy } });
-      this.props.cx = cx;
-      this.props.cy = cy;
-      this.props.w = width;
-      this.props.h = height;
       this.radius = width > height ? width / 2 : height / 2;
       let shape = new b2CircleShape();
       shape.m_radius = this.radius;
-      new_body.CreateFixture({ shape });
-      this.body = new_body;
-    } else if (this.shapeType == ShapeType.BOX) {
-      let new_body = this.scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: cx, y: cy } });
-      this.props.cx = cx;
-      this.props.cy = cy;
-      this.props.w = width;
-      this.props.h = height;
+      this.body.CreateFixture({ shape });
+    }
+    // make a new box body?
+    else if (this.shapeType == ShapeType.BOX) {
       this.radius = Math.sqrt(Math.pow(height / 2, 2) + Math.pow(width / 2, 2));
       let shape = new b2PolygonShape();
-      shape.SetAsBox(this.props.w / 2, this.props.h / 2);
-      new_body.CreateFixture({ shape });
-      this.body = new_body;
-    } else {
-      // we need to manually scale all the vertices
-      // TODO: this isn't tested
-      let xScale = height / this.props!.h;
-      let yScale = width / this.props!.w;
+      shape.SetAsBox(width / 2, height / 2);
+      this.body.CreateFixture({ shape });
+    }
+    // Make a new polygon body
+    else {
+      // we need to manually scale all the vertices, based on the old verts
+      let xScale = height / this.props.h;
+      let yScale = width / this.props.w;
       let ps = oldFix.GetShape() as b2PolygonShape;
       let vertices: number[] = [];
       for (let i = 0; i < ps.m_vertices.length; ++i) {
@@ -450,44 +444,30 @@ export class RigidBodyComponent {
         vertices.push(mTempVector.x * xScale);
         vertices.push(mTempVector.y * yScale);
       }
-
-      let r = 0;
-      for (let i = 0; i < vertices.length; i += 2)
-        r = Math.max(r, Math.pow(vertices[i], 2), + Math.pow(vertices[i + 1], 2));
-      let new_body = this.scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: cx, y: cy } });
-      this.props.cx = cx;
-      this.props.cy = cy;
-      this.props.w = width;
-      this.props.h = height;
-      this.radius = r;
       let vertArray: b2Vec2[] = [];
       for (let i = 0; i < vertices.length; i += 2)
         vertArray[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
       (this.props as PolygonCfg).vertArray = vertArray;
+      // Also re-compute the bounding radius
+      let r = 0;
+      for (let i = 0; i < vertices.length; i += 2)
+        r = Math.max(r, Math.pow(vertices[i], 2), + Math.pow(vertices[i + 1], 2));
+      this.radius = r;
       let shape = new b2PolygonShape();
       shape.Set(vertArray);
-      new_body.CreateFixture({ shape });
-      this.body = new_body;
-      // TODO: in Level 79, the debug rendering of polygons isn't quite right
+      this.body.CreateFixture({ shape });
     }
-    // TODO:  right now, there are too many hidden ways that a body gets
-    //        manipulated, which makes it really hard to get this right.
-    this.body.SetUserData(oldBody.GetUserData());
-    this.body.SetType(oldBody.GetType());
-    // Update the user-visible physics values
+    // Update props with new center and dimensions
+    this.props.cx = cx;
+    this.props.cy = cy;
+    this.props.w = width;
+    this.props.h = height;
+
+    // Copy the old fixture's DEF and collision status to the new fixture before
+    // destroying it
     this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
-    this.body.SetBullet(oldBody.IsBullet());
-    // clone forces
-    this.body.SetAngularVelocity(oldBody.GetAngularVelocity());
-    let transform = new b2Transform();
-    transform.SetPositionAngle(this.body.GetPosition(), oldBody.GetAngle());
-    this.body.SetTransform(transform);
-    this.body.SetGravityScale(oldBody.GetGravityScale());
-    this.body.SetLinearDamping(oldBody.GetLinearDamping());
-    this.body.SetLinearVelocity(oldBody.GetLinearVelocity());
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
-    // disable the old body
-    oldBody.SetEnabled(false);
+    this.body.DestroyFixture(oldFix)
   }
 
   /** Report if this body is a circle */
@@ -511,11 +491,7 @@ export class RigidBodyComponent {
     let shape = new b2CircleShape();
     shape.m_radius = circleCfg.radius;
     rb.body.CreateFixture({ shape });
-    rb.setPhysics(commonCfg.density ?? 1, commonCfg.elasticity ?? 0, commonCfg.friction ?? 0);
-    // TODO:  commonCfg.collisionsEnabled isn't useful, because the Role
-    //        overrides it
-    rb.setCollisionsEnabled(commonCfg.collisionsEnabled ?? true);
-    rb.bless();
+    rb.applyCommonProps();
     return rb;
   }
 
@@ -532,9 +508,7 @@ export class RigidBodyComponent {
     let shape = new b2PolygonShape();
     shape.SetAsBox(rb.props.w / 2, rb.props.h / 2);
     rb.body.CreateFixture({ shape });
-    rb.setPhysics(commonCfg.density ?? 1, commonCfg.elasticity ?? 0, commonCfg.friction ?? 0);
-    rb.setCollisionsEnabled(commonCfg.collisionsEnabled ?? true);
-    rb.bless();
+    rb.applyCommonProps();
     return rb;
   }
 
@@ -553,20 +527,14 @@ export class RigidBodyComponent {
     let shape = new b2PolygonShape();
     shape.Set((rb.props as PolygonCfg).vertArray);
     rb.body.CreateFixture({ shape });
-    rb.bless();
-    rb.setPhysics(commonCfg.density ?? 1, commonCfg.elasticity ?? 0, commonCfg.friction ?? 0);
-    rb.setCollisionsEnabled(commonCfg.collisionsEnabled ?? true);
+    rb.applyCommonProps();
     return rb;
   }
 
-  /**
-   * Apply common properties based on the AdvancedRigidBodyConfig
-   *
-   * TODO: There are better ways to do this
-   */
-  private bless() {
+  /** Apply common properties based on the AdvancedRigidBodyConfig */
+  private applyCommonProps() {
+    // Make the entity continuously rotate
     if (this.props.rotationSpeed != 0) {
-      // Make the entity continuously rotate
       if (this.body.GetType() == b2BodyType.b2_staticBody) this.body.SetType(b2BodyType.b2_kinematicBody);
       this.body.SetAngularVelocity(this.props.rotationSpeed * 2 * Math.PI);
     }
@@ -574,6 +542,9 @@ export class RigidBodyComponent {
       this.body.SetFixedRotation(true);
     if (this.props.dynamic)
       this.body.SetType(b2BodyType.b2_dynamicBody);
+
+    this.setPhysics(this.props.density, this.props.elasticity, this.props.friction);
+    this.setCollisionsEnabled(this.props.collisionsEnabled);
   }
 
   /** Make the entity stop rotating */

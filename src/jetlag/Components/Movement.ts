@@ -5,7 +5,7 @@ import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { CameraSystem } from "../Systems/Camera";
-import { ActorPool } from "../Systems/ActorPool";
+import { ActorPoolSystem } from "../Systems/ActorPool";
 import { AnimatedSprite, AppearanceComponent, ImageSprite } from "./Appearance";
 import { Projectile } from "./Role";
 import { StateEvent } from "./StateManager";
@@ -80,7 +80,7 @@ export class PathMovement {
     if (!this.rigidBody) return;
     this.done = true;
     // Stop the movement
-    this.rigidBody.breakJoints();
+    this.rigidBody.breakDistJoints();
     this.rigidBody.body.SetLinearVelocity({ x: 0, y: 0 });
   }
 
@@ -90,7 +90,7 @@ export class PathMovement {
     // convert from the point to a unit vector, then set velocity
     p.Subtract(this.rigidBody!.getCenter()).Normalize();
     p.Scale(this.velocity);
-    this.rigidBody!.breakJoints();
+    this.rigidBody!.breakDistJoints();
     this.rigidBody!.body.SetLinearVelocity(p);
   }
 
@@ -189,14 +189,14 @@ export class TiltMovement {
   /** Update the Y velocity, without affecting the X velocity */
   updateYVelocity(v: number) {
     if (!this.rigidBody?.body.IsEnabled()) return;
-    this.rigidBody.breakJoints();
+    this.rigidBody.breakDistJoints();
     this.rigidBody.body.SetLinearVelocity({ x: this.rigidBody?.body.GetLinearVelocity().x ?? 0, y: v });
   }
 
   /** Update the X velocity, without affecting the Y velocity */
   updateXVelocity(v: number) {
     if (!this.rigidBody?.body.IsEnabled()) return;
-    this.rigidBody.breakJoints();
+    this.rigidBody.breakDistJoints();
     this.rigidBody.body.SetLinearVelocity({ x: v, y: this.rigidBody?.body.GetLinearVelocity().y ?? 0 });
   }
 
@@ -276,7 +276,7 @@ export class BasicChase {
       x *= this.multiplier;
     }
     // apply velocity
-    this.rigidBody?.breakJoints();
+    this.rigidBody?.breakDistJoints();
     this.rigidBody?.body.SetLinearVelocity({ x, y });
   }
 
@@ -536,7 +536,7 @@ export class ProjectileMovement {
 
   /** Set a new velocity for the actor */
   updateVelocity(x: number, y: number) {
-    this._rigidBody?.breakJoints();
+    this._rigidBody?.breakDistJoints();
     this._rigidBody?.body.SetLinearVelocity({ x, y });
   }
 
@@ -569,7 +569,7 @@ export class ProjectileMovement {
   // TODO: can we combine the throwing methods?
   // TODO: This should not take a pool
   // TODO: Images and Sounds are not movement.  Should throwFixed be part of the role, and dispatch accordingly?
-  public throwFixed(pool: ActorPool, actor: Actor, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+  public throwFixed(pool: ActorPoolSystem, actor: Actor, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
     // get the next projectile, set sensor, set image
     let b = pool.get();
     if (!b) return;
@@ -613,7 +613,7 @@ export class ProjectileMovement {
    */
   // TODO: This should not take a pool
   // TODO: Images and Sounds are not movement.  Should throwFixed be part of the role, and dispatch accordingly?
-  public throwAt(pool: ActorPool, fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
+  public throwAt(pool: ActorPoolSystem, fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
     // get the next projectile, set sensor, set image
     let b = pool.get();
     if (!b) return;
@@ -720,7 +720,7 @@ export class ExplicitMovement {
    * @param y The new y velocity
    */
   updateVelocity(x: number, y: number) {
-    this.rigidBody?.breakJoints();
+    this.rigidBody?.breakDistJoints();
     this.rigidBody?.body.SetLinearVelocity({ x, y });
   }
 
@@ -730,7 +730,7 @@ export class ExplicitMovement {
    * @param x The new x velocity
    */
   updateXVelocity(x: number) {
-    this.rigidBody?.breakJoints();
+    this.rigidBody?.breakDistJoints();
     this.rigidBody?.body.SetLinearVelocity({ x, y: this.rigidBody.body.GetLinearVelocity().y });
   }
 
@@ -740,7 +740,7 @@ export class ExplicitMovement {
    * @param y The new x velocity
    */
   updateYVelocity(y: number) {
-    this.rigidBody?.breakJoints();
+    this.rigidBody?.breakDistJoints();
     this.rigidBody?.body.SetLinearVelocity({ x: this.rigidBody.body.GetLinearVelocity().x, y });
   }
 

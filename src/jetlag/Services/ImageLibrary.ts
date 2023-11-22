@@ -1,17 +1,13 @@
-// TODO: Code Review
-
 import { Assets, Graphics, Sprite as PixiSprite, Text as PixiText, Texture } from "pixi.js";
 import { Config } from "../Config";
 import { stage } from "../Stage";
-import { b2Vec2 } from "@box2d/core";
-import { CameraSystem } from "../Systems/Camera";
 
 /** DebugSprite is used when we need to render a debug outline on an actor */
 export class DebugSprite {
   /** The PIXI context that we use for making the shape's outline */
   readonly shape = new Graphics();
 
-  /** A radius line when debugShape is a circle */
+  /** A radial line when debugShape is a circle */
   readonly line = new Graphics();
 }
 
@@ -29,50 +25,6 @@ export class Sprite {
   constructor(readonly imgName: string, readonly sprite: PixiSprite) { }
 
   /**
-   * Set the position for this sprite
-   *
-   * @param x The x coordinate
-   * @param y The y coordinate
-   */
-  setPosition(x: number, y: number) {
-    this.sprite.position.x = x;
-    this.sprite.position.y = y;
-  }
-
-  /** Get the x coordinate of the sprite */
-  getXPosition() { return this.sprite.position.x; }
-
-  /** Get the y coordinate of the sprite */
-  getYPosition() { return this.sprite.position.y; }
-
-  /** Get the width of the sprite */
-  getWidth() { return this.sprite.width; }
-
-  /** Get the height of the sprite */
-  getHeight() { return this.sprite.height; }
-
-  /**
-   * Set the width of the sprite
-   *
-   * @param w The new width
-   */
-  setWidth(w: number) { this.sprite.width = w; }
-
-  /**
-   * Set the height of the sprite
-   *
-   * @param h The new height
-   */
-  setHeight(h: number) { this.sprite.height = h; }
-
-  /**
-   * Set the rotation of the sprite
-   *
-   * @param r The new rotation
-   */
-  setRotation(r: number) { this.sprite.rotation = r; }
-
-  /**
    * Set the position of the sprite relative to some X/Y anchor point
    *
    * @param ax The X anchor
@@ -86,69 +38,29 @@ export class Sprite {
   }
 }
 
-/**
- * Text provides its functionality via the PIXI.text type.
- *
- * TODO: Support rotated text?
- */
+/** Text is for anything that we render by using a string and a font */
 export class Text {
+  /** A debug context, for when we need to print the text's outline */
+  readonly debug = new Graphics();
+
   /**
    * Create a Text object by wrapping a PIXI text
    *
    * @param text A PIXI text object
    */
-  constructor(private text: PixiText) { }
-
-  /** Report the X position of the text */
-  getXPosition() { return this.text.position.x; }
-
-  /** Report the Y position of the text */
-  getYPosition() { return this.text.position.y; }
+  private constructor(readonly text: PixiText) { }
 
   /**
-   * Return the width and height of the text
+   * Create some text, with the font size scaled according to the stage's
+   * current scale.
    *
-   * @param camera      The camera of the scene where the text is being drawn
-   * @param sampleText  Some text whose size we're computing, since the object's
-   *                    real text might not be available yet
+   * @param txt   The text to show
+   * @param opts  PIXI options for the text
    */
-  getDims(camera: CameraSystem, sampleText: string) {
-    // NB:  When the game starts, text.text will usually be "", which gets us a
-    //      valid height but not a valid width.  Swapping in sampleText gets us
-    //      a better estimate.
-    let t = this.text.text;
-    this.text.text = sampleText;
-    let res = { width: this.text.width / camera.getScale(), height: this.text.height / camera.getScale() };
-    this.text.text = t;
-    return res;
+  public static makeText(txt: string, opts: any) {
+    opts.fontSize = Math.floor(opts.fontSize * stage.fontScaling);
+    return new Text(new PixiText(txt, opts));
   }
-
-  /**
-   * Set the string to display
-   *
-   * @param text The string of text to display
-   */
-  setText(text: string) { this.text.text = text; }
-
-  /**
-   * Set the position of the text
-   *
-   * @param x The X coordinate of the text
-   * @param y The Y coordinate of the text
-   */
-  setPosition(x: number, y: number) {
-    this.text.position.x = x;
-    this.text.position.y = y;
-  }
-
-  /** Get the width and height of this text */
-  getBounds() {
-    let bounds = this.text.getBounds();
-    return new b2Vec2(bounds.width, bounds.height);
-  }
-
-  /** Get the part of the Text that can be passed to the renderer */
-  getRenderObject() { return this.text; }
 }
 
 /**
@@ -199,21 +111,8 @@ export class ImageLibraryService {
       if (imgName !== "") stage.console.log("Unable to find graphics asset '" + imgName + "'");
       return new Sprite("", new PixiSprite());
     }
-    // TODO: should we be cloning the texture?
+    // NB:  If we wanted to use Pixi to modify the texture, then we'd need to
+    //      clone it first.
     return new Sprite(imgName, new PixiSprite(texture));
-  }
-
-  /** Get a debug context that can be used by a sprite during debug renders */
-  makeDebugContext() { return new DebugSprite(); }
-
-  /**
-   * Create some text
-   *
-   * @param txt   The text to show
-   * @param opts  PIXI options for the text
-   */
-  public makeText(txt: string, opts: any) {
-    opts.fontSize = Math.floor(opts.fontSize * stage.fontScaling);
-    return new Text(new PixiText(txt, opts));
   }
 }
