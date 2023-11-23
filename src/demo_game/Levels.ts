@@ -1,5 +1,3 @@
-// Last review: 08-10-2023
-
 import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
 import * as Helpers from "./helpers";
@@ -1718,11 +1716,13 @@ export function buildLevelScreen(level: number) {
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world, { density: 1, friction: 1 }),
       movement: new InertMovement(),
       role: new Obstacle(),
-      sounds: new SoundEffectComponent({ collide: "high_pitch.ogg", tap: "low_pitch.ogg" })
+      sounds: new SoundEffectComponent({ collide: "high_pitch.ogg" })
     });
 
-    // The tap handler doesn't do anything, but we need it there for the sound to work.
-    let tapHandler = () => { return true; };
+    let tapHandler = () => {
+      stage.musicLibrary.getSound("low_pitch.ogg").play();
+      return true;
+    };
     o.gestures = { tap: tapHandler };
 
     welcomeMessage("Touch the purple ball or collide with it, and a " + "sound will play");

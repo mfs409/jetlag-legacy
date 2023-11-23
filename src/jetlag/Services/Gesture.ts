@@ -126,13 +126,10 @@ export class GestureService {
    * @param coords  The coordinates (within the scene) of the gesture
    */
   private tap(scene: Scene, coords: { x: number, y: number }) {
-    for (let actor of scene.physics!.actorsAt(coords)) {
-      if (actor.gestures?.tap) {
-        actor.sounds?.tap?.play();
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor.gestures?.tap)
         if (actor.gestures.tap(coords))
           return true;
-      }
-    }
     return false;
   }
 
