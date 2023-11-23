@@ -20,6 +20,8 @@ export interface ISound {
   stop(): void;
   /** Pause the sound, so we can resume it later */
   pause(): void;
+  /** Report if the sound is currently playing */
+  playing(): boolean;
 }
 
 /**

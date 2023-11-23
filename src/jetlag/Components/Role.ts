@@ -3,14 +3,11 @@
 import { b2Contact, b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
-import { ISound } from "../Services/AudioLibrary";
 import { StateEvent } from "./StateManager";
 
 /**
  * These are the different reasons why two entities might pass through each
  * other, even when the collide with everything else
- *
- * TODO: We could gain some efficiency by switching to a bitmask
  */
 export enum CollisionExemptions {
   CRAWL_HERO = 0,
@@ -180,9 +177,6 @@ export class Destination extends Role {
   /** the number of Heroes already in this Destination */
   private holding = 0;
 
-  /** The sound to play when a hero arrives at this destination */
-  private arrivalSound?: ISound;
-
   /** The number of Heroes that this Destination can hold */
   private capacity: number;
 
@@ -194,17 +188,14 @@ export class Destination extends Role {
    *
    * @param capacity          The number of Heroes that this Destination can
    *                          hold
-   * @param arrivalSound      The sound to play when a hero arrives at this
-   *                          destination
    * @param onAttemptArrival  A custom, optional check to decide if the
    *                          Destination is "ready" to accept a Hero
    */
-  constructor(cfg: { capacity?: number, arrivalSound?: string, onAttemptArrival?: (h: Actor) => boolean } = {}) {
+  constructor(cfg: { capacity?: number, onAttemptArrival?: (h: Actor) => boolean } = {}) {
     super();
 
     this.collisionRules.role.push(CollisionExemptions.DESTINATION);
 
-    if (cfg.arrivalSound) this.arrivalSound = stage.musicLibrary.getSound(cfg.arrivalSound);
     this.capacity = cfg.capacity ?? 1;
     this.onAttemptArrival = cfg.onAttemptArrival;
   }
@@ -234,7 +225,7 @@ export class Destination extends Role {
     if (this.onAttemptArrival && !this.onAttemptArrival(h)) return false;
     // it's allowed in... play a sound
     this.holding++;
-    if (this.arrivalSound) this.arrivalSound.play();
+    this.actor?.sounds?.arrive?.play();
     return true;
   }
 }
@@ -356,7 +347,8 @@ export class Enemy extends Role {
     if (this.onDefeated) this.onDefeated(this.actor!, h);
 
     // remove the enemy from the screen
-    this.actor!.remove(false);
+    this.actor?.sounds.defeat?.play();
+    this.actor!.remove();
 
     // possibly update score
     if (increaseScore) stage.score.onEnemyDefeated();
@@ -423,9 +415,6 @@ export class Hero extends Role {
   /** Indicate that the hero can jump while in the air */
   public allowMultiJump = false;
 
-  /** Sound to play when a jump occurs */
-  private jumpSound?: ISound;
-
   /** Is the hero currently in crawl mode? */
   private crawling = false;
 
@@ -436,14 +425,13 @@ export class Hero extends Role {
    * Construct a Hero role
    *
    * @param strength                The hero's strength (default 1)
-   * @param jumpSound               A sound to play when jumping
    * @param allowMultiJump          True if the hero can jump when in mid-jump
    * @param strengthChangeCallback  Code to run on any change to the hero's
    *                                strength
    * @param mustSurvive             Does the level end immediately if this hero
    *                                is defeated?
    */
-  constructor(cfg: { strength?: number, jumpSound?: string, allowMultiJump?: boolean, strengthChangeCallback?: (h: Actor) => void, mustSurvive?: boolean } = {}) {
+  constructor(cfg: { strength?: number, allowMultiJump?: boolean, strengthChangeCallback?: (h: Actor) => void, mustSurvive?: boolean } = {}) {
     super();
 
     // Heroes don't collide with goodies or destinations
@@ -454,8 +442,6 @@ export class Hero extends Role {
     stage.score.onHeroCreated();
     if (cfg.strength != undefined)
       this._strength = cfg.strength;
-    if (cfg.jumpSound)
-      this.jumpSound = stage.musicLibrary.getSound(cfg.jumpSound);
     this.allowMultiJump = !!cfg.allowMultiJump;
     this.strengthChangeCallback = cfg.strengthChangeCallback;
     this.mustSurvive = !!cfg.mustSurvive;
@@ -499,8 +485,8 @@ export class Hero extends Role {
     else if (other.role instanceof Destination) {
       if (other.role.receive(this.actor!)) {
         stage.score.onDestinationArrive();
-        // hide the hero quietly, since the destination might make a sound
-        this.actor!.remove(true);
+        // hide the hero, since the destination might make a sound
+        this.actor!.remove();
       }
       return true;
     }
@@ -513,7 +499,7 @@ export class Hero extends Role {
     // Goodies get collected
     else if (other.role instanceof Goodie) {
       if (!other.role.onCollect(other, this.actor!)) return true;
-      other.remove(false);
+      other.remove();
       stage.score.onGoodieCollected();
     }
     return false;
@@ -528,7 +514,7 @@ export class Hero extends Role {
     // if the enemy always defeats the hero, no matter what, then defeat the
     // hero
     if (enemy.instantDefeat) {
-      this.actor!.remove(false);
+      this.actor!.remove();
       if (enemy.onDefeatHero)
         enemy.onDefeatHero(enemy.actor!, this.actor!);
 
@@ -555,7 +541,7 @@ export class Hero extends Role {
     }
     // when we can't defeat it by losing strength, remove the hero
     else if (enemy.damage >= this._strength) {
-      this.actor!.remove(false);
+      this.actor!.remove();
       if (enemy.onDefeatHero)
         enemy.onDefeatHero(enemy.actor!, this.actor!);
 
@@ -620,7 +606,7 @@ export class Hero extends Role {
 
     if (!this.allowMultiJump) this.inAir = true;
     this.actor!.state.changeState(this.actor!, StateEvent.JUMP_START);
-    if (this.jumpSound) this.jumpSound.play();
+    this.actor?.sounds?.jump?.play();
 
     // suspend creation of sticky joints, so the hero can actually move
     this.actor!.rigidBody!.props.stickyDelay = window.performance.now() + 10;
@@ -737,30 +723,13 @@ export class Obstacle extends Role {
   public jumpReEnable = true;
 
   /**
-   * A sound to play when the obstacle is hit by a hero
-   *
-   * TODO: It's not clear we still use this
-   */
-  private collideSound?: ISound;
-
-  /** how long to delay (in ms) between attempts to play the collide sound */
-  private collideSoundDelay = 0;
-
-  /** Time of last collision sound */
-  private lastCollideSoundTime = 0;
-
-  /**
    * Internal method for playing a sound when a hero collides with this
    * obstacle
    */
   public playCollideSound() {
-    if (!this.collideSound) return;
-
-    // Make sure we have waited long enough since the last time we played the sound
-    let now = new Date().getTime();
-    if (now < this.lastCollideSoundTime + this.collideSoundDelay) return;
-    this.lastCollideSoundTime = now;
-    this.collideSound.play();
+    if (!this.actor?.sounds?.collide) return;
+    if (!this.actor.sounds.collide.playing())
+      this.actor.sounds.collide.play();
   }
 }
 
@@ -859,14 +828,14 @@ export class Projectile extends Role {
         // return... don't remove the projectile
         return true;
       }
-      this.actor!.remove(false);
+      this.actor!.remove();
       return true;
     }
     if (other.role instanceof Projectile) {
       if (!this.disappearOnCollide) return true;
       // only disappear if other is not a sensor
       if (!other.rigidBody?.getCollisionsEnabled()) {
-        this.actor!.remove(false);
+        this.actor!.remove();
       }
       return true;
     }
@@ -878,10 +847,10 @@ export class Projectile extends Role {
         other.role.defeat(true, this.actor);
         // hide the projectile quietly, so that the sound of the enemy can
         // be heard
-        this.actor?.remove(true);
+        this.actor?.remove();
       } else {
         // hide the projectile
-        this.actor?.remove(false);
+        this.actor?.remove();
       }
       return true;
     }
@@ -901,7 +870,7 @@ export class Projectile extends Role {
     let dx = Math.abs(body.GetPosition().x - this.rangeFrom.x);
     let dy = Math.abs(body.GetPosition().y - this.rangeFrom.y);
     if (dx * dx + dy * dy > this.range * this.range)
-      this.actor!.remove(true);
+      this.actor!.remove();
   }
 }
 

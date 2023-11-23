@@ -613,7 +613,7 @@ export function setShrinkOverTime(actor: Actor, shrinkX: number, shrinkY: number
     if (w > 0.05 && h > 0.05) {
       actor.resize(x, y, w, h);
     } else {
-      actor.remove(false);
+      actor.remove();
       done = true;
     }
   });
@@ -726,8 +726,8 @@ export function populateProjectilePool(scene: Scene, pool: ActorPoolSystem, cfg:
       rigidBody.body.SetGravityScale(1);
     rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
     let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide });
-    let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role });
-    p.sounds = cfg.soundEffects;
+    // TODO: we should be cloning the soundEffects?
+    let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role, sounds: cfg.soundEffects });
     pool.put(p);
   }
 }

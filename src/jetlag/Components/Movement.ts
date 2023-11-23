@@ -10,7 +10,6 @@ import { AnimatedSprite, AppearanceComponent, ImageSprite } from "./Appearance";
 import { Projectile } from "./Role";
 import { StateEvent } from "./StateManager";
 import { CircleCfgOpts, BoxCfgOpts } from "../Config";
-import { ISound } from "../Services/AudioLibrary";
 import { SoundEffectComponent } from "./SoundEffect";
 
 /**
@@ -487,8 +486,6 @@ export interface ProjectileSystemConfigOpts {
   fixedVectorVelocity?: number,
   /** Should projectiles be rotated in the direction they are thrown? */
   rotateVectorThrow?: boolean,
-  /** A sound to play when throwing a projectile */
-  throwSound?: string,
   /** A sound to play when a projectile disappears */
   soundEffects?: SoundEffectComponent,
   /** A set of image names to randomly assign to projectiles' appearance */
@@ -525,9 +522,6 @@ export class ProjectileMovement {
   /** Should projectiles be rotated in the direction they are thrown? */
   rotateVectorThrow?: boolean;
 
-  /** A sound to play when throwing a projectile */
-  throwSound?: ISound;
-
   /** A set of image names to randomly assign to projectiles' appearance */
   randomImageSources?: string[];
 
@@ -546,8 +540,6 @@ export class ProjectileMovement {
    * @param cfg The requested configuration
    */
   constructor(cfg: ProjectileSystemConfigOpts) {
-    if (cfg.throwSound)
-      this.throwSound = stage.musicLibrary.getSound(cfg.throwSound);
     this.multiplier = cfg.multiplier ?? 1;
     this.fixedVectorVelocity = cfg.fixedVectorVelocity;
     this.rotateVectorThrow = cfg.rotateVectorThrow;
@@ -593,7 +585,7 @@ export class ProjectileMovement {
     // give the projectile velocity, show it, and play sound
     (b.movement as ProjectileMovement).updateVelocity(velocityX, velocityY);
     b.enabled = true;
-    this.throwSound?.play();
+    b.sounds?.toss?.play();
     actor.state.changeState(actor, StateEvent.THROW_START);
   }
 
@@ -654,7 +646,7 @@ export class ProjectileMovement {
 
     // show the projectile, play sound, and animate the hero
     b.enabled = true;
-    this.throwSound?.play();
+    b.sounds?.toss?.play();
     actor.state.changeState(actor, StateEvent.THROW_START);
   }
 }

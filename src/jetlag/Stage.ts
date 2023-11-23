@@ -1,4 +1,4 @@
-// TODO: Code Review
+// TODO: Code Review: Add transparency, everything else is good
 
 import { Scene } from "./Entities/Scene";
 import { ParallaxSystem } from "./Systems/Parallax";
@@ -32,7 +32,7 @@ import { ImageLibraryService } from "./Services/ImageLibrary";
  * in the game, we don't make a new Stage object... instead we clear out the
  * existing one and reuse it.
  *
- * Stage does not manage transitions between stages on its own. Instead, it has
+ * Stage does not manage transitions between scenes on its own. Instead, it has
  * mechanisms (onScreenChange and endLevel) for resetting itself at the
  * beginning of a stage, and cleaning itself up at the end of a stage.
  *
@@ -150,14 +150,14 @@ export class Stage {
     this.score.onClockTick(elapsedMs);
 
     // handle accelerometer stuff... note that accelerometer is effectively
-    // disabled during a popup... we could change that by moving this to the
+    // disabled during an overlay... we could change that by moving this to the
     // top, but that's probably not going to produce logical behavior
     this.tilt.handleTilt();
 
     // Advance the physics world
     this.world.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 })
 
-    // Run any pending events, and clear one-time events
+    // Run any pending world events, and clear one-time events
     this.world.runRendertimeEvents();
 
     // Determine the center of the camera's focus
@@ -186,26 +186,24 @@ export class Stage {
     this.music.stopMusic();
     this.music.clear();
 
-    // reset score
+    // reset score and storage
     this.score.reset();
     this.storage.clearLevelStorage();
 
-    // reset keyboard handlers, since they aren't part of the world
+    // reset keyboard and gesture handlers, since they aren't part of the world
     this.keyboard.clearHandlers();
-
-    // Reset the touch screen, too
     this.gestures.reset();
 
     // reset other fields to default values
     this.backgroundColor = 0xffffff;
 
-    // Just re-make the scenes, instead of clearing the old ones
+    // Just re-make the scenes and systems, instead of clearing the old ones
     this.world = new Scene(this.pixelMeterRatio, new AdvancedCollisionSystem());
     (this.world.physics as AdvancedCollisionSystem).setScene(this.world);
-    this.tilt.reset();
     this.hud = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
     this.background = new ParallaxSystem();
     this.foreground = new ParallaxSystem();
+    this.tilt.reset();
 
     // Now run the level
     builder(index, this);
@@ -242,6 +240,9 @@ export class Stage {
     // make sure the volume is reset to its old value
     this.musicLibrary.resetMusicVolume(parseInt(this.storage.getPersistent("volume") ?? "1"));
 
+    // Configure any systems that should be running
+    this.tilt = new TiltSystem;
+
     // For the sake of tutorials, we can do a little bit of querystring parsing
     // to override the default level
     let level = 1;
@@ -258,14 +259,11 @@ export class Stage {
       this.renderer.startRenderLoop();
     });
 
-    this.tilt = new TiltSystem;
   }
 
   /**
    * If the game is supposed to fill the screen, this code will change the
    * config object to maximize the div in which the game is drawn
-   *
-   * @param config The JetLagConfig object
    */
   private adjustScreenDimensions() {
     // as we compute the new screen width, height, and pixel ratio, we need
@@ -301,10 +299,8 @@ export class Stage {
    * @param ms The number of milliseconds for which to vibrate
    */
   vibrate(ms: number) {
-    if (!!navigator.vibrate)
-      navigator.vibrate(ms);
-    else
-      this.console.log("Simulating " + ms + "ms of vibrate");
+    if (!!navigator.vibrate) navigator.vibrate(ms);
+    else this.console.log("Simulating " + ms + "ms of vibrate");
   }
 }
 

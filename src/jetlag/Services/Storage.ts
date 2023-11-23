@@ -1,20 +1,20 @@
-// TODO: Code Review
+// TODO:  This needs to be extended to handle persistence better in non-browser
+//        environments, but otherwise it's good.
 
 /**
  * StorageService provides three key/value stores
  *
  * - Persistent: Things saved here will remain here, even after the player
- *               leaves the page.  This uses the HTML5 persistent storage API.
+ *               leaves the page.  This currently uses the HTML5 persistent
+ *               storage API.
  * - Session:    Things saved here will remain as the player moves among levels,
- *               but will be discarded when the player leaves/refreshes the
+ *               but will be discarded when the player exits/refreshes the
  *               browser.
  * - Level:      Things saved here will remain only until the player moves to
  *               another level.
  *
  * Note that Session and Level can story any data type.  Persistent can only
- * store strings.
- *
- * TODO:  We need to abstract Persistent so it can work on phones?
+ * store strings, so you'll need JSON serialization for fancy stuff.
  */
 export class StorageService {
   /** The "session" storage */

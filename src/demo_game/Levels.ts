@@ -269,8 +269,10 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Destination({ capacity: 2, arrivalSound: "high_pitch.ogg" }),
+      role: new Destination({ capacity: 2 }),
+      sounds: new SoundEffectComponent({ arrive: "high_pitch.ogg" }),
     });
+
 
     // Notice that this line didn't change from level 4: we still need a
     // total of 2 heroes reaching destinations
@@ -1291,7 +1293,8 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Enemy({ onDefeated: (_e: Actor, _h?: Actor) => { stage.musicLibrary.getSound("slow_down.ogg").play(); } }),
+      role: new Enemy(),
+      sounds: new SoundEffectComponent({ defeat: "slow_down.ogg" }),
     });
 
     // draw another enemy.  It is too deadly for us to ever defeat.
@@ -1311,11 +1314,11 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Goodie({
         onCollect: (_g: Actor, h: Actor) => {
-          stage.musicLibrary.getSound("woo_woo_woo.ogg").play();
           (h.role as Hero).strength = 2 + (h.role as Hero).strength;
           return true;
         }
       }),
+      sounds: new SoundEffectComponent({ disappear: "woo_woo_woo.ogg" }),
     });
 
     // Display the hero's strength
@@ -1579,7 +1582,7 @@ export function buildLevelScreen(level: number) {
         // If it's been less than 300 milliseconds, and if this is the second
         // consecutive tap to the vertical obstacle, remove it
         if (x - lastTouch < 300 && lastTapActor == vertical_obstacle) {
-          vertical_obstacle.remove(true);
+          vertical_obstacle.remove();
           return true;
         }
         // Otherwise, remember the time of the tap, and that it was to the
@@ -1606,7 +1609,7 @@ export function buildLevelScreen(level: number) {
       tap: () => {
         let x = stage.renderer.now;
         if (x - lastTouch < 300 && lastTapActor == horizontal_obstacle) {
-          horizontal_obstacle.remove(true);
+          horizontal_obstacle.remove();
           return true;
         }
         lastTouch = x;
@@ -1714,13 +1717,12 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world, { density: 1, friction: 1 }),
       movement: new InertMovement(),
-      role: new Obstacle({ heroCollision: () => stage.musicLibrary.getSound("high_pitch.ogg").play() }),
+      role: new Obstacle(),
+      sounds: new SoundEffectComponent({ collide: "high_pitch.ogg", tap: "low_pitch.ogg" })
     });
 
-    let tapHandler = () => {
-      stage.musicLibrary.getSound("low_pitch.ogg").play();
-      return true;
-    };
+    // The tap handler doesn't do anything, but we need it there for the sound to work.
+    let tapHandler = () => { return true; };
     o.gestures = { tap: tapHandler };
 
     welcomeMessage("Touch the purple ball or collide with it, and a " + "sound will play");
@@ -1845,7 +1847,7 @@ export function buildLevelScreen(level: number) {
         role: new Obstacle(),
       });
       // Let's make it disappear quietly after 10 seconds...
-      stage.world.timer.addEvent(new TimedEvent(10, false, () => o.remove(true)));
+      stage.world.timer.addEvent(new TimedEvent(10, false, () => o.remove()));
       return true;
     };
     // "Pan" means "drag", more or less.  It has three parts: the initial
@@ -2046,7 +2048,8 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world, { density: 5, friction: 0.6 }),
       movement: new TiltMovement(),
-      role: new Hero({ jumpSound: "flap_flap.ogg" }),
+      role: new Hero(),
+      sounds: new SoundEffectComponent({ jump: "flap_flap.ogg" }),
     });
 
     cfg = { cx: 127, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
@@ -2861,8 +2864,7 @@ export function buildLevelScreen(level: number) {
       disappearOnCollide: true,
       range: 40,
       immuneToCollisions: true,
-      throwSound: "flap_flap.ogg",
-      soundEffects: new SoundEffectComponent("slow_down.ogg")
+      soundEffects: new SoundEffectComponent({ disappear: "slow_down.ogg", toss: "flap_flap.ogg" })
     });
 
     // Touching will throw a projectile downward
@@ -2880,8 +2882,8 @@ export function buildLevelScreen(level: number) {
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Enemy(),
+      sounds: new SoundEffectComponent({ defeat: "low_pitch.ogg" })
     });
-    (e.role as Enemy).onDefeated = (_e: Actor, _a?: Actor) => stage.musicLibrary.getSound("low_pitch.ogg").play();
 
     // This variable is used by the timer
     let counter = 1;
@@ -2894,24 +2896,24 @@ export function buildLevelScreen(level: number) {
         let y = (e.rigidBody?.getCenter().y ?? 0) + counter;
         // make an enemy to the left and down
         let cfg = { cx: (e.rigidBody?.getCenter().x ?? 0) - counter, cy: y, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-        let left = Actor.Make({
+        Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
           movement: new InertMovement(),
           role: new Enemy(),
+          sounds: new SoundEffectComponent({ defeat: "low_pitch.ogg" }),
         });
-        (left.role as Enemy).onDefeated = (_e: Actor, _a?: Actor) => stage.musicLibrary.getSound("low_pitch.ogg").play();
         // make an enemy to the right and down
         cfg = {
           cx: (e.rigidBody?.getCenter().x ?? 0) + counter, cy: y, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png"
         };
-        let right = Actor.Make({
+        Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
           movement: new InertMovement(),
           role: new Enemy(),
+          sounds: new SoundEffectComponent({ defeat: "low_pitch.ogg" }),
         });
-        (right.role as Enemy).onDefeated = (_e: Actor, _a?: Actor) => stage.musicLibrary.getSound("low_pitch.ogg").play();
         counter += 1;
       }
     }));
@@ -3243,21 +3245,26 @@ export function buildLevelScreen(level: number) {
       // The first enemy we create will harm the hero even if the hero is
       // invincible
       let role: Enemy;
+      let sounds: SoundEffectComponent | undefined = undefined;
       if (i == 0)
         role = new Enemy({ damage: 4, instantDefeat: true });
       // the second enemy will not be harmed by invincibility, but won't harm an
       // invincible hero
-      else if (i == 1)
+      else if (i == 1) {
         role = new Enemy({ damage: 4, immuneToInvincibility: true });
+      }
       // The other enemies can be defeated by invincibility
-      else
-        role = new Enemy({ disableHeroCollision: true, damage: 4, onDefeated: () => stage.musicLibrary.getSound("high_pitch.ogg").play() });
+      else {
+        role = new Enemy({ disableHeroCollision: true, damage: 4, });
+        sounds = new SoundEffectComponent({ defeat: "high_pitch.ogg" })
+      }
 
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: RigidBodyComponent.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
         movement: new InertMovement(),
         role,
+        sounds,
       });
 
     }
@@ -3347,7 +3354,7 @@ export function buildLevelScreen(level: number) {
     });
     (h.movement as ExplicitMovement).addVelocity(2, 0);
 
-    stage.world.camera.setCameraFocus(h);
+    // stage.world.camera.setCameraFocus(h);
 
     // enable hero jumping and crawling
     Helpers.addTapControl(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.jumpAction(h, 0, -8, 0));
@@ -3521,7 +3528,7 @@ export function buildLevelScreen(level: number) {
         enemyCollision: (thisActor: Actor, collideActor: Actor) => {
           if (collideActor.extra.size === "big") {
             (collideActor.role as Enemy).defeat(true, thisActor);
-            thisActor.remove(true);
+            thisActor.remove();
           }
         }
       }),
@@ -3799,7 +3806,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Enemy(),
     });
-    stage.world.timer.addEvent(new TimedEvent(2, false, () => disappear_enemy.remove(true)));
+    stage.world.timer.addEvent(new TimedEvent(2, false, () => disappear_enemy.remove()));
 
     // create an enemy that will appear after 3 seconds
     cfg = { cx: 5, cy: 5, radius: 1, width: 2, height: 2, img: "red_ball.png" };
@@ -4040,7 +4047,7 @@ export function buildLevelScreen(level: number) {
       // pause the game, draw the destination.
       else if (callback_obstacle.rigidBody?.getCenter().x == 60) {
         if (collects != 3) return;
-        callback_obstacle.remove(true);
+        callback_obstacle.remove();
 
         stage.musicLibrary.getSound("high_pitch.ogg").play();
 
@@ -4104,15 +4111,15 @@ export function buildLevelScreen(level: number) {
       rigidBody: RigidBodyComponent.Circle(cfg, stage.world, { density: 1, friction: 1 }),
       movement: new InertMovement(),
       role: new Obstacle(),
+      sounds: new SoundEffectComponent({ disappear: "high_pitch.ogg" }),
     });
-    o.sounds = new SoundEffectComponent("high_pitch.ogg");
     o.gestures = {
       tap: () => {
         if (stage.score.getGoodieCount(0) == 0) return false;
         // note: we could draw a picture of an open chest in the
         // obstacle's place, or even use a disappear animation whose
         // final frame looks like an open treasure chest.
-        o.remove(false);
+        o.remove();
         // Draw a bunch of goodies!
         for (let i = 0; i < 3; ++i) {
           cfg = { cx: 3 * i + 1, cy: 7 - i, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
@@ -4325,7 +4332,7 @@ export function buildLevelScreen(level: number) {
       // here's a way to read and write a goodie count
       stage.score.addToGoodieCount(0, 4);
       // get rid of the star, so we know it's been used
-      thisActor.remove(true);
+      thisActor.remove();
       // resize the hero, and change its image
       collideActor.resize(collideActor.rigidBody?.getCenter().x ?? 0, collideActor.rigidBody?.getCenter().y ?? 0, 0.5, 0.5);
       (collideActor.appearance as ImageSprite).setImage("leg_star_1.png");
@@ -4867,7 +4874,7 @@ export function buildLevelScreen(level: number) {
         heroCollision: () => {
           // add 15 seconds to the timer, remove the obstacle
           stage.score.setLoseCountdownRemaining((stage.score.getLoseCountdownRemaining() ?? 0) + 15);
-          o.remove(true);
+          o.remove();
         }
       }),
     });
@@ -5934,7 +5941,7 @@ export function buildLevelScreen(level: number) {
           });
           (stage.world.physics as AdvancedCollisionSystem).addEndContactHandler(o, h, () => {
             collisions++;
-            t.remove(true);
+            t.remove();
             if (collisions == 3)
               stage.score.winLevel();
           });

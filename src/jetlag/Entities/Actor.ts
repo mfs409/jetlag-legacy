@@ -32,7 +32,7 @@ export class Actor {
   readonly movement: MovementComponent;
 
   /** The packet of information describing the audio aspects of this Actor */
-  public sounds?: SoundEffectComponent;
+  readonly sounds: SoundEffectComponent;
 
   /** The behavioral role that this Actor plays within the game */
   readonly role: RoleComponent;
@@ -57,7 +57,7 @@ export class Actor {
    *
    * @param scene The scene where the Actor goes (defaults to game.world)
    */
-  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
+  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent }) {
     return new Actor(config);
   }
 
@@ -69,7 +69,7 @@ export class Actor {
    *
    * @param scene The scene where the Actor goes (defaults to game.world)
    */
-  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers }) {
+  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent }) {
     this.scene = config.rigidBody.scene;
 
     this.appearance = config.appearance;
@@ -87,6 +87,8 @@ export class Actor {
 
     if (config.gestures)
       this.gestures = config.gestures;
+
+    this.sounds = config.sounds ?? new SoundEffectComponent({});
   }
 
   /**
@@ -106,19 +108,14 @@ export class Actor {
     return true;
   }
 
-  /**
-   * Make an Actor disappear
-   *
-   * @param quiet True if the disappear sound should not be played
-   */
-  public remove(quiet: boolean) {
+  /** Make an Actor disappear */
+  public remove() {
     // set it invisible immediately, so that future calls know to ignore
     // this Actor.  This also disables the rigidBody.
     this.enabled = false;
 
     // play a sound when we remove this Actor?
-    if (this.sounds?.disappearSound && !quiet)
-      this.sounds.disappearSound.play();
+    this.sounds?.disappear?.play();
 
     // Send a message to subscribers, e.g., in case one of them wants to run a
     // Disappear animation

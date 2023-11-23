@@ -1,19 +1,18 @@
-// TODO: Code Review
-
 import { b2Vec2 } from "@box2d/core";
 import { stage } from "../Stage";
 import { CameraSystem } from "../Systems/Camera";
 import { AnimatedSprite, ImageSprite } from "../Components/Appearance";
 
 /**
- * A ParallaxLayer is a layer that seems to scroll and repeat at a velocity that
- * gives a sense of depth.
+ * A ParallaxLayer is a layer that seems to scroll and repeat.  Layering
+ * several, with different scroll speeds, gives a sense of depth to the
+ * background.
  */
 class ParallaxLayer {
   /** The images to display */
   private images: (ImageSprite | AnimatedSprite)[] = [];
 
-  /** coords of last render */
+  /** coordinates of last render */
   private last = new b2Vec2(0, 0);
 
   /** Last camera position */
@@ -22,11 +21,15 @@ class ParallaxLayer {
   /**
    * Construct a ParallaxLayer that can be rendered correctly
    *
-   * @param cfgOpts       The configuration options for this layer
+   * @param anchor        A reference point for where one tile of the
+   *                      defaultImage will be placed.
+   * @param defaultImage  An ImageSprite or AnimatedSprite that will be cloned
+   *                      in order to produce enough images to achieve a good
+   *                      scrolling effect.
    * @param speed         Speed at which it scrolls.  Important values are 0, 1,
    *                      and between.  Differs for auto and non-auto.
    * @param isHorizontal  True for X scrolling, false for Y scrolling
-   * @param isAuto        True if this should scroll regardless of camera
+   * @param isAuto        True if this should scroll regardless of the camera
    */
   constructor(anchor: { cx: number, cy: number }, defaultImage: ImageSprite | AnimatedSprite, private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
     this.last.Set(anchor.cx - defaultImage.props.w / 2, anchor.cy - defaultImage.props.h / 2);
@@ -70,35 +73,6 @@ class ParallaxLayer {
   }
 
   /**
-   * This is how we actually figure out where to draw the background
-   *
-   * @param camera  The camera for the world that these layers accompany
-   */
-  private normalizeAndRender(camera: CameraSystem, elapsedMs: number) {
-    let x = camera.getLeft(); // left of viewport
-    let y = camera.getTop(); // top of viewport
-    let camW = stage.screenWidth / stage.pixelMeterRatio;
-    let camH = stage.screenHeight / stage.pixelMeterRatio;
-    // Normalize the reference tile
-    // TODO: surely some O(1) algebra would work here?
-    if (this.isHorizontal) {
-      let w = this.images[0].props.w;
-      while (this.last.x > x + camW) this.last.x -= w;
-      while (this.last.x + w < x) this.last.x += w;
-      while (this.last.x > x) this.last.x -= w;
-    } else {
-      let h = this.images[0].props.h;
-      while (this.last.y > y + camH) this.last.y -= h;
-      while (this.last.y + h < y) this.last.y += h;
-      while (this.last.y > y) this.last.y -= h;
-    }
-    // save camera for next render
-    this.lastCam.x = x;
-    this.lastCam.y = y;
-    this.renderVisibleTiles(camera, elapsedMs);
-  }
-
-  /**
    * Draw a layer that moves in relation to the camera center point
    *
    * NB: the efficiency of this code derives from the assumption that the
@@ -116,6 +90,35 @@ class ParallaxLayer {
     if (this.isHorizontal) this.last.x = this.last.x + dx * this.speed;
     else this.last.y = this.last.y + dy * this.speed;
     this.normalizeAndRender(camera, elapsedMs);
+  }
+
+  /**
+   * This is how we actually figure out where to draw the background
+   *
+   * @param camera  The camera for the world that these layers accompany
+   */
+  private normalizeAndRender(camera: CameraSystem, elapsedMs: number) {
+    let x = camera.getLeft(); // left of viewport
+    let y = camera.getTop(); // top of viewport
+    let camW = stage.screenWidth / stage.pixelMeterRatio;
+    let camH = stage.screenHeight / stage.pixelMeterRatio;
+    // Normalize the reference tile
+    // TODO: Do this without a while loop
+    if (this.isHorizontal) {
+      let w = this.images[0].props.w;
+      while (this.last.x > x + camW) this.last.x -= w;
+      while (this.last.x + w < x) this.last.x += w;
+      while (this.last.x > x) this.last.x -= w;
+    } else {
+      let h = this.images[0].props.h;
+      while (this.last.y > y + camH) this.last.y -= h;
+      while (this.last.y + h < y) this.last.y += h;
+      while (this.last.y > y) this.last.y -= h;
+    }
+    // save camera for next render
+    this.lastCam.x = x;
+    this.lastCam.y = y;
+    this.renderVisibleTiles(camera, elapsedMs);
   }
 
   /**
@@ -162,6 +165,7 @@ class ParallaxLayer {
  * - 1 means "moves at same speed as hero", which means "fixed position"
  * - 0 means "doesn't move", which means "looks like a tiled background"
  * - in-between should be interesting
+ * - negative means "moves too fast"
  */
 export class ParallaxSystem {
   /** All the layers to show */
