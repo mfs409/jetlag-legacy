@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { b2Vec2 } from "@box2d/core";
 import { stage } from "../Stage";
 
@@ -9,8 +7,9 @@ import { stage } from "../Stage";
  * portrait vs. landscape).  Until we have a use case, we'll just anticipate as
  * best we can by having this enum to pass to the constructor.
  *
- * NB:  In 2015, Android accelerometer readings on tablets and phones were
- *      weirdly different, but maybe it's cleaner by now?
+ * TODO:  In 2015, Android accelerometer readings on tablets and phones were
+ *        weirdly different, but maybe it's cleaner by now?  It would be good to
+ *        check, and also to check iphone/ipad.
  */
 export enum AccelerometerMode { LANDSCAPE, PORTRAIT }
 

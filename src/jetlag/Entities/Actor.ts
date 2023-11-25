@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { RigidBodyComponent } from "../Components/RigidBody";
 import { AppearanceComponent, TextSprite } from "../Components/Appearance";
 import { StateEvent, StateManagerComponent } from "../Components/StateManager";
@@ -10,7 +8,7 @@ import { InertMovement, MovementComponent } from "../Components/Movement";
 import { GestureHandlers } from "../Config";
 
 /**
- * Actor is the core entity of the game.  Pretty much everything on the stage is
+ * Actor is the main entity of the game.  Pretty much everything on the stage is
  * an actor.
  */
 export class Actor {
@@ -40,7 +38,7 @@ export class Actor {
   /** The visual representation of this Actor within the game */
   readonly appearance: AppearanceComponent;
 
-  /** Extra data for the game designer to attach to the Actor */
+  /** Extra data that the game designer can attach to the Actor */
   readonly extra: any = {};
 
   /** The current state of this Actor */
@@ -52,10 +50,10 @@ export class Actor {
   /**
    * Create an Actor
    *
-   * TODO:  Update the documentation after adding more components to the config
-   *        arg
-   *
-   * @param scene The scene where the Actor goes (defaults to game.world)
+   * @param config  Actor configuration, consisting of `rigidBody`,
+   *                `appearance`, and optional `movement`, `role`, `gestures`,
+   *                and `sounds`
+   * @param config.rigidBody See {@link RigidBodyComponent}
    */
   static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent }) {
     return new Actor(config);
@@ -64,10 +62,9 @@ export class Actor {
   /**
    * Construct an Actor
    *
-   * TODO:  Update the documentation after adding more components to the config
-   *        arg
-   *
-   * @param scene The scene where the Actor goes (defaults to game.world)
+   * @param config  Actor configuration, consisting of `rigidBody`,
+   *                `appearance`, and optional `movement`, `role`, `gestures`,
+   *                and `sounds`
    */
   private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent }) {
     this.scene = config.rigidBody.scene;
@@ -97,7 +94,7 @@ export class Actor {
    *
    * @param elapsedMs The time since the last render
    *
-   * @returns True if the Actor should be rendered, false otherwise
+   * @returns True if the Actor is enabled, false otherwise
    */
   public prerender(elapsedMs: number) {
     if (!this.enabled) return false;
@@ -110,8 +107,10 @@ export class Actor {
 
   /** Make an Actor disappear */
   public remove() {
-    // set it invisible immediately, so that future calls know to ignore
-    // this Actor.  This also disables the rigidBody.
+    // set it invisible immediately, so that future calls know to ignore this
+    // Actor.  This also disables the rigidBody.
+    //
+    // NB: We disable instead of actually removing from the physics world
     this.enabled = false;
 
     // play a sound when we remove this Actor?

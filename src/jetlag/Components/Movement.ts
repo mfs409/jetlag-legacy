@@ -51,8 +51,8 @@ export class Path {
 /**
  * A rule for moving along a fixed path
  *
- * TODO: we should have a way to advance the actor along the path "as if" it had
- * been going for x milliseconds
+ * TODO:  We should have a way to advance the actor along the path "as if" it
+ *        had been going for x milliseconds
  */
 export class PathMovement {
   /** The Actor to which this movement is attached */
@@ -62,8 +62,8 @@ export class PathMovement {
     if (this.rigidBody?.body.GetType() == b2BodyType.b2_staticBody)
       this.rigidBody.body.SetType(b2BodyType.b2_kinematicBody);
     // A path with <2 points doesn't make sense...
-    if (this.path.getNumPoints() < 2) this.haltPath();
-    else this.startPath();
+    if (this.path.getNumPoints() < 2) this.halt();
+    else this.start();
   }
   public get rigidBody() { return this._rigidBody; }
   private _rigidBody?: RigidBodyComponent;
@@ -75,7 +75,7 @@ export class PathMovement {
   private nextIndex = -1;
 
   /** Stop processing a path, and stop the actor too */
-  private haltPath() {
+  private halt() {
     if (!this.rigidBody) return;
     this.done = true;
     // Stop the movement
@@ -94,7 +94,7 @@ export class PathMovement {
   }
 
   /** Begin running a path */
-  private startPath() {
+  private start() {
     if (!this.rigidBody) return;
     // move to the starting point
     let transform = new b2Transform().SetPositionAngle(this.path.getPoint(0), this._rigidBody!.body.GetAngle());
@@ -116,9 +116,9 @@ export class PathMovement {
   constructor(private path: Path, private velocity: number, private loop: boolean) {
     if (path.getNumPoints() < 2) {
       stage.console.log("Error: path must have at least two points");
-      this.haltPath();
+      this.halt();
     } else {
-      this.startPath();
+      this.start();
     }
   }
 
@@ -130,7 +130,7 @@ export class PathMovement {
    * @param loop      Should it loop?
    */
   public resetPath(path: Path, velocity: number, loop: boolean) {
-    this.haltPath();
+    this.halt();
     this.nextIndex = -1;
     this.done = false;
     this.path = path;
@@ -139,7 +139,7 @@ export class PathMovement {
     if (this.path.getNumPoints() < 2) {
       stage.console.log("Error: path must have at least two points");
     } else {
-      this.startPath();
+      this.start();
     }
   }
 
@@ -159,8 +159,8 @@ export class PathMovement {
     // Update the goal, and restart, stop, or start moving toward it
     this.nextIndex++;
     if (this.nextIndex == this.path.getNumPoints()) {
-      if (this.loop) this.startPath(); // start over for the looping case
-      else this.haltPath(); // halt the path for the non-looping case
+      if (this.loop) this.start(); // start over for the looping case
+      else this.halt(); // halt the path for the non-looping case
       return;
     }
     this.goToNext(); // Not at end, so move to next
@@ -812,9 +812,7 @@ export class ExplicitMovement {
 /** A rule for things that don't actually move */
 export class InertMovement {
   /** The Actor to which this movement is attached */
-  public set rigidBody(body: RigidBodyComponent | undefined) {
-    this._rigidBody = body;
-  }
+  public set rigidBody(body: RigidBodyComponent | undefined) { this._rigidBody = body; }
   public get rigidBody() { return this._rigidBody; }
   private _rigidBody?: RigidBodyComponent;
 

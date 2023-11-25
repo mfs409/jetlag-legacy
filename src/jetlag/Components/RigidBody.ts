@@ -500,7 +500,7 @@ export class RigidBodyComponent {
    *
    * @param boxCfg    The configuration of this BoxBody
    * @param scene     The world in which to create the body (defaults to
-   *                  game.world)
+   *                  stage.world)
    * @param commonCfg Additional configuration
    */
   public static Box(boxCfg: BoxCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {

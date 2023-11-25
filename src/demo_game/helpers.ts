@@ -12,6 +12,7 @@ import { Enemy, Hero, Obstacle, Passive, Projectile } from "../jetlag/Components
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
+import { MusicComponent } from "../jetlag/Components/Music";
 
 /** Manage the state of Mute */
 export function toggleMute() {
@@ -61,7 +62,7 @@ export function getVolume() {
  *                  must have been registered as Music, not as a Sound
  */
 export function setMusic(musicName: string) {
-  stage.music.setMusic(stage.musicLibrary.getMusic(musicName));
+  stage.music = new MusicComponent(stage.musicLibrary.getMusic(musicName));
 }
 
 /**

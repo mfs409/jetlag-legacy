@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { Actor } from "../Entities/Actor";
 
 /**

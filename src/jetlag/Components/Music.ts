@@ -1,22 +1,12 @@
-// TODO: Code Review
-
 import { ISound } from "../Services/AudioLibrary";
 
-/**
- * MusicComponent manages the background music for a stage
- *
- * TODO:  It should be possible to attach a MusicComponent to the Game object
- *        itself, for music that lives across stages.
- */
+/** MusicComponent manages the background music for a stage */
 export class MusicComponent {
-  /** The music, if any */
-  private music?: ISound;
-
   /** Whether the music is playing or not */
   private musicPlaying = false;
 
   /** If the level has music attached to it, this starts playing it */
-  public playMusic() {
+  public play() {
     if (!this.musicPlaying && this.music) {
       this.musicPlaying = true;
       this.music.play();
@@ -24,28 +14,25 @@ export class MusicComponent {
   }
 
   /** If the level has music attached to it, this pauses it */
-  public pauseMusic() {
-    if (this.musicPlaying) {
+  public pause() {
+    if (this.music && this.musicPlaying) {
       this.musicPlaying = false;
-      this.music!.stop();
+      this.music.pause();
     }
   }
 
   /** If the level has music attached to it, this stops it */
-  public stopMusic() {
-    if (this.musicPlaying) {
+  public stop() {
+    if (this.music && this.musicPlaying) {
       this.musicPlaying = false;
-      this.music!.stop();
+      this.music.stop();
     }
   }
 
   /**
-   * Set the music for the stage
+   * Construct a MusicComponent by providing a music object to play
    *
-   * @param music The music to assign to the stage
+   * @param music The music object to use
    */
-  public setMusic(music: ISound) { this.music = music; }
-
-  /** Clear the music for this stage */
-  public clear() { this.music = undefined; }
+  constructor(private music?: ISound) { }
 }

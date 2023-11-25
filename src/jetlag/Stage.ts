@@ -1,5 +1,3 @@
-// TODO: Code Review: Add transparency, everything else is good
-
 import { Scene } from "./Entities/Scene";
 import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
@@ -38,6 +36,9 @@ import { ImageLibraryService } from "./Services/ImageLibrary";
  *
  * TODO:  It would be nice to have transparency to the (paused) underlying
  *        world, maybe even with effects, when an overlay is showing.
+ *
+ * TODO:  It should be possible to attach a MusicComponent to the Stage itself,
+ *        for music that lives across stages.
  */
 export class Stage {
   /** The physics world in which all actors exist */
@@ -62,7 +63,7 @@ export class Stage {
   public foreground!: ParallaxSystem;
 
   /** Everything related to music */
-  readonly music = new MusicComponent();
+  public music: MusicComponent | undefined;
 
   /** The Score, suitable for use throughout JetLag */
   readonly score = new ScoreSystem();
@@ -143,7 +144,7 @@ export class Stage {
 
     // Only set the color and play music if we don't have an overlay showing
     this.renderer.setFrameColor(this.backgroundColor);
-    this.music.playMusic();
+    this.music?.play();
 
     // Update the win/lose countdown timers and the stopwatch.  This might end
     // the level.
@@ -183,8 +184,7 @@ export class Stage {
    */
   public switchTo(builder: (index: number, stage: Stage) => void, index: number) {
     // reset music
-    this.music.stopMusic();
-    this.music.clear();
+    this.music?.stop();
 
     // reset score and storage
     this.score.reset();
@@ -288,7 +288,7 @@ export class Stage {
 
   /** Close the window to exit the game */
   public exit() {
-    this.music.stopMusic();
+    this.music?.stop();
     window.close();
   }
 

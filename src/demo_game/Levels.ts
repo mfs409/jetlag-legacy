@@ -2800,12 +2800,12 @@ export function buildLevelScreen(level: number) {
     // removing the projectile (or for not removing it).  That being the case,
     // we can set a "callback" to run custom code when the projectile and
     // obstacle collide, and then just have the custom code do nothing.
-    (leftBucket.role as Obstacle).projectileCollision = () => { };
+    (leftBucket.role as Obstacle).onProjectileCollision = () => { };
 
     // we can make a CollisionCallback object, and connect it to several obstacles
     let c = () => { };
-    (rightBucket.role as Obstacle).projectileCollision = c;
-    (bottomBucket.role as Obstacle).projectileCollision = c;
+    (rightBucket.role as Obstacle).onProjectileCollision = c;
+    (bottomBucket.role as Obstacle).onProjectileCollision = c;
 
     // put a hint on the screen after 15 seconds to show where to click to ensure that
     // projectiles hit the enemy
@@ -2818,7 +2818,7 @@ export function buildLevelScreen(level: number) {
         role: new Obstacle(),
       });
       // Make sure that when projectiles hit the obstacle, nothing happens
-      (hint.role as Obstacle).projectileCollision = () => { }
+      (hint.role as Obstacle).onProjectileCollision = () => { }
     }));
 
     welcomeMessage("Press anywhere to throw a projectile");
@@ -3443,7 +3443,7 @@ export function buildLevelScreen(level: number) {
       movement: new ExplicitMovement(),
       role: new Hero({
         // provide some code to run when the hero's strength changes
-        strengthChangeCallback: (actor: Actor) => {
+        onStrengthChange: (actor: Actor) => {
           // get the hero's strength. Since the hero isn't dead, the
           // strength is at least 1. Since there are 7 strength
           // booster goodies, the strength is at most 8.

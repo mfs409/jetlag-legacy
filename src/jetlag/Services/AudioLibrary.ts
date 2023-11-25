@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { Howl, Howler } from "howler";
 import { Config } from "../Config";
 import { stage } from "../Stage";
@@ -25,9 +23,9 @@ export interface ISound {
 }
 
 /**
- * AudioLibraryService provides a library of sound and music objects that can be played
- * at any time.  The only difference between sounds and music is that music
- * objects will always loop, whereas sound objects never will.
+ * AudioLibraryService provides a library of sound and music objects that can be
+ * played at any time.  The only difference between sounds and music is that
+ * music objects will always loop, whereas sound objects never will.
  */
 export class AudioLibraryService {
   /** All of the sounds (non-looping audio) in the game, by name */

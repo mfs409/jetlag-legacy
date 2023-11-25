@@ -228,14 +228,14 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
           let exA = a.role?.collisionRules;
           let exB = b.role?.collisionRules;
           if (exA && exB) {
-            for (let a of exA.ignore)
-              for (let b of exB.role)
+            for (let a of exA.ignores)
+              for (let b of exB.properties)
                 if (a == b) {
                   contact.SetEnabled(false);
                   return;
                 }
-            for (let b of exB.ignore)
-              for (let a of exA.role)
+            for (let b of exB.ignores)
+              for (let a of exA.properties)
                 if (b == a) {
                   contact.SetEnabled(false);
                   return;
