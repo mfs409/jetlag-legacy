@@ -2,6 +2,8 @@ import { b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 import { StateEvent } from "./StateManager";
+import { AnimatedSprite, ImageSprite } from "./Appearance";
+import { ProjectileMovement } from "./Movement";
 
 /**
  * These are the different reasons why two entities might pass through each
@@ -334,7 +336,6 @@ export class Hero extends Role {
   }
   private _strength = 1;
 
-
   /** Time until the hero's invincibility runs out */
   get invincibleRemaining() { return Math.max(0, this._invincibleRemaining / 1000); }
   set invincibleRemaining(amount: number) {
@@ -666,7 +667,7 @@ export class Obstacle extends Role {
   heroCollision?: (thisActor: Actor, collideActor: Actor) => void;
 
   /** This is for when a projectile collides with an obstacle */
-  onProjectileCollision?: (thisActor: Actor, collideActor: Actor) => void;
+  onProjectileCollision?: (thisActor: Actor, collideActor: Actor) => boolean;
 
   /** This is for when an enemy collides with an obstacle */
   enemyCollision?: (thisActor: Actor, collideActor: Actor) => void;
@@ -726,15 +727,15 @@ export class Projectile extends Role {
   /** The actor associated with this Role */
   public get actor() { return this._actor; }
 
-  /** This is the initial point from which the projectile was thrown */
-  readonly rangeFrom = new b2Vec2(0, 0);
-
   /**
-   * We have to ensure that projectiles don't continue traveling off-screen
+   * We have to ensure that projectiles don't continue traveling off screen
    * forever. This field lets us cap the distance away from the hero that a
    * projectile can travel before we make it disappear.
    */
   public range: number;
+
+  /** This is the initial point from which the projectile was thrown */
+  readonly rangeFrom = new b2Vec2(0, 0);
 
   /**
    * When projectiles collide, and they are not sensors, one will disappear.
@@ -744,6 +745,12 @@ export class Projectile extends Role {
 
   /** How much damage does this projectile do? */
   public damage: number;
+
+  /** Code to run when the projectile is reclaimed due to a collision */
+  readonly reclaimer?: (actor: Actor) => void;
+
+  /** A set of image names to randomly assign to projectiles' appearance */
+  randomImageSources?: string[];
 
   /**
    * Construct a Projectile role
@@ -756,19 +763,26 @@ export class Projectile extends Role {
    * @param cfg.disappearOnCollide  Should the projectile disappear when it
    *                                collides with another projectile? (default
    *                                true)
+   * @param cfg.reclaimer           Code to run when the projectile is reclaimed
+   *                                due to a collision.
+   * @param cfg.randomImageSources  An array of image names to use for the
+   *                                appearance (assumes the appearance is an
+   *                                ImageSprite)
    */
-  constructor(cfg: { damage?: number, range?: number, disappearOnCollide?: boolean } = {}) {
+  constructor(cfg: { damage?: number, range?: number, disappearOnCollide?: boolean, reclaimer?: (actor: Actor) => void, randomImageSources?: string[] } = {}) {
     super();
     this.collisionRules.properties.push(CollisionExemptions.PROJECTILE);
     this.damage = cfg.damage ?? 1;
     this.range = cfg.range ?? 40;
     this.disappearOnCollide = cfg.disappearOnCollide ?? true;
+    this.reclaimer = cfg.reclaimer;
+    this.randomImageSources = cfg.randomImageSources;
   }
 
   /**
    * Code to run when a Projectile collides with an Actor
    *
-   * @param other   Other object involved in this collision
+   * @param other Other actor involved in this collision
    */
   onCollide(other: Actor) {
     // if this is an obstacle, check if it has a projectile callback, and if so,
@@ -776,12 +790,15 @@ export class Projectile extends Role {
     if (other.role instanceof Obstacle) {
       let o = other.role;
       if (o.onProjectileCollision) {
-        o.onProjectileCollision(other, this._actor!);
-        // return... don't remove the projectile... the obstacle will handle
-        // that
+        // Only disappear if it returns true
+        if (o.onProjectileCollision(other, this._actor!)) {
+          this._actor!.remove();
+          if (this.reclaimer) this.reclaimer(this._actor!);
+        }
         return true;
       }
       this._actor!.remove();
+      if (this.reclaimer) this.reclaimer(this._actor!);
       return true;
     }
     if (other.role instanceof Projectile) {
@@ -789,6 +806,7 @@ export class Projectile extends Role {
       // only disappear if other is not a sensor
       if (!other.rigidBody.getCollisionsEnabled()) {
         this._actor!.remove();
+        if (this.reclaimer) this.reclaimer(this._actor!);
       }
       return true;
     }
@@ -800,26 +818,76 @@ export class Projectile extends Role {
         other.role.defeat(true, this._actor);
       }
       this._actor?.remove();
+      if (this.reclaimer) this.reclaimer(this._actor!);
       return true;
     }
     return false;
   }
 
   /**
-   * Draw a projectile.  When drawing a projectile, we first check if it is
-   * too far from its starting point.  We only draw it if it is not.
+   * Toss a projectile. This is for tossing in a single, predetermined
+   * direction
    *
-   * @param elapsedMs The number of milliseconds since the last render
+   * @param actor     The actor who is performing the toss
+   * @param offsetX   The x distance between the top left of the projectile and
+   *                  the top left of the actor tossing the projectile
+   * @param offsetY   The y distance between the top left of the projectile and
+   *                  the top left of the actor tossing the projectile
+   * @param velocityX The X velocity of the projectile when it is tossed
+   * @param velocityY The Y velocity of the projectile when it is tossed
    */
-  // TODO: Is this too coupled with the ActorPool?
-  public prerender(_elapsedMs: number) {
-    let body = this._actor!.rigidBody.body;
-    if (!body || !body.IsEnabled()) return;
-    // eliminate the projectile quietly if it has traveled too far
-    let dx = Math.abs(body.GetPosition().x - this.rangeFrom.x);
-    let dy = Math.abs(body.GetPosition().y - this.rangeFrom.y);
-    if (dx * dx + dy * dy > this.range * this.range)
-      this._actor!.remove();
+  public tossFrom(actor: Actor, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+    // Get the actor, set its appearance, enable it
+    let b = this.actor;
+    if (!b) return;
+    if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
+    if (this.randomImageSources) {
+      let idx = Math.floor(Math.random() * this.randomImageSources!.length);
+      (b.appearance as ImageSprite).setImage(this.randomImageSources![idx]);
+    }
+    b.enabled = true;
+
+    // Compute the starting point, then toss it
+    this.rangeFrom.Set(actor.rigidBody.getCenter().x + offsetX, actor.rigidBody.getCenter().y + offsetY);
+    (b.movement as ProjectileMovement).tossFrom(this.rangeFrom, velocityX, velocityY);
+
+    // Play a sound?  Animate the tossing actor?
+    b.sounds?.toss?.play();
+    actor.state.changeState(b, StateEvent.TOSS_Y);
+  }
+
+  /**
+   * Toss a projectile. This is for tossing in the direction of a specified
+   * point.
+   *
+   * @param fromX   X coordinate of the center of the actor doing the toss
+   * @param fromY   Y coordinate of the center of the actor doing the toss
+   * @param toX     X coordinate of the point at which to toss
+   * @param toY     Y coordinate of the point at which to toss
+   * @param actor   The actor who is performing the toss
+   * @param offsetX The x distance between the top left of the projectile and
+   *                the top left of the actor tossing the projectile
+   * @param offsetY The y distance between the top left of the projectile and
+   *                the top left of the actor tossing the projectile
+   */
+  public tossAt(fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
+    // Get the actor, set its appearance, enable it
+    let b = this.actor;
+    if (!b) return;
+    if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
+    if (this.randomImageSources) {
+      let idx = Math.floor(Math.random() * this.randomImageSources!.length);
+      (b.appearance as ImageSprite).setImage(this.randomImageSources![idx]);
+    }
+    b.enabled = true;
+
+    // Compute the starting point, then toss it
+    this.rangeFrom.Set(fromX + offsetX, fromY + offsetY);
+    (b.movement as ProjectileMovement).tossAt(this.rangeFrom, fromX, fromY, toX, toY, offsetX, offsetY);
+
+    // Play a sound?  Animate the tossing actor?
+    b.sounds?.toss?.play();
+    actor.state.changeState(b, StateEvent.TOSS_Y);
   }
 }
 

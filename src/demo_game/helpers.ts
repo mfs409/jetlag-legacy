@@ -440,23 +440,23 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
 }
 
 /**
- * The default behavior for throwing is to throw in a straight line. If we
+ * The default behavior for tossing is to toss in a straight line. If we
  * instead desire that the projectiles have some sort of aiming to them, we need
- * to use this method, which throws toward where the screen was pressed
+ * to use this method, which tosses toward where the screen was pressed
  *
  * Note: you probably want to use an invisible button that covers the screen...
  *
  * @param scene   Where to draw the button
  * @param cfg     Configuration for an image and a box
- * @param actor   The actor who should throw the projectile
- * @param msDelay A delay between throws, so that holding doesn't lead to too
- *                many throws at once
+ * @param actor   The actor who should toss the projectile
+ * @param msDelay A delay between tosses, so that holding doesn't lead to too
+ *                many tosses at once
  * @param offsetX The x distance between the top left of the projectile and the
- *                top left of the actor throwing the projectile
+ *                top left of the actor tossing the projectile
  * @param offsetY The y distance between the top left of the projectile and the
- *                top left of the actor throwing the projectile
+ *                top left of the actor tossing the projectile
  */
-export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPoolSystem, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
+export function addDirectionalTossButton(overlay: Scene, projectiles: ActorPoolSystem, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
   let c = Actor.Make({
     appearance: new ImageSprite(cfg),
     rigidBody: RigidBodyComponent.Box(cfg, overlay),
@@ -486,14 +486,14 @@ export function addDirectionalThrowButton(overlay: Scene, projectiles: ActorPool
   };
   c.gestures = { touchDown, touchUp, panMove };
 
-  let mLastThrow = 0;
+  let mLastToss = 0;
   stage.world.repeatEvents.push(() => {
     if (isHolding) {
       let now = new Date().getTime();
-      if (mLastThrow + msDelay < now) {
-        mLastThrow = now;
+      if (mLastToss + msDelay < now) {
+        mLastToss = now;
         // TODO: fix ??
-        (projectiles.get()?.movement as ProjectileMovement).throwAt(projectiles, actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, v.x, v.y, actor, offsetX, offsetY);
+        (projectiles.get()?.role as Projectile | undefined)?.tossAt(actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, v.x, v.y, actor, offsetX, offsetY);
       }
     }
   });
@@ -519,46 +519,46 @@ export function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: n
 }
 
 /**
- * Return a function that makes an actor throw a projectile in a direction that
+ * Return a function that makes an actor toss a projectile in a direction that
  * relates to how the screen was touched
  *
  * @param scene   The scene that was touched
- * @param actor   The actor who should throw the projectile
+ * @param actor   The actor who should toss the projectile
  * @param offsetX The x distance between the top left of the projectile and the
- *                top left of the actor throwing the projectile
+ *                top left of the actor tossing the projectile
  * @param offsetY The y distance between the top left of the projectile and the
- *                top left of the actor throwing the projectile
+ *                top left of the actor tossing the projectile
  */
-export function ThrowDirectionalAction(scene: Scene, projectiles: ActorPoolSystem, actor: Actor, offsetX: number, offsetY: number) {
+export function TossDirectionalAction(scene: Scene, projectiles: ActorPoolSystem, actor: Actor, offsetX: number, offsetY: number) {
   return (hudCoords: { x: number; y: number }) => {
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
     let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
-    (projectiles.get()?.movement as ProjectileMovement).throwAt(projectiles, actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, world.x, world.y, actor, offsetX, offsetY);
+    (projectiles.get()?.role as Projectile | undefined)?.tossAt(actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, world.x, world.y, actor, offsetX, offsetY);
     return true;
   };
 }
 
 /**
- * Return a function for making an actor throw a projectile if enough time has
+ * Return a function for making an actor toss a projectile if enough time has
  * transpired
  *
- * @param actor     The actor who should throw the projectile
- * @param msDelay   A delay between throws, so that holding doesn't lead to too
- *                  many throws at once
+ * @param actor     The actor who should toss the projectile
+ * @param msDelay   A delay between tosses, so that holding doesn't lead to too
+ *                  many tosses at once
  * @param offsetX   The x distance between the top left of the projectile and
- *                  the top left of the actor throwing the projectile
+ *                  the top left of the actor tossing the projectile
  * @param offsetY   The y distance between the top left of the projectile and
- *                  the top left of the actor throwing the projectile
- * @param velocityX The X velocity of the projectile when it is thrown
- * @param velocityY The Y velocity of the projectile when it is thrown
+ *                  the top left of the actor tossing the projectile
+ * @param velocityX The X velocity of the projectile when it is tossed
+ * @param velocityY The Y velocity of the projectile when it is tossed
  */
-export function makeRepeatThrow(projectiles: ActorPoolSystem, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
-  let mLastThrow = 0; // captured by lambda
+export function makeRepeatToss(projectiles: ActorPoolSystem, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+  let last = 0;
   return () => {
     let now = new Date().getTime();
-    if (mLastThrow + msDelay < now) {
-      mLastThrow = now;
-      (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, actor, offsetX, offsetY, velocityX, velocityY);
+    if (last + msDelay < now) {
+      last = now;
+      (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(actor, offsetX, offsetY, velocityX, velocityY);
     }
   };
 }
@@ -720,13 +720,26 @@ export function populateProjectilePool(scene: Scene, pool: ActorPoolSystem, cfg:
     // TODO:  If we did this differently, then TextSprite and FilledSprite
     //        wouldn't need clone()
     let appearance = cfg.appearance.clone();
-    let rigidBody = (cfg.body.hasOwnProperty("radius")) ?
-      RigidBodyComponent.Circle(cfg.body as CircleCfgOpts, scene) :
-      RigidBodyComponent.Box(cfg.body as BoxCfgOpts, scene);
+    let rigidBody = (cfg.body.hasOwnProperty("radius")) ? RigidBodyComponent.Circle(cfg.body as CircleCfgOpts, scene) : RigidBodyComponent.Box(cfg.body as BoxCfgOpts, scene);
     if (cfg.gravityAffectsProjectiles)
       rigidBody.body.SetGravityScale(1);
     rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
-    let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide });
+    let reclaimer = (actor: Actor) => {
+      pool.put(actor);
+      actor.enabled = false;
+    }
+    let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide, reclaimer, randomImageSources: cfg.randomImageSources });
+    // Put in some code for eliminating the projectile quietly if it has
+    // traveled too far
+    role.prerenderTasks.push((_elapsedMs: number, actor?: Actor) => {
+      if (!actor) return;
+      if (!actor.enabled) return;
+      let role = actor.role as Projectile;
+      let body = actor.rigidBody.body;
+      let dx = Math.abs(body.GetPosition().x - role.rangeFrom.x);
+      let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
+      if ((dx * dx + dy * dy) > (role.range * role.range)) reclaimer(actor);
+    });
     // TODO: we should be cloning the soundEffects?
     let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role, sounds: cfg.soundEffects });
     pool.put(p);

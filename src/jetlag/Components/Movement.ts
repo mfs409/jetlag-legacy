@@ -1,14 +1,9 @@
-// TODO: Code Review
-
 import { b2BodyType, b2Transform, b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { CameraSystem } from "../Systems/Camera";
-import { ActorPoolSystem } from "../Systems/ActorPool";
-import { AnimatedSprite, AppearanceComponent, ImageSprite } from "./Appearance";
-import { Projectile } from "./Role";
-import { StateEvent } from "./StateManager";
+import { AppearanceComponent } from "./Appearance";
 import { CircleCfgOpts, BoxCfgOpts } from "../Config";
 import { SoundEffectComponent } from "./SoundEffect";
 
@@ -484,8 +479,8 @@ export interface ProjectileSystemConfigOpts {
   gravityAffectsProjectiles?: boolean,
   /** A fixed velocity for all projectiles */
   fixedVectorVelocity?: number,
-  /** Should projectiles be rotated in the direction they are thrown? */
-  rotateVectorThrow?: boolean,
+  /** Should projectiles be rotated in the direction they are tossed? */
+  rotateVectorToss?: boolean,
   /** A sound to play when a projectile disappears */
   soundEffects?: SoundEffectComponent,
   /** A set of image names to randomly assign to projectiles' appearance */
@@ -498,8 +493,7 @@ export interface ProjectileSystemConfigOpts {
 
 /** A rule for how projectiles move */
 export class ProjectileMovement {
-  /** The Actor to which this movement is attached */
-  // TODO: We need a whole actor, not just a body?
+  /** The body of the actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
     this._rigidBody = body;
     // this can't be a static body
@@ -519,11 +513,8 @@ export class ProjectileMovement {
   /** A fixed velocity for all projectiles */
   fixedVectorVelocity?: number;
 
-  /** Should projectiles be rotated in the direction they are thrown? */
-  rotateVectorThrow?: boolean;
-
-  /** A set of image names to randomly assign to projectiles' appearance */
-  randomImageSources?: string[];
+  /** Should projectiles be rotated in the direction they are tossed? */
+  rotateVectorToss?: boolean;
 
   /** Do any last-minute adjustments related to the movement */
   prerender(_elapsedMs: number, _camera: CameraSystem) { }
@@ -542,81 +533,44 @@ export class ProjectileMovement {
   constructor(cfg: ProjectileSystemConfigOpts) {
     this.multiplier = cfg.multiplier ?? 1;
     this.fixedVectorVelocity = cfg.fixedVectorVelocity;
-    this.rotateVectorThrow = cfg.rotateVectorThrow;
-    this.randomImageSources = cfg.randomImageSources;
+    this.rotateVectorToss = cfg.rotateVectorToss;
   }
 
   /**
-   * Throw a projectile. This is for throwing in a single, predetermined
-   * direction
+   * Toss a projectile. This is for tossing in a single, predetermined
+   * direction.  This method just handles movement.  You shouldn't call it on
+   * your own.  Use the Role's tossFrom() method instead.
    *
-   * @param actor     The actor who is performing the throw
-   * @param offsetX   The x distance between the top left of the projectile and
-   *                  the top left of the actor throwing the projectile
-   * @param offsetY   The y distance between the top left of the projectile and
-   *                  the top left of the actor throwing the projectile
-   * @param velocityX The X velocity of the projectile when it is thrown
-   * @param velocityY The Y velocity of the projectile when it is thrown
+   * @param from      The initial position
+   * @param velocityX The X velocity of the projectile when it is tossed
+   * @param velocityY The Y velocity of the projectile when it is tossed
    */
-  // TODO: can we combine the throwing methods?
-  // TODO: This should not take a pool
-  // TODO: Images and Sounds are not movement.  Should throwFixed be part of the role, and dispatch accordingly?
-  public throwFixed(pool: ActorPoolSystem, actor: Actor, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
-    // get the next projectile, set sensor, set image
-    let b = pool.get();
-    if (!b) return;
-    if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
-
-    if (this.randomImageSources) {
-      let idx = Math.floor(Math.random() * this.randomImageSources!.length);
-      (b.appearance as ImageSprite).setImage(this.randomImageSources![idx]);
-    }
-
-    // calculate offset for starting position of projectile, put it on
-    // screen
-    (b.role as Projectile).rangeFrom.Set(
-      actor.rigidBody.getCenter().x + offsetX,
-      actor.rigidBody.getCenter().y + offsetY
-    );
+  public tossFrom(from: b2Vec2, velocityX: number, velocityY: number) {
+    // Move the projectile and give it velocity
     let transform = new b2Transform();
-    transform.SetPositionAngle((b.role as Projectile).rangeFrom, 0);
-    b.rigidBody.body.SetTransform(transform);
-
-    // give the projectile velocity, show it, and play sound
-    (b.movement as ProjectileMovement).updateVelocity(velocityX, velocityY);
-    b.enabled = true;
-    b.sounds?.toss?.play();
-    actor.state.changeState(actor, StateEvent.TOSS_Y);
+    transform.SetPositionAngle(from, 0);
+    this._rigidBody?.body.SetTransform(transform);
+    this.updateVelocity(velocityX, velocityY);
   }
 
   /**
-   * Throw a projectile. This is for throwing in the direction of a specified
-   * point
+   * Toss a projectile. This is for tossing in the direction of a specified
+   * point.  This method just handles movement.  You shouldn't call it on your
+   * own.  Use the Role's tossAt() method instead.
    *
-   * @param fromX   X coordinate of the center of the actor doing the throw
-   * @param fromY   Y coordinate of the center of the actor doing the throw
-   * @param toX     X coordinate of the point at which to throw
-   * @param toY     Y coordinate of the point at which to throw
-   * @param actor   The actor who is performing the throw
+   * @param fromX   X coordinate of the center of the actor doing the toss
+   * @param fromY   Y coordinate of the center of the actor doing the toss
+   * @param toX     X coordinate of the point at which to toss
+   * @param toY     Y coordinate of the point at which to toss
    * @param offsetX The x distance between the top left of the projectile and
-   *                the top left of the actor throwing the projectile
+   *                the top left of the actor tossing the projectile
    * @param offsetY The y distance between the top left of the projectile and
-   *                the top left of the actor throwing the projectile
+   *                the top left of the actor tossing the projectile
    */
-  // TODO: This should not take a pool
-  // TODO: Images and Sounds are not movement.  Should throwFixed be part of the role, and dispatch accordingly?
-  public throwAt(pool: ActorPoolSystem, fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
-    // get the next projectile, set sensor, set image
-    let b = pool.get();
-    if (!b) return;
-    if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
-
-    // calculate offset for starting position of projectile, put it on
-    // screen
-    (b.role as Projectile).rangeFrom.Set(fromX + offsetX, fromY + offsetY);
+  public tossAt(from: b2Vec2, fromX: number, fromY: number, toX: number, toY: number, offsetX: number, offsetY: number) {
     let transform = new b2Transform();
-    transform.SetPositionAngle((b.role as Projectile).rangeFrom, 0);
-    b.rigidBody?.body.SetTransform(transform);
+    transform.SetPositionAngle(from, 0);
+    this._rigidBody?.body.SetTransform(transform);
 
     // give the projectile velocity
     let dX = toX - fromX - offsetX;
@@ -627,27 +581,22 @@ export class ProjectileMovement {
       let tmpX = dX / hypotenuse;
       let tmpY = dY / hypotenuse;
       // multiply by fixed velocity
-      tmpX *= this.fixedVectorVelocity;
-      tmpY *= this.fixedVectorVelocity;
-      (b.movement as ProjectileMovement).updateVelocity(tmpX, tmpY);
+      tmpX *= this.fixedVectorVelocity!;
+      tmpY *= this.fixedVectorVelocity!;
+      this.updateVelocity(tmpX, tmpY);
     }
     else {
       // compute absolute vector, multiply by dampening factor
       let tmpX = dX * this.multiplier;
       let tmpY = dY * this.multiplier;
-      (b.movement as ProjectileMovement).updateVelocity(tmpX, tmpY);
+      this.updateVelocity(tmpX, tmpY);
     }
 
     // rotate the projectile
-    if (this.rotateVectorThrow) {
+    if (this.rotateVectorToss) {
       let angle = Math.atan2(toY - fromY - offsetY, toX - fromX - offsetX) - Math.atan2(-1, 0);
-      b.rigidBody?.setRotation(angle);
+      this._rigidBody?.setRotation(angle);
     }
-
-    // show the projectile, play sound, and animate the hero
-    b.enabled = true;
-    b.sounds?.toss?.play();
-    actor.state.changeState(actor, StateEvent.TOSS_Y);
   }
 }
 

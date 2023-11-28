@@ -12,9 +12,6 @@ export class ActorPoolSystem {
   /** For limiting the number of actors that can be returned */
   private remaining?: number;
 
-  /** Index of next available actor */
-  private nextIndex = 0;
-
   /** Return the number of actors remaining */
   public getRemaining() { return this.remaining ?? 0; }
 
@@ -32,20 +29,11 @@ export class ActorPoolSystem {
    * consider adding more actors to the pool.
    */
   public get(): Actor | undefined {
-    // NB:  We don't use pop(), because that would require pooled actors to know
-    //      which pool they came from
-
     // have we reached our limit?
     if (this.remaining == 0) return;
     // do we need to decrease our limit?
     if (this.remaining != undefined) this.remaining--;
-
-    // is there an available actor?
-    if (this.pool[this.nextIndex].enabled) return;
-    // get the next actor
-    let b = this.pool[this.nextIndex];
-    this.nextIndex = (this.nextIndex + 1) % this.pool.length;
-    return b;
+    return this.pool.pop();
   }
 
   /**

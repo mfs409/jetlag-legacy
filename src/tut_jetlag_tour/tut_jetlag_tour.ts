@@ -1,11 +1,11 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { Config } from "../jetlag/Config";
 import { FilledSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { ExplicitMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { GridSystem } from "../jetlag/Systems/GridSystem";
-import { Destination, Enemy, Hero, Obstacle } from "../jetlag/Components/Role";
+import { Destination, Enemy, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
@@ -78,9 +78,8 @@ function tut_jetlag_tour(level: number) {
             let x = h.rigidBody.getCenter().x;
             let y = h.rigidBody.getCenter().y;
             let scale = 8;
-            (projectiles.get()?.movement as ProjectileMovement).throwAt(projectiles, x, y, x + scale * dx, y + scale * dy, h, 0, 0);
+            (projectiles.get()?.role as Projectile | undefined)?.tossAt(x, y, x + scale * dx, y + scale * dy, h, 0, 0);
         });
-
 
         // Raining enemies
         stage.world.timer.addEvent(new TimedEvent(2, true, () => {

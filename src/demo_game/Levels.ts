@@ -1,4 +1,4 @@
-import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
 import * as Helpers from "./helpers";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
@@ -7,7 +7,7 @@ import { AnimatedSprite, ImageSprite, TextSprite } from "../jetlag/Components/Ap
 import { Actor } from "../jetlag/Entities/Actor";
 import { b2Vec2 } from "@box2d/core";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
-import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive, CollisionExemptions } from "../jetlag/Components/Role";
+import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive, CollisionExemptions, Projectile } from "../jetlag/Components/Role";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { TimedEvent } from "../jetlag/Systems/Timer";
@@ -2552,9 +2552,7 @@ export function buildLevelScreen(level: number) {
         // TODO: There is a lot of copy/paste of code like this, which doesn't work:
         //    (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .525, 0, 10, 0);
         // It should be:
-        let p = (projectiles.get()?.movement as ProjectileMovement);
-        if (p != undefined)
-          p.throwFixed(projectiles, h, .525, 0, 10, 0);
+        (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .525, 0, 10, 0);
         return true;
       }
     };
@@ -2614,8 +2612,8 @@ export function buildLevelScreen(level: number) {
     // as long as it is held, but only throws once every 100 milliseconds.
     // Throwing to the left flies out of the top of the hero.  Throwing to the
     // right flies out of the bottom.
-    Helpers.addToggleButton(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatThrow(projectiles, h, 100, 0, -.5, -30, 0), undefined);
-    Helpers.addToggleButton(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatThrow(projectiles, h, 100, 0, .5, 30, 0), undefined);
+    Helpers.addToggleButton(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatToss(projectiles, h, 100, 0, -.5, -30, 0), undefined);
+    Helpers.addToggleButton(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatToss(projectiles, h, 100, 0, .5, 30, 0), undefined);
 
     welcomeMessage("Press left and right to throw projectiles");
     winMessage("Great Job");
@@ -2662,7 +2660,7 @@ export function buildLevelScreen(level: number) {
 
     // this button only throws one projectile per press...
     Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => { (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, 0, 0, 0, -10); return true; });
+      () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, 0, 0, 0, -10); return true; });
 
     welcomeMessage("Defeat all enemies to win");
     winMessage("Great Job");
@@ -2699,9 +2697,9 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }), strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
     });
 
-    // Draw a button for throwing projectiles in many directions.  Again, note that if we
-    // hold the button, it keeps throwing
-    Helpers.addDirectionalThrowButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
+    // Draw a button for throwing projectiles in many directions.  Again, note
+    // that if we hold the button, it keeps throwing
+    Helpers.addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
 
     // We'll set up a timer, so that enemies keep falling from the sky
     stage.world.timer.addEvent(new TimedEvent(1, true, () => {
@@ -2791,21 +2789,22 @@ export function buildLevelScreen(level: number) {
     // cover "most" of the screen with a button for throwing projectiles.  This
     // ensures that we can still tap the hero to make it jump
     Helpers.addTapControl(stage.hud, { cx: 8.5, cy: 4.5, width: 15, height: 9, img: "" },
-      Helpers.ThrowDirectionalAction(stage.hud, projectiles, h, 0, 0)
+      Helpers.TossDirectionalAction(stage.hud, projectiles, h, 0, 0)
     );
 
 
     // We want to make it so that when the ball hits the obstacle (the
     // backboard), it doesn't disappear. The only time a projectile does not
     // disappear when hitting an obstacle is when you provide custom code to run
-    // on a projectile/obstacle collision. In that case, you are responsible for
-    // removing the projectile (or for not removing it).  That being the case,
-    // we can set a "callback" to run custom code when the projectile and
-    // obstacle collide, and then just have the custom code do nothing.
-    (leftBucket.role as Obstacle).onProjectileCollision = () => { };
+    // on a projectile/obstacle collision, and that code returns false. In that
+    // case, you are responsible for removing the projectile (or for not
+    // removing it).  That being the case, we can set a "callback" to run custom
+    // code when the projectile and obstacle collide, and then just have the
+    // custom code do nothing.
+    (leftBucket.role as Obstacle).onProjectileCollision = () => false;
 
     // we can make a CollisionCallback object, and connect it to several obstacles
-    let c = () => { };
+    let c = () => false;
     (rightBucket.role as Obstacle).onProjectileCollision = c;
     (bottomBucket.role as Obstacle).onProjectileCollision = c;
 
@@ -2820,7 +2819,7 @@ export function buildLevelScreen(level: number) {
         role: new Obstacle(),
       });
       // Make sure that when projectiles hit the obstacle, nothing happens
-      (hint.role as Obstacle).onProjectileCollision = () => { }
+      (hint.role as Obstacle).onProjectileCollision = () => false
     }));
 
     welcomeMessage("Press anywhere to throw a projectile");
@@ -2871,10 +2870,7 @@ export function buildLevelScreen(level: number) {
 
     // Touching will throw a projectile downward
     h.gestures = {
-      tap: () => {
-        (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .12, .75, 0, 10);
-        return true;
-      }
+      tap: () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .12, .75, 0, 10); return true; }
     };
 
     // draw an enemy that makes a sound when it disappears
@@ -3208,7 +3204,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
     h.gestures = {
-      tap: () => { (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .4, .4, 0, -3); return true; }
+      tap: () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .4, .4, 0, -3); return true; }
     };
 
     // make a projectile pool and give an animation pattern for the projectiles
@@ -3636,10 +3632,7 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle(),
     });
     o.gestures = {
-      tap: () => {
-        (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .125, .75, 0, 15);
-        return true;
-      }
+      tap: () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .125, .75, 0, 15); return true; }
     };
 
     // set up our projectiles.  There are only 20... throw them carefully
@@ -4244,7 +4237,7 @@ export function buildLevelScreen(level: number) {
       body: { radius: 0.1, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.2, height: 0.21, img: "grey_ball.png" })
     });
-    h.gestures = { tap: () => { (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, -.75, 0, -20, 0); return true; } }
+    h.gestures = { tap: () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, -.75, 0, -20, 0); return true; } }
 
     // add an obstacle that has an enemy collision callback, so it can defeat
     // enemies by colliding with them (but only the one we mark as "weak")
@@ -4421,7 +4414,7 @@ export function buildLevelScreen(level: number) {
       immuneToCollisions: true,
       appearance: new ImageSprite({ width: 0.2, height: 0.2, img: "grey_ball.png" }),
     });
-    Helpers.addDirectionalThrowButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
+    Helpers.addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
 
     // we're going to win by "surviving" for 25 seconds... with no enemies, that
     // shouldn't be too hard.  Let's put the timer on the HUD, so the player
@@ -4781,7 +4774,7 @@ export function buildLevelScreen(level: number) {
     // rotation
     let projectiles = new ActorPoolSystem();
     Helpers.populateProjectilePool(stage.world, projectiles, {
-      size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorThrow: true,
+      size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorToss: true,
       immuneToCollisions: true, disappearOnCollide: true, range: 40,
       body: { width: 0.02, height: .5, cx: -100, cy: -100 },
       appearance: new ImageSprite({ width: 0.02, height: 1, img: "red.png" }),
@@ -4790,7 +4783,7 @@ export function buildLevelScreen(level: number) {
     // draw a button for throwing projectiles in many directions. It
     // only covers half the screen, to show how such an effect would
     // behave
-    Helpers.addDirectionalThrowButton(stage.hud,
+    Helpers.addDirectionalTossButton(stage.hud,
       projectiles, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, h, 100, 0, 0);
 
     // Warning!  If you make these projectiles any longer, and if you are not
