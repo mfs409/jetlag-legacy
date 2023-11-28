@@ -27,6 +27,7 @@
     "src/tut_getting_started/*",
     "src/tut_jetlag_tour/*",
     "src/tut_maze_game/*",
+    "src/tut_animations/*",
   ],
   "typedocOptions": {
     "out": "./docs/",

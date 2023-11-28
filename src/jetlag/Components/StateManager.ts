@@ -9,12 +9,51 @@ export interface IStateObserver {
    * A notification method, for learning of an event that might change an
    * Entity's state
    *
-   * @param entity The entity whose state is changing.  We pass it as an
-   *               argument, so that classes who implement IStateObserver don't
-   *               need to cache it.
-   * @param event  The event that might have caused `entity`'s state to change
+   * @param actor     The actor whose state is changing.
+   * @param event     The event that might have caused `actor`'s state to change
+   * @param newState  The new state of `actor`
    */
-  onStateChange(entity: Actor, event: StateEvent): void;
+  onStateChange(actor: Actor, event: StateEvent, newState: ActorState): void;
+}
+
+/** The directions an actor can face */
+export const enum DIRECTION { N, NE, E, SE, S, SW, W, NW };
+
+/**
+ * The subscribable state of an Actor.  Consists of direction and flags related
+ * to moving, tossing, invincibility, jumping, and crawling
+ */
+export class ActorState {
+  /** What direction is the actor facing */
+  public direction = DIRECTION.E;
+  /** Is the actor moving or idle */
+  public moving = false;
+  /** Is the actor tossing a projectile */
+  public tossing = false;
+  /** Is the actor invincible */
+  public invincible = false;
+  /** Is the actor jumping */
+  public jumping = false;
+  /** Is the actor crawling */
+  public crawling = false;
+  /** Is the actor disappearing */
+  public disappearing = false;
+}
+
+/**
+ * The events that can cause a state to change.  Note that these events can be
+ * generated repeatedly (for example, on each time step, a right-moving Entity
+ * will re-generate MOVE_R), and multiple can be generated in a single instant
+ * (e.g., MOVE_R and MOVE_U), so IStateObservers will need to be careful in
+ * handling events.
+ */
+export const enum StateEvent {
+  // Indicate movement (or lack) in each major direction
+  MOVE_N, MOVE_NE, MOVE_E, MOVE_SE, MOVE_S, MOVE_SW, MOVE_W, MOVE_NW, STOP,
+  // Indicate toss/invincible/jump/crawl happening
+  TOSS_Y, TOSS_N, INV_Y, INV_N, JUMP_Y, JUMP_N, CRAWL_Y, CRAWL_N,
+  // Indicate being removed
+  DISAPPEAR,
 }
 
 /**
@@ -24,7 +63,7 @@ export interface IStateObserver {
  */
 export class StateManagerComponent {
   /** The current state */
-  current = AnimationState.IDLE_RIGHT;
+  current = new ActorState();
 
   /** The set of observers of this.current */
   private observers: IStateObserver[] = [];
@@ -35,326 +74,33 @@ export class StateManagerComponent {
   }
 
   /** Receive a state-change request and if it is for a new state, pass it to observers */
-  changeState(entity: Actor, event: StateEvent) {
-    let newState = transitions.get(this.current)!(event);
-    if (newState == this.current) return;
-    this.current = newState;
-    this.observers.forEach((so) => so.onStateChange(entity, event));
+  changeState(actor: Actor, event: StateEvent) {
+    let changed = false;
+    switch (event) {
+      // Movement events change direction, and un-set idle
+      case StateEvent.MOVE_N: changed = this.current.direction != DIRECTION.N || !this.current.moving; this.current.direction = DIRECTION.N; this.current.moving = true; break;
+      case StateEvent.MOVE_NE: changed = this.current.direction != DIRECTION.NE || !this.current.moving; this.current.direction = DIRECTION.NE; this.current.moving = true; break;
+      case StateEvent.MOVE_E: changed = this.current.direction != DIRECTION.E || !this.current.moving; this.current.direction = DIRECTION.E; this.current.moving = true; break;
+      case StateEvent.MOVE_SE: changed = this.current.direction != DIRECTION.SE || !this.current.moving; this.current.direction = DIRECTION.SE; this.current.moving = true; break;
+      case StateEvent.MOVE_S: changed = this.current.direction != DIRECTION.S || !this.current.moving; this.current.direction = DIRECTION.S; this.current.moving = true; break;
+      case StateEvent.MOVE_SW: changed = this.current.direction != DIRECTION.SW || !this.current.moving; this.current.direction = DIRECTION.SW; this.current.moving = true; break;
+      case StateEvent.MOVE_W: changed = this.current.direction != DIRECTION.W || !this.current.moving; this.current.direction = DIRECTION.W; this.current.moving = true; break;
+      case StateEvent.MOVE_NW: changed = this.current.direction != DIRECTION.NW || !this.current.moving; this.current.direction = DIRECTION.NW; this.current.moving = true; break;
+      // Stop events just set idle
+      case StateEvent.STOP: changed = this.current.moving; this.current.moving = false; break;
+      // Toss/Invincible/Jump/Crawl events just set/clear their corresponding boolean
+      case StateEvent.TOSS_Y: changed = !this.current.tossing; this.current.tossing = true; break;
+      case StateEvent.TOSS_N: changed = this.current.tossing; this.current.tossing = false; break;
+      case StateEvent.INV_Y: changed = !this.current.invincible; this.current.invincible = true; break;
+      case StateEvent.INV_N: changed = this.current.invincible; this.current.invincible = false; break;
+      case StateEvent.JUMP_Y: changed = !this.current.jumping; this.current.jumping = true; break;
+      case StateEvent.JUMP_N: changed = this.current.jumping; this.current.jumping = false; break;
+      case StateEvent.CRAWL_Y: changed = !this.current.crawling; this.current.crawling = true; break;
+      case StateEvent.CRAWL_N: changed = this.current.crawling; this.current.crawling = false; break;
+      // Disappear is a terminal state
+      case StateEvent.DISAPPEAR: changed = !this.current.disappearing; this.current.disappearing = true; break;
+    }
+    if (changed)
+      this.observers.forEach((so) => so.onStateChange(actor, event, this.current));
   }
-}
-
-/**
- * The events that can cause a state to change.  Note that these events can be
- * generated repeatedly (for example, on each time step, a right-moving Entity
- * will re-generate MOVE_R), so IStateObservers will need to be careful in
- * handling events.
- */
-export enum StateEvent {
-  MOVE_R = 0,           // Moving to the right
-  MOVE_L = 1,           // Moving to the left
-  MOVE_STOP = 2,        // Not moving
-  THROW_START = 3,      // Started throwing something
-  THROW_STOP = 4,       // The timeout after throwing has expired
-  INVINCIBLE_START = 5, // Started being invincible
-  INVINCIBLE_STOP = 6,  // The invincibility ran out
-  JUMP_START = 7,       // Start jumping
-  JUMP_STOP = 8,        // Land after a jump
-  CRAWL_START = 9,      // Start crawling
-  CRAWL_STOP = 10,      // Stop crawling
-  DISAPPEAR = 11,       // Disappear from the screen
-  COUNT = 12,
-}
-
-/**
- * There are many different ways to animate an Entity.  This enum lists every
- * possible animation that is currently supported.  For the time being, these
- * are a superset of all states that any Entity might care about.
- *
- * Note that there are a few times where information can get "lost".  For
- * example, if an entity is jumping and crawling, then we lose whichever started
- * first.  If an entity is throwing, we lose any jump or crawl information.  If
- * an entity is invincible, we lose jump/crawl/throw information.  Disappearing
- * is a terminal state, so we forget everything else when we enter it.  We could
- * flesh out additional states into a bitmask, but so far it's not necessary.
- *
- * TODO: several of these states are not in the Config.ts!
- */
-export enum AnimationState {
-  IDLE_RIGHT,             // Not moving, facing right
-  IDLE_LEFT,              // Not moving, facing left
-  MOVE_RIGHT,             // Moving to the right
-  MOVE_LEFT,              // Moving left
-  JUMP_RIGHT,             // Jumping, moving right
-  JUMP_LEFT,              // Jumping, moving left
-  JUMP_IDLE_RIGHT,        // Jumping, no x-y movement, facing right
-  JUMP_IDLE_LEFT,         // Jumping, no x-y movement, facing left
-  CRAWL_RIGHT,            // In a crawl position, moving right
-  CRAWL_LEFT,             // In a crawl position, moving left
-  CRAWL_IDLE_RIGHT,       // In a crawl position, not moving, facing right
-  CRAWL_IDLE_LEFT,        // In a crawl position, not moving, facing left
-  THROW_RIGHT,            // Throwing, moving right
-  THROW_LEFT,             // Throwing, moving left
-  THROW_IDLE_RIGHT,       // Throwing, not moving, facing right
-  THROW_IDLE_LEFT,        // Throwing, not moving, facing left
-  INVINCIBLE_RIGHT,       // Invincible, moving right
-  INVINCIBLE_LEFT,        // Invincible, moving left
-  INVINCIBLE_IDLE_LEFT,   // Invincible, not moving, facing left
-  INVINCIBLE_IDLE_RIGHT,  // Invincible, not moving, facing right
-  DISAPPEARING,           // Actively being removed from the scene
-  COUNT,
-}
-
-/**
- * Given the above states and overview of transitions, we need a table to
- * describe how an event transitions from one state to another.  This map is
- * from states to transition functions.  The transition functions take an event
- * and return a new state.
- */
-export const transitions = new Map([
-  [AnimationState.IDLE_RIGHT, from_idle_right],
-  [AnimationState.IDLE_LEFT, from_idle_left],
-  [AnimationState.MOVE_RIGHT, from_move_right],
-  [AnimationState.MOVE_LEFT, from_move_left],
-  [AnimationState.JUMP_RIGHT, from_jump_right],
-  [AnimationState.JUMP_LEFT, from_jump_left],
-  [AnimationState.JUMP_IDLE_RIGHT, from_jump_idle_right],
-  [AnimationState.JUMP_IDLE_LEFT, from_jump_idle_left],
-  [AnimationState.CRAWL_RIGHT, from_crawl_right],
-  [AnimationState.CRAWL_LEFT, from_crawl_left],
-  [AnimationState.CRAWL_IDLE_RIGHT, from_crawl_idle_right],
-  [AnimationState.CRAWL_IDLE_LEFT, from_crawl_idle_left],
-  [AnimationState.THROW_RIGHT, from_throw_right],
-  [AnimationState.THROW_LEFT, from_throw_left],
-  [AnimationState.THROW_IDLE_RIGHT, from_throw_idle_right],
-  [AnimationState.THROW_IDLE_LEFT, from_throw_idle_left],
-  [AnimationState.INVINCIBLE_RIGHT, from_invincible_right],
-  [AnimationState.INVINCIBLE_LEFT, from_invincible_left],
-  [AnimationState.INVINCIBLE_IDLE_LEFT, from_invincible_idle_left],
-  [AnimationState.INVINCIBLE_IDLE_RIGHT, from_invincible_idle_right],
-  [AnimationState.DISAPPEARING, from_disappearing],
-]);
-
-/** A transition function for the `transitions` map */
-function from_idle_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_IDLE_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_RIGHT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_IDLE_RIGHT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_IDLE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.IDLE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_idle_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_IDLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_LEFT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_IDLE_LEFT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_IDLE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.IDLE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_move_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_L) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.IDLE_RIGHT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_RIGHT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.MOVE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_move_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.IDLE_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_LEFT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.MOVE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_jump_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_L) return AnimationState.JUMP_LEFT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.JUMP_IDLE_RIGHT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.JUMP_STOP) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.JUMP_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_jump_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.JUMP_RIGHT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.JUMP_IDLE_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.JUMP_STOP) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.JUMP_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_jump_idle_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.JUMP_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.JUMP_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_IDLE_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_RIGHT;
-  if (event == StateEvent.JUMP_STOP) return AnimationState.IDLE_RIGHT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_IDLE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.JUMP_IDLE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_jump_idle_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.JUMP_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.JUMP_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_IDLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_LEFT;
-  if (event == StateEvent.JUMP_STOP) return AnimationState.IDLE_LEFT;
-  if (event == StateEvent.CRAWL_START) return AnimationState.CRAWL_IDLE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.JUMP_IDLE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_crawl_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_L) return AnimationState.CRAWL_LEFT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.CRAWL_IDLE_RIGHT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_RIGHT;
-  if (event == StateEvent.CRAWL_STOP) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.CRAWL_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_crawl_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.CRAWL_RIGHT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.CRAWL_IDLE_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_LEFT;
-  if (event == StateEvent.CRAWL_STOP) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.CRAWL_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_crawl_idle_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.CRAWL_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.CRAWL_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_IDLE_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_RIGHT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_IDLE_RIGHT;
-  if (event == StateEvent.CRAWL_STOP) return AnimationState.IDLE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.CRAWL_IDLE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_crawl_idle_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.CRAWL_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.CRAWL_LEFT;
-  if (event == StateEvent.THROW_START) return AnimationState.THROW_IDLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_LEFT;
-  if (event == StateEvent.JUMP_START) return AnimationState.JUMP_IDLE_LEFT;
-  if (event == StateEvent.CRAWL_STOP) return AnimationState.IDLE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.CRAWL_IDLE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_throw_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_L) return AnimationState.THROW_LEFT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.THROW_IDLE_RIGHT;
-  if (event == StateEvent.THROW_STOP) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.THROW_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_throw_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.THROW_RIGHT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.THROW_IDLE_LEFT;
-  if (event == StateEvent.THROW_STOP) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.THROW_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_throw_idle_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.THROW_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.THROW_LEFT;
-  if (event == StateEvent.THROW_STOP) return AnimationState.IDLE_RIGHT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.THROW_IDLE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_throw_idle_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.THROW_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.THROW_LEFT;
-  if (event == StateEvent.THROW_STOP) return AnimationState.IDLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_START) return AnimationState.INVINCIBLE_IDLE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.THROW_IDLE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_invincible_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_L) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.INVINCIBLE_IDLE_RIGHT;
-  if (event == StateEvent.INVINCIBLE_STOP) return AnimationState.MOVE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.INVINCIBLE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_invincible_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.MOVE_STOP) return AnimationState.INVINCIBLE_IDLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_STOP) return AnimationState.MOVE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.INVINCIBLE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_invincible_idle_right(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_STOP) return AnimationState.IDLE_RIGHT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.INVINCIBLE_IDLE_RIGHT;
-}
-
-/** A transition function for the `transitions` map */
-function from_invincible_idle_left(event: StateEvent) {
-  if (event == StateEvent.MOVE_R) return AnimationState.INVINCIBLE_RIGHT;
-  if (event == StateEvent.MOVE_L) return AnimationState.INVINCIBLE_LEFT;
-  if (event == StateEvent.INVINCIBLE_STOP) return AnimationState.IDLE_LEFT;
-  if (event == StateEvent.DISAPPEAR) return AnimationState.DISAPPEARING;
-  return AnimationState.INVINCIBLE_IDLE_LEFT;
-}
-
-/** A transition function for the `transitions` map */
-function from_disappearing(_event: StateEvent) {
-  return AnimationState.DISAPPEARING;
 }

@@ -1,0 +1,28 @@
+Authors: bluecarrot16, Benjamin K. Smith (BenCreating), Evert, Eliza Wyatt (ElizaWy), TheraHedwig, MuffinElZangano, Durrani, Johannes Sj?lund (wulax), Stephen Challener (Redshrike), Nila122, Matthew Krohn (makrohn), Zi Ye
+
+- body/bodies/male/universal/lavender.png: by bluecarrot16, Benjamin K. Smith (BenCreating), Evert, Eliza Wyatt (ElizaWy), TheraHedwig, MuffinElZangano, Durrani, Johannes Sj?lund (wulax), Stephen Challener (Redshrike). License(s): CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - https://opengameart.org/content/lpc-male-jumping-animation-by-durrani
+    - https://opengameart.org/content/lpc-runcycle-and-diagonal-walkcycle
+    - https://opengameart.org/content/lpc-revised-character-basics
+
+- body/tail/lizard/fg/lavender.png: by Nila122, bluecarrot16. License(s): CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/drakes-and-lizardfolk
+
+- body/tail/lizard/bg/lavender.png: by Nila122, bluecarrot16. License(s): CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/drakes-and-lizardfolk
+
+- head/heads/orc_male/universal/lavender.png: by bluecarrot16, Matthew Krohn (makrohn), Stephen Challener (Redshrike), Zi Ye. License(s): CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/four-characters-my-lpc-entries
+    - https://opengameart.org/content/sinbad-the-ogre
+    - https://opengameart.org/content/lpc-male-sheets
+    - https://opengameart.org/content/lpc-character-bases
+
+- tools/whip/background/whip.png: by bluecarrot16. License(s): OGA-BY 3.0+, GPL 3.0, CC-BY 4.0. 
+    - https://opengameart.org/content/lpc-more-weapons
+
+- tools/whip/whip.png: by bluecarrot16. License(s): OGA-BY 3.0+, GPL 3.0, CC-BY 4.0. 
+    - https://opengameart.org/content/lpc-more-weapons
+
+https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/#?body=Body_color_lavender&head=Orc_male_lavender&tail=Lizard_tail_lavender&wings=none&weapon=Whip_whip&legs=none

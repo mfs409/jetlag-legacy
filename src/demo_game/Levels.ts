@@ -7,11 +7,11 @@ import { AnimatedSprite, ImageSprite, TextSprite } from "../jetlag/Components/Ap
 import { Actor } from "../jetlag/Entities/Actor";
 import { b2Vec2 } from "@box2d/core";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
-import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive } from "../jetlag/Components/Role";
+import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive, CollisionExemptions } from "../jetlag/Components/Role";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { TimedEvent } from "../jetlag/Systems/Timer";
-import { AnimationSequence } from "../jetlag/Config";
+import { AnimationSequence, AnimationState } from "../jetlag/Config";
 import { SvgSystem } from "../jetlag/Systems/Svg";
 import { buildSplashScreen } from "./Splash";
 import { buildChooserScreen } from "./Chooser";
@@ -2211,10 +2211,12 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, friction: 1 });
     // We do two new things here.  First, we provide animations in the hero's
     // configuration
+    let animations = new Map();
+    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_W, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_1.png", "flip_leg_star_1.png"] }));
+
     let h_cfg = {
-      cx: .4, cy: .4, width: 0.8, height: 0.8, radius: 0.4,
-      idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }),
-      idle_left: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_1.png", "flip_leg_star_1.png"] }),
+      cx: .4, cy: .4, width: 0.8, height: 0.8, radius: 0.4, animations,
     };
     let h = Actor.Make({
       // Then, here, we make an *AnimatedSprite*, which uses that configuration.
@@ -3039,15 +3041,17 @@ export function buildLevelScreen(level: number) {
 
     stage.score.setVictoryDestination(1);
     // this hero will be animated:
+    let animations = new Map();
+    // This says that we spend 200 milliseconds on each of the images that are
+    // listed, and then we repeat
+    //
+    // Note that "AnimationState.IDLE_E" is the default animation, and the only one that
+    // is required.  it is both the default, and what to use for an Actor who
+    // is facing to the right and standing still.
+    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_2.png", "leg_star_3.png", "leg_star_4.png"] }));
     let h_cfg = {
       cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4,
-      // This says that we spend 200 milliseconds on each of the images that are
-      // listed, and then we repeat
-      //
-      // Note that "idle_right" is the default animation, and the only one that
-      // is required.  it is both the default, and what to use for an Actor who
-      // is facing to the right and standing still.
-      idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_2.png", "leg_star_3.png", "leg_star_4.png"] }),
+      animations,
     };
 
     let h = Actor.Make({
@@ -3091,23 +3095,31 @@ export function buildLevelScreen(level: number) {
     // The hero has one animation when it is not in the air, another when it is
     // Note that "jump_right" will also be used when jumping to the left, if
     // there is no "jump_left"
-    let h_cfg = {
-      cx: 0.25, cy: 7, width: 0.8, height: 0.8, radius: 0.4,
-      // img: "leg_star_1.png",
-      // this is the more complex form of animation... we show the
-      // different cells for different lengths of time
-      idle_right: new AnimationSequence(true)
-        .to("leg_star_1.png", 150)
-        .to("leg_star_2.png", 200)
-        .to("leg_star_3.png", 300)
-        .to("leg_star_4.png", 350),
-      // we can use the complex form to express the simpler animation, of course
-      jump_right: new AnimationSequence(true)
-        .to("leg_star_4.png", 200)
-        .to("leg_star_6.png", 200)
-        .to("leg_star_7.png", 200)
-        .to("leg_star_8.png", 200),
-    };
+
+    // this is the more complex form of animation... we show the
+    // different cells for different lengths of time
+    let idle_right = new AnimationSequence(true)
+      .to("leg_star_1.png", 150)
+      .to("leg_star_2.png", 200)
+      .to("leg_star_3.png", 300)
+      .to("leg_star_4.png", 350);
+    // we can use the complex form to express the simpler animation, of course
+    let jump_right = new AnimationSequence(true)
+      .to("leg_star_4.png", 200)
+      .to("leg_star_6.png", 200)
+      .to("leg_star_7.png", 200)
+      .to("leg_star_8.png", 200);
+    let animations = new Map();
+    animations.set(AnimationState.IDLE_E, idle_right);
+    animations.set(AnimationState.JUMP_E, jump_right);
+    // TODO: Why don't we need all of these?
+    // animations.set(AnimationState.JUMP_NE, jump_right);
+    // animations.set(AnimationState.JUMP_SE, jump_right);
+    // animations.set(AnimationState.JUMP_W, jump_right);
+    // animations.set(AnimationState.JUMP_NW, jump_right);
+    // animations.set(AnimationState.JUMP_SW, jump_right);
+
+    let h_cfg = { cx: 0.25, cy: 7, width: 0.8, height: 0.8, radius: 0.4, animations };
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: RigidBodyComponent.Circle(h_cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
@@ -3122,11 +3134,13 @@ export function buildLevelScreen(level: number) {
     // size we want, but we need to offset it from the (defunct)
     // goodie's position. Note, too, that the final cell is blank, so
     // that we don't leave a residue on the screen.
+
+    // We can't do a disappearance animation without also having AnimationState.IDLE_E,
+    // but we can cheat and just use one image the whole time.
+    let g_animations = new Map();
+    g_animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["star_burst_3.png"] }));
     let g_cfg = {
-      cx: 2, cy: 7.5, width: 0.5, height: 0.5, radius: 0.25,
-      // We can't do a disappearance animation without also having idle_right,
-      // but we can cheat and just use one image the whole time.
-      idle_right: Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["star_burst_3.png"] }),
+      cx: 2, cy: 7.5, width: 0.5, height: 0.5, radius: 0.25, animations: g_animations,
       disappear: new AnimationSequence(false)
         .to("star_burst_3.png", 200)
         .to("star_burst_2.png", 200)
@@ -3163,11 +3177,29 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // set up our hero
+    let animations = new Map();
+    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["color_star_1.png"] }));
+    // set up an animation when the hero throws:
+    animations.set(AnimationState.TOSS_E, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_NE, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_SE, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_W, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_NW, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_SW, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_N, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_S, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+
+    animations.set(AnimationState.TOSS_IDLE_E, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_NE, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_SE, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_W, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_NW, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_SW, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_N, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+    animations.set(AnimationState.TOSS_IDLE_S, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
+
     let h_cfg = {
-      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4,
-      idle_right: Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["color_star_1.png"] }),
-      // set up an animation when the hero throws:
-      throw_right: new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400)
+      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, animations
     };
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
@@ -3181,10 +3213,12 @@ export function buildLevelScreen(level: number) {
 
     // make a projectile pool and give an animation pattern for the projectiles
     let projectiles = new ActorPoolSystem();
+    let p_animations = new Map();
+    p_animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }));
     Helpers.populateProjectilePool(stage.world, projectiles, {
       size: 100,
       body: { radius: 0.25, cx: -100, cy: -100 },
-      appearance: new AnimatedSprite({ width: 0.5, height: 0.5, idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }), z: 0 }),
+      appearance: new AnimatedSprite({ width: 0.5, height: 0.5, animations: p_animations, z: 0 }),
       strength: 1,
       range: 40,
       disappearOnCollide: true,
@@ -3213,6 +3247,21 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // make an animated hero, and give it an invincibility animation
+    let animations = new Map();
+    animations.set(AnimationState.IDLE_E, new AnimationSequence(true)
+      .to("color_star_1.png", 300)
+      .to("color_star_2.png", 300)
+      .to("color_star_3.png", 300)
+      .to("color_star_4.png", 300));
+    animations.set(AnimationState.INV_E, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_SE, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_NE, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_W, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_SW, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_NW, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_N, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+    animations.set(AnimationState.INV_S, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
+
     let h_cfg = {
       cx: 0.25,
       cy: 5.25,
@@ -3220,16 +3269,7 @@ export function buildLevelScreen(level: number) {
       height: 0.8,
       radius: 0.4,
       img: "color_star_1.png",
-      idle_right: new AnimationSequence(true)
-        .to("color_star_1.png", 300)
-        .to("color_star_2.png", 300)
-        .to("color_star_3.png", 300)
-        .to("color_star_4.png", 300),
-      invincible_right: new AnimationSequence(true)
-        .to("color_star_5.png", 100)
-        .to("color_star_6.png", 100)
-        .to("color_star_7.png", 100)
-        .to("color_star_8.png", 100),
+      animations,
     };
     Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
@@ -3331,21 +3371,24 @@ export function buildLevelScreen(level: number) {
 
     // make a hero with fixed velocity, and give it crawl and jump
     // animations
-    let boxCfg = {
-      cx: 0, cy: 8, width: 0.75, height: 0.75,
-      idle_right: Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["leg_star_1.png"] }),
-      jump_right: new AnimationSequence(true)
-        .to("leg_star_5.png", 200)
-        .to("leg_star_6.png", 200)
-        .to("leg_star_7.png", 200)
-        .to("leg_star_8.png", 200),
-      crawl_right: new AnimationSequence(true)
-        .to("leg_star_1.png", 100)
-        .to("leg_star_2.png", 300)
-        .to("leg_star_3.png", 300)
-        .to("leg_star_4.png", 100)
+    let animations = new Map();
+    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["leg_star_1.png"] }));
+    let jumping = new AnimationSequence(true).to("leg_star_5.png", 200).to("leg_star_6.png", 200).to("leg_star_7.png", 200).to("leg_star_8.png", 200);
+    animations.set(AnimationState.JUMP_E, jumping);
+    animations.set(AnimationState.JUMP_NE, jumping);
+    animations.set(AnimationState.JUMP_SE, jumping);
+    animations.set(AnimationState.JUMP_IDLE_E, jumping);
+    animations.set(AnimationState.JUMP_IDLE_NE, jumping);
+    animations.set(AnimationState.JUMP_IDLE_SE, jumping);
+    let crawling = new AnimationSequence(true).to("leg_star_1.png", 100).to("leg_star_2.png", 300).to("leg_star_3.png", 300).to("leg_star_4.png", 100);
+    animations.set(AnimationState.CRAWL_E, crawling);
+    animations.set(AnimationState.CRAWL_NE, crawling);
+    animations.set(AnimationState.CRAWL_SE, crawling);
+    animations.set(AnimationState.CRAWL_IDLE_E, crawling);
+    animations.set(AnimationState.CRAWL_IDLE_SE, crawling);
+    animations.set(AnimationState.CRAWL_IDLE_NE, crawling);
 
-    };
+    let boxCfg = { cx: 0, cy: 8, width: 0.75, height: 0.75, animations };
     let h = Actor.Make({
       appearance: new AnimatedSprite(boxCfg),
       rigidBody: RigidBodyComponent.Box(boxCfg, stage.world, { density: 5 }),
@@ -4002,7 +4045,7 @@ export function buildLevelScreen(level: number) {
         role: new Goodie({
           onCollect: () => {
             collects++;
-            (callback_obstacle.role as Obstacle).disableHeroCollision();
+            (callback_obstacle.role as Obstacle).disableCollision(CollisionExemptions.HERO);
             return true;
           }
         }),
@@ -4017,7 +4060,7 @@ export function buildLevelScreen(level: number) {
       if (callback_obstacle.rigidBody.getCenter().x == 14) {
         callback_obstacle.rigidBody.setCenter(30, 4.5);
         makeGoodie(18);
-        (callback_obstacle.role as Obstacle).enableHeroCollision();
+        (callback_obstacle.role as Obstacle).enableCollision(CollisionExemptions.HERO);
         // Notice that we can explicitly play a sound like this:
         stage.musicLibrary.getSound("high_pitch.ogg").play();
         return;
@@ -4028,7 +4071,7 @@ export function buildLevelScreen(level: number) {
         if (collects != 1) return;
         callback_obstacle.rigidBody.setCenter(50, 4.5);
         makeGoodie(46);
-        (callback_obstacle.role as Obstacle).enableHeroCollision();
+        (callback_obstacle.role as Obstacle).enableCollision(CollisionExemptions.HERO);
         stage.musicLibrary.getSound("high_pitch.ogg").play();
         return;
       }
@@ -4038,7 +4081,7 @@ export function buildLevelScreen(level: number) {
         if (collects != 2) return;
         callback_obstacle.rigidBody.setCenter(60, 4.5);
         makeGoodie(56);
-        (callback_obstacle.role as Obstacle).enableHeroCollision();
+        (callback_obstacle.role as Obstacle).enableCollision(CollisionExemptions.HERO);
         stage.musicLibrary.getSound("high_pitch.ogg").play();
         return;
       }
@@ -4162,10 +4205,16 @@ export function buildLevelScreen(level: number) {
 
     // make a hero and give it some strength, so it can defeat an enemy via
     // collision.
+    let animations = new Map();
+    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["green_ball.png"] }));
+    let inv = new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100);
+    for (let s of [AnimationState.INV_E, AnimationState.INV_NE, AnimationState.INV_SE, AnimationState.INV_W, AnimationState.INV_SW, AnimationState.INV_NW, AnimationState.INV_N, AnimationState.INV_S])
+      animations.set(s, inv);
+    for (let s of [AnimationState.INV_IDLE_E, AnimationState.INV_IDLE_NE, AnimationState.INV_IDLE_SE, AnimationState.INV_IDLE_W, AnimationState.INV_IDLE_SW, AnimationState.INV_IDLE_NW, AnimationState.INV_IDLE_N, AnimationState.INV_IDLE_S])
+      animations.set(s, inv);
+
     let h_cfg = {
-      cx: 5, cy: 5, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png",
-      idle_right: Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["green_ball.png"] }),
-      invincible_right: new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100)
+      cx: 5, cy: 5, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png", animations
     };
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
@@ -4592,10 +4641,18 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
 
     // Let's set up a hero
+    let animations = new Map();
+    let r = Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] });
+    animations.set(AnimationState.IDLE_E, r);
+    let l = Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
+    animations.set(AnimationState.IDLE_W, l);
+    animations.set(AnimationState.IDLE_NW, l);
+    animations.set(AnimationState.IDLE_SW, l);
+    animations.set(AnimationState.WALK_W, l);
+    animations.set(AnimationState.WALK_SW, l);
+    animations.set(AnimationState.WALK_NW, l);
     let h_cfg = {
-      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4,
-      idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }),
-      idle_left: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] })
+      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, animations
     };
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
@@ -5067,10 +5124,21 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
     loseMessage("Try Again");
 
+    let w = Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
+    let animations = new Map();
+    // TODO:  AnimatedSprite::getAnimationState is rather lackluster right now,
+    //        leading to a lot of redundancy in these situations.  Consider
+    //        something better?
+    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_W, w);
+    animations.set(AnimationState.IDLE_NW, w);
+    animations.set(AnimationState.IDLE_SW, w);
+    animations.set(AnimationState.WALK_W, w);
+    animations.set(AnimationState.WALK_SW, w);
+    animations.set(AnimationState.WALK_NW, w);
+
     let h_cfg = {
-      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4,
-      idle_right: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }),
-      idle_left: Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] }),
+      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, animations,
     };
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),

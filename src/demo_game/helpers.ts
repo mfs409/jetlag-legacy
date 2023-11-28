@@ -629,7 +629,7 @@ export function setShrinkOverTime(actor: Actor, shrinkX: number, shrinkY: number
  */
 export function defeatOnTouch(enemy: Enemy) {
   // TODO: It's probably not worth having this as its own function?
-  if (!enemy.actor!.gestures) enemy.actor!.gestures = new GestureHandlers();
+  if (enemy.actor!.gestures == undefined) enemy.actor!.gestures = new GestureHandlers();
   enemy.actor!.gestures.tap = () => {
     stage.vibrate(100);
     enemy.defeat(true);

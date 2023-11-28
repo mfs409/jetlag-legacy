@@ -395,14 +395,20 @@ export class RigidBodyComponent {
    * The prerender step will move the Entity's Appearance based on its RigidBody
    * 
    * @param elapsedMs The time since the last render
-   * @param entity    The entity to which this RigidBody is attached
+   * @param actor     The entity to which this RigidBody is attached
    */
-  public prerender(_elapsedMs: number, entity: Actor) {
+  public prerender(_elapsedMs: number, actor: Actor) {
     // Broadcast the left/right movement of this entity
     let v = this.body.GetLinearVelocity();
-    if (v.x < 0) entity.state.changeState(entity, StateEvent.MOVE_L);
-    else if (v.x > 0) entity.state.changeState(entity, StateEvent.MOVE_R);
-    else entity.state.changeState(entity, StateEvent.MOVE_STOP);
+    if (v.x > 0 && v.y > 0) actor.state.changeState(actor, StateEvent.MOVE_SE);
+    else if (v.x > 0 && v.y < 0) actor.state.changeState(actor, StateEvent.MOVE_NE);
+    else if (v.x > 0 && v.y == 0) actor.state.changeState(actor, StateEvent.MOVE_E);
+    else if (v.x < 0 && v.y > 0) actor.state.changeState(actor, StateEvent.MOVE_SW);
+    else if (v.x < 0 && v.y < 0) actor.state.changeState(actor, StateEvent.MOVE_NW);
+    else if (v.x < 0 && v.y == 0) actor.state.changeState(actor, StateEvent.MOVE_W);
+    else if (v.x == 0 && v.y > 0) actor.state.changeState(actor, StateEvent.MOVE_S);
+    else if (v.x == 0 && v.y < 0) actor.state.changeState(actor, StateEvent.MOVE_N);
+    else if (v.x == 0 && v.y == 0) actor.state.changeState(actor, StateEvent.STOP);
   }
 
   /**

@@ -96,6 +96,39 @@ export interface TxtConfigOpts {
 }
 
 /**
+ * The different ActorState combinations for which we might have an animation
+ */
+export const enum AnimationState {
+  // Stationary
+  IDLE_N, IDLE_NE, IDLE_E, IDLE_SE, IDLE_S, IDLE_SW, IDLE_W, IDLE_NW,
+  // Moving
+  WALK_N, WALK_NE, WALK_E, WALK_SE, WALK_S, WALK_SW, WALK_W, WALK_NW,
+  // Stationary + Tossing
+  TOSS_IDLE_N, TOSS_IDLE_NE, TOSS_IDLE_E, TOSS_IDLE_SE, TOSS_IDLE_S, TOSS_IDLE_SW, TOSS_IDLE_W, TOSS_IDLE_NW,
+
+  // Moving + Tossing
+  TOSS_N, TOSS_NE, TOSS_E, TOSS_SE, TOSS_S, TOSS_SW, TOSS_W, TOSS_NW,
+
+  // Stationary + Invincible
+  INV_IDLE_N, INV_IDLE_NE, INV_IDLE_E, INV_IDLE_SE, INV_IDLE_S, INV_IDLE_SW, INV_IDLE_W, INV_IDLE_NW,
+
+  // Moving + Invincible
+  INV_N, INV_NE, INV_E, INV_SE, INV_S, INV_SW, INV_W, INV_NW,
+
+  // Stationary + Jumping
+  JUMP_IDLE_N, JUMP_IDLE_NE, JUMP_IDLE_E, JUMP_IDLE_SE, JUMP_IDLE_S, JUMP_IDLE_SW, JUMP_IDLE_W, JUMP_IDLE_NW,
+
+  // Moving + Jumping
+  JUMP_N, JUMP_NE, JUMP_E, JUMP_SE, JUMP_S, JUMP_SW, JUMP_W, JUMP_NW,
+
+  // Stationary + Crawling
+  CRAWL_IDLE_N, CRAWL_IDLE_NE, CRAWL_IDLE_E, CRAWL_IDLE_SE, CRAWL_IDLE_S, CRAWL_IDLE_SW, CRAWL_IDLE_W, CRAWL_IDLE_NW,
+
+  // Moving + Crawling
+  CRAWL_N, CRAWL_NE, CRAWL_E, CRAWL_SE, CRAWL_S, CRAWL_SW, CRAWL_W, CRAWL_NW,
+}
+
+/**
  * AniCfgOpts expresses the required and optional fields that a programmer
  * should provide to JetLag in order to create an entity whose visual
  * representation uses flipbook-style animation.
@@ -107,30 +140,11 @@ export interface AniCfgOpts {
   width: number;
   /** Height of the animation */
   height: number;
-  /** The default animation */
-  idle_right: AnimationSequence;
-  /* The flipped default */
-  idle_left?: AnimationSequence;
-  /** The default moving animation */
-  move_right?: AnimationSequence;
-  /** The flipped moving animation */
-  move_left?: AnimationSequence;
-  /** The default jumping animation */
-  jump_right?: AnimationSequence;
-  /** The flipped jumping animation */
-  jump_left?: AnimationSequence;
-  /** The default crawling animation */
-  crawl_right?: AnimationSequence;
-  /** The flipped crawling animation */
-  crawl_left?: AnimationSequence;
-  /** The default throwing animation */
-  throw_right?: AnimationSequence;
-  /** The flipped throwing animation */
-  throw_left?: AnimationSequence;
-  /** The default invincible animation */
-  invincible_right?: AnimationSequence;
-  /** The flipped invincible animation */
-  invincible_left?: AnimationSequence;
+  /**
+   * The valid animations.  Note that you must include one for IDLE_E, since
+   * that is the default animation
+   */
+  animations: Map<AnimationState, AnimationSequence>
   /** The disappearance animation */
   disappear?: AnimationSequence;
   /** Dimensions for the disappearance animation */

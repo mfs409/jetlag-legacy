@@ -586,7 +586,7 @@ export class ProjectileMovement {
     (b.movement as ProjectileMovement).updateVelocity(velocityX, velocityY);
     b.enabled = true;
     b.sounds?.toss?.play();
-    actor.state.changeState(actor, StateEvent.THROW_START);
+    actor.state.changeState(actor, StateEvent.TOSS_Y);
   }
 
   /**
@@ -647,7 +647,7 @@ export class ProjectileMovement {
     // show the projectile, play sound, and animate the hero
     b.enabled = true;
     b.sounds?.toss?.play();
-    actor.state.changeState(actor, StateEvent.THROW_START);
+    actor.state.changeState(actor, StateEvent.TOSS_Y);
   }
 }
 

@@ -15,16 +15,18 @@ export enum CollisionExemptions {
   HERO = 4,
   PROJECTILE = 5,
   ENEMY = 6,
-  SENSOR = 7, // NB: Always disabled collisions
+  SENSOR = 7, // NB: Sensor collisions are always disabled
   OBSTACLE = 8,
-  PASSIVE = 9, // NB: Always disabled collisions
+  PASSIVE = 9, // NB: Passive collisions are never ignored
 }
 
 /** Role is the base class for all of the roles that an actor can play */
 class Role {
   /** The actor associated with this Role */
-  public get actor() { return this._actor; }
   protected _actor?: Actor;
+
+  /** Tasks to run before every render */
+  readonly prerenderTasks: ((elapsedMs: number, actor?: Actor) => void)[] = [];
 
   /**
    * collisionRules lets us turn off collisions based on the roles of two
@@ -41,41 +43,23 @@ class Role {
     ignores: [] as CollisionExemptions[]
   }
 
-  /** This actor does not ignore collisions with Heroes */
-  public enableHeroCollision() { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.HERO); }
+  /**
+   * Indicate that the current Role should not ignore collisions with some other
+   * role
+   *
+   * @param which The role that should not be ignored
+   */
+  public enableCollision(which: CollisionExemptions) { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != which); }
+
+  /**
+   * Indicate that the current Role should ignore collisions with some other
+   * role
+   *
+   * @param which The role that should be ignored
+   */
 
   /** This actor ignores collisions with Heroes */
-  public disableHeroCollision() { this.collisionRules.ignores.push(CollisionExemptions.HERO); }
-
-  /** This actor does not ignore collisions with Goodies */
-  public enableGoodieCollision() { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.GOODIE); }
-
-  /** This actor ignores collisions with Goodies */
-  public disableGoodieCollision() { this.collisionRules.ignores.push(CollisionExemptions.GOODIE); }
-
-  /** This actor does not ignore collisions with Destinations */
-  public enableDestinationCollision() { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.DESTINATION); }
-
-  /** This actor ignores collisions with Destinations */
-  public disableDestinationCollision() { this.collisionRules.ignores.push(CollisionExemptions.DESTINATION); }
-
-  /** This actor does not ignore collisions with Enemies */
-  public enableEnemyCollision() { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.ENEMY); }
-
-  /** This actor ignores collisions with enemies */
-  public disableEnemyCollision() { this.collisionRules.ignores.push(CollisionExemptions.ENEMY); }
-
-  /** This actor does not ignore collisions with Projectiles */
-  public enableProjectileCollision() { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.PROJECTILE); }
-
-  /** This actor ignores collisions with Projectiles */
-  public disableProjectileCollision() { this.collisionRules.ignores.push(CollisionExemptions.PROJECTILE); }
-
-  /** This actor does not ignore collisions with Obstacles */
-  public enableObstacleCollision() { this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.OBSTACLE); }
-
-  /** This actor ignores collisions with Obstacles */
-  public disableObstacleCollision() { this.collisionRules.ignores.push(CollisionExemptions.OBSTACLE); }
+  public disableCollision(which: CollisionExemptions) { this.collisionRules.ignores.push(which); }
 
   /** Code to run when there is a collision involving this role's Actor */
   onCollide(_other: Actor) {
@@ -85,8 +69,9 @@ class Role {
   }
 
   /** Code to run immediately before rendering this role's Actor */
-  prerender(_elapsedMs: number) {
-    // Most Roles don't have special code they need to run
+  prerender(elapsedMs: number) {
+    for (let task of this.prerenderTasks)
+      task(elapsedMs, this._actor);
   }
 }
 
@@ -104,12 +89,14 @@ class Role {
  * disappears, and some code runs.
  */
 export class Goodie extends Role {
-  /** The Actor to which this Goodie role is attached */
+  /** The actor associated with this Role */
   public set actor(actor: Actor | undefined) {
     this._actor = actor;
-    // Turn off collisions
+    // The default is that Goodies don't collide with anything
     actor?.rigidBody.setCollisionsEnabled(false);
   }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /** The code to run when the hero collects this goodie */
   onCollect: (g: Actor, h: Actor) => boolean;
@@ -127,10 +114,10 @@ export class Goodie extends Role {
 
     // Goodies don't collide with Goodies
     this.collisionRules.properties.push(CollisionExemptions.GOODIE);
-    this.disableGoodieCollision();
+    this.disableCollision(CollisionExemptions.GOODIE);
 
     // Provide a default onCollect handler
-    this.onCollect = (cfg.onCollect) ? cfg.onCollect : (_g: Actor, _h: Actor) => { stage.score.addToGoodieCount(0, 1); return true; };
+    this.onCollect = (cfg.onCollect) ? cfg.onCollect : () => { stage.score.addToGoodieCount(0, 1); return true; };
   }
 }
 
@@ -139,11 +126,14 @@ export class Goodie extends Role {
  * when all heroes reach destinations, the level is won.
  */
 export class Destination extends Role {
-  /** The Actor to which this Destination role is attached */
+  /** The actor associated with this Role */
   public set actor(actor: Actor | undefined) {
     this._actor = actor;
+    // The default is that Destinations don't collide with anything
     actor?.rigidBody.setCollisionsEnabled(false);
   }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /** the number of Heroes already in this Destination */
   private holding = 0;
@@ -151,7 +141,10 @@ export class Destination extends Role {
   /** The number of Heroes that this Destination can hold */
   private capacity: number;
 
-  /** A custom, optional check before accepting a Hero */
+  /**
+   * A custom, optional check before accepting a Hero.  Returns false if the
+   * destination isn't ready to accept `h`.
+   */
   private onAttemptArrival?: (h: Actor) => boolean;
 
   /**
@@ -185,9 +178,9 @@ export class Destination extends Role {
     if (this.holding >= this.capacity) return false;
     // custom test?
     if (this.onAttemptArrival && !this.onAttemptArrival(h)) return false;
-    // it's allowed in... play a sound
+    // it's allowed in... play a sound?
+    this._actor?.sounds?.arrive?.play();
     this.holding++;
-    this.actor?.sounds?.arrive?.play();
     return true;
   }
 }
@@ -199,9 +192,9 @@ export class Destination extends Role {
  */
 export class Enemy extends Role {
   /** The actor associated with this Role */
-  public set actor(actor: Actor | undefined) {
-    this._actor = actor;
-  }
+  public set actor(actor: Actor | undefined) { this._actor = actor; }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /** Code to run when this enemy (`e`) defeats a hero (`h`) */
   onDefeatHero?: (e: Actor, h: Actor) => void;
@@ -223,10 +216,8 @@ export class Enemy extends Role {
     this._defeatByCrawl = val;
     // make sure heroes don't ricochet off of this enemy when defeating it
     // via crawling
-    if (val)
-      this.collisionRules.ignores.push(CollisionExemptions.CRAWL_HERO)
-    else
-      this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.CRAWL_HERO)
+    if (val) this.disableCollision(CollisionExemptions.CRAWL_HERO)
+    else this.enableCollision(CollisionExemptions.CRAWL_HERO)
   }
   public get defeatByCrawl() { return this._defeatByCrawl; }
   private _defeatByCrawl = false;
@@ -237,22 +228,21 @@ export class Enemy extends Role {
     // make sure heroes don't ricochet off of this enemy when defeating it
     // via jumping
     if (val)
-      this.collisionRules.ignores.push(CollisionExemptions.JUMP_HERO)
+      this.disableCollision(CollisionExemptions.JUMP_HERO)
     else
-      this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.JUMP_HERO)
+      this.enableCollision(CollisionExemptions.JUMP_HERO)
   }
   public get defeatByJump() { return this._defeatByJump; }
   private _defeatByJump = false;
 
-
   /** When the enemy collides with an invincible hero, does the enemy survive */
-  immuneToInvincibility = false;
+  immuneToInvincibility: boolean;
 
   /**
    * When the enemy collides with an invincible hero, does it instantly defeat
    * the hero?
    */
-  instantDefeat = false;
+  instantDefeat: boolean;
 
   /**
    * Construct an Enemy role
@@ -276,13 +266,12 @@ export class Enemy extends Role {
 
     // Enemies don't collide with goodies or destinations
     this.collisionRules.properties.push(CollisionExemptions.ENEMY);
-    this.disableGoodieCollision();
-    this.disableDestinationCollision();
+    this.disableCollision(CollisionExemptions.GOODIE);
+    this.disableCollision(CollisionExemptions.DESTINATION);
     if (!!cfg.disableHeroCollision)
-      this.collisionRules.ignores.push(CollisionExemptions.HERO);
+      this.disableCollision(CollisionExemptions.HERO);
 
-    if (cfg.damage != undefined)
-      this.damage = cfg.damage;
+    this.damage = cfg.damage ?? this.damage;
     this.onDefeatHero = cfg.onDefeatHero;
     this.onDefeated = cfg.onDefeated;
     this.defeatByCrawl = !!cfg.defeatByCrawl;
@@ -302,11 +291,11 @@ export class Enemy extends Role {
    * @param h             The actor who defeated this enemy, if any
    */
   public defeat(increaseScore: boolean, h?: Actor) {
-    if (this.onDefeated) this.onDefeated(this.actor!, h);
+    if (this.onDefeated) this.onDefeated(this._actor!, h);
 
     // remove the enemy from the screen
-    this.actor?.sounds.defeat?.play();
-    this.actor!.remove();
+    this._actor?.sounds.defeat?.play();
+    this._actor!.remove();
 
     // possibly update score
     if (increaseScore) stage.score.onEnemyDefeated();
@@ -326,6 +315,8 @@ export class Hero extends Role {
     this._actor = actor;
     actor?.rigidBody.body.SetType(b2BodyType.b2_dynamicBody);
   }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /**
    * Strength of the hero. This determines how many collisions with enemies
@@ -339,7 +330,7 @@ export class Hero extends Role {
     let old = this._strength;
     this._strength = amount;
     if (old != amount && this.onStrengthChange)
-      this.onStrengthChange(this.actor!);
+      this.onStrengthChange(this._actor!);
   }
   private _strength = 1;
 
@@ -348,7 +339,8 @@ export class Hero extends Role {
   get invincibleRemaining() { return Math.max(0, this._invincibleRemaining / 1000); }
   set invincibleRemaining(amount: number) {
     this._invincibleRemaining = amount * 1000;
-    this.actor!.state.changeState(this.actor!, StateEvent.INVINCIBLE_START);
+    if (amount != 0)
+      this._actor!.state.changeState(this._actor!, StateEvent.INV_Y);
   }
   private _invincibleRemaining = 0;
 
@@ -399,8 +391,8 @@ export class Hero extends Role {
 
     // Heroes don't collide with goodies or destinations
     this.collisionRules.properties.push(CollisionExemptions.HERO);
-    this.disableGoodieCollision();
-    this.disableDestinationCollision();
+    this.disableCollision(CollisionExemptions.GOODIE);
+    this.disableCollision(CollisionExemptions.DESTINATION);
 
     stage.score.onHeroCreated();
     if (cfg.strength != undefined)
@@ -408,18 +400,22 @@ export class Hero extends Role {
     this.allowMultiJump = !!cfg.allowMultiJump;
     this.onStrengthChange = cfg.onStrengthChange;
     this.mustSurvive = !!cfg.mustSurvive;
+
+    this.prerenderTasks.push((elapsedMs: number) => {
+      // determine when to turn off invincibility
+      if (this._invincibleRemaining > 0) {
+        this._invincibleRemaining -= elapsedMs;
+        if (this._invincibleRemaining <= 0) {
+          this._invincibleRemaining = 0;
+          this._actor!.state.changeState(this._actor!, StateEvent.INV_N);
+        }
+      }
+
+    })
   }
 
   /** Code to run immediately before rendering a Hero's Actor */
-  prerender(elapsedMs: number) {
-    // determine when to turn off invincibility
-    if (this._invincibleRemaining > 0) {
-      this._invincibleRemaining -= elapsedMs;
-      if (this._invincibleRemaining <= 0) {
-        this._invincibleRemaining = 0;
-        this.actor!.state.changeState(this.actor!, StateEvent.INVINCIBLE_STOP);
-      }
-    }
+  prerender() {
   }
 
   /**
@@ -445,21 +441,21 @@ export class Hero extends Role {
     }
     // Destinations try to receive the hero
     else if (other.role instanceof Destination) {
-      if (other.role.receive(this.actor!)) {
+      if (other.role.receive(this._actor!)) {
         stage.score.onDestinationArrive();
-        this.actor!.remove();
+        this._actor!.remove();
       }
       return true;
     }
     // Sensors try to change the hero's behavior
     else if (other.role instanceof Sensor) {
       if (other.role.heroCollision)
-        other.role.heroCollision(other, this.actor!);
+        other.role.heroCollision(other, this._actor!);
       return true;
     }
     // Goodies get collected
     else if (other.role instanceof Goodie) {
-      if (!other.role.onCollect(other, this.actor!)) return true;
+      if (!other.role.onCollect(other, this._actor!)) return true;
       other.remove();
       stage.score.onGoodieCollected();
     }
@@ -475,8 +471,8 @@ export class Hero extends Role {
     // if the enemy always defeats the hero, no matter what, then defeat the
     // hero
     if (enemy.instantDefeat) {
-      this.actor!.remove();
-      if (enemy.onDefeatHero) enemy.onDefeatHero(enemy.actor!, this.actor!);
+      this._actor!.remove();
+      if (enemy.onDefeatHero) enemy.onDefeatHero(enemy.actor!, this._actor!);
 
       if (this.mustSurvive) stage.score.loseLevel();
       else stage.score.onDefeatHero();
@@ -486,23 +482,23 @@ export class Hero extends Role {
     if (this._invincibleRemaining > 0) {
       // if the enemy is immune to invincibility, do nothing
       if (enemy.immuneToInvincibility) return;
-      enemy.defeat(true, this.actor!);
+      enemy.defeat(true, this._actor!);
     }
     // defeat by crawling?
     else if (this.crawling && enemy.defeatByCrawl) {
-      enemy.defeat(true, this.actor!);
+      enemy.defeat(true, this._actor!);
     }
     // defeat by jumping only if the hero's bottom is above the enemy's
     // head
     else if (this.inAir && enemy.defeatByJump &&
-      ((this.actor!.rigidBody.getCenter().y) <= (enemy.actor!.rigidBody.getCenter().y))) {
-      enemy.defeat(true, this.actor!);
+      ((this._actor!.rigidBody.getCenter().y) <= (enemy.actor!.rigidBody.getCenter().y))) {
+      enemy.defeat(true, this._actor!);
     }
     // when we can't defeat it by losing strength, remove the hero
     else if (enemy.damage >= this._strength) {
-      this.actor!.remove();
+      this._actor!.remove();
       if (enemy.onDefeatHero)
-        enemy.onDefeatHero(enemy.actor!, this.actor!);
+        enemy.onDefeatHero(enemy.actor!, this._actor!);
 
       if (this.mustSurvive) stage.score.loseLevel();
       else stage.score.onDefeatHero();
@@ -510,7 +506,7 @@ export class Hero extends Role {
     // when we can defeat it by losing strength
     else {
       this.strength = this.strength - enemy.damage;
-      enemy.defeat(true, this.actor!);
+      enemy.defeat(true, this._actor!);
     }
   }
 
@@ -527,7 +523,7 @@ export class Hero extends Role {
     // Did we collide with a sensor?
     let sensor = true;
     // The default is for all fixtures of a actor have the same sensor state
-    let fixtures = this.actor!.rigidBody.body.GetFixtureList();
+    let fixtures = this._actor!.rigidBody.body.GetFixtureList();
     if (fixtures != null)
       sensor = sensor && fixtures.IsSensor();
 
@@ -536,7 +532,7 @@ export class Hero extends Role {
 
     // if there is code attached to the obstacle for modifying the hero's
     // behavior, run it
-    if (obstacle.heroCollision) obstacle.heroCollision(o, this.actor!);
+    if (obstacle.heroCollision) obstacle.heroCollision(o, this._actor!);
 
     // If this is a wall, then mark us not in the air so we can do more
     // jumps. Note that sensors should not enable jumps for the hero.
@@ -544,7 +540,7 @@ export class Hero extends Role {
       this.collisionRules.properties = this.collisionRules.properties.filter(value => value != CollisionExemptions.JUMP_HERO);
       this.inAir = false;
       this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.JUMP_HERO)
-      this.actor!.state.changeState(this.actor!, StateEvent.JUMP_STOP);
+      this._actor!.state.changeState(this._actor!, StateEvent.JUMP_N);
     }
   }
 
@@ -556,18 +552,18 @@ export class Hero extends Role {
     this.collisionRules.properties = this.collisionRules.properties.filter(v => v != CollisionExemptions.JUMP_HERO);
     this.collisionRules.properties.push(CollisionExemptions.JUMP_HERO);
 
-    let v = this.actor!.rigidBody.body.GetLinearVelocity() ?? { x: 0, y: 0 };
+    let v = this._actor!.rigidBody.body.GetLinearVelocity() ?? { x: 0, y: 0 };
     x += v.x;
     y += v.y;
-    this.actor!.rigidBody.breakDistJoints();
-    this.actor!.rigidBody.body.SetLinearVelocity(new b2Vec2(x, y));
+    this._actor!.rigidBody.breakDistJoints();
+    this._actor!.rigidBody.body.SetLinearVelocity(new b2Vec2(x, y));
 
     if (!this.allowMultiJump) this.inAir = true;
-    this.actor!.state.changeState(this.actor!, StateEvent.JUMP_START);
-    this.actor?.sounds?.jump?.play();
+    this._actor!.state.changeState(this._actor!, StateEvent.JUMP_Y);
+    this._actor?.sounds?.jump?.play();
 
     // suspend creation of sticky joints, so the hero can actually move
-    this.actor!.rigidBody!.props.stickyDelay = window.performance.now() + 10;
+    this._actor!.rigidBody!.props.stickyDelay = window.performance.now() + 10;
   }
 
   /**
@@ -576,15 +572,15 @@ export class Hero extends Role {
    * @param rotate The amount to rotate the actor when the crawl starts
    */
   crawlOn(rotate: number) {
-    if (!this.actor!.rigidBody || this.crawling) return;
-    let body = this.actor!.rigidBody.body;
+    if (!this._actor!.rigidBody || this.crawling) return;
+    let body = this._actor!.rigidBody.body;
     this.collisionRules.properties = this.collisionRules.properties.filter(v => v != CollisionExemptions.CRAWL_HERO);
     this.collisionRules.properties.push(CollisionExemptions.CRAWL_HERO);
     this.crawling = true;
     let transform = new b2Transform();
     transform.SetPositionAngle(body.GetPosition(), body.GetAngle() + rotate);
     body.SetTransform(transform);
-    this.actor!.state.changeState(this.actor!, StateEvent.CRAWL_START);
+    this._actor!.state.changeState(this._actor!, StateEvent.CRAWL_Y);
   }
 
   /**
@@ -593,14 +589,14 @@ export class Hero extends Role {
    * @param rotate The amount to rotate the actor when the crawl ends
    */
   public crawlOff(rotate: number) {
-    if (!this.crawling || !this.actor!.rigidBody) return;
-    let body = this.actor!.rigidBody.body;
+    if (!this.crawling || !this._actor!.rigidBody) return;
+    let body = this._actor!.rigidBody.body;
     this.collisionRules.properties = this.collisionRules.properties.filter(value => value != CollisionExemptions.CRAWL_HERO)
     this.crawling = false;
     let transform = new b2Transform();
     transform.SetPositionAngle(body.GetPosition(), body.GetAngle() - rotate);
     body.SetTransform(transform);
-    this.actor!.state.changeState(this.actor!, StateEvent.CRAWL_STOP);
+    this._actor!.state.changeState(this._actor!, StateEvent.CRAWL_N);
   }
 
   /**
@@ -610,7 +606,7 @@ export class Hero extends Role {
    */
   // TODO: Why only if in the middle of a jump?
   public increaseRotation(delta: number) {
-    let body = this.actor!.rigidBody.body;
+    let body = this._actor!.rigidBody.body;
     if (!body) return;
     if (this.inAir) {
       this.currentRotation += delta;
@@ -623,13 +619,14 @@ export class Hero extends Role {
 }
 
 /**
- * Obstacles are usually walls, except they can move, and can be used to run all
- * sorts of arbitrary code that changes the game, or the behavior of the things
- * that collide with them.
+ * Obstacles are usually walls, except they can also move, and can be used in
+ * all sorts of other ways.
  */
 export class Obstacle extends Role {
   /** The actor associated with this Role */
   public set actor(actor: Actor | undefined) { this._actor = actor; }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /**
    * Construct an Obstacle role
@@ -659,7 +656,7 @@ export class Obstacle extends Role {
   onCollide(other: Actor) {
     // NB: Hero and Projectile handle their collisions with obstacles for us :)
     if (other.role instanceof Enemy) {
-      if (this.enemyCollision) this.enemyCollision(this.actor!, other);
+      if (this.enemyCollision) this.enemyCollision(this._actor!, other);
       return true;
     }
     return false;
@@ -683,23 +680,25 @@ export class Obstacle extends Role {
    * avoid re-playing the sound before it even finishes.
    */
   public playCollideSound() {
-    if (!this.actor?.sounds?.collide) return;
-    if (!this.actor.sounds.collide.playing())
-      this.actor.sounds.collide.play();
+    if (!this._actor?.sounds?.collide) return;
+    if (!this._actor.sounds.collide.playing())
+      this._actor.sounds.collide.play();
   }
 }
 
 /**
- * A sensor is something that an Actor can "pass through", which causes some
- * code to run.
+ * A sensor is something that a Hero can "pass through", which causes some code
+ * to run.
  */
 export class Sensor extends Role {
-  /** The Actor to which this Hero role is attached */
+  /** The actor associated with this Role */
   public set actor(actor: Actor | undefined) {
     this._actor = actor;
     // Turn off collisions
     actor?.rigidBody.setCollisionsEnabled(false);
   }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /** 
    * Construct a Sensor by providing some code to run when a hero passes over
@@ -713,7 +712,10 @@ export class Sensor extends Role {
   }
 }
 
-/** Projectiles are actors that can be thrown from an actor's location */
+/**
+ * Projectiles are actors that can be tossed from an actor's location, in order
+ * to damage enemies
+ */
 export class Projectile extends Role {
   /** The Actor to which this role is attached */
   public set actor(actor: Actor | undefined) {
@@ -721,6 +723,8 @@ export class Projectile extends Role {
     // We need a dynamic body here:
     actor?.rigidBody.body.SetType(b2BodyType.b2_dynamicBody);
   }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /** This is the initial point from which the projectile was thrown */
   readonly rangeFrom = new b2Vec2(0, 0);
@@ -772,19 +776,19 @@ export class Projectile extends Role {
     if (other.role instanceof Obstacle) {
       let o = other.role;
       if (o.onProjectileCollision) {
-        o.onProjectileCollision(other, this.actor!);
+        o.onProjectileCollision(other, this._actor!);
         // return... don't remove the projectile... the obstacle will handle
         // that
         return true;
       }
-      this.actor!.remove();
+      this._actor!.remove();
       return true;
     }
     if (other.role instanceof Projectile) {
       if (!this.disappearOnCollide) return true;
       // only disappear if other is not a sensor
       if (!other.rigidBody.getCollisionsEnabled()) {
-        this.actor!.remove();
+        this._actor!.remove();
       }
       return true;
     }
@@ -793,9 +797,9 @@ export class Projectile extends Role {
       other.role.damage -= this.damage;
       if (other.role.damage <= 0) {
         // remove this enemy
-        other.role.defeat(true, this.actor);
+        other.role.defeat(true, this._actor);
       }
-      this.actor?.remove();
+      this._actor?.remove();
       return true;
     }
     return false;
@@ -809,13 +813,13 @@ export class Projectile extends Role {
    */
   // TODO: Is this too coupled with the ActorPool?
   public prerender(_elapsedMs: number) {
-    let body = this.actor!.rigidBody.body;
+    let body = this._actor!.rigidBody.body;
     if (!body || !body.IsEnabled()) return;
     // eliminate the projectile quietly if it has traveled too far
     let dx = Math.abs(body.GetPosition().x - this.rangeFrom.x);
     let dy = Math.abs(body.GetPosition().y - this.rangeFrom.y);
     if (dx * dx + dy * dy > this.range * this.range)
-      this.actor!.remove();
+      this._actor!.remove();
   }
 }
 
@@ -824,12 +828,14 @@ export class Projectile extends Role {
  * game, like background images, HUD text, etc.
  */
 export class Passive extends Role {
-  /** The Actor to which this Hero role is attached */
+  /** The actor associated with this Role */
   public set actor(actor: Actor | undefined) {
     this._actor = actor;
     // Turn off collisions
     actor?.rigidBody.setCollisionsEnabled(false);
   }
+  /** The actor associated with this Role */
+  public get actor() { return this._actor; }
 
   /** Construct a Passive role */
   constructor() {

@@ -4,8 +4,8 @@ import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageLibrary";
 import { CameraSystem } from "../Systems/Camera";
 import { Actor } from "../Entities/Actor";
-import { AniCfgOpts, AnimationSequence, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolygonConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";
-import { AnimationState, StateEvent, IStateObserver, transitions } from "./StateManager";
+import { AniCfgOpts, AnimationSequence, AnimationState, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolygonConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";
+import { StateEvent, IStateObserver, ActorState, DIRECTION } from "./StateManager";
 import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { InertMovement } from "./Movement";
@@ -243,6 +243,7 @@ export class TextConfig {
   }
 }
 
+
 /**
  * AnimationConfig stores the geometry and other configuration information
  * needed when describing an animated image.
@@ -291,45 +292,13 @@ export class AnimationConfig {
     if (tmpZ > 2) tmpZ = 2;
     this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
 
+    // Clone all animations into the map
     this.animations = new Map();
-
-    // The order is important here: if we have a "right" but not a "left", we
-    // use the "right" as the "left".  We also fall back to the idle for any
-    // animation that is missing.  By computing all of these animations here,
-    // the code later on can be a lot simpler.
-    //
-    // Also note that we set up *all* of the animations, for *every entity*.  It
-    // doesn't matter if a certain role can't be invincible, or can't jump, etc:
-    // we'd have a lot more code and complexity if we tried to specialize the
-    // animation transitions on a per-role basis, without any appreciable gain
-    // in performance or maintainability.
-
-    // TODO: Some of the combined states (*_idle_{left/right}) are not in use?
-    this.animations.set(AnimationState.IDLE_RIGHT, opts.idle_right.clone());
-    this.animations.set(AnimationState.IDLE_LEFT, opts.idle_left?.clone() ?? opts.idle_right.clone());
-
-    this.animations.set(AnimationState.MOVE_RIGHT, opts.move_right?.clone() ?? this.animations.get(AnimationState.IDLE_RIGHT)!.clone());
-    this.animations.set(AnimationState.MOVE_LEFT, opts.move_left?.clone() ?? opts.move_right?.clone() ?? this.animations.get(AnimationState.IDLE_LEFT)!.clone());
-
-    this.animations.set(AnimationState.JUMP_RIGHT, opts.jump_right?.clone() ?? this.animations.get(AnimationState.IDLE_RIGHT)!.clone());
-    this.animations.set(AnimationState.JUMP_LEFT, opts.jump_left?.clone() ?? opts.jump_right?.clone() ?? this.animations.get(AnimationState.IDLE_LEFT)!.clone());
-    this.animations.set(AnimationState.JUMP_IDLE_RIGHT, this.animations.get(AnimationState.JUMP_RIGHT)!.clone());
-    this.animations.set(AnimationState.JUMP_IDLE_LEFT, this.animations.get(AnimationState.JUMP_LEFT)!.clone());
-
-    this.animations.set(AnimationState.CRAWL_RIGHT, opts.crawl_right?.clone() ?? this.animations.get(AnimationState.IDLE_RIGHT)!.clone());
-    this.animations.set(AnimationState.CRAWL_LEFT, opts.crawl_left ?? opts.crawl_right?.clone() ?? this.animations.get(AnimationState.IDLE_LEFT)!.clone());
-    this.animations.set(AnimationState.CRAWL_IDLE_RIGHT, this.animations.get(AnimationState.CRAWL_RIGHT)!.clone());
-    this.animations.set(AnimationState.CRAWL_IDLE_LEFT, this.animations.get(AnimationState.CRAWL_LEFT)!.clone());
-
-    this.animations.set(AnimationState.THROW_RIGHT, opts.throw_right?.clone() ?? this.animations.get(AnimationState.IDLE_RIGHT)!.clone());
-    this.animations.set(AnimationState.THROW_LEFT, opts.throw_left?.clone() ?? opts.throw_right?.clone() ?? this.animations.get(AnimationState.IDLE_LEFT)!.clone());
-    this.animations.set(AnimationState.THROW_IDLE_RIGHT, this.animations.get(AnimationState.THROW_RIGHT)!.clone());
-    this.animations.set(AnimationState.THROW_IDLE_LEFT, this.animations.get(AnimationState.THROW_LEFT)!.clone());
-
-    this.animations.set(AnimationState.INVINCIBLE_RIGHT, opts.invincible_right?.clone() ?? this.animations.get(AnimationState.IDLE_RIGHT)!.clone());
-    this.animations.set(AnimationState.INVINCIBLE_LEFT, opts.invincible_left?.clone() ?? opts.invincible_right?.clone() ?? this.animations.get(AnimationState.IDLE_LEFT)!.clone());
-    this.animations.set(AnimationState.INVINCIBLE_IDLE_LEFT, this.animations.get(AnimationState.INVINCIBLE_RIGHT)!.clone());
-    this.animations.set(AnimationState.INVINCIBLE_IDLE_RIGHT, this.animations.get(AnimationState.INVINCIBLE_LEFT)!.clone());
+    for (let k of opts.animations.keys()) {
+      let v = opts.animations.get(k);
+      if (v)
+        this.animations.set(k, v.clone())
+    }
 
     // Disappearance animations are special, because of their dimension and
     // offset properties.
@@ -512,9 +481,6 @@ export class AnimatedSprite implements IStateObserver {
   /** The amount of time for which the current frame has been displayed */
   private elapsedTime = 0;
 
-  /** The last state of the Actor; determines which animation is showing */
-  private lastState = AnimationState.IDLE_RIGHT;
-
   /** The amount of time remaining in a throw animation, if one is active */
   private throwRemain = 0;
 
@@ -525,25 +491,20 @@ export class AnimatedSprite implements IStateObserver {
    */
   constructor(cfgOpts: AniCfgOpts) {
     this.props = new AnimationConfig(cfgOpts);
-    this.currAni = this.props.animations.get(AnimationState.IDLE_RIGHT)!;
+    this.currAni = this.props.animations.get(AnimationState.IDLE_E)!;
   }
 
   /** Make a copy of this AnimatedSprite */
   clone() {
+    let animations = new Map();
+    for (let k of this.props.animations.keys()) {
+      let v = this.props.animations.get(k);
+      if (v)
+        animations.set(k, v.clone())
+    }
+
     return new AnimatedSprite({
-      z: this.props.z, width: this.props.w, height: this.props.h,
-      idle_right: this.props.animations.get(AnimationState.IDLE_RIGHT)!.clone(),
-      idle_left: this.props.animations.get(AnimationState.IDLE_LEFT)?.clone(),
-      move_right: this.props.animations.get(AnimationState.MOVE_RIGHT)?.clone(),
-      move_left: this.props.animations.get(AnimationState.MOVE_LEFT)?.clone(),
-      jump_right: this.props.animations.get(AnimationState.JUMP_RIGHT)?.clone(),
-      jump_left: this.props.animations.get(AnimationState.JUMP_LEFT)?.clone(),
-      crawl_right: this.props.animations.get(AnimationState.CRAWL_RIGHT)?.clone(),
-      crawl_left: this.props.animations.get(AnimationState.CRAWL_LEFT)?.clone(),
-      throw_right: this.props.animations.get(AnimationState.THROW_RIGHT)?.clone(),
-      throw_left: this.props.animations.get(AnimationState.THROW_LEFT)?.clone(),
-      invincible_right: this.props.animations.get(AnimationState.INVINCIBLE_RIGHT)?.clone(),
-      invincible_left: this.props.animations.get(AnimationState.INVINCIBLE_LEFT)?.clone(),
+      z: this.props.z, width: this.props.w, height: this.props.h, animations,
       disappear: this.props.disappear?.animation.clone(),
       disappearDims: this.props.disappear?.dims.Clone(),
       disappearOffset: this.props.disappear?.offset.Clone()
@@ -578,52 +539,180 @@ export class AnimatedSprite implements IStateObserver {
   public getCurrent() { return this.currAni.steps[this.activeFrame].cell; }
 
   /**
-   * When the attached Entity's state changes, figure out if the animation needs to change
+   * When the attached Actor's state changes, figure out if the animation needs
+   * to change
    *
-   * @param entity The entity whose state is changing
-   * @param event  The event that is causing the state change
+   * @param actor     The actor whose state is changing.
+   * @param event     The event that might have caused `actor`'s state to change
+   * @param newState  The new state of `actor`
    */
-  onStateChange(entity: Actor, event: StateEvent) {
-    let newState = transitions.get(this.lastState)!(event);
-    if (newState == this.lastState) return;
-
+  onStateChange(actor: Actor, event: StateEvent, newState: ActorState) {
     // Should we kick off a disappear animation?
-    if (newState == AnimationState.DISAPPEARING) {
-      this.lastState = newState;
-
-      if (!this.props.disappear) return;
+    if (newState.disappearing) {
+      if (!this.props.disappear) return; // Exit early... no animation
 
       let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.props.disappear.offset.x;
       let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.props.disappear.offset.y;
+      let animations = new Map();
+      animations.set(AnimationState.IDLE_E, this.props.disappear.animation);
       let o = Actor.Make({
-        appearance: new AnimatedSprite({ idle_right: this.props.disappear.animation, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
-        rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, entity.scene, { collisionsEnabled: false }),
+        appearance: new AnimatedSprite({ animations, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
+        rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, actor.scene, { collisionsEnabled: false }),
         // TODO: will we always want this to be inert, or might we sometimes want to animate it while letting it keep moving / bouncing / etc?
         movement: new InertMovement(),
         // TODO: will we always want this to have a Passive role?
         role: new Passive(),
       });
-      entity.scene.camera.addEntity(o);
+      actor.scene.camera.addEntity(o);
       return;
     }
 
     // Do a regular animation
-    let newAni = this.props.animations.get(newState)!;
-    if (newAni == this.currAni) return;
+    let st = AnimatedSprite.getAnimationState(newState);
+    let newAni = this.props.animations.get(st);
+    // [mfs] I suspect that this check rarely passes, because object equality != configOpts equality...
+    if (newAni === this.currAni) return;
+    if (newAni === undefined) { console.log("notfound", st); newAni = this.props.animations.get(AnimationState.IDLE_E)!; }
     this.currAni = newAni;
     this.activeFrame = 0;
     this.elapsedTime = 0;
-    this.lastState = newState;
-    this.currAni = newAni;
 
-    // If it's a throw, then it's our responsibility to figure out when to stop
+    // If it's a toss, then it's our responsibility to figure out when to stop
     // it
     //
-    // TODO: What if the throw animation is long enough that you can get a
-    //       second before the first is done?  Do we need a special case for
-    //       THROW_START while in throwing, at the top?
-    if (event == StateEvent.THROW_START)
+    // TODO: What if the toss animation is long enough that you can get a second
+    //       before the first is done?  Do we need a special case for
+    //       TOSS_Y while in throwing?
+    if (event == StateEvent.TOSS_Y)
       this.throwRemain = newAni.getDuration();
+  }
+
+  /**
+   * Figure out what AnimationState to use, given an ActorState
+   *
+   * @param s The ActorState from which we will derive an AnimationState
+   */
+  private static getAnimationState(s: ActorState) {
+    // NB:  It's somewhat unavoidable that somewhere we need to have a big chunk
+    //      of code for dealing with the 80 different animations.  Here it is.  
+    if (s.moving) {
+      if (s.direction == DIRECTION.N) {
+        if (s.crawling) { return AnimationState.CRAWL_N; }
+        else if (s.invincible) { return AnimationState.INV_N; }
+        else if (s.jumping) { return AnimationState.JUMP_N; }
+        else if (s.tossing) { return AnimationState.TOSS_N; }
+        else { return AnimationState.WALK_N; }
+      }
+      else if (s.direction == DIRECTION.NE) {
+        if (s.crawling) { return AnimationState.CRAWL_NE; }
+        else if (s.invincible) { return AnimationState.INV_NE; }
+        else if (s.jumping) { return AnimationState.JUMP_NE; }
+        else if (s.tossing) { return AnimationState.TOSS_NE; }
+        else { return AnimationState.WALK_NE; }
+      }
+      else if (s.direction == DIRECTION.E) {
+        if (s.crawling) { return AnimationState.CRAWL_E; }
+        else if (s.invincible) { return AnimationState.INV_E; }
+        else if (s.jumping) { return AnimationState.JUMP_E; }
+        else if (s.tossing) { return AnimationState.TOSS_E; }
+        else { return AnimationState.WALK_E; }
+      }
+      else if (s.direction == DIRECTION.SE) {
+        if (s.crawling) { return AnimationState.CRAWL_SE; }
+        else if (s.invincible) { return AnimationState.INV_SE; }
+        else if (s.jumping) { return AnimationState.JUMP_SE; }
+        else if (s.tossing) { return AnimationState.TOSS_SE; }
+        else { return AnimationState.WALK_SE; }
+      }
+      else if (s.direction == DIRECTION.S) {
+        if (s.crawling) { return AnimationState.CRAWL_S; }
+        else if (s.invincible) { return AnimationState.INV_S; }
+        else if (s.jumping) { return AnimationState.JUMP_S; }
+        else if (s.tossing) { return AnimationState.TOSS_S; }
+        else { return AnimationState.WALK_S; }
+      }
+      else if (s.direction == DIRECTION.SW) {
+        if (s.crawling) { return AnimationState.CRAWL_SW; }
+        else if (s.invincible) { return AnimationState.INV_SW; }
+        else if (s.jumping) { return AnimationState.JUMP_SW; }
+        else if (s.tossing) { return AnimationState.TOSS_SW; }
+        else { return AnimationState.WALK_SW; }
+      }
+      else if (s.direction == DIRECTION.W) {
+        if (s.crawling) { return AnimationState.CRAWL_W; }
+        else if (s.invincible) { return AnimationState.INV_W; }
+        else if (s.jumping) { return AnimationState.JUMP_W; }
+        else if (s.tossing) { return AnimationState.TOSS_W; }
+        else { return AnimationState.WALK_W; }
+      }
+      else if (s.direction == DIRECTION.NW) {
+        if (s.crawling) { return AnimationState.CRAWL_NW; }
+        else if (s.invincible) { return AnimationState.INV_NW; }
+        else if (s.jumping) { return AnimationState.JUMP_NW; }
+        else if (s.tossing) { return AnimationState.TOSS_NW; }
+        else { return AnimationState.WALK_NW; }
+      }
+    }
+    else {
+      if (s.direction == DIRECTION.N) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_N; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_N; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_N; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_N; }
+        else { return AnimationState.IDLE_N; }
+      }
+      else if (s.direction == DIRECTION.NE) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_NE; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_NE; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_NE; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_NE; }
+        else { return AnimationState.IDLE_NE; }
+      }
+      else if (s.direction == DIRECTION.E) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_E; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_E; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_E; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_E; }
+        else { return AnimationState.IDLE_E; }
+      }
+      else if (s.direction == DIRECTION.SE) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_SE; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_SE; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_SE; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_SE; }
+        else { return AnimationState.IDLE_SE; }
+      }
+      else if (s.direction == DIRECTION.S) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_S; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_S; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_S; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_S; }
+        else { return AnimationState.IDLE_S; }
+      }
+      else if (s.direction == DIRECTION.SW) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_SW; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_SW; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_SW; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_SW; }
+        else { return AnimationState.IDLE_SW; }
+      }
+      else if (s.direction == DIRECTION.W) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_W; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_W; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_W; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_W; }
+        else { return AnimationState.IDLE_W; }
+      }
+      else if (s.direction == DIRECTION.NW) {
+        if (s.crawling) { return AnimationState.CRAWL_IDLE_NW; }
+        else if (s.invincible) { return AnimationState.INV_IDLE_NW; }
+        else if (s.jumping) { return AnimationState.JUMP_IDLE_NW; }
+        else if (s.tossing) { return AnimationState.TOSS_IDLE_NW; }
+        else { return AnimationState.IDLE_NW; }
+      }
+    }
+    // Default case: IDLE_E
+    return AnimationState.IDLE_E;
   }
 
   /**
@@ -660,7 +749,7 @@ export class AnimatedSprite implements IStateObserver {
       this.throwRemain -= elapsedMs;
       if (this.throwRemain <= 0) {
         this.throwRemain = 0;
-        this._actor!.state.changeState(this._actor!, StateEvent.THROW_STOP);
+        this._actor!.state.changeState(this._actor!, StateEvent.TOSS_N);
         // THROW_STOP will put us in a new animation, so we don't want to
         // advance it
         elapsedMs = 0;
