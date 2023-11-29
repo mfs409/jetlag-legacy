@@ -1,7 +1,8 @@
-// TODO: Code Review
-
 import { Sprite } from "./Services/ImageLibrary";
 import { stage } from "./Stage";
+
+// TODO:  It seems that once `helpers.ts` goes away, we won't need these
+//        interfaces anymore, and can use the classes directly
 
 /**
  * ImgConfigOpts expresses the required and optional fields that a programmer
@@ -23,8 +24,6 @@ export interface ImgConfigOpts {
  * FilledBoxConfigOpts expresses the required and optional fields that a
  * programmer should provide to JetLag in order to create an entity whose visual
  * representation is a solid rectangle.
- *
- * TODO: Support gradients?
  */
 export interface FilledBoxConfigOpts {
   /** Z index of the box: Must be in the range [-2, 2] */
@@ -97,6 +96,9 @@ export interface TxtConfigOpts {
 
 /**
  * The different ActorState combinations for which we might have an animation
+ *
+ * NB:  JetLag supports a very broad set of possible states.  In many games,
+ *      most of these won't be useful.
  */
 export const enum AnimationState {
   // Stationary
@@ -105,25 +107,18 @@ export const enum AnimationState {
   WALK_N, WALK_NE, WALK_E, WALK_SE, WALK_S, WALK_SW, WALK_W, WALK_NW,
   // Stationary + Tossing
   TOSS_IDLE_N, TOSS_IDLE_NE, TOSS_IDLE_E, TOSS_IDLE_SE, TOSS_IDLE_S, TOSS_IDLE_SW, TOSS_IDLE_W, TOSS_IDLE_NW,
-
   // Moving + Tossing
   TOSS_N, TOSS_NE, TOSS_E, TOSS_SE, TOSS_S, TOSS_SW, TOSS_W, TOSS_NW,
-
   // Stationary + Invincible
   INV_IDLE_N, INV_IDLE_NE, INV_IDLE_E, INV_IDLE_SE, INV_IDLE_S, INV_IDLE_SW, INV_IDLE_W, INV_IDLE_NW,
-
   // Moving + Invincible
   INV_N, INV_NE, INV_E, INV_SE, INV_S, INV_SW, INV_W, INV_NW,
-
   // Stationary + Jumping
   JUMP_IDLE_N, JUMP_IDLE_NE, JUMP_IDLE_E, JUMP_IDLE_SE, JUMP_IDLE_S, JUMP_IDLE_SW, JUMP_IDLE_W, JUMP_IDLE_NW,
-
   // Moving + Jumping
   JUMP_N, JUMP_NE, JUMP_E, JUMP_SE, JUMP_S, JUMP_SW, JUMP_W, JUMP_NW,
-
   // Stationary + Crawling
   CRAWL_IDLE_N, CRAWL_IDLE_NE, CRAWL_IDLE_E, CRAWL_IDLE_SE, CRAWL_IDLE_S, CRAWL_IDLE_SW, CRAWL_IDLE_W, CRAWL_IDLE_NW,
-
   // Moving + Crawling
   CRAWL_N, CRAWL_NE, CRAWL_E, CRAWL_SE, CRAWL_S, CRAWL_SW, CRAWL_W, CRAWL_NW,
 }
@@ -184,6 +179,9 @@ export interface CircleCfgOpts {
 /**
  * PolygonCfgOpts expresses the required fields that a programmer should provide
  * to JetLag in order to create an entity with a rigid Polygon body.
+ *
+ * TODO:  Why do we have width and height?  Can't we have a computed radius
+ *        instead?
  */
 export interface PolygonCfgOpts {
   /** X coordinate of the center */
@@ -335,10 +333,10 @@ export interface AdvancedRigidBodyCfgOpts {
 }
 
 /**
- * Config stores game-specific configuration values.  The programmer makes one
+ * GameConfig stores game-specific configuration values.  The programmer makes one
  * of these to tell JetLag how to run their game.
  */
-export interface Config {
+export interface GameConfig {
   /** How many pixels are equivalent to a meter in the game? */
   readonly pixelMeterRatio: number;
 

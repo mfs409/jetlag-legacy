@@ -1,5 +1,3 @@
-// TODO: Code Review of filters (everything else is good)
-
 import { Application, Container, Graphics, BlurFilter, NoiseFilter } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
 import { stage } from "../Stage";
@@ -358,19 +356,19 @@ export class RendererService {
    */
   public getFPS() { return this.pixi.ticker.FPS; }
 
-  /** in-progress support for an ASCII filter */
+  /** TODO: in-progress support for an ASCII filter */
   private ascii_filter = new AsciiFilter(8);
 
-  /** in-progress support for a blur filter */
+  /** TODO: in-progress support for a blur filter */
   private blur_filter = new BlurFilter(.5);
 
-  /** in-progress support for an old sepia TV filter.  Part 1: noise. */
+  /** TODO: in-progress support for an old sepia TV filter.  Part 1: noise. */
   private noise_filter = new NoiseFilter();
 
-  /** in-progress support for an old sepia TV filter.  Part 2: lens effect. */
+  /** TODO: in-progress support for an old sepia TV filter.  Part 2: lens effect. */
   private godray_filter = new GodrayFilter();
 
-  /** in-progress support for an old sepia TV filter.  Part 3: sepia. */
+  /** TODO: in-progress support for an old sepia TV filter.  Part 3: sepia. */
   private old_film_filter = new OldFilmFilter();
 
   /**
@@ -394,8 +392,6 @@ export class RendererService {
       this.main.filters = [this.ascii_filter as any];
     }
     else if (use_sepia_tv) {
-      // TODO:  Is there a way to avoid re-making the ColorMatrixFilter every
-      //        time?
       this.noise_filter.seed = Math.random();
       this.old_film_filter.sepia = .3;
       this.old_film_filter.noise = .3;

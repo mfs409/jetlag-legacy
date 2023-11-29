@@ -1,13 +1,11 @@
-// Last review: 08-10-2023
-
 import { buildSplashScreen } from "./Splash";
-import { Config } from "../jetlag/Config";
+import { GameConfig } from "../jetlag/Config";
 
 /**
  * GameConfig stores things like screen dimensions and other game configuration,
  * as well as the names of all the assets (images and sounds) used by this game.
  */
-export class GameConfig implements Config {
+export class DemoGameConfig implements GameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;

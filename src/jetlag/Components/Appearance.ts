@@ -1,5 +1,3 @@
-// TODO: Code Review of AnimatedSprite (everything else is good)
-
 import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageLibrary";
 import { CameraSystem } from "../Systems/Camera";
@@ -595,6 +593,8 @@ export class AnimatedSprite implements IStateObserver {
   private static getAnimationState(s: ActorState) {
     // NB:  It's somewhat unavoidable that somewhere we need to have a big chunk
     //      of code for dealing with the 80 different animations.  Here it is.  
+
+    // TODO:  Despite the above comment, this code needs to be smarter
     if (s.moving) {
       if (s.direction == DIRECTION.N) {
         if (s.crawling) { return AnimationState.CRAWL_N; }
@@ -750,7 +750,7 @@ export class AnimatedSprite implements IStateObserver {
       if (this.throwRemain <= 0) {
         this.throwRemain = 0;
         this._actor!.state.changeState(this._actor!, StateEvent.TOSS_N);
-        // THROW_STOP will put us in a new animation, so we don't want to
+        // TOSS_N will put us in a new animation, so we don't want to
         // advance it
         elapsedMs = 0;
       }

@@ -1,5 +1,5 @@
 import { Howl, Howler } from "howler";
-import { Config } from "../Config";
+import { GameConfig } from "../Config";
 import { stage } from "../Stage";
 
 /**
@@ -39,7 +39,7 @@ export class AudioLibraryService {
    *
    * @param config The game-wide configuration
    */
-  constructor(config: Config) {
+  constructor(config: GameConfig) {
     for (let name of config.soundNames!)
       this.sounds[name] = new Howl({ src: [config.resourcePrefix + name] });
     for (let name of config.musicNames!)

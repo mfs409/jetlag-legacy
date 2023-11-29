@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { AnimationSequence, AnimationState, Config } from "../jetlag/Config";
+import { AnimationSequence, AnimationState, GameConfig } from "../jetlag/Config";
 import { AnimatedSprite, FilledSprite } from "../jetlag/Components/Appearance";
 import { ExplicitMovement } from "../jetlag/Components/Movement";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
@@ -12,7 +12,7 @@ import { stage } from "../jetlag/Stage";
  * A single place for storing screen dimensions and other game configuration, as
  * well as the names of all the assets (images and sounds) used by this game.
  */
-export class EmptyGameConfig implements Config {
+export class EmptyGameConfig implements GameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;

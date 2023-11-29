@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { Config } from "../jetlag/Config";
+import { GameConfig } from "../jetlag/Config";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
@@ -14,7 +14,7 @@ import { buildSplashScreen } from "../demo_game/Splash";
  * GameConfig stores things like screen dimensions and other game configuration,
  * as well as the names of all the assets (images and sounds) used by this game.
  */
-class GameConfig implements Config {
+class TutMazeGameConfig implements GameConfig {
     // It's very unlikely that you'll want to change these next four values.
     // Hover over them to see what they mean.
     pixelMeterRatio = 100;
@@ -254,4 +254,4 @@ function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: (
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new GameConfig());
+initializeAndLaunch("game-player", new TutMazeGameConfig());

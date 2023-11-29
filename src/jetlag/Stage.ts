@@ -4,7 +4,7 @@ import { GestureService } from "./Services/Gesture";
 import { AudioLibraryService } from "./Services/AudioLibrary";
 import { MusicComponent } from "./Components/Music";
 import { ScoreSystem } from "./Systems/Score";
-import { Config } from "./Config";
+import { GameConfig } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
 import { RendererService } from "./Services/Renderer";
@@ -215,7 +215,7 @@ export class Stage {
    * @param config  The game-wide configuration object
    * @param domId   The Id of the DOM element where the game exists
    */
-  constructor(readonly config: Config, domId: string) {
+  constructor(readonly config: GameConfig, domId: string) {
     this.console = new ConsoleService(config);
 
     this.pixelMeterRatio = config.pixelMeterRatio;
@@ -310,7 +310,7 @@ export class Stage {
  * @param domId  The name of the DIV into which the game should be placed
  * @param config The game configuration object
  */
-export function initializeAndLaunch(domId: string, config: Config) {
+export function initializeAndLaunch(domId: string, config: GameConfig) {
   stage = new Stage(config, domId);
 }
 

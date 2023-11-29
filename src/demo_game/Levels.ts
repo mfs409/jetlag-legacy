@@ -5820,15 +5820,20 @@ export function buildLevelScreen(level: number) {
 
     stage.score.setVictoryDestination(1);
 
-    // draw an obstacle from SVG.  We are stretching it in the X and Y dimensions, and also
-    // moving it rightward and upward
-    SvgSystem.processFile("shape.svg", 5, 5, 2, 2, (body: RigidBodyComponent) => {
-      return new ImageSprite({ width: body.props.w, height: body.props.h, img: "red.png" })
-    }, () => new Obstacle(), (actor: Actor) => {
-      // This code is run each time a line of the SVG is drawn.  When we draw a line,
-      // we'll give it some density and friction.  Remember that the line is
-      // actually a rotated obstacle.
-      actor.rigidBody!.setPhysics(1, .2, .4);
+    // draw an obstacle from SVG.  We are stretching it in the X and Y
+    // dimensions, and also moving it rightward and upward
+    SvgSystem.processFile("shape.svg", 5, 5, 2, 2, (centerX: number, centerY: number, width: number, rotation: number) => {
+      // Make an obstacle and rotate it
+      let cfg = { box: true, cx: centerX, cy: centerY, width, height: 0.05, img: "" };
+      let body = RigidBodyComponent.Box(cfg, stage.world)
+      let a = Actor.Make({
+        appearance: new ImageSprite({ width: body.props.w, height: body.props.h, img: "red.png" }),
+        rigidBody: body,
+        movement: new InertMovement(),
+        role: new Obstacle(),
+      });
+      a.rigidBody.setRotation(rotation);
+      a.rigidBody.setPhysics(1, .2, .4);
     });
 
     welcomeMessage("Obstacles can be drawn from SVG files");

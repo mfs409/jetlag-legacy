@@ -1,5 +1,5 @@
 import { Assets, Graphics, Sprite as PixiSprite, Text as PixiText, Texture } from "pixi.js";
-import { Config } from "../Config";
+import { GameConfig } from "../Config";
 import { stage } from "../Stage";
 
 /** DebugSprite is used when we need to render a debug outline on an actor */
@@ -93,7 +93,7 @@ export class ImageLibraryService {
    *
    * @param config The game-wide configuration
    */
-  constructor(private config: Config) {
+  constructor(private config: GameConfig) {
     // Set the names of the graphics assets, but don't load them yet.
     for (let imgName of config.imageNames!)
       Assets.add(imgName, config.resourcePrefix + imgName);

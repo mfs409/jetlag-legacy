@@ -1,12 +1,5 @@
-// TODO: Code Review
-
-import { b2Vec2, b2Transform } from "@box2d/core";
-import { Actor } from "../Entities/Actor";
+import { b2Vec2 } from "@box2d/core";
 import { stage } from "../Stage";
-import { RigidBodyComponent } from "../Components/RigidBody";
-import { AppearanceComponent } from "../Components/Appearance";
-import { InertMovement } from "../Components/Movement";
-import { RoleComponent } from "../Components/Role";
 
 /**
  * The Svg System is for loading SVG line drawings into a game.  SVG line
@@ -14,6 +7,10 @@ import { RoleComponent } from "../Components/Role";
  * their full potential. We only use them to define a set of lines for a simple,
  * stationary Actor. You should draw a picture on top of your line drawing, so
  * that the player knows that there is an actor on the screen.
+ *
+ * Note that SVG supports *curves*, but JetLag does not.  You can instruct
+ * InkScape not to make curves.  If you forget, JetLag will turn your curves
+ * into straight lines.
  */
 export class SvgSystem {
   /** Coordinate of the last point we drew */
@@ -50,17 +47,16 @@ export class SvgSystem {
   private mode = 0;
 
   /**
-   * Construct an object for drawing entities based on an SVG
+   * Construct an object for drawing entities based on an SVG.  The arguments to
+   * actorMaker define a box via its center x, center y, width, and rotation.
+   * You'll probably want a very narrow height.
    *
-   * @param translate       The user-specified top left corner
-   * @param stretch         The requested stretch factors
-   * @param appearanceMaker A callback for making each line's Appearance
-   * @param RoleMaker       A callback for making each line's Role
-   * @param callback        The callback to run on each line once it is created
+   * @param translate   The user-specified top left corner
+   * @param stretch     The requested stretch factors
+   * @param actorMaker  A function for building an actor for each line of the
+   *                    SVG
    */
-  private constructor(private translate: b2Vec2, private appearanceMaker: (body: RigidBodyComponent) => AppearanceComponent,
-    private roleMaker: () => RoleComponent,
-    private callback: (actor: Actor) => void, private userStretch: b2Vec2) { }
+  private constructor(private translate: b2Vec2, private userStretch: b2Vec2, private actorMaker: (cx: number, cy: number, width: number, rotation: number) => void) { }
 
   /**
    * Process an SVG file and go through all of the "path" elements in the
@@ -82,9 +78,12 @@ export class SvgSystem {
    * @param cb       A callback to run on each line segment (Obstacle) that we
    *                 make
    */
-  public static processFile(file: string, x: number, y: number, stretchX: number, stretchY: number, appearanceMaker: (body: RigidBodyComponent) => AppearanceComponent, roleMaker: () => RoleComponent, cb: (actor: Actor) => void) {
-    let svg = new SvgSystem(new b2Vec2(x, y), appearanceMaker, roleMaker, cb, new b2Vec2(stretchX, stretchY));
+  public static processFile(file: string, x: number, y: number, stretchX: number, stretchY: number, actorMaker: (cx: number, cy: number, width: number, rotation: number) => void) {
+    let svg = new SvgSystem(new b2Vec2(x, y), new b2Vec2(stretchX, stretchY), actorMaker);
     // send the request.  On completion, we'll be in onFileLoaded
+    //
+    // TODO:  Capacitor and Electron might require a different way of getting
+    //        the SVG file...
     let xhr = new XMLHttpRequest();
     xhr.addEventListener("load", (aa: ProgressEvent) => svg.onFileLoaded(aa));
     xhr.open("GET", stage.config.resourcePrefix + file, true);
@@ -101,7 +100,8 @@ export class SvgSystem {
   private onFileLoaded(event: ProgressEvent) {
     let file_contents = (event.currentTarget as XMLHttpRequest).response;
     let dp = new DOMParser();
-    let doc = dp.parseFromString(file_contents, "text/xml"); // consider "image/svg+xml" to get an SVGDocument instead
+    // TODO: consider "image/svg+xml" to get an SVGDocument instead
+    let doc = dp.parseFromString(file_contents, "text/xml");
     let gs = doc.getElementsByTagName("g");
     for (let i = 0; i < gs.length; ++i) {
       let g = gs[i];
@@ -292,22 +292,8 @@ export class SvgSystem {
     let centerX = (x1 + x2) / 2;
     let centerY = (y1 + y2) / 2;
     let len = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-    // Make an obstacle and rotate it
-    let cfg = { box: true, cx: centerX, cy: centerY, width: len, height: 0.05, img: "" };
-    let body = RigidBodyComponent.Box(cfg, stage.world)
-    let a = Actor.Make({
-      appearance: this.appearanceMaker(body),
-      rigidBody: body,
-      // TODO: is this the right approach?  Should we have a MovementMaker?
-      movement: new InertMovement(),
-      // TODO: is this the right approach?  Should we have a RoleMaker?
-      role: this.roleMaker(),
-    });
-    let transform = new b2Transform();
-    transform.SetPositionAngle(new b2Vec2(centerX, centerY), Math.atan2(y2 - y1, x2 - x1));
-    a.rigidBody?.body.SetTransform(transform);
-    // let the game code modify this line segment
-    if (this.callback) this.callback(a);
+    let rot = Math.atan2(y2 - y1, x2 - x1);
+    this.actorMaker(centerX, centerY, len, rot);
   }
 
   /**

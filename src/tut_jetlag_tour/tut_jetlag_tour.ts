@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { Config } from "../jetlag/Config";
+import { GameConfig } from "../jetlag/Config";
 import { FilledSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -15,7 +15,7 @@ import { TimedEvent } from "../jetlag/Systems/Timer";
 import * as Helpers from "../demo_game/helpers";
 
 /** Configuration information for the tut_jetlag_tour game */
-export class GameConfig implements Config {
+export class TutJetlagTour implements GameConfig {
     // Standard screen dimensions and scaling
     pixelMeterRatio = 100;
     screenDimensions = { width: 1600, height: 900 };
@@ -180,4 +180,4 @@ function tut_jetlag_tour(level: number) {
 
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new GameConfig());
+initializeAndLaunch("game-player", new TutJetlagTour());
