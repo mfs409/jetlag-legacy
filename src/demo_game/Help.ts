@@ -37,7 +37,7 @@ export function buildHelpScreen(index: number) {
     // gravitational forces
 
     // Light blue background
-    stage.backgroundColor = 0x19698e;
+    stage.backgroundColor = "#19698e";
 
     // put some information and pictures on the screen
     Helpers.makeText(stage.world,
@@ -124,7 +124,7 @@ export function buildHelpScreen(index: number) {
   // Our second help scene is just here to show that it is possible to have more than one help scene.
   else if (index == 2) {
     // This is just like the previous screen, but with different text
-    stage.backgroundColor = 0x19698e;
+    stage.backgroundColor = "#19698e";
     Helpers.makeText(stage.world,
       { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "Read, Write, Play");

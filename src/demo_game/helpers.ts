@@ -1,5 +1,3 @@
-// TODO: Code Review
-
 import { b2BodyType, b2Vec2 } from "@box2d/core";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Scene } from "../jetlag/Entities/Scene";

@@ -1,7 +1,7 @@
 // TODO: Populate this with instructions on how to get started making a tutorial
 
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { Config } from "../jetlag/Config";
+import { GameConfig } from "../jetlag/Config";
 import { FilledSprite } from "../jetlag/Components/Appearance";
 import { TiltMovement } from "../jetlag/Components/Movement";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
@@ -15,7 +15,7 @@ import { GridSystem } from "../jetlag/Systems/GridSystem";
  * GameConfig stores things like screen dimensions and other game configuration,
  * as well as the names of all the assets (images and sounds) used by this game.
  */
-export class EmptyGameConfig implements Config {
+export class EmptyGameConfig implements GameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;
@@ -41,9 +41,6 @@ export class EmptyGameConfig implements Config {
 
     // Images that we use for buttons in the Splash and Chooser
     "left_arrow.png", "right_arrow.png", "back_arrow.png", "level_tile.png", "audio_on.png", "audio_off.png",
-
-    // Some raw colors
-    "black.png", "red.png", // TODO: stop needing these!
 
     // Background images for OverlayScenes
     "msg2.png", "fade.png",
@@ -94,7 +91,7 @@ export function build_game(_level: number) {
   // Draw a grid on the screen, to help us think about the positions of actors
   GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
-  stage.world.tilt!.tiltMax.Set(10, 10);
+  stage.tilt!.tiltMax.Set(10, 10);
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
@@ -104,7 +101,7 @@ export function build_game(_level: number) {
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  stage.world.tilt!.tiltVelocityOverride = false;
+  stage.tilt!.tiltVelocityOverride = false;
 
   Actor.Make({
     rigidBody: RigidBodyComponent.Box({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),

@@ -31,9 +31,6 @@ export class DemoGameConfig implements GameConfig {
     // Images that we use for buttons in the Splash and Chooser
     "left_arrow.png", "right_arrow.png", "back_arrow.png", "level_tile.png", "audio_on.png", "audio_off.png",
 
-    // Some raw colors
-    "black.png", "red.png", // TODO: stop needing these!
-
     // Background images for OverlayScenes
     "msg2.png", "fade.png",
 

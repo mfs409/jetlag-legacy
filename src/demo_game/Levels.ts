@@ -1985,7 +1985,7 @@ export function buildLevelScreen(level: number) {
     stage.world.camera.setCameraFocus(h);
 
     // Paint the background blue
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
 
     // put in a picture that auto-tiles, and that moves with velocity "0"
     // relative to the movement of the hero (on whom the camera focuses).  This
@@ -2068,7 +2068,7 @@ export function buildLevelScreen(level: number) {
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
 
     // set up our background again, but add a few more layers
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
 
     // this layer has a scroll factor of 0... it won't move
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
@@ -2120,7 +2120,7 @@ export function buildLevelScreen(level: number) {
     // soon as you land.
     Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, Helpers.jumpAction(h, 0, -10, 9000));
     // set up the backgrounds
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 0, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // if the hero jumps over the destination, we have a problem. To fix
@@ -2167,7 +2167,7 @@ export function buildLevelScreen(level: number) {
     (h.movement as ExplicitMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h, 6, 0);
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 10.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // Now we'll say that the destination is as high as the screen, so reaching
@@ -2236,7 +2236,7 @@ export function buildLevelScreen(level: number) {
     });
 
     stage.score.setVictoryDestination(1);
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // let's draw an enemy, just in case anyone wants to try to go to the bottom
@@ -2281,7 +2281,7 @@ export function buildLevelScreen(level: number) {
     });
 
     stage.score.setVictoryDestination(1);
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -2425,7 +2425,7 @@ export function buildLevelScreen(level: number) {
     });
 
     stage.score.setVictoryDestination(1);
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // place a speed-up obstacle that lasts for 2 seconds
@@ -2492,7 +2492,7 @@ export function buildLevelScreen(level: number) {
 
     // set up vertical scrolling backgrounds.  I was lazy and didn't make
     // anything that looks even halfway good.
-    stage.backgroundColor = 0xff00ff;
+    stage.backgroundColor = "#ff00ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1, isHorizontal: false });
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0, isHorizontal: false });
     stage.background.addLayer({ cx: 8, cy: 6.4, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: 0.5, isHorizontal: false });
@@ -3074,7 +3074,7 @@ export function buildLevelScreen(level: number) {
     Helpers.enableTilt(10, 0);
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // The hero must reach this destination
@@ -5009,7 +5009,7 @@ export function buildLevelScreen(level: number) {
     stage.world.camera.setBounds(0, 0, 64, 9);
 
     // set up the background
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // draw a turbo boost button that covers the whole screen... make sure its
@@ -5052,7 +5052,7 @@ export function buildLevelScreen(level: number) {
     stage.world.camera.setCameraFocus(h, 5, 0);
     stage.world.camera.setBounds(0, 0, 64, 9);
 
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // This control has a dampening effect, so that on release, the hero
@@ -5720,7 +5720,7 @@ export function buildLevelScreen(level: number) {
     );
 
     // set up our background, with a few layers
-    stage.backgroundColor = 0x17b4ff;
+    stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { appearance: new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
 

@@ -1,30 +1,32 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { GameConfig } from "../jetlag/Config";
-import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { FilledSprite, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
 import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
-import { ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
-import { Destination, Goodie, Hero, Obstacle, Passive } from "../jetlag/Components/Role";
+import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
+import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Scene } from "../jetlag/Entities/Scene";
-import { ImgConfigOpts, BoxCfgOpts, TxtConfigOpts } from "../jetlag/Config";
-import { buildSplashScreen } from "../demo_game/Splash";
+import { KeyCodes } from "../jetlag/Services/Keyboard";
 
 /**
- * GameConfig stores things like screen dimensions and other game configuration,
- * as well as the names of all the assets (images and sounds) used by this game.
+ * TutMazeGameConfig stores configuration information for the Maze Game
+ * tutorial.
  */
 class TutMazeGameConfig implements GameConfig {
-    // It's very unlikely that you'll want to change these next four values.
-    // Hover over them to see what they mean.
+    // We want a landscape game.  The reference layout is 1600x900 pixels, with
+    // each 100 pixels representing a meter
     pixelMeterRatio = 100;
     screenDimensions = { width: 1600, height: 900 };
+    // Resize to fill the screen
     adaptToScreenSize = true;
 
-    // When you deploy your game, you'll want to change all of these
-    canVibrate = true;
+    // This game does not use vibration or accelerometer
+    canVibrate = false;
     forceAccelerometerOff = true;
-    storageKey = "com.me.my_jetlag_game.storage";
+    // This game does not use any local persistent storage
+    storageKey = "";
+    // For now, we're in debug mode, so print console messages and show hitboxes
     hitBoxes = true;
 
     // Here's where we name all the images/sounds/background music files.  You'll
@@ -35,222 +37,612 @@ class TutMazeGameConfig implements GameConfig {
     soundNames = [];
     imageNames = [
         // The non-animated actors in the game
-        "green_ball.png", "mustard_ball.png", "red_ball.png", "blue_ball.png", "purple_ball.png", "grey_ball.png",
-
-        // Some raw colors
-        "black.png", "red.png", // TODO: stop needing these!
-
-        // background noise, and buttons
-        "noise.png", "pause.png",
+        "green_ball.png", "mustard_ball.png", "red_ball.png", "blue_ball.png", "grey_ball.png",
     ];
 
     // The name of the function that builds the initial screen of the game
     gameBuilder = tut_maze_game;
 }
 
-
 /**
- * buildSplashScreen is used to draw the scene that we see when the game starts.
- * In our case, it's just a menu.  The splash screen is mostly just branding: it
- * usually just has a big logo and then buttons for going to the level chooser,
- * the store, and the help scenes.  On a phone, it should also have a button for
- * quitting the app.
+ * tut_maze_game builds the different levels of our "maze game" tutorial
  *
- * There is usually only one splash screen, but JetLag allows for many, so there
- * is an index parameter.  In this code, we just ignore the index.
- *
- * @param level Which splash screen should be displayed
+ * @param level level of the tutorial should be built?
  */
 function tut_maze_game(level: number) {
-    if (level == 1) {  // Define the maze layout with walls, a hero, a destination, and a goodie
+    // Level 1 is the final game, without hitboxes, suitable for the start of
+    // the tutorial
+    if (level == 1) {
+        stage.renderer.suppressHitBoxes = true;
+
+        // Define the maze layout with walls, a hero, a destination, and a goodie
         const mazeLayout = [
-            "####################",
-            "#H                 #",
-            "# # ### # # ## # # #",
-            "# #  G  # #      # #",
-            "# # ### ### #      #",
-            "# #   #  G         #",
-            "# # # # #####      #",
-            "#   #     G        #",
-            "####################",
+            "H#G             ",
+            " ####### ##### #",
+            " #     # #G#   #",
+            " # ### # # # # #",
+            " #   #   # # #  ",
+            " #G#G# #   #G# #",
+            " ##### ## ####  ",
+            " #   #   #   ## ",
+            "   #   #   #G#D ",
         ];
 
-        // Create a hero controlled explicitly via special touches
-        let heroCfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+        stage.backgroundColor = "#b3cde0";
+
+        // Draw four walls, covering the four borders of the world
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+
+        // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
-            appearance: new ImageSprite(heroCfg),
-            rigidBody: RigidBodyComponent.Circle(heroCfg, stage.world, { friction: 0.6 }),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
 
-        // Create walls for the maze
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+
+        // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
-                const cell = mazeLayout[row][col];
-                if (cell === "#") {
-                    let wallCfg = { cx: col + 0.5, cy: row + 0.5, width: 1, height: 1, img: "noise.png" };
+                if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: RigidBodyComponent.Box(wallCfg, stage.world, { friction: 1 }),
-                        appearance: new ImageSprite(wallCfg),
-                        movement: new InertMovement(),
+                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
-                } else if (cell === "G") {
-                    const goodieCfg = { cx: col + 0.5, cy: row + 0.5, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+                }
+                else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
-                        appearance: new ImageSprite(goodieCfg),
-                        rigidBody: RigidBodyComponent.Circle(goodieCfg, stage.world),
-                        movement: new InertMovement(),
+                        appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
+                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
                         role: new Goodie(),
                     });
                 }
             }
         }
 
-
-        // Create a destination for the goodie
-        let destCfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        // Create a destination that requires 6 goodies before it works
+        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
             rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
-            role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 1; } }),
-            movement: new InertMovement(),
+            role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
 
+        // Put a message on the screen to help the player along
         Actor.Make({
-            appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.getGoodieCount(0) + " Remaining Goodies"),
-            role: new Passive(),
-            movement: new InertMovement(),
-            rigidBody: RigidBodyComponent.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, stage.hud),
+            appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
+            rigidBody: RigidBodyComponent.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
-        // Draw a joystick on the HUD to control the hero
-        addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
+        // Add an enemy
+        Actor.Make({
+            appearance: new ImageSprite({ width: .8, height: .8, img: "red_ball.png" }),
+            rigidBody: RigidBodyComponent.Circle({ radius: .4, cx: 8.5, cy: .5 }),
+            role: new Enemy(),
+            movement: new PathMovement(new Path().to(8.5, .5).to(8.5, 5.5).to(10.5, 5.5).to(10.5, 2.5).to(10.5, 5.5).to(8.5, 5.5).to(8.5, .5), 3, true)
+        });
 
-        winMessage("Great Job");
+        // When the level is won, put some white text on a black background.
+        // Clicking restarts the level.
+        stage.score.winSceneBuilder = (overlay: Scene) => {
+            Actor.Make({
+                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                gestures: {
+                    tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
+                }
+            });
+            Actor.Make({
+                appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+            });
+        };
 
-        stage.score.onLose = { level: level, builder: buildSplashScreen };
-        stage.score.onWin = { level: level, builder: buildSplashScreen };
+        // When the level is lost, put some white text on a black background.
+        // Clicking restarts the level.
+        stage.score.loseSceneBuilder = (overlay: Scene) => {
+            Actor.Make({
+                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                gestures: {
+                    tap: () => {
+                        stage.clearOverlay();
+                        stage.switchTo(stage.score.onLose.builder, stage.score.onLose.level);
+                        return true;
+                    }
+                }
+            });
+            Actor.Make({
+                appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+            });
+        };
+
+        stage.score.onLose = { level: level, builder: tut_maze_game };
+        stage.score.onWin = { level: level, builder: tut_maze_game };
     }
+
+    // Don't forget: before diving into the code, present the configuration
+    // object, the imports, and the call to the launcher.
+
+    // Level 2 is where we get started, by just having a hero we can move
     else if (level == 2) {
-        makeText(stage.world, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 28, z: 0 }, () => "Nothing here yet...")
-    }
-}
-
-/**
- * This is a standard way of drawing a black screen with some text, to serve as
- * the win screen for the game
- *
- * @param message   The message to display in the middle of the screen
- * @param callback  Code to run when the win message first appears
- */
-function winMessage(message: string, callback?: () => void) {
-    stage.score.winSceneBuilder = (overlay: Scene) => {
-        addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
-            stage.clearOverlay();
-            stage.switchTo(() => { }, 1);
-            return true;
+        // Create a hero whose movement we can control "explicitly"
+        let h = Actor.Make({
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            role: new Hero(),
+            movement: new ExplicitMovement(),
         });
-        makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
-        if (callback) callback();
-    };
-}
 
-/**
- * Draw a touchable region of the screen that acts as a joystick.  As the
- * user performs Pan actions within the region, the actor's velocity should
- * change accordingly.
- *
- * @param scene     Where to draw the joystick
- * @param cfgOpts   An ImgConfig object, for the appearance of the joystick
- * @param actor     The actor to move with this joystick
- * @param scale     A value to use to scale the velocity produced by the
- *                  joystick
- * @param stopOnUp  Should the actor stop when the joystick is released?
- */
-function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
-    let moving = false;
-    function doMove(hudCoords: { x: number; y: number }) {
-        moving = true;
-        (cfg.actor.movement as ExplicitMovement).setAbsoluteVelocity(
-            (cfg.scale ?? 1) * (hudCoords.x - cfgOpts.cx),
-            (cfg.scale ?? 1) * (hudCoords.y - cfgOpts.cy));
-        return true;
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
     }
-    function doStop() {
-        if (!moving) return true;
-        moving = false;
-        if (!!cfg.stopOnUp) {
-            (cfg.actor.movement as ExplicitMovement).setAbsoluteVelocity(0, 0);
-            cfg.actor.rigidBody?.clearRotation();
+    // Level 3 adds a destination and a background color
+    else if (level == 3) {
+        stage.backgroundColor = "#b3cde0";
+
+        // Create a hero whose movement we can control "explicitly"
+        let h = Actor.Make({
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            role: new Hero(),
+            movement: new ExplicitMovement(),
+        });
+
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+
+        // Create a destination
+        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        Actor.Make({
+            appearance: new ImageSprite(destCfg),
+            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            role: new Destination(),
+        });
+        stage.score.setVictoryDestination(1);
+
+        // Win/Lose transitions
+        stage.score.onLose = { level: level, builder: tut_maze_game };
+        stage.score.onWin = { level: level, builder: tut_maze_game };
+    }
+    // Level 4 adds a wall and a goodie, plus borders
+    else if (level == 4) {
+        stage.backgroundColor = "#b3cde0";
+
+        // Draw four walls, covering the four borders of the world
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+
+        // Create a hero whose movement we can control "explicitly"
+        let h = Actor.Make({
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            role: new Hero(),
+            movement: new ExplicitMovement(),
+        });
+
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+
+        Actor.Make({
+            rigidBody: RigidBodyComponent.Box({ cx: 4.5, cy: 4.5, width: 1, height: 1 }, stage.world),
+            appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+            role: new Obstacle(),
+        });
+
+        Actor.Make({
+            appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
+            rigidBody: RigidBodyComponent.Circle({ cx: 6.5, cy: 6.5, radius: 0.25 }, stage.world),
+            role: new Goodie(),
+        });
+
+        // Create a destination
+        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        Actor.Make({
+            appearance: new ImageSprite(destCfg),
+            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            role: new Destination(),
+        });
+        stage.score.setVictoryDestination(1);
+
+        stage.score.onLose = { level: level, builder: tut_maze_game };
+        stage.score.onWin = { level: level, builder: tut_maze_game };
+    }
+    // Level 5 adds a fancy way to make walls and goodies
+    else if (level == 5) {
+        // Define the maze layout with walls, a hero, a destination, and a goodie
+        const mazeLayout = [
+            "H#G             ",
+            " ####### ##### #",
+            " #     # #G#   #",
+            " # ### # # # # #",
+            " #   #   # # #  ",
+            " #G#G# #   #G# #",
+            " ##### ## ####  ",
+            " #   #   #   ## ",
+            "   #   #   #G#D ",
+        ];
+
+        stage.backgroundColor = "#b3cde0";
+
+        // Draw four walls, covering the four borders of the world
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+
+        // Create a hero whose movement we can control "explicitly"
+        let h = Actor.Make({
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            role: new Hero(),
+            movement: new ExplicitMovement(),
+        });
+
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+
+        // Create walls and goodies from the `mazeLayout`
+        for (let row = 0; row < mazeLayout.length; row++) {
+            for (let col = 0; col < mazeLayout[row].length; col++) {
+                if (mazeLayout[row][col] === "#") {
+                    Actor.Make({
+                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        role: new Obstacle(),
+                    });
+                }
+                else if (mazeLayout[row][col] === "G") {
+                    Actor.Make({
+                        appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
+                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        role: new Goodie(),
+                    });
+                }
+            }
         }
-        return true;
+
+        // Create a destination
+        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        Actor.Make({
+            appearance: new ImageSprite(destCfg),
+            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            role: new Destination(),
+        });
+        stage.score.setVictoryDestination(1);
+
+        stage.score.onLose = { level: level, builder: tut_maze_game };
+        stage.score.onWin = { level: level, builder: tut_maze_game };
     }
-    return addPanCallbackControl(scene, cfgOpts, doMove, doMove, doStop);
-}
+    // Level 6 "Activates" the destination and adds some helpful text
+    else if (level == 6) {
+        // Define the maze layout with walls, a hero, a destination, and a goodie
+        const mazeLayout = [
+            "H#G             ",
+            " ####### ##### #",
+            " #     # #G#   #",
+            " # ### # # # # #",
+            " #   #   # # #  ",
+            " #G#G# #   #G# #",
+            " ##### ## ####  ",
+            " #   #   #   ## ",
+            "   #   #   #G#D ",
+        ];
 
-/**
- * Add a control that runs custom code when pressed, on any finger movement, and
- * when released
- *
- * @param scene     The scene where the control should be drawn
- * @param cfg       Configuration for an image and a box
- * @param panStart  The action to perform when the pan event starts
- * @param panMove   The action to perform when the finger moves
- * @param panStop   The action to perform when the pan event stops
- */
-function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
-    // TODO: it's probably not worth having this helper function
-    let c = Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: RigidBodyComponent.Box(cfg, scene),
-        movement: new InertMovement(),
-        role: new Passive(),
-    });
-    c.gestures = { panStart, panMove, panStop };
-    return c;
-}
+        stage.backgroundColor = "#b3cde0";
 
-/**
- * Add a button that performs an action when clicked.
- *
- * @param scene The scene where the button should go
- * @param cfg   Configuration for an image and a box
- * @param tap   The code to run in response to a tap
- */
-function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coords: { x: number; y: number }) => boolean) {
-    // TODO: we'd have more flexibility if we passed in an appearance, or just got
-    // rid of this, but we use it too much for that refactor to be worthwhile.
-    let c = Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: RigidBodyComponent.Box(cfg, scene),
-        movement: new InertMovement(),
-        role: new Passive(),
-    });
-    c.gestures = { tap };
-    return c;
-}
+        // Draw four walls, covering the four borders of the world
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
 
-/**
- * Create an Actor whose appearance is text.  Since every Actor needs to have a
- * body, this will create a simple body to accompany the actor.
- *
- * @param scene     The scene where the Text should be made
- * @param cfgOpts   Text configuration options
- * @param producer  A callback for making the text for this Actor
- *
- * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
- */
-function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
-    return Actor.Make({
-        appearance: new TextSprite(cfgOpts, producer),
-        // TODO: the ".1" options are somewhat arbitrary
-        rigidBody: RigidBodyComponent.Box({ cx: cfgOpts.cx, cy: cfgOpts.cy, width: .1, height: .1 }, scene),
-        movement: new InertMovement(),
-        role: new Passive(),
-    });
+        // Create a hero whose movement we can control "explicitly"
+        let h = Actor.Make({
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            role: new Hero(),
+            movement: new ExplicitMovement(),
+        });
+
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+
+        // Create walls and goodies from the `mazeLayout`
+        for (let row = 0; row < mazeLayout.length; row++) {
+            for (let col = 0; col < mazeLayout[row].length; col++) {
+                if (mazeLayout[row][col] === "#") {
+                    Actor.Make({
+                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        role: new Obstacle(),
+                    });
+                }
+                else if (mazeLayout[row][col] === "G") {
+                    Actor.Make({
+                        appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
+                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        role: new Goodie(),
+                    });
+                }
+            }
+        }
+
+        // Create a destination that requires 6 goodies before it works
+        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        Actor.Make({
+            appearance: new ImageSprite(destCfg),
+            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
+        });
+        stage.score.setVictoryDestination(1);
+
+        // Put a message on the screen to help the player along
+        Actor.Make({
+            appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
+            rigidBody: RigidBodyComponent.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+        });
+
+        stage.score.onLose = { level: level, builder: tut_maze_game };
+        stage.score.onWin = { level: level, builder: tut_maze_game };
+    }
+    // Level 7 finishes by adding an enemy and win/lose builders (but leaves on
+    // the hitboxes)
+    else if (level == 7) {
+        // Define the maze layout with walls, a hero, a destination, and a goodie
+        const mazeLayout = [
+            "H#G             ",
+            " ####### ##### #",
+            " #     # #G#   #",
+            " # ### # # # # #",
+            " #   #   # # #  ",
+            " #G#G# #   #G# #",
+            " ##### ## ####  ",
+            " #   #   #   ## ",
+            "   #   #   #G#D ",
+        ];
+
+        stage.backgroundColor = "#b3cde0";
+
+        // Draw four walls, covering the four borders of the world
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+        Actor.Make({
+            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            role: new Obstacle(),
+        });
+
+        // Create a hero whose movement we can control "explicitly"
+        let h = Actor.Make({
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
+            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            role: new Hero(),
+            movement: new ExplicitMovement(),
+        });
+
+        // Set up the keyboard for controlling the hero
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+
+        // Create walls and goodies from the `mazeLayout`
+        for (let row = 0; row < mazeLayout.length; row++) {
+            for (let col = 0; col < mazeLayout[row].length; col++) {
+                if (mazeLayout[row][col] === "#") {
+                    Actor.Make({
+                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        role: new Obstacle(),
+                    });
+                }
+                else if (mazeLayout[row][col] === "G") {
+                    Actor.Make({
+                        appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
+                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        role: new Goodie(),
+                    });
+                }
+            }
+        }
+
+        // Create a destination that requires 6 goodies before it works
+        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        Actor.Make({
+            appearance: new ImageSprite(destCfg),
+            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
+        });
+        stage.score.setVictoryDestination(1);
+
+        // Put a message on the screen to help the player along
+        Actor.Make({
+            appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
+            rigidBody: RigidBodyComponent.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+        });
+
+        // Add an enemy
+        Actor.Make({
+            appearance: new ImageSprite({ width: .8, height: .8, img: "red_ball.png" }),
+            rigidBody: RigidBodyComponent.Circle({ radius: .4, cx: 8.5, cy: .5 }),
+            role: new Enemy(),
+            movement: new PathMovement(new Path().to(8.5, .5).to(8.5, 5.5).to(10.5, 5.5).to(10.5, 2.5).to(10.5, 5.5).to(8.5, 5.5).to(8.5, .5), 3, true)
+        });
+
+        // When the level is won, put some white text on a black background.
+        // Clicking restarts the level.
+        stage.score.winSceneBuilder = (overlay: Scene) => {
+            Actor.Make({
+                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                gestures: {
+                    tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
+                }
+            });
+            Actor.Make({
+                appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+            });
+        };
+
+        // When the level is lost, put some white text on a black background.
+        // Clicking restarts the level.
+        stage.score.loseSceneBuilder = (overlay: Scene) => {
+            Actor.Make({
+                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                gestures: {
+                    tap: () => {
+                        stage.clearOverlay();
+                        stage.switchTo(stage.score.onLose.builder, stage.score.onLose.level);
+                        return true;
+                    }
+                }
+            });
+            Actor.Make({
+                appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
+                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+            });
+        };
+
+        stage.score.onLose = { level: level, builder: tut_maze_game };
+        stage.score.onWin = { level: level, builder: tut_maze_game };
+    }
 }
 
 // call the function that kicks off the game

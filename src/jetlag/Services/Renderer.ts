@@ -36,6 +36,12 @@ export class RendererService {
   public get now() { return this.elapsed; }
 
   /**
+   * When in debug mode, this lets us still disable hitboxes.  It's useful for
+   * tutorials, otherwise not.
+   */
+  public suppressHitBoxes = false;
+
+  /**
    * Initialize the renderer.
    *
    * @param screenWidth   The width of the screen
@@ -75,7 +81,7 @@ export class RendererService {
       stage.render(x);
 
       // Add the debug container
-      if (this.debug) this.main.addChild(this.debug);
+      if (this.debug && !this.suppressHitBoxes) this.main.addChild(this.debug);
 
       // Add the container to the renderer, so it will show on screen
       this.pixi.stage.addChild(this.main);

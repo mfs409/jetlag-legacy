@@ -54,7 +54,7 @@ export class Stage {
   public overlay?: Scene;
 
   /** Background color for the stage being drawn.  Defaults to white */
-  public backgroundColor = 0xffffff;
+  public backgroundColor = "#ffffff";
 
   /** The background layers */
   public background!: ParallaxSystem;
@@ -143,7 +143,7 @@ export class Stage {
     }
 
     // Only set the color and play music if we don't have an overlay showing
-    this.renderer.setFrameColor(this.backgroundColor);
+    this.renderer.setFrameColor(this.backgroundColor as any);
     this.music?.play();
 
     // Update the win/lose countdown timers and the stopwatch.  This might end
@@ -195,7 +195,7 @@ export class Stage {
     this.gestures.reset();
 
     // reset other fields to default values
-    this.backgroundColor = 0xffffff;
+    this.backgroundColor = "#ffffff";
 
     // Just re-make the scenes and systems, instead of clearing the old ones
     this.world = new Scene(this.pixelMeterRatio, new AdvancedCollisionSystem());
