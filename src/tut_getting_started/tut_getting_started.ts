@@ -3,7 +3,7 @@ import { GameConfig } from "../jetlag/Config";
 import { ImageSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
-import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { BoxBody } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
 
@@ -98,7 +98,7 @@ export function tut_getting_started(_index: number) {
     // so this will be behind everything.
     Actor.Make({
         appearance: new ImageSprite({ width: 16, height: 9, img: "splash.png" }),
-        rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
+        rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
         movement: new InertMovement(),
         role: new Passive(),
     });
@@ -128,7 +128,7 @@ export function tut_getting_started(_index: number) {
     let cfg = { box: true, cx: 15, cy: 8, width: 0.75, height: 0.75, img: "audio_off.png" };
     let mute = Actor.Make({
         appearance: new ImageSprite(cfg),
-        rigidBody: RigidBodyComponent.Box(cfg, stage.world),
+        rigidBody: BoxBody.Box(cfg, stage.world),
         movement: new InertMovement(),
         role: new Passive(),
     });

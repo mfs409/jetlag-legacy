@@ -72,7 +72,9 @@ let rebuild = function () {
 
 // Set up chokidar to watch the source folder (where the html file is) and the
 // assets folder.  On any insert/remove/modification, call rebuild()
-var watcher = chokidar.watch([src_folder, src_assets], { ignored: /^\./, persistent: true });
+//
+// TODO: chokidar is choking on src_assets... what can we do about that?
+var watcher = chokidar.watch([src_folder/*, src_assets*/], { ignored: /^\./, persistent: true });
 watcher.on('add', rebuild)
     .on('change', rebuild)
     .on('unlink', rebuild)

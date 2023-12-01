@@ -1,9 +1,9 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { GameConfig } from "../jetlag/Config";
-import { FilledSprite, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
-import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
 import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Scene } from "../jetlag/Entities/Scene";
@@ -72,30 +72,30 @@ function tut_maze_game(level: number) {
 
         // Draw four walls, covering the four borders of the world
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
 
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -115,15 +115,15 @@ function tut_maze_game(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
-                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        rigidBody: BoxBody.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
                 }
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: CircleBody.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
                         role: new Goodie(),
                     });
                 }
@@ -134,7 +134,7 @@ function tut_maze_game(level: number) {
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
-            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            rigidBody: CircleBody.Circle(destCfg, stage.world),
             role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
@@ -142,13 +142,13 @@ function tut_maze_game(level: number) {
         // Put a message on the screen to help the player along
         Actor.Make({
             appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
-            rigidBody: RigidBodyComponent.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+            rigidBody: BoxBody.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
         // Add an enemy
         Actor.Make({
             appearance: new ImageSprite({ width: .8, height: .8, img: "red_ball.png" }),
-            rigidBody: RigidBodyComponent.Circle({ radius: .4, cx: 8.5, cy: .5 }),
+            rigidBody: CircleBody.Circle({ radius: .4, cx: 8.5, cy: .5 }),
             role: new Enemy(),
             movement: new PathMovement(new Path().to(8.5, .5).to(8.5, 5.5).to(10.5, 5.5).to(10.5, 2.5).to(10.5, 5.5).to(8.5, 5.5).to(8.5, .5), 3, true)
         });
@@ -157,15 +157,15 @@ function tut_maze_game(level: number) {
         // Clicking restarts the level.
         stage.score.winSceneBuilder = (overlay: Scene) => {
             Actor.Make({
-                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
                 gestures: {
                     tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
                 }
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
             });
         };
 
@@ -173,8 +173,8 @@ function tut_maze_game(level: number) {
         // Clicking restarts the level.
         stage.score.loseSceneBuilder = (overlay: Scene) => {
             Actor.Make({
-                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
                 gestures: {
                     tap: () => {
                         stage.clearOverlay();
@@ -185,7 +185,7 @@ function tut_maze_game(level: number) {
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
             });
         };
 
@@ -201,7 +201,7 @@ function tut_maze_game(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -223,7 +223,7 @@ function tut_maze_game(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -242,7 +242,7 @@ function tut_maze_game(level: number) {
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
-            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            rigidBody: CircleBody.Circle(destCfg, stage.world),
             role: new Destination(),
         });
         stage.score.setVictoryDestination(1);
@@ -257,30 +257,30 @@ function tut_maze_game(level: number) {
 
         // Draw four walls, covering the four borders of the world
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
 
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -296,14 +296,14 @@ function tut_maze_game(level: number) {
         stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
 
         Actor.Make({
-            rigidBody: RigidBodyComponent.Box({ cx: 4.5, cy: 4.5, width: 1, height: 1 }, stage.world),
-            appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+            rigidBody: BoxBody.Box({ cx: 4.5, cy: 4.5, width: 1, height: 1 }, stage.world),
+            appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
             role: new Obstacle(),
         });
 
         Actor.Make({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-            rigidBody: RigidBodyComponent.Circle({ cx: 6.5, cy: 6.5, radius: 0.25 }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: 6.5, cy: 6.5, radius: 0.25 }, stage.world),
             role: new Goodie(),
         });
 
@@ -311,7 +311,7 @@ function tut_maze_game(level: number) {
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
-            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            rigidBody: CircleBody.Circle(destCfg, stage.world),
             role: new Destination(),
         });
         stage.score.setVictoryDestination(1);
@@ -338,30 +338,30 @@ function tut_maze_game(level: number) {
 
         // Draw four walls, covering the four borders of the world
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
 
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -381,15 +381,15 @@ function tut_maze_game(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
-                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        rigidBody: BoxBody.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
                 }
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: CircleBody.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
                         role: new Goodie(),
                     });
                 }
@@ -400,7 +400,7 @@ function tut_maze_game(level: number) {
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
-            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            rigidBody: CircleBody.Circle(destCfg, stage.world),
             role: new Destination(),
         });
         stage.score.setVictoryDestination(1);
@@ -427,30 +427,30 @@ function tut_maze_game(level: number) {
 
         // Draw four walls, covering the four borders of the world
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
 
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -470,15 +470,15 @@ function tut_maze_game(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
-                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        rigidBody: BoxBody.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
                 }
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: CircleBody.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
                         role: new Goodie(),
                     });
                 }
@@ -489,7 +489,7 @@ function tut_maze_game(level: number) {
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
-            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            rigidBody: CircleBody.Circle(destCfg, stage.world),
             role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
@@ -497,7 +497,7 @@ function tut_maze_game(level: number) {
         // Put a message on the screen to help the player along
         Actor.Make({
             appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
-            rigidBody: RigidBodyComponent.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+            rigidBody: BoxBody.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
         stage.score.onLose = { level: level, builder: tut_maze_game };
@@ -523,30 +523,30 @@ function tut_maze_game(level: number) {
 
         // Draw four walls, covering the four borders of the world
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: -.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+            appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 8, cy: 9.05, width: 16, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
         Actor.Make({
-            appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: RigidBodyComponent.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+            appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+            rigidBody: BoxBody.Box({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
 
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: RigidBodyComponent.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: CircleBody.Circle({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
             movement: new ExplicitMovement(),
         });
@@ -566,15 +566,15 @@ function tut_maze_game(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: RigidBodyComponent.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
-                        appearance: FilledSprite.Box({ width: 1, height: 1, fillColor: "#6497b1" }),
+                        rigidBody: BoxBody.Box({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
                 }
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: RigidBodyComponent.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: CircleBody.Circle({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
                         role: new Goodie(),
                     });
                 }
@@ -585,7 +585,7 @@ function tut_maze_game(level: number) {
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
             appearance: new ImageSprite(destCfg),
-            rigidBody: RigidBodyComponent.Circle(destCfg, stage.world),
+            rigidBody: CircleBody.Circle(destCfg, stage.world),
             role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
@@ -593,13 +593,13 @@ function tut_maze_game(level: number) {
         // Put a message on the screen to help the player along
         Actor.Make({
             appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
-            rigidBody: RigidBodyComponent.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+            rigidBody: BoxBody.Box({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
         // Add an enemy
         Actor.Make({
             appearance: new ImageSprite({ width: .8, height: .8, img: "red_ball.png" }),
-            rigidBody: RigidBodyComponent.Circle({ radius: .4, cx: 8.5, cy: .5 }),
+            rigidBody: CircleBody.Circle({ radius: .4, cx: 8.5, cy: .5 }),
             role: new Enemy(),
             movement: new PathMovement(new Path().to(8.5, .5).to(8.5, 5.5).to(10.5, 5.5).to(10.5, 2.5).to(10.5, 5.5).to(8.5, 5.5).to(8.5, .5), 3, true)
         });
@@ -608,15 +608,15 @@ function tut_maze_game(level: number) {
         // Clicking restarts the level.
         stage.score.winSceneBuilder = (overlay: Scene) => {
             Actor.Make({
-                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
                 gestures: {
                     tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
                 }
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
             });
         };
 
@@ -624,8 +624,8 @@ function tut_maze_game(level: number) {
         // Clicking restarts the level.
         stage.score.loseSceneBuilder = (overlay: Scene) => {
             Actor.Make({
-                appearance: FilledSprite.Box({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
                 gestures: {
                     tap: () => {
                         stage.clearOverlay();
@@ -636,7 +636,7 @@ function tut_maze_game(level: number) {
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
-                rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
             });
         };
 

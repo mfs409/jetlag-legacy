@@ -1,8 +1,8 @@
 import { Application, Container, Graphics, BlurFilter, NoiseFilter } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
 import { stage } from "../Stage";
-import { AppearanceComponent, FilledBoxConfig, FilledCircleConfig, FilledPolygonConfig, FilledSprite, } from "../Components/Appearance";
-import { RigidBodyComponent, PolygonCfg } from "../Components/RigidBody";
+import { AppearanceComponent, FilledBox, FilledCircle, FilledPolygon } from "../Components/Appearance";
+import { RigidBodyComponent, BoxBody, CircleBody, PolygonBody } from "../Components/RigidBody";
 import { CameraSystem } from "../Systems/Camera";
 import { Sprite, Text } from "./ImageLibrary";
 import { b2Vec2 } from "@box2d/core";
@@ -180,7 +180,7 @@ export class RendererService {
    * @param graphic     The graphic context
    * @param camera      The camera (and by extension, the world)
    */
-  public addFilledSpriteToFrame(appearance: FilledSprite, body: RigidBodyComponent, graphic: Graphics, camera: CameraSystem) {
+  public addFilledSpriteToFrame(appearance: FilledBox | FilledCircle | FilledPolygon, body: RigidBodyComponent, graphic: Graphics, camera: CameraSystem) {
     graphic.clear();
     // If the actor isn't on screen, skip it
     if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
@@ -188,27 +188,27 @@ export class RendererService {
     let s = camera.getScale();
     let x = s * (body.getCenter().x - camera.getLeft());
     let y = s * (body.getCenter().y - camera.getTop());
-    if (appearance.props.lineWidth && appearance.props.lineColor)
-      graphic.lineStyle(appearance.props.lineWidth, appearance.props.lineColor);
-    if (appearance.props.fillColor)
-      graphic.beginFill(appearance.props.fillColor);
-    if (appearance.props instanceof FilledBoxConfig) {
-      let w = s * appearance.props.w;
-      let h = s * appearance.props.h;
+    if (appearance.lineWidth && appearance.lineColor)
+      graphic.lineStyle(appearance.lineWidth, appearance.lineColor);
+    if (appearance.fillColor)
+      graphic.beginFill(appearance.fillColor);
+    if (appearance instanceof FilledBox) {
+      let w = s * appearance.width;
+      let h = s * appearance.height;
       graphic.drawRect(x, y, w, h);
       graphic.position.set(x, y);
       graphic.pivot.set(x + w / 2, y + h / 2);
       graphic.rotation = body.getRotation();
     }
-    else if (appearance.props instanceof FilledCircleConfig) {
-      let radius = s * appearance.props.radius;
+    else if (appearance instanceof FilledCircle) {
+      let radius = s * appearance.radius;
       graphic.drawCircle(x, y, radius);
     }
-    else if (appearance.props instanceof FilledPolygonConfig) {
+    else if (appearance instanceof FilledPolygon) {
       // For polygons, we need to translate the points (they are 0-relative in
       // Box2d, we need them to be relative to (x,y))
       let pts: number[] = [];
-      for (let pt of appearance.props.vertices) {
+      for (let pt of appearance.vertices) {
         pts.push(s * pt.x + x);
         pts.push(s * pt.y + y);
       }
@@ -221,7 +221,7 @@ export class RendererService {
       graphic.rotation = body.getRotation();
     }
     else {
-      throw "Error: unrecognized FilledSprite props type"
+      throw "Error: unrecognized FilledSprite?"
     }
     this.main.addChild(graphic);
 
@@ -250,8 +250,8 @@ export class RendererService {
 
     // Add the sprite
     sprite.setAnchoredPosition(0.5, 0.5, x, y); // (.5, .5) == anchor at center
-    sprite.sprite.width = s * appearance.props.w;
-    sprite.sprite.height = s * appearance.props.h;
+    sprite.sprite.width = s * appearance.width;
+    sprite.sprite.height = s * appearance.height;
     sprite.sprite.rotation = body.getRotation();
     this.main.addChild(sprite.sprite);
 
@@ -271,15 +271,15 @@ export class RendererService {
     let r = body.getRotation();
     let x = s * (body.getCenter().x - camera.getLeft());
     let y = s * (body.getCenter().y - camera.getTop());
-    let w = s * body.props.w;
-    let h = s * body.props.h;
-    if (!this.debug) return;
-    if (body.isBox())
+    let w = s * body.w;
+    let h = s * body.h;
+    if (!this.debug || !body.debug) return;
+    if (body instanceof BoxBody)
       this.drawDebugBox(x, y, w, h, r, body.debug.shape, 0x00ff00);
-    else if (body.isCircle())
+    else if (body instanceof CircleBody)
       this.drawDebugCircle(x, y, body.radius * s, r, body.debug.shape, body.debug.line, 0x0000ff);
-    else if (body.isPolygon())
-      this.drawDebugPoly(x, y, r, s, (body.props as PolygonCfg).vertArray, body.debug.shape);
+    else if (body instanceof PolygonBody)
+      this.drawDebugPoly(x, y, r, s, body.vertArray, body.debug.shape);
   }
 
   /**
@@ -294,15 +294,15 @@ export class RendererService {
    */
   public addPictureToFrame(anchor: { cx: number, cy: number }, appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem) {
     // If the picture isn't on screen, skip it
-    let radius = Math.sqrt(Math.pow(appearance.props.w / 2, 2) + Math.pow(appearance.props.h / 2, 2))
+    let radius = Math.sqrt(Math.pow(appearance.width / 2, 2) + Math.pow(appearance.height / 2, 2))
     if (!camera.inBounds(anchor.cx, anchor.cy, radius)) return;
 
     // Convert from meters to pixels
     let s = camera.getScale();
     let x = s * (anchor.cx - camera.getLeft());
     let y = s * (anchor.cy - camera.getTop());
-    let w = s * appearance.props.w;
-    let h = s * appearance.props.h;
+    let w = s * appearance.width;
+    let h = s * appearance.height;
 
     // Put it on screen
     sprite.setAnchoredPosition(0.5, 0.5, x, y); // (.5, .5) == anchor at center

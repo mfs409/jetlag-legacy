@@ -236,7 +236,7 @@ export class CameraSystem {
    * @param actor The actor to add
    */
   addEntity(actor: Actor) {
-    this.actors[actor.appearance.props.z + 2].push(actor);
+    this.actors[actor.appearance.z + 2].push(actor);
   }
 
   /**
@@ -245,7 +245,7 @@ export class CameraSystem {
    * @param actor The actor to remove
    */
   removeEntity(actor: Actor) {
-    let z = actor.appearance.props.z
+    let z = actor.appearance.z
     let i = this.actors[z + 2].indexOf(actor);
     this.actors[z + 2].splice(i, 1);
   }

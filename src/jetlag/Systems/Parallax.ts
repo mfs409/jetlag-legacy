@@ -23,7 +23,7 @@ class ParallaxLayer {
    *
    * @param anchor        A reference point for where one tile of the
    *                      defaultImage will be placed.
-   * @param defaultImage  An ImageSprite or AnimatedSprite that will be cloned
+   * @param imageMaker  An ImageSprite or AnimatedSprite that will be cloned
    *                      in order to produce enough images to achieve a good
    *                      scrolling effect.
    * @param speed         Speed at which it scrolls.  Important values are 0, 1,
@@ -31,19 +31,21 @@ class ParallaxLayer {
    * @param isHorizontal  True for X scrolling, false for Y scrolling
    * @param isAuto        True if this should scroll regardless of the camera
    */
-  constructor(anchor: { cx: number, cy: number }, defaultImage: ImageSprite | AnimatedSprite, private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
-    this.last.Set(anchor.cx - defaultImage.props.w / 2, anchor.cy - defaultImage.props.h / 2);
+  constructor(anchor: { cx: number, cy: number }, imageMaker: () => (ImageSprite | AnimatedSprite), private speed: number, private isHorizontal: boolean, private isAuto: boolean) {
+    let firstImage = imageMaker();
+    this.images.push(firstImage);
+    this.last.Set(anchor.cx - firstImage.width / 2, anchor.cy - firstImage.height / 2);
     // figure out how many sprites we need to properly tile the image
     let num = 1;
     if (this.isHorizontal) {
       let screenWidthMeters = stage.screenWidth / stage.pixelMeterRatio;
-      num += Math.ceil(screenWidthMeters / defaultImage.props.w);
+      num += Math.ceil(screenWidthMeters / firstImage.width);
     } else {
       let screenHeightMeters = stage.screenHeight / stage.pixelMeterRatio;
-      num += Math.ceil(screenHeightMeters / defaultImage.props.h);
+      num += Math.ceil(screenHeightMeters / firstImage.height);
     }
-    for (let i = 0; i < num; ++i)
-      this.images.push(defaultImage.clone());
+    for (let i = 1; i < num; ++i)
+      this.images.push(imageMaker());
   }
 
   /**
@@ -105,12 +107,12 @@ class ParallaxLayer {
     // Normalize the reference tile
     // TODO: Do this without a while loop
     if (this.isHorizontal) {
-      let w = this.images[0].props.w;
+      let w = this.images[0].width;
       while (this.last.x > x + camW) this.last.x -= w;
       while (this.last.x + w < x) this.last.x += w;
       while (this.last.x > x) this.last.x -= w;
     } else {
-      let h = this.images[0].props.h;
+      let h = this.images[0].height;
       while (this.last.y > y + camH) this.last.y -= h;
       while (this.last.y + h < y) this.last.y += h;
       while (this.last.y > y) this.last.y -= h;
@@ -136,10 +138,10 @@ class ParallaxLayer {
       let i = 0;
       let plx = this.last.x;
       while (plx < x + camW) {
-        let cx = plx + this.images[i].props.w / 2;
-        let cy = this.last.y + this.images[i].props.h / 2;
+        let cx = plx + this.images[i].width / 2;
+        let cy = this.last.y + this.images[i].height / 2;
         this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs);
-        plx += this.images[i].props.w;
+        plx += this.images[i].width;
         i++;
       }
     }
@@ -147,10 +149,10 @@ class ParallaxLayer {
       let i = 0;
       let ply = this.last.y;
       while (ply < y + camH) {
-        let cx = this.last.x + this.images[i].props.w / 2;
-        let cy = ply + this.images[i].props.h / 2;;
+        let cx = this.last.x + this.images[i].width / 2;
+        let cy = ply + this.images[i].height / 2;;
         this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs);
-        ply += this.images[i].props.h;
+        ply += this.images[i].height;
         i++;
       }
     }
@@ -181,8 +183,8 @@ export class ParallaxSystem {
    * @param isAuto        Should the image scroll automatically, or in relation
    *                      to the camera position?
    */
-  public addLayer(anchor: { cx: number, cy: number }, cfg: { appearance: ImageSprite | AnimatedSprite, speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
-    this.layers.push(new ParallaxLayer(anchor, cfg.appearance, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
+  public addLayer(anchor: { cx: number, cy: number }, cfg: { imageMaker: () => (ImageSprite | AnimatedSprite), speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
+    this.layers.push(new ParallaxLayer(anchor, cfg.imageMaker, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
   }
 
   /**

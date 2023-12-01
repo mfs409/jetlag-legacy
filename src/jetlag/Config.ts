@@ -1,104 +1,11 @@
 import { Sprite } from "./Services/ImageLibrary";
 import { stage } from "./Stage";
 
-// TODO:  It seems that once `helpers.ts` goes away, we won't need these
-//        interfaces anymore, and can use the classes directly
-
-/**
- * ImgConfigOpts expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation is a single image.
- */
-export interface ImgConfigOpts {
-  /** Z index of the image: Must be in the range [-2, 2] */
-  z?: number;
-  /** Width of the image */
-  width: number;
-  /** Height of the image */
-  height: number;
-  /** The name of the image to use for this actor. */
-  img: string;
-}
-
-/**
- * FilledBoxConfigOpts expresses the required and optional fields that a
- * programmer should provide to JetLag in order to create an entity whose visual
- * representation is a solid rectangle.
- */
-export interface FilledBoxConfigOpts {
-  /** Z index of the box: Must be in the range [-2, 2] */
-  z?: number;
-  /** Width of the box */
-  width: number;
-  /** Height of the box */
-  height: number;
-  /** Line width */
-  lineWidth?: number;
-  /** Line color */
-  lineColor?: string;
-  /** Fill color */
-  fillColor?: string;
-}
-
-/**
- * FilledCircleConfigOpts expresses the required and optional fields that a
- * programmer should provide to JetLag in order to create an entity whose visual
- * representation is a solid circle.
- */
-export interface FilledCircleConfigOpts {
-  /** Z index of the circle: Must be in the range [-2, 2] */
-  z?: number;
-  /** Radius of the circle */
-  radius: number;
-  /** Line width */
-  lineWidth?: number;
-  /** Line color */
-  lineColor?: string;
-  /** Fill color */
-  fillColor?: string;
-}
-
-/**
- * FilledPolygonConfigOpts expresses the required and optional fields that a
- * programmer should provide to JetLag in order to create an entity whose visual
- * representation is a solid polygon.
- */
-export interface FilledPolygonConfigOpts {
-  /** Z index of the polygon: Must be in the range [-2, 2] */
-  z?: number;
-  /** Vertices of the polygon */
-  vertices: number[];
-  /** Line width */
-  lineWidth?: number;
-  /** Line color */
-  lineColor?: string;
-  /** Fill color */
-  fillColor?: string;
-}
-
-/**
- * TxtConfigOpts expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation is some text.
- */
-export interface TxtConfigOpts {
-  /** Z index of the image: Must be in the range [-2, 2] */
-  z?: number;
-  /** Should the text be centered at (cx,cy) (true) or is (cx,cy) top-left (false) */
-  center: boolean;
-  /** Font to use */
-  face: string;
-  /** Color for the text */
-  color: string;
-  /** Font size */
-  size: number;
-}
-
 /**
  * The different ActorState combinations for which we might have an animation
  *
- * NB:  JetLag supports a very broad set of possible states.  In many games,
- *      most of these won't be useful.
+ * NB:  JetLag supports a broad set of possible states.  In many games, most of
+ *      these won't be useful.
  */
 export const enum AnimationState {
   // Stationary
@@ -121,82 +28,6 @@ export const enum AnimationState {
   CRAWL_IDLE_N, CRAWL_IDLE_NE, CRAWL_IDLE_E, CRAWL_IDLE_SE, CRAWL_IDLE_S, CRAWL_IDLE_SW, CRAWL_IDLE_W, CRAWL_IDLE_NW,
   // Moving + Crawling
   CRAWL_N, CRAWL_NE, CRAWL_E, CRAWL_SE, CRAWL_S, CRAWL_SW, CRAWL_W, CRAWL_NW,
-}
-
-/**
- * AniCfgOpts expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation uses flipbook-style animation.
- */
-export interface AniCfgOpts {
-  /** Z index of the image: Must be in the range [-2, 2] */
-  z?: number;
-  /** Width of the animation */
-  width: number;
-  /** Height of the animation */
-  height: number;
-  /**
-   * The valid animations.  Note that you must include one for IDLE_E, since
-   * that is the default animation
-   */
-  animations: Map<AnimationState, AnimationSequence>
-  /** The disappearance animation */
-  disappear?: AnimationSequence;
-  /** Dimensions for the disappearance animation */
-  disappearDims?: { x: number, y: number };
-  /** Offset of the disappearance animation relative to the actor */
-  disappearOffset?: { x: number, y: number };
-}
-
-/**
- * BoxCfgOpts expresses the required fields that a programmer should provide to
- * JetLag in order to create an entity with a rigid Box body.
- */
-export interface BoxCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Width of the box */
-  width: number;
-  /** Height of the box */
-  height: number;
-}
-
-/**
- * CircleCfgOpts expresses the required fields that a programmer should provide
- * to JetLag in order to create an entity with a rigid Circle body.
- */
-export interface CircleCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Radius of the circle */
-  radius: number;
-}
-
-/**
- * PolygonCfgOpts expresses the required fields that a programmer should provide
- * to JetLag in order to create an entity with a rigid Polygon body.
- *
- * TODO:  Why do we have width and height?  Can't we have a computed radius
- *        instead?
- */
-export interface PolygonCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Width of the box */
-  width: number;
-  /** Height of the box */
-  height: number;
-  /**
-   * Vertices of the body, as a stream of alternating x and y values that are
-   * offsets relative to (cx, cy)
-   */
-  vertices: number[];
 }
 
 /**
@@ -280,54 +111,42 @@ export class GestureHandlers {
 }
 
 /**
- * AdvancedRigidBodyCfgOpts describes advanced, optional configuration
- * properties for any rigid body
- *
- * TODO: Consider using arrays for the rigid/sticky stuff?
+ * For the purpose of stickiness and pass-through surfaces, we treat things as
+ * having four sides, as defined by this enum.
  */
-export interface AdvancedRigidBodyCfgOpts {
+export const enum Sides { TOP, RIGHT, BOTTOM, LEFT }
+
+/**
+ * PhysicsCfg describes provides advanced, but optional, ways of altering the
+ * physical behavior of rigid bodies when they are being constructed.
+ *
+ * <!--
+ * JetLag Developer Note: We replicate the documentation for PhysicsCfg in many
+ * places. Please take care when adding to PhysicsCfg, so that the documentation
+ * does not become stale.
+ * -->
+ */
+export interface PhysicsCfg {
   /** The density of the body */
   density?: number;
   /** The elasticity of the body */
   elasticity?: number;
   /** The friction of the body */
   friction?: number;
-
   /** Should rotation be disabled? */
   disableRotation?: boolean;
-
   /** Do collisions happen, or do other bodies glide through this? */
   collisionsEnabled?: boolean;
-
-  /** When entities touch the top of this, do they stick? */
-  topSticky?: boolean;
-  /** When entities touch the bottom of this, do they stick? */
-  bottomSticky?: boolean;
-  /** When entities touch the left side of this, do they stick? */
-  leftSticky?: boolean;
-  /** When entities touch the right side of this, do they stick? */
-  rightSticky?: boolean;
-  /** 
-   * When an entity *stops* sticking to this, how long before it can stick
-   * again? 
-   */
+  /** Which sides of the body are sticky, if any? */
+  stickySides?: Sides[];
+  /** Delay after something stops sticking, before it can stick again */
   stickyDelay?: number;
-
-  /** Is the top the only hard surface of this body */
-  topRigidOnly?: boolean;
-  /** Is the bottom the only hard surface of this body */
-  bottomRigidOnly?: boolean;
-  /** Is the left side the only hard surface of this body */
-  leftRigidOnly?: boolean;
-  /** Is the right side the only hard surface of this body */
-  rightRigidOnly?: boolean;
-
+  /** Are collisions only valid from one direction? */
+  singleRigidSide?: Sides;
   /** Entities with a matching nonzero Id don't collide with each other */
   passThroughId?: number;
-
   /** The speed at which to rotate, in rotations per second */
   rotationSpeed?: number;
-
   /** Should the body be forced to be dynamic? */
   dynamic?: boolean;
 }
@@ -376,5 +195,6 @@ export interface GameConfig {
   readonly forceAccelerometerOff: boolean;
 
   /** The code that starts drawing levels of the game */
+  // TODO: redesign so that there's no requirement for a level argument?
   readonly gameBuilder: (level: number) => void;
 }

@@ -5,7 +5,7 @@ import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import * as Helpers from "./helpers";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { BoxBody } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
 import { buildSplashScreen } from "./Splash";
@@ -36,7 +36,7 @@ export function buildChooserScreen(index: number) {
     Helpers.setMusic("tune.ogg");
     Actor.Make({
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
-      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -83,7 +83,7 @@ export function buildChooserScreen(index: number) {
     Helpers.setMusic("tune.ogg");
     Actor.Make({
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
-      rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -117,7 +117,7 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "level_tile.png" };
   let tile = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
+    rigidBody: BoxBody.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -129,7 +129,7 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   tile.gestures = { tap };
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world, { collisionsEnabled: false }),
+    rigidBody: BoxBody.Box(cfg, stage.world, { collisionsEnabled: false }),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -149,7 +149,7 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
     appearance: img,
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
+    rigidBody: BoxBody.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -174,7 +174,7 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
     appearance: img,
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
+    rigidBody: BoxBody.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });
@@ -198,7 +198,7 @@ function drawSplashButton(x: number, y: number, width: number, height: number) {
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
     appearance: img,
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world),
+    rigidBody: BoxBody.Box(cfg, stage.world),
     movement: new InertMovement(),
     role: new Passive(),
   });

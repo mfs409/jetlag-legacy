@@ -5,7 +5,7 @@ import { ImageSprite } from "../jetlag/Components/Appearance";
 import * as Helpers from "./helpers";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { CircleBody } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
 import { buildSplashScreen } from "./Splash";
@@ -47,7 +47,7 @@ export function buildHelpScreen(index: number) {
     let cfg = { cx: 0.75, cy: 2.5, radius: 0.375, width: 0.75, height: 0.75, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -58,7 +58,7 @@ export function buildHelpScreen(index: number) {
     cfg = { cx: 0.75, cy: 3.5, radius: 0.375, width: 0.75, height: 0.75, img: "blue_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -69,7 +69,7 @@ export function buildHelpScreen(index: number) {
     cfg = { cx: 0.75, cy: 4.5, radius: 0.375, width: 0.75, height: 0.75, img: "red_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -80,7 +80,7 @@ export function buildHelpScreen(index: number) {
     cfg = { cx: 0.75, cy: 5.5, radius: 0.375, width: 0.75, height: 0.75, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -91,7 +91,7 @@ export function buildHelpScreen(index: number) {
     cfg = { cx: 0.75, cy: 6.5, radius: 0.375, width: 0.75, height: 0.75, img: "purple_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Passive(),
     });
@@ -102,7 +102,7 @@ export function buildHelpScreen(index: number) {
     cfg = { cx: 0.75, cy: 7.5, radius: 0.375, width: 0.75, height: 0.75, img: "grey_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: RigidBodyComponent.Circle(cfg, stage.world),
+      rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
       role: new Passive(),
     });

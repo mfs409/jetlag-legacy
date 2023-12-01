@@ -1,6 +1,7 @@
 import { b2AABB, b2Contact, b2ContactImpulse, b2ContactListener, b2DistanceJoint, b2DistanceJointDef, b2Fixture, b2Manifold, b2Vec2, b2World, b2WorldManifold } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
+import { Sides } from "../Config";
 
 /**
  * PointToActorCallback queries the world to find the actor at a given
@@ -179,14 +180,14 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
           let a = contact.GetFixtureA().GetBody().GetUserData();
           let b = contact.GetFixtureB().GetBody().GetUserData();
           if (!(a instanceof Actor) || !(b instanceof Actor) || !a.rigidBody || !b.rigidBody) return;
-          let ap = a.rigidBody.props, bp = b.rigidBody.props;
+          let ab = a.rigidBody, bb = b.rigidBody;
 
           // is either one-sided?
           let oneSided: Actor | undefined = undefined;
           let other: Actor | undefined = undefined;
-          if (ap.bottomRigidOnly || ap.topRigidOnly || ap.leftRigidOnly || ap.rightRigidOnly) {
+          if (ab.singleRigidSide != undefined) {
             oneSided = a; other = b;
-          } else if (bp.bottomRigidOnly || bp.topRigidOnly || bp.leftRigidOnly || bp.rightRigidOnly) {
+          } else if (bb.singleRigidSide != undefined) {
             oneSided = b; other = a;
           }
           // Should we disable a one-sided collision?
@@ -196,29 +197,30 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
             let numPoints = worldManiFold.points.length;
             for (let i = 0; i < numPoints; i++) {
               let xy = new b2Vec2(0, 0);
+              // TODO: I don't think this should be using velocity... can't it just use position?
               other.rigidBody?.body.GetLinearVelocityFromWorldPoint(worldManiFold.points[i], xy);
               // disable based on the value of isOneSided and the vector between
               // the entities
-              if (oneSided.rigidBody!.props.topRigidOnly && xy.y < 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.props.leftRigidOnly && xy.y > 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.props.rightRigidOnly && xy.x > 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.props.bottomRigidOnly && xy.x < 0) contact.SetEnabled(false);
+              if (oneSided.rigidBody!.singleRigidSide == Sides.TOP && xy.y < 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.LEFT && xy.y > 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.RIGHT && xy.x > 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.BOTTOM && xy.x < 0) contact.SetEnabled(false);
             }
             return;
           }
 
           // If at least one entity is sticky, then see about making them stick
-          if (ap.bottomSticky || ap.topSticky || ap.leftSticky || ap.rightSticky) {
+          if (ab.stickySides.length > 0) {
             this.collisionSystem.handleSticky(a, b, contact);
             return;
-          } else if (bp.bottomSticky || bp.topSticky || bp.leftSticky || bp.rightSticky) {
+          } else if (bb.stickySides.length > 0) {
             this.collisionSystem.handleSticky(b, a, contact);
             return;
           }
 
           // if the entities have the same passthrough ID, and it's not
           // zero, then disable the contact
-          if (ap.passThroughId && ap.passThroughId == bp.passThroughId) {
+          if (ab.passThroughId && ab.passThroughId == bb.passThroughId) {
             contact.SetEnabled(false);
             return;
           }
@@ -266,16 +268,16 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
     // don't create a joint if we've already got one
     if (other.rigidBody?.distJoint) return;
     // don't create a joint if we're supposed to wait
-    if (window.performance.now() < (other.rigidBody?.props.stickyDelay ?? 0)) return;
+    if (window.performance.now() < (other.rigidBody?.stickyDelay ?? 0)) return;
     // only do something if we're hitting the actor from the correct direction
     let sBody = sticky.rigidBody!;
     let oBody = other.rigidBody!;
-    let oy = oBody.getCenter().y, ox = oBody.getCenter().x, ow = oBody.props.w, oh = oBody.props.h;
-    let sy = sBody.getCenter().y, sx = sBody.getCenter().x, sw = sBody.props.w, sh = sBody.props.h;
-    if ((sBody.props.topSticky && ((oy + oh / 2) <= (sy - sh / 2))) ||
-      (sBody.props.bottomSticky && ((oy - oh / 2) >= (sy + sh / 2))) ||
-      (sBody.props.rightSticky && ((ox - ow / 2) >= (sx + sw / 2))) ||
-      (sBody.props.leftSticky && ((ox + ow / 2) <= (sx - sw / 2)))) {
+    let oy = oBody.getCenter().y, ox = oBody.getCenter().x, ow = oBody.w, oh = oBody.h;
+    let sy = sBody.getCenter().y, sx = sBody.getCenter().x, sw = sBody.w, sh = sBody.h;
+    if ((sBody.stickySides.indexOf(Sides.TOP) > -1 && ((oy + oh / 2) <= (sy - sh / 2))) ||
+      (sBody.stickySides.indexOf(Sides.BOTTOM) > -1 && ((oy - oh / 2) >= (sy + sh / 2))) ||
+      (sBody.stickySides.indexOf(Sides.RIGHT) > -1 && ((ox - ow / 2) >= (sx + sw / 2))) ||
+      (sBody.stickySides.indexOf(Sides.LEFT) > -1 && ((ox + ow / 2) <= (sx - sw / 2)))) {
       // create a distance joint. Note that we need to make the joint in a
       // callback that runs later
       let m = new b2WorldManifold();

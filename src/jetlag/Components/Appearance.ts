@@ -2,50 +2,21 @@ import { b2Vec2 } from "@box2d/core";
 import { Text, Sprite } from "../Services/ImageLibrary";
 import { CameraSystem } from "../Systems/Camera";
 import { Actor } from "../Entities/Actor";
-import { AniCfgOpts, AnimationSequence, AnimationState, FilledBoxConfigOpts, FilledCircleConfigOpts, FilledPolygonConfigOpts, ImgConfigOpts, TxtConfigOpts } from "../Config";
+import { AnimationSequence, AnimationState } from "../Config";
 import { StateEvent, IStateObserver, ActorState, DIRECTION } from "./StateManager";
 import { stage } from "../Stage";
-import { RigidBodyComponent } from "./RigidBody";
+import { BoxBody } from "./RigidBody";
 import { InertMovement } from "./Movement";
 import { Passive } from "./Role";
 import { Graphics } from "pixi.js";
 
-/** 
- * ImageConfig stores the geometry and other configuration information needed
- * when describing an image that is not animated.
- */
-export class ImageConfig {
-  /** Width of the image */
-  w: number;
-  /** Height of the image */
-  h: number;
-  /** Z index of the image */
-  z: -2 | -1 | 0 | 1 | 2;
-
-  /**
-   * Construct an ImageConfig object
-   *
-   * @param opts The configuration options that describe how to make this
-   *             image's configuration
-   */
-  constructor(opts: ImgConfigOpts) {
-    this.w = opts.width;
-    this.h = opts.height;
-
-    let tmpZ = opts.z ?? 0;
-    if (tmpZ < -2) tmpZ = -2;
-    if (tmpZ > 2) tmpZ = 2;
-    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
-  }
-}
-
 /**
- * Validate a filledConfig object's line/fill information
+ * Validate a filled Box/Circle/Polygon's line/fill information
  *
- * @param cfg     The config object to validate
+ * @param cfg     The object being validated
  * @param cfgName The type of the object, for error messages
  */
-function validateFilledConfig(cfg: FilledBoxConfig | FilledCircleConfig | FilledPolygonConfig, cfgName: string) {
+function validateFilledConfig(cfg: FilledBox | FilledCircle | FilledPolygon, cfgName: string) {
   // Validate: if there's a line width, there needs to be a line color
   if (cfg.lineWidth !== undefined && cfg.lineColor === undefined)
     stage.console.log(`Error: ${cfgName} with lineWidth must have lineColor`);
@@ -60,254 +31,13 @@ function validateFilledConfig(cfg: FilledBoxConfig | FilledCircleConfig | Filled
 
 }
 
-/** 
- * FilledBoxConfig stores the configuration information needed when describing
- * an appearance that is achieved using a filled box, not images or text.
- */
-export class FilledBoxConfig {
-  /** Width of the box */
-  w: number;
-  /** Height of the box */
-  h: number;
-  /** Z index of the box */
-  z: -2 | -1 | 0 | 1 | 2;
-  /** Line width */
-  lineWidth?: number;
-  /** Line color */
-  lineColor?: string;
-  /** Fill color */
-  fillColor?: string;
-
-  /**
-   * Construct a FilledBoxConfig object
-   *
-   * @param opts The configuration options that describe how to make this box's
-   *             configuration
-   */
-  constructor(opts: FilledBoxConfigOpts) {
-    this.w = opts.width;
-    this.h = opts.height;
-
-    let tmpZ = opts.z ?? 0;
-    if (tmpZ < -2) tmpZ = -2;
-    if (tmpZ > 2) tmpZ = 2;
-    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
-
-    this.lineWidth = opts.lineWidth;
-    this.lineColor = opts.lineColor;
-    this.fillColor = opts.fillColor;
-
-    validateFilledConfig(this, "FilledBox");
-  }
-}
-
-/**
- * FilledCircleConfig stores the configuration information needed when
- * describing an appearance that is achieved using a filled circle, not images
- * or text
- */
-export class FilledCircleConfig {
-  /** Radius of the circle */
-  radius: number;
-  /** Width, to simplify some other code */
-  w: number;
-  /** Height, to simplify some other code */
-  h: number;
-  /** Z index of the circle: Must be in the range [-2, 2] */
-  z: number;
-  /** Line width */
-  lineWidth?: number;
-  /** Line color */
-  lineColor?: string;
-  /** Fill color */
-  fillColor?: string;
-
-  /**
-   * Construct a FilledCircleConfig object
-   *
-   * @param opts The configuration options that describe how to make this
-   *             circle's configuration
-   */
-  constructor(opts: FilledCircleConfigOpts) {
-    this.radius = opts.radius;
-    this.w = this.h = 2 * this.radius;
-
-    let tmpZ = opts.z ?? 0;
-    if (tmpZ < -2) tmpZ = -2;
-    if (tmpZ > 2) tmpZ = 2;
-    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
-
-    this.lineWidth = opts.lineWidth;
-    this.lineColor = opts.lineColor;
-    this.fillColor = opts.fillColor;
-
-    validateFilledConfig(this, "FilledCircle");
-  }
-}
-
-/**
- * FilledPolygonConfig expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation is a solid polygon.
- */
-export class FilledPolygonConfig {
-  /** Z index of the polygon: Must be in the range [-2, 2] */
-  z: number;
-  /** Width, to simplify some other code */
-  w: number;
-  /** Height, to simplify some other code */
-  h: number;
-  /** Vertices of the polygon */
-  vertices: { x: number, y: number }[];
-  /** Line width */
-  lineWidth?: number;
-  /** Line color */
-  lineColor?: string;
-  /** Fill color */
-  fillColor?: string;
-
-  /**
-   * Construct a FilledPolygonConfig object
-   *
-   * @param opts The configuration options that describe how to make this
-   *             polygon's configuration
-   */
-  constructor(opts: FilledPolygonConfigOpts) {
-    this.vertices = [];
-    for (let i = 0; i < opts.vertices.length; i += 2)
-      this.vertices.push({ x: opts.vertices[i], y: opts.vertices[i + 1] });
-    let minX = this.vertices[0].x;
-    let minY = this.vertices[0].y;
-    let maxX = minX;
-    let maxY = minY;
-    for (let v of this.vertices) {
-      maxX = Math.max(maxX, v.x)
-      maxY = Math.max(maxY, v.y)
-      minX = Math.min(minX, v.x)
-      minY = Math.min(minY, v.y)
-    }
-    this.w = (Math.abs(maxX) > Math.abs(minX)) ? 2 * maxX : 2 * minX;
-    this.h = (Math.abs(maxY) > Math.abs(minY)) ? 2 * maxY : 2 * minY;
-
-    let tmpZ = opts.z ?? 0;
-    if (tmpZ < -2) tmpZ = -2;
-    if (tmpZ > 2) tmpZ = 2;
-    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
-
-    this.lineWidth = opts.lineWidth;
-    this.lineColor = opts.lineColor;
-    this.fillColor = opts.fillColor;
-
-    validateFilledConfig(this, "FilledPolygon");
-  }
-}
-
-/**
- * TextConfig stores the geometry and other configuration information needed
- * when describing on-screen text.
- */
-export class TextConfig {
-  /** Width of the text (computed) */
-  w = 0;
-  /** Height of the text (computed) */
-  h = 0;
-  /** Z index of the image */
-  z: -2 | -1 | 0 | 1 | 2;
-  /** Should the text be centered at X,Y (true) or is (X,Y) top-left (false) */
-  c: boolean;
-  /** Font to use */
-  face: string;
-  /** Color for the text */
-  rgb: string;
-  /** Font size */
-  size: number;
-
-  /**
-   * Construct a TextConfig object 
-   *
-   * @param opts The configuration options that describe how to make this text's
-   *             configuration
-   */
-  constructor(opts: TxtConfigOpts) {
-    this.c = opts.center;
-    this.face = opts.face;
-    this.rgb = opts.color;
-    this.size = opts.size;
-
-    let tmpZ = opts.z ?? 0;
-    if (tmpZ < -2) tmpZ = -2;
-    if (tmpZ > 2) tmpZ = 2;
-    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
-  }
-}
-
-
-/**
- * AnimationConfig stores the geometry and other configuration information
- * needed when describing an animated image.
- */
-export class AnimationConfig {
-  /** Width of the animation */
-  w: number;
-  /** Height of the animation */
-  h: number;
-  /** Z index of the image */
-  z: -2 | -1 | 0 | 1 | 2;
-  /**
-   * The animation sequences to use (they correspond to different
-   * AnimationStates) 
-   */
-  animations: Map<AnimationState, AnimationSequence>;
-  /**
-   * Disappearance animations are special, because they can have a different
-   * Geometry than the Entity that they represent, so we store them in a special
-   * bundle
-   */
-  disappear?: {
-    /** The disappear animation */
-    animation: AnimationSequence,
-    /** Dimensions for the animation */
-    dims: b2Vec2,
-    /**
-     * Offset of the animation's center, relative to the corresponding entity's
-     * center
-     */
-    offset: b2Vec2
-  };
-
-  /**
-   * Construct an AnimationConfig object
-   *
-   * @param opts The configuration options that describe how to make this
-   *             animation's configuration
-   */
-  constructor(opts: AniCfgOpts) {
-    this.w = opts.width;
-    this.h = opts.height;
-
-    let tmpZ = opts.z ?? 0;
-    if (tmpZ < -2) tmpZ = -2;
-    if (tmpZ > 2) tmpZ = 2;
-    this.z = tmpZ as -2 | -1 | 0 | 1 | 2;
-
-    // Clone all animations into the map
-    this.animations = new Map();
-    for (let k of opts.animations.keys()) {
-      let v = opts.animations.get(k);
-      if (v)
-        this.animations.set(k, v.clone())
-    }
-
-    // Disappearance animations are special, because of their dimension and
-    // offset properties.
-    if (opts.disappear) {
-      this.disappear = {
-        animation: opts.disappear.clone(),
-        dims: new b2Vec2(opts.disappearDims?.x ?? 0, opts.disappearDims?.y ?? 0),
-        offset: new b2Vec2(opts.disappearOffset?.x ?? 0, opts.disappearOffset?.y ?? 0)
-      };
-    }
-  }
+/** Coerce a z value into the range -2...2 */
+function coerceZ(z: number | undefined): (-2 | -1 | 0 | 1 | 2) {
+  if (z == -2) return -2;
+  if (z == -1) return -1;
+  if (z == 1) return 1;
+  if (z == 2) return 2;
+  return 0;
 }
 
 /**
@@ -318,32 +48,45 @@ export class AnimationConfig {
 export class TextSprite {
   /** The Actor to which this TextSprite is attached */
   public actor?: Actor;
-
   /** The low-level text object that we pass to the Renderer */
   private readonly text: Text;
-
-  /** The configuration/geometry of this TextSprite */
-  readonly props: TextConfig;
+  /** Width of the text (computed) */
+  width = 0;
+  /** Height of the text (computed) */
+  height = 0;
+  /** Z index of the image */
+  z: -2 | -1 | 0 | 1 | 2;
+  /** Should the text be centered at X,Y (true) or is (X,Y) top-left (false) */
+  center: boolean;
+  /** Font to use */
+  face: string;
+  /** Color for the text */
+  color: string;
+  /** Font size */
+  size: number;
 
   /**
    * Build some text that can be rendered
-   * 
-   * @param cfgOpts  The configuration options for this TextSprite
-   * @param producer A function that creates the text to display, or a String
+   *
+   * @param opts        The configuration options for this TextSprite
+   * @param opts.center Should the text be centered at the rigid body's (cx,cy)
+   *                    (true) or is the rigid body's (cx,cy) top-left (false)
+   * @param opts.face   Font to use
+   * @param opts.color  Color for the text (should be an RGB string code, like
+   *                    #aa4433)
+   * @param opts.size   Font size
+   * @param opts.z      An optional z index in the range [-2,2]
+   * @param producer    A function that creates the text to display, or a String
    */
-  constructor(cfgOpts: TxtConfigOpts, public producer: string | (() => string)) {
-    this.props = new TextConfig(cfgOpts);
-    this.text = Text.makeText("", { fontFamily: this.props.face, fontSize: this.props.size, fill: this.props.rgb });
-    this.props.w = this.text.text.width;
-    this.props.h = this.text.text.height;
-  }
-
-  /** Make another TextSprite that is identical to this one */
-  clone() {
-    return new TextSprite({
-      z: this.props.z, center: this.props.c, face: this.props.face, color: this.props.rgb,
-      size: this.props.size
-    }, this.producer);
+  constructor(opts: { center: boolean, face: string, color: string, size: number, z?: number }, public producer: string | (() => string)) {
+    this.center = opts.center;
+    this.face = opts.face;
+    this.color = opts.color;
+    this.size = opts.size;
+    this.z = coerceZ(opts.z);
+    this.text = Text.makeText("", { fontFamily: this.face, fontSize: this.size, fill: this.color });
+    this.width = this.text.text.width;
+    this.height = this.text.text.height;
   }
 
   /**
@@ -357,7 +100,7 @@ export class TextSprite {
     if (this.actor) {
       // Update the text before passing to the renderer!
       this.text.text.text = (typeof this.producer == "string") ? this.producer : this.producer();
-      stage.renderer.addTextToFrame(this.text, this.actor.rigidBody, camera, this.props.c);
+      stage.renderer.addTextToFrame(this.text, this.actor.rigidBody, camera, this.center);
     }
   }
 
@@ -391,25 +134,33 @@ export class ImageSprite {
   /** The Actor to which this ImageSprite is attached */
   public actor?: Actor;
 
-  /** The configuration/geometry of this ImageSprite */
-  public props: ImageConfig;
-
   /** The image to display for this actor */
   public image: Sprite;
+
+  /** Width of the image */
+  width: number;
+  /** Height of the image */
+  height: number;
+  /** Z index of the image */
+  z: -2 | -1 | 0 | 1 | 2;
+  /** The name of the image file */
+  img: string;
 
   /**
    * Build an image that can be rendered
    *
-   * @param cfg  The configuration options for this ImageSprite
+   * @param opts        Configuration information for this ImageConfig object
+   * @param opts.width  The width of the image, in meters
+   * @param opts.height The height of the image, in meters
+   * @param opts.img    The name of the file to use as the image
+   * @param opts.z      An optional z index in the range [-2,2]
    */
-  constructor(cfg: ImgConfigOpts) {
-    this.props = new ImageConfig(cfg);
-    this.image = stage.imageLibrary.getSprite(cfg.img);
-  }
-
-  /** Make a clone of the provided ImageSprite */
-  clone() {
-    return new ImageSprite({ z: this.props.z, width: this.props.w, height: this.props.h, img: this.image.imgName });
+  constructor(opts: { width: number, height: number, img: string, z?: number }) {
+    this.width = opts.width;
+    this.height = opts.height;
+    this.z = coerceZ(opts.z);
+    this.img = opts.img;
+    this.image = stage.imageLibrary.getSprite(this.img);
   }
 
   /**
@@ -450,7 +201,7 @@ export class ImageSprite {
 
 /**
  * AnimatedSprite describes any object whose visual representation is an
- * animation.  There can be many types of animations.  The "idle_right"
+ * animation.  There can be many types of animations.  The "IDLE_E"
  * (right-facing) animation is the default.  AnimatedSprite can be notified when
  * an Entity's state changes, so that it can switch to the animation associated
  * with the new state.
@@ -467,11 +218,8 @@ export class AnimatedSprite implements IStateObserver {
   get actor() { return this._actor; }
   private _actor?: Actor;
 
-  /** The configuration/geometry of this AnimatedSprite */
-  public props: AnimationConfig;
-
   /** The currently running animation */
-  private currAni: AnimationSequence;
+  private current_ani: AnimationSequence;
 
   /** The frame of the currently running animation that is being displayed */
   private activeFrame = 0;
@@ -482,31 +230,77 @@ export class AnimatedSprite implements IStateObserver {
   /** The amount of time remaining in a throw animation, if one is active */
   private throwRemain = 0;
 
+  /** Width of the animation */
+  width: number;
+  /** Height of the animation */
+  height: number;
+  /** Z index of the image */
+  z: -2 | -1 | 0 | 1 | 2;
+  /**
+   * The animation sequences to use (they correspond to different
+   * AnimationStates) 
+   */
+  animations: Map<AnimationState, AnimationSequence>;
+  /**
+   * Disappearance animations are special, because they can have a different
+   * Geometry than the Entity that they represent, so we store them in a special
+   * bundle
+   */
+  disappear?: {
+    /** The disappear animation */
+    animation: AnimationSequence,
+    /** Dimensions for the animation */
+    dims: b2Vec2,
+    /**
+     * Offset of the animation's center, relative to the corresponding entity's
+     * center
+     */
+    offset: b2Vec2
+  };
+
   /**
    * Build an animation that can be rendered
    *
-   * @param cfgOpts The configuration options for this AnimatedSprite
+   * @param opts                  Configuration information for this
+   *                              AnimationConfig object
+   * @param opts.width            The width of the animation
+   * @param opts.height           The height of the animation
+   * @param opts.animations       A map with the valid animations.  Note that
+   *                              you must include one for IDLE_E, since that is
+   *                              the default animation
+   * @param opts.disappear        An animation to use when making the actor
+   *                              disappear
+   * @param opts.disappearDims    Dimensions for the disappear animation
+   * @param opts.disappearOffset  An offset between the disappear animation and
+   *                              the center of the actor
+   * @param opts.z                An optional z index in the range [-2,2]
    */
-  constructor(cfgOpts: AniCfgOpts) {
-    this.props = new AnimationConfig(cfgOpts);
-    this.currAni = this.props.animations.get(AnimationState.IDLE_E)!;
-  }
+  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, disappear?: AnimationSequence, disappearDims?: { x: number, y: number }, disappearOffset?: { x: number, y: number }, z?: number }) {
+    this.width = opts.width;
+    this.height = opts.height;
+    this.z = coerceZ(opts.z);
 
-  /** Make a copy of this AnimatedSprite */
-  clone() {
-    let animations = new Map();
-    for (let k of this.props.animations.keys()) {
-      let v = this.props.animations.get(k);
+    if (!opts.animations.has(AnimationState.IDLE_E))
+      stage.console.log("Error: you must always provide an IDLE_E animation");
+
+    // Clone all animations into the map
+    this.animations = new Map();
+    for (let k of opts.animations.keys()) {
+      let v = opts.animations.get(k);
       if (v)
-        animations.set(k, v.clone())
+        this.animations.set(k, v.clone())
     }
 
-    return new AnimatedSprite({
-      z: this.props.z, width: this.props.w, height: this.props.h, animations,
-      disappear: this.props.disappear?.animation.clone(),
-      disappearDims: this.props.disappear?.dims.Clone(),
-      disappearOffset: this.props.disappear?.offset.Clone()
-    });
+    // Disappearance animations are special, because of their dimension and
+    // offset properties.
+    if (opts.disappear) {
+      this.disappear = {
+        animation: opts.disappear.clone(),
+        dims: new b2Vec2(opts.disappearDims?.x ?? 0, opts.disappearDims?.y ?? 0),
+        offset: new b2Vec2(opts.disappearOffset?.x ?? 0, opts.disappearOffset?.y ?? 0)
+      };
+    }
+    this.current_ani = this.animations.get(AnimationState.IDLE_E)!;
   }
 
   /** Restart the current animation */
@@ -523,18 +317,18 @@ export class AnimatedSprite implements IStateObserver {
     this.elapsedTime += elapsedMs;
 
     // are we still in this frame?
-    if (this.elapsedTime <= this.currAni.steps[this.activeFrame].duration) return;
+    if (this.elapsedTime <= this.current_ani.steps[this.activeFrame].duration) return;
 
     // are we on the last frame, with no loop? If so, stay where we are
-    if (this.activeFrame == this.currAni.steps.length - 1 && !this.currAni.loop) return;
+    if (this.activeFrame == this.current_ani.steps.length - 1 && !this.current_ani.loop) return;
 
     // advance the animation and reset its timer to zero
-    this.activeFrame = (this.activeFrame + 1) % this.currAni.steps.length;
+    this.activeFrame = (this.activeFrame + 1) % this.current_ani.steps.length;
     this.elapsedTime = 0;
   }
 
   /** Return the current image for the active animation. */
-  public getCurrent() { return this.currAni.steps[this.activeFrame].cell; }
+  public getCurrent() { return this.current_ani.steps[this.activeFrame].cell; }
 
   /**
    * When the attached Actor's state changes, figure out if the animation needs
@@ -547,15 +341,15 @@ export class AnimatedSprite implements IStateObserver {
   onStateChange(actor: Actor, event: StateEvent, newState: ActorState) {
     // Should we kick off a disappear animation?
     if (newState.disappearing) {
-      if (!this.props.disappear) return; // Exit early... no animation
+      if (!this.disappear) return; // Exit early... no animation
 
-      let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.props.disappear.offset.x;
-      let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.props.disappear.offset.y;
+      let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.disappear.offset.x;
+      let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.disappear.offset.y;
       let animations = new Map();
-      animations.set(AnimationState.IDLE_E, this.props.disappear.animation);
+      animations.set(AnimationState.IDLE_E, this.disappear.animation);
       let o = Actor.Make({
-        appearance: new AnimatedSprite({ animations, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, z: this.props.z }),
-        rigidBody: RigidBodyComponent.Box({ cx, cy, width: this.props.disappear.dims.x, height: this.props.disappear.dims.y, }, actor.scene, { collisionsEnabled: false }),
+        appearance: new AnimatedSprite({ animations, width: this.disappear.dims.x, height: this.disappear.dims.y, z: this.z }),
+        rigidBody: BoxBody.Box({ cx, cy, width: this.disappear.dims.x, height: this.disappear.dims.y, }, actor.scene, { collisionsEnabled: false }),
         // TODO: will we always want this to be inert, or might we sometimes want to animate it while letting it keep moving / bouncing / etc?
         movement: new InertMovement(),
         // TODO: will we always want this to have a Passive role?
@@ -567,11 +361,11 @@ export class AnimatedSprite implements IStateObserver {
 
     // Do a regular animation
     let st = AnimatedSprite.getAnimationState(newState);
-    let newAni = this.props.animations.get(st);
+    let newAni = this.animations.get(st);
     // [mfs] I suspect that this check rarely passes, because object equality != configOpts equality...
-    if (newAni === this.currAni) return;
-    if (newAni === undefined) { console.log("notfound", st); newAni = this.props.animations.get(AnimationState.IDLE_E)!; }
-    this.currAni = newAni;
+    if (newAni === this.current_ani) return;
+    if (newAni === undefined) { console.log("notfound", st); newAni = this.animations.get(AnimationState.IDLE_E)!; }
+    this.current_ani = newAni;
     this.activeFrame = 0;
     this.elapsedTime = 0;
 
@@ -762,84 +556,50 @@ export class AnimatedSprite implements IStateObserver {
 }
 
 /**
- * FilledSprite describes any object whose visual representation is a filled
- * circle/box/polygon shape.
+ * FilledBox describes any object whose visual representation is a filled box.
  */
-export class FilledSprite {
-  /** The Actor to which this ImageSprite is attached */
+export class FilledBox {
+  /** The Actor to which this FilledSprite is attached */
   public actor?: Actor;
-
   /** The low-level graphics object that we pass to the Renderer */
   readonly graphics = new Graphics();
+  /** Width of the box */
+  width: number;
+  /** Height of the box */
+  height: number;
+  /** Z index of the box */
+  z: -2 | -1 | 0 | 1 | 2;
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: string;
+  /** Fill color */
+  fillColor?: string;
 
   /**
-   * Build a filled-geometry sprite that can be rendered
+   * Build a FilledBox
    *
-   * @param props  The configuration options for this FilledSprite
+   * @param opts            Configuration information for this FilledBoxConfig
+   *                        object
+   * @param opts.width      Width of the box 
+   * @param opts.height     Height of the box 
+   * @param opts.lineWidth  Width of the border
+   * @param opts.lineColor  Color for the border
+   * @param opts.fillColor  Color to fill the box
+   * @param opts.z          An optional z index in the range [-2,2]
    */
-  private constructor(public props: FilledBoxConfig | FilledCircleConfig | FilledPolygonConfig) {
+  public constructor(opts: { width: number, height: number, lineWidth?: number, lineColor?: string, fillColor?: string, z?: number }) {
+    this.width = opts.width;
+    this.height = opts.height;
+    this.z = coerceZ(opts.z);
+    this.lineWidth = opts.lineWidth;
+    this.lineColor = opts.lineColor;
+    this.fillColor = opts.fillColor;
+    validateFilledConfig(this, "FilledBox");
   }
 
   /**
-   * Construct a FilledSprite as a Box
-   *
-   * @param cfg The configuration of this FilledBox
-   */
-  public static Box(cfg: FilledBoxConfigOpts) {
-    return new FilledSprite(new FilledBoxConfig(cfg));
-  }
-
-  /**
-   * Construct a FilledSprite as a Circle
-   *
-   * @param cfg The configuration of this FilledCircle
-   */
-  public static Circle(cfg: FilledCircleConfigOpts) {
-    return new FilledSprite(new FilledCircleConfig(cfg));
-  }
-
-  /**
-   * Construct a FilledSprite as a Polygon
-   *
-   * @param cfg The configuration of this FilledPolygon
-   */
-  public static Polygon(cfg: FilledPolygonConfigOpts) {
-    return new FilledSprite(new FilledPolygonConfig(cfg));
-  }
-
-  /** Make a clone of the provided FilledSprite */
-  clone() {
-    if (this.props instanceof FilledBoxConfig) {
-      return new FilledSprite(new FilledBoxConfig({
-        width: this.props.w, height: this.props.h,
-        z: this.props.z, lineWidth: this.props.lineWidth,
-        lineColor: this.props.lineColor, fillColor: this.props.fillColor
-      }));
-    }
-    else if (this.props instanceof FilledCircleConfig) {
-      return new FilledSprite(new FilledCircleConfig({
-        radius: this.props.radius, z: this.props.z, lineWidth: this.props.lineWidth,
-        lineColor: this.props.lineColor, fillColor: this.props.fillColor
-      }));
-    }
-    else if (this.props instanceof FilledPolygonConfig) {
-      let vertices = [] as number[];
-      for (let v of this.props.vertices) {
-        vertices.push(v.x);
-        vertices.push(v.y);
-      }
-      return new FilledSprite(new FilledPolygonConfig({
-        vertices, z: this.props.z, lineWidth: this.props.lineWidth,
-        lineColor: this.props.lineColor, fillColor: this.props.fillColor
-      }));
-    }
-    else {
-      throw "Unrecognized prop type";
-    }
-  }
-
-  /**
-   * Render the FilledSprite
+   * Render the FilledBox
    *
    * @param camera    The camera for the current stage
    * @param elapsedMs The time since the last render
@@ -849,11 +609,145 @@ export class FilledSprite {
       stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
   }
 
-  /** Perform any custom updates to the text before displaying it */
+  /** Perform any custom updates to the box before displaying it */
+  prerender(_elapsedMs: number) { }
+}
+
+/**
+ * FilledCircle describes any object whose visual representation is a filled
+ * circle.
+ */
+export class FilledCircle {
+  /** The Actor to which this FilledCircle is attached */
+  public actor?: Actor;
+  /** The low-level graphics object that we pass to the Renderer */
+  readonly graphics = new Graphics();
+  /** Radius of the circle */
+  radius: number;
+  /** Width, to simplify some other code */
+  width: number;
+  /** Height, to simplify some other code */
+  height: number;
+  /** Z index of the circle: Must be in the range [-2, 2] */
+  z: number;
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: string;
+  /** Fill color */
+  fillColor?: string;
+
+  /**
+   * Build a FilledCircle
+   * 
+   * @param opts            Configuration information for this
+   *                        FilledCircleConfig object
+   * @param opts.radius     Radius of the circle
+   * @param opts.lineWidth  Width of the border
+   * @param opts.lineColor  Color for the border
+   * @param opts.fillColor  Color to fill the circle
+   * @param opts.z          An optional z index in the range [-2,2]
+   */
+  public constructor(opts: { radius: number, lineWidth?: number, lineColor?: string, fillColor?: string, z?: number }) {
+    this.radius = opts.radius;
+    this.width = this.height = 2 * this.radius;
+    this.z = coerceZ(opts.z);
+    this.lineWidth = opts.lineWidth;
+    this.lineColor = opts.lineColor;
+    this.fillColor = opts.fillColor;
+    validateFilledConfig(this, "FilledCircle");
+  }
+
+  /**
+   * Render the FilledCircle
+   *
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  render(camera: CameraSystem, _elapsedMs: number) {
+    if (this.actor)
+      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
+  }
+
+  /** Perform any custom updates to the circle before displaying it */
+  prerender(_elapsedMs: number) { }
+}
+
+/**
+ * FilledPolygon describes any object whose visual representation is a filled
+ * polygon.
+ */
+export class FilledPolygon {
+  /** The Actor to which this FilledPolygon is attached */
+  public actor?: Actor;
+  /** The low-level graphics object that we pass to the Renderer */
+  readonly graphics = new Graphics();
+  /** Z index of the polygon: Must be in the range [-2, 2] */
+  z: number;
+  /** Width, to simplify some other code */
+  width: number;
+  /** Height, to simplify some other code */
+  height: number;
+  /** Vertices of the polygon */
+  vertices: { x: number, y: number }[] = [];
+  /** Line width */
+  lineWidth?: number;
+  /** Line color */
+  lineColor?: string;
+  /** Fill color */
+  fillColor?: string;
+
+  /**
+   * Build a FilledPolygon
+   *
+   * @param opts            Configuration information for this
+   *                        FilledPolygonConfig object
+   * @param opts.vertices   An array of vertex points.  Even indices are x
+   *                        values, odd indices are y values.  The points should
+   *                        be relative to the center.
+   * @param opts.lineWidth  Width of the border
+   * @param opts.lineColor  Color for the border
+   * @param opts.fillColor  Color to fill the box
+   * @param opts.z          An optional z index in the range [-2,2]
+   */
+  constructor(opts: { vertices: number[], lineWidth?: number, lineColor?: string, fillColor?: string, z?: number }) {
+    for (let i = 0; i < opts.vertices.length; i += 2)
+      this.vertices.push({ x: opts.vertices[i], y: opts.vertices[i + 1] });
+    let minX = this.vertices[0].x;
+    let minY = this.vertices[0].y;
+    let maxX = minX;
+    let maxY = minY;
+    for (let v of this.vertices) {
+      maxX = Math.max(maxX, v.x)
+      maxY = Math.max(maxY, v.y)
+      minX = Math.min(minX, v.x)
+      minY = Math.min(minY, v.y)
+    }
+    this.width = (Math.abs(maxX) > Math.abs(minX)) ? 2 * maxX : 2 * minX;
+    this.height = (Math.abs(maxY) > Math.abs(minY)) ? 2 * maxY : 2 * minY;
+    this.z = opts.z ?? 0;
+    this.lineWidth = opts.lineWidth;
+    this.lineColor = opts.lineColor;
+    this.fillColor = opts.fillColor;
+    validateFilledConfig(this, "FilledPolygon");
+  }
+
+  /**
+   * Render the FilledPolygon
+   *
+   * @param camera    The camera for the current stage
+   * @param elapsedMs The time since the last render
+   */
+  render(camera: CameraSystem, _elapsedMs: number) {
+    if (this.actor)
+      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
+  }
+
+  /** Perform any custom updates to the polygon before displaying it */
   prerender(_elapsedMs: number) { }
 }
 
 /**
  * AppearanceComponent is the type of anything that can be drawn to the screen.
  */
-export type AppearanceComponent = TextSprite | ImageSprite | AnimatedSprite | FilledSprite;
+export type AppearanceComponent = TextSprite | ImageSprite | AnimatedSprite | FilledBox | FilledCircle | FilledPolygon;

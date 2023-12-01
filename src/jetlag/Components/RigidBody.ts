@@ -1,196 +1,42 @@
 import { b2Body, b2BodyType, b2CircleShape, b2DistanceJoint, b2DistanceJointDef, b2PolygonShape, b2RevoluteJoint, b2RevoluteJointDef, b2Transform, b2Vec2, b2WeldJointDef } from "@box2d/core";
-import { BoxCfgOpts, CircleCfgOpts, PolygonCfgOpts, AdvancedRigidBodyCfgOpts } from "../Config";
 import { stage } from "../Stage";
 import { DebugSprite } from "../Services/ImageLibrary";
 import { Actor } from "../Entities/Actor";
 import { StateEvent } from "./StateManager";
 import { Scene } from "../Entities/Scene";
+import { PhysicsCfg, Sides } from "../Config";
 
 /**
- * AdvancedRigidBodyCfg checks and reifies an AdvancedRigidBodyCfgOpts object,
- * so it can be used to build a RigidBody
+ * The base type for all rigid bodies in the game.  Rigid bodies can be Boxes,
+ * Circles, and Polygons.
  */
-class AdvancedRigidBodyCfg {
-  /** The density of the body */
-  density: number;
-  /** The elasticity of the body */
-  elasticity: number;
-  /** The friction of the body */
-  friction: number;
-  /** Do collisions happen, or do other bodies glide through this? */
-  collisionsEnabled: boolean;
-  /** When entities touch the top of this, do they stick? */
-  topSticky: boolean;
-  /** When entities touch the bottom of this, do they stick? */
-  bottomSticky: boolean;
-  /** When entities touch the left side of this, do they stick? */
-  leftSticky: boolean;
-  /** When entities touch the right side of this, do they stick? */
-  rightSticky: boolean;
-  /** 
-   * When an entity *stops* sticking to this, how long before it can stick
-   * again? 
-   */
-  stickyDelay?: number;
-  /** Should rotation be disabled? */
-  disableRotation: boolean;
-  /** Is the top the only hard surface of this body */
-  topRigidOnly: boolean;
-  /** Is the bottom the only hard surface of this body */
-  bottomRigidOnly: boolean;
-  /** Is the left side the only hard surface of this body */
-  leftRigidOnly: boolean;
-  /** Is the right side the only hard surface of this body */
-  rightRigidOnly: boolean;
-  /** Entities with a matching nonzero Id don't collide with each other */
-  passThroughId?: number;
-  /** Speed at which to rotation, in rotations per second */
-  rotationSpeed: number;
-  /** Force the body to be dynamic? */
-  dynamic: boolean;
-
-  /**
-   * Construct a common body configuration object from a packet of config
-   * information
-   */
-  constructor(cfg: AdvancedRigidBodyCfgOpts) {
-    this.density = cfg.density ?? 1;
-    this.elasticity = cfg.elasticity ?? 0;
-    this.friction = cfg.friction ?? 0;
-    this.collisionsEnabled = cfg.collisionsEnabled == false ? false : true;
-    this.topSticky = !!cfg.topSticky;
-    this.bottomSticky = !!cfg.bottomSticky;
-    this.leftSticky = !!cfg.leftSticky;
-    this.rightSticky = !!cfg.rightSticky;
-    this.stickyDelay = cfg.stickyDelay;
-    this.topRigidOnly = !!cfg.topRigidOnly;
-    this.bottomRigidOnly = !!cfg.bottomRigidOnly;
-    this.leftRigidOnly = !!cfg.leftRigidOnly;
-    this.rightRigidOnly = !!cfg.rightRigidOnly;
-    this.passThroughId = cfg.passThroughId;
-    this.rotationSpeed = cfg.rotationSpeed ?? 0;
-    this.disableRotation = !!cfg.disableRotation;
-    this.dynamic = !!cfg.dynamic;
-  }
-}
-
-/**
- * BoxCfg checks and reifies the union of BoxCfgOpts and
- * AdvancedRigidBodyCfgOpts, making it easy to configure a RigidBody as a box.
- */
-export class BoxCfg extends AdvancedRigidBodyCfg {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Width of the box */
-  w: number;
-  /** Height of the box */
-  h: number;
-
-  /** Construct a Box configuration from a BoxCfgOpts */
-  constructor(boxCfg: BoxCfgOpts, commonCfg: AdvancedRigidBodyCfgOpts) {
-    super(commonCfg);
-    this.cx = boxCfg.cx;
-    this.cy = boxCfg.cy;
-    this.w = boxCfg.width;
-    this.h = boxCfg.height;
-  }
-}
-
-/**
- * CircleCfg checks and reifies the union of CircleCfgOpts and
- * AdvancedRigidBodyCfgOpts, making it easy to configure a RigidBody as a
- * circle.
- */
-export class CircleCfg extends AdvancedRigidBodyCfg {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Radius */
-  r: number;
-  /** Width of the circle */
-  w: number;
-  /** Height of the circle */
-  h: number;
-
-  /** Construct a Circle configuration from a CircleCfgOpts */
-  constructor(circleCfg: CircleCfgOpts, commonCfg: AdvancedRigidBodyCfgOpts) {
-    super(commonCfg);
-    this.cx = circleCfg.cx;
-    this.cy = circleCfg.cy;
-    this.w = 2 * circleCfg.radius;
-    this.h = 2 * circleCfg.radius;
-    this.r = circleCfg.radius;
-  }
-}
-
-/**
- * PolygonCfg checks and reifies the union of PolygonCfgOpts and
- * AdvancedRigidBodyCfgOpts, making it easy to configure a RigidBody as a
- * polygon.
- */
-export class PolygonCfg extends AdvancedRigidBodyCfg {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Vertices */
-  public vertArray: b2Vec2[] = [];
-  /** Width of the bounding box of the polygon */
-  w: number;
-  /** Height of the bounding box of the polygon */
-  h: number;
-
-  /** Construct a Polygon configuration from a PolygonCfgOpts */
-  constructor(polyCfg: PolygonCfgOpts, commonCfg: AdvancedRigidBodyCfgOpts) {
-    super(commonCfg);
-    this.cx = polyCfg.cx;
-    this.cy = polyCfg.cy;
-    for (let i = 0; i < polyCfg.vertices.length; i += 2)
-      this.vertArray[i / 2] = new b2Vec2(polyCfg.vertices[i], polyCfg.vertices[i + 1]);
-    this.w = polyCfg.width;
-    this.h = polyCfg.height;
-  }
-}
-
-/** The different shape types that JetLag supports */
-enum ShapeType { CIRCLE, BOX, POLYGON };
-
-/**
- * All rigid bodies in a game will be of this type.  Internally, they can be
- * Boxes, Circles, or Polygons.
- */
-export class RigidBodyComponent {
-  /** The physics body */
-  readonly body: b2Body;
-
-  /** It's useful to have a debug context for drawing the "hit box" */
-  readonly debug = new DebugSprite();
-
+abstract class RigidBodyBase {
+  /** A debug context for drawing the "hit box" */
+  readonly debug: DebugSprite | undefined;
   /** A definition for when we attach a revolute joint to this entity */
   revJointDef?: b2RevoluteJointDef;
-
   /** A joint that allows this entity to revolve around another */
   revJoint?: b2RevoluteJoint;
-
-  /**
-   * Sometimes an entity collides with another entity, and should stick to it. In
-   * that case, we use this distance joint to make the entities stick together
-   */
+  /** Delay after something stops sticking, before it can stick again */
+  stickyDelay?: number;
+  /** Which sides of the body are sticky, if any? */
+  stickySides: Sides[] = [];
+  /** Entities with a matching nonzero Id don't collide with each other */
+  passThroughId?: number;
+  /** Are collisions only valid from one direction? */
+  singleRigidSide?: Sides;
+  /** A joint for fusing entities together when one is "sticky" */
   public distJoint?: b2DistanceJoint;
 
   /**
-   * Create a rigid body for an Entity
+   * Create a rigid body
    *
-   * @param scene     The physics world where this body exists
-   * @param props     A description of the shape of this body
-   * @param radius    The radius of a circumscribed circle, for culling
-   * @param shapeType The shape type, for quick disambiguation
+   * @param scene       The physics world where this body exists
+   * @param body        The physics body
+   * @param radius      The radius of a circumscribed circle, for culling
    */
-  private constructor(readonly scene: Scene, public props: BoxCfg | CircleCfg | PolygonCfg, public radius: number, private shapeType: ShapeType) {
-    this.body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: this.props.cx, y: this.props.cy } });
+  protected constructor(readonly scene: Scene, readonly body: b2Body, public radius: number) {
+    if (stage.config.hitBoxes) this.debug = new DebugSprite();
   }
 
   /**
@@ -221,7 +67,7 @@ export class RigidBodyComponent {
     this.revJointDef.collideConnected = false;
     this.revJointDef.referenceAngle = 0;
     this.revJointDef.enableLimit = false;
-    this.revJoint = this.scene.physics!.world.CreateJoint(this.revJointDef);
+    this.revJoint = this.body.GetWorld().CreateJoint(this.revJointDef);
   }
 
   /**
@@ -235,12 +81,12 @@ export class RigidBodyComponent {
     // destroy the previously created joint, change the definition, re-create
     // the joint
     if (this.revJoint) {
-      this.scene.physics!.world.DestroyJoint(this.revJoint);
+      this.body.GetWorld().DestroyJoint(this.revJoint);
       this.revJointDef!.enableMotor = true;
       this.revJointDef!.motorSpeed = motorSpeed;
       this.revJointDef!.maxMotorTorque = motorTorque;
     }
-    this.revJoint = this.scene.physics!.world.CreateJoint(this.revJointDef!);
+    this.revJoint = this.body.GetWorld().CreateJoint(this.revJointDef!);
   }
 
   /**
@@ -252,11 +98,11 @@ export class RigidBodyComponent {
   public setRevoluteJointLimits(upper: number, lower: number) {
     // destroy the previously created joint, change the definition, re-create
     // the joint
-    this.scene.physics!.world.DestroyJoint(this.revJoint!);
+    this.body.GetWorld().DestroyJoint(this.revJoint!);
     this.revJointDef!.upperAngle = upper;
     this.revJointDef!.lowerAngle = lower;
     this.revJointDef!.enableLimit = true;
-    this.revJoint = this.scene.physics!.world.CreateJoint(this.revJointDef!);
+    this.revJoint = this.body.GetWorld().CreateJoint(this.revJointDef!);
   }
 
   /**
@@ -282,7 +128,7 @@ export class RigidBodyComponent {
     w.localAnchorB.Set(otherX, otherY);
     w.referenceAngle = angle;
     w.collideConnected = false;
-    this.scene.physics!.world.CreateJoint(w);
+    this.body.GetWorld().CreateJoint(w);
   }
 
   /**
@@ -312,14 +158,14 @@ export class RigidBodyComponent {
     mDistJointDef.damping = 0.1;
     mDistJointDef.stiffness = 2;
 
-    this.scene.physics!.world.CreateJoint(mDistJointDef);
+    this.body.GetWorld().CreateJoint(mDistJointDef);
   }
 
   /** Break any implicit distance joints connecting this entity */
   public breakDistJoints() {
     // Clobber any joints, or this won't be able to move
     if (this.distJoint) {
-      this.scene.physics!.world.DestroyJoint(this.distJoint);
+      this.body.GetWorld().DestroyJoint(this.distJoint);
       this.distJoint = undefined;
     }
   }
@@ -412,7 +258,137 @@ export class RigidBodyComponent {
   }
 
   /**
-   * Resize and re-center a RigidBody
+   * Update physics properties
+   *
+   * @param physicsCfg  A description of which properties to change
+   */
+  protected updatePhysics(physicsCfg: PhysicsCfg) {
+    // Update density/elasticity/friction?
+    if (physicsCfg.density != undefined && physicsCfg.density != 0)
+      this.setPhysics(physicsCfg.density, this.body.GetFixtureList()?.GetRestitution() ?? 0, this.body.GetFixtureList()?.GetFriction() ?? 0)
+    if (physicsCfg.elasticity != undefined)
+      this.setPhysics(this.body.GetFixtureList()?.GetDensity() ?? 1, physicsCfg.elasticity, this.body.GetFixtureList()?.GetFriction() ?? 0)
+    if (physicsCfg.friction != undefined)
+      this.setPhysics(this.body.GetFixtureList()?.GetDensity() ?? 1, this.body.GetFixtureList()?.GetRestitution() ?? 0, physicsCfg.friction);
+
+    // Enable.disable collisions?
+    if (physicsCfg.collisionsEnabled != undefined)
+      this.setCollisionsEnabled(physicsCfg.collisionsEnabled);
+
+    // Update sticky properties?
+    if (physicsCfg.stickyDelay != undefined)
+      this.stickyDelay = physicsCfg.stickyDelay;
+    if (physicsCfg.stickySides != undefined) {
+      this.stickySides = [];
+      for (let side of physicsCfg.stickySides ?? []) this.stickySides.push(side);
+    }
+
+    // Pass-through?
+    if (physicsCfg.passThroughId != undefined)
+      this.passThroughId = physicsCfg.passThroughId;
+
+    // Rigidity?
+    if (physicsCfg.singleRigidSide != undefined)
+      this.singleRigidSide = physicsCfg.singleRigidSide;
+
+    // Make the entity continuously rotate?
+    if (physicsCfg.rotationSpeed != undefined) {
+      if (this.body.GetType() == b2BodyType.b2_staticBody) this.body.SetType(b2BodyType.b2_kinematicBody);
+      this.body.SetAngularVelocity(physicsCfg.rotationSpeed * 2 * Math.PI);
+    }
+
+    // No rotation, even after torque-inducing collisions?
+    if (physicsCfg.disableRotation) this.body.SetFixedRotation(true);
+
+    // Switch the body to dynamic?
+    if (physicsCfg.dynamic) this.body.SetType(b2BodyType.b2_dynamicBody);
+  }
+
+  /** Make the entity stop rotating */
+  public clearRotation() {
+    if (this.body.GetType() != b2BodyType.b2_staticBody)
+      this.body.SetAngularVelocity(0);
+  }
+
+  /** Report the current velocity of this body */
+  public getVelocity() { return this.body.GetLinearVelocity().Clone(); }
+
+  /** Change the velocity of this body */
+  public setVelocity(v: b2Vec2) { return this.body.SetLinearVelocity(v); }
+}
+
+/** A rigid body whose underlying shape is a circle */
+export class CircleBody extends RigidBodyBase {
+  /** Radius */
+  r: number;
+  /** Width of the circle */
+  w: number;
+  /** Height of the circle */
+  h: number;
+
+  /**
+   * Construct a CircleBody
+   *
+   * @param scene       The scene where the body should be created
+   * @param body        The underlying Box2D body
+   * @param circleCfg   Shape information for the circle
+   */
+  private constructor(scene: Scene, body: b2Body, circleCfg: { cx: number, cy: number, radius: number }) {
+    super(scene, body, circleCfg.radius);
+    this.w = 2 * circleCfg.radius;
+    this.h = 2 * circleCfg.radius;
+    this.r = circleCfg.radius;
+  }
+
+  /**
+   * Construct a CircleBody
+   *
+   *
+   * @param circleCfg                     The basic shape configuration for the
+   *                                      circle
+   * @param circleCfg.cx                  X coordinate of the center of the
+   *                                      circle
+   * @param circleCfg.cy                  Y coordinate of the center of the
+   *                                      circle
+   * @param circleCfg.radius              Radius of the circle
+   * @param scene                         The scene (world or hud) where this
+   *                                      circle should be created
+   * @param physicsCfg                    A set of configuration options that
+   *                                      can be applied while creating the
+   *                                      circle
+   * @param physicsCfg.density            The density of the body
+   * @param physicsCfg.elasticity         The elasticity of the body
+   * @param physicsCfg.friction           The friction of the body
+   * @param physicsCfg.disableRotation    Should rotation be disabled?
+   * @param physicsCfg.collisionsEnabled  Do collisions happen, or do other
+   *                                      bodies glide through this?
+   * @param physicsCfg.stickySides        Which sides of the body are sticky, if
+   *                                      any?
+   * @param physicsCfg.stickyDelay        Delay after something stops sticking,
+   *                                      before it can stick again
+   * @param physicsCfg.singleRigidSide    Are collisions only valid from one
+   *                                      direction?
+   * @param physicsCfg.passThroughId      Entities with a matching nonzero Id
+   *                                      don't collide with each other
+   * @param physicsCfg.rotationSpeed      The speed at which to rotate, in
+   *                                      rotations per second
+   * @param physicsCfg.dynamic            Should the body be forced to be
+   *                                      dynamic?
+   *
+   * @returns A rigid body with a Circle shape
+   */
+  public static Circle(shapeCfg: { cx: number, cy: number, radius: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+    let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: shapeCfg.cx, y: shapeCfg.cy } });
+    let rb = new CircleBody(scene, body, shapeCfg);
+    let shape = new b2CircleShape();
+    shape.m_radius = shapeCfg.radius;
+    rb.body.CreateFixture({ shape });
+    rb.updatePhysics(physicsCfg);
+    return rb;
+  }
+
+  /**
+   * Resize and re-center a CircleBody
    *
    * @param cx      The new X position
    * @param cy      The new Y position
@@ -423,149 +399,271 @@ export class RigidBodyComponent {
     // Get the current fixture, so we can preserve sensor state,
     // density/elasticity/friction, and vertices when we make a new fixture
     let oldFix = this.body.GetFixtureList()!;
+    // Compute the transform
+    let transform = new b2Transform();
+    transform.SetPositionAngle({ x: cx, y: cy }, this.body.GetAngle());
 
-    // make a new circle body?
-    if (this.shapeType == ShapeType.CIRCLE) {
-      this.radius = width > height ? width / 2 : height / 2;
-      let shape = new b2CircleShape();
-      shape.m_radius = this.radius;
-      this.body.CreateFixture({ shape });
-    }
-    // make a new box body?
-    else if (this.shapeType == ShapeType.BOX) {
-      this.radius = Math.sqrt(Math.pow(height / 2, 2) + Math.pow(width / 2, 2));
-      let shape = new b2PolygonShape();
-      shape.SetAsBox(width / 2, height / 2);
-      this.body.CreateFixture({ shape });
-    }
-    // Make a new polygon body
-    else {
-      // we need to manually scale all the vertices, based on the old verts
-      let xScale = height / this.props.h;
-      let yScale = width / this.props.w;
-      let ps = oldFix.GetShape() as b2PolygonShape;
-      let vertices: number[] = [];
-      for (let i = 0; i < ps.m_vertices.length; ++i) {
-        let mTempVector = ps.m_vertices[i];
-        vertices.push(mTempVector.x * xScale);
-        vertices.push(mTempVector.y * yScale);
-      }
-      let vertArray: b2Vec2[] = [];
-      for (let i = 0; i < vertices.length; i += 2)
-        vertArray[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
-      (this.props as PolygonCfg).vertArray = vertArray;
-      // Also re-compute the bounding radius
-      let r = 0;
-      for (let i = 0; i < vertices.length; i += 2)
-        r = Math.max(r, Math.pow(vertices[i], 2), + Math.pow(vertices[i + 1], 2));
-      this.radius = r;
-      let shape = new b2PolygonShape();
-      shape.Set(vertArray);
-      this.body.CreateFixture({ shape });
-    }
-    // Update props with new center and dimensions
-    this.props.cx = cx;
-    this.props.cy = cy;
-    this.props.w = width;
-    this.props.h = height;
+    // make a new circle body
+    this.radius = width > height ? width / 2 : height / 2;
+    let shape = new b2CircleShape();
+    shape.m_radius = this.radius;
+    this.body.CreateFixture({ shape });
+
+    // Update dimensions
+    this.w = width;
+    this.h = height;
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
     this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix)
+    this.body.SetTransform(transform);
   }
+};
 
-  /** Report if this body is a circle */
-  public isCircle() { return this.shapeType == ShapeType.CIRCLE; }
-
-  /** Report if this body is a box */
-  public isBox() { return this.shapeType == ShapeType.BOX; }
-
-  /** Report if this body is a polygon */
-  public isPolygon() { return this.shapeType == ShapeType.POLYGON; }
+/** A rigid body whose underlying shape is a rectangle */
+export class BoxBody extends RigidBodyBase {
+  /** Width of the box */
+  w: number;
+  /** Height of the box */
+  h: number;
 
   /**
-   * Construct a RigidBody as a Circle
+   * Construct a BoxBody
    *
-   * @param circleCfg The configuration of this CircleBody
-   * @param scene     The world in which to create the body
-   * @param commonCfg Additional configuration
+   * @param scene       The scene where the body should be created
+   * @param body        The underlying Box2D body
+   * @param boxCfg      Shape information for the box
+   * @param physicsCfg  Optional physics configuration
    */
-  public static Circle(circleCfg: CircleCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
-    let rb = new RigidBodyComponent(scene, new CircleCfg(circleCfg, commonCfg), circleCfg.radius, ShapeType.CIRCLE);
-    let shape = new b2CircleShape();
-    shape.m_radius = circleCfg.radius;
-    rb.body.CreateFixture({ shape });
-    rb.applyCommonProps();
-    return rb;
+  private constructor(scene: Scene, body: b2Body, boxCfg: { cx: number, cy: number, width: number, height: number }) {
+    super(scene, body, Math.sqrt(Math.pow(boxCfg.height / 2, 2) + Math.pow(boxCfg.width / 2, 2)));
+    this.w = boxCfg.width;
+    this.h = boxCfg.height;
   }
 
   /**
-   * Construct a RigidBody as a Box
+   * Construct a BoxBody
    *
-   * @param boxCfg    The configuration of this BoxBody
-   * @param scene     The world in which to create the body (defaults to
-   *                  stage.world)
-   * @param commonCfg Additional configuration
+   *
+   * @param boxCfg                        The basic shape configuration for the
+   *                                      box
+   * @param boxCfg.cx                     X coordinate of the center of the
+   *                                      box
+   * @param boxCfg.cy                     Y coordinate of the center of the
+   *                                      box
+   * @param boxCfg.width                  Width of the box
+   * @param boxCfg.height                 Height of the box
+   * @param scene                         The scene (world or hud) where this
+   *                                      box should be created
+   * @param physicsCfg                    A set of configuration options that
+   *                                      can be applied while creating the
+   *                                      box
+   * @param physicsCfg.density            The density of the body
+   * @param physicsCfg.elasticity         The elasticity of the body
+   * @param physicsCfg.friction           The friction of the body
+   * @param physicsCfg.disableRotation    Should rotation be disabled?
+   * @param physicsCfg.collisionsEnabled  Do collisions happen, or do other
+   *                                      bodies glide through this?
+   * @param physicsCfg.stickySides        Which sides of the body are sticky, if
+   *                                      any?
+   * @param physicsCfg.stickyDelay        Delay after something stops sticking,
+   *                                      before it can stick again
+   * @param physicsCfg.singleRigidSide    Are collisions only valid from one
+   *                                      direction?
+   * @param physicsCfg.passThroughId      Entities with a matching nonzero Id
+   *                                      don't collide with each other
+   * @param physicsCfg.rotationSpeed      The speed at which to rotate, in
+   *                                      rotations per second
+   * @param physicsCfg.dynamic            Should the body be forced to be
+   *                                      dynamic?
+   *
+   * @returns A rigid body with a Box shape
    */
-  public static Box(boxCfg: BoxCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
-    let rb = new RigidBodyComponent(scene, new BoxCfg(boxCfg, commonCfg), Math.sqrt(Math.pow(boxCfg.height / 2, 2) + Math.pow(boxCfg.width / 2, 2)), ShapeType.BOX);
+  public static Box(boxCfg: { cx: number, cy: number, width: number, height: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+    let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: boxCfg.cx, y: boxCfg.cy } });
+    let rb = new BoxBody(scene, body, boxCfg);
     let shape = new b2PolygonShape();
-    shape.SetAsBox(rb.props.w / 2, rb.props.h / 2);
+    shape.SetAsBox(rb.w / 2, rb.h / 2);
     rb.body.CreateFixture({ shape });
-    rb.applyCommonProps();
+    rb.updatePhysics(physicsCfg);
     return rb;
+  }
+
+  /**
+   * Resize and re-center a BoxBody
+   *
+   * @param cx      The new X position
+   * @param cy      The new Y position
+   * @param width   The new width
+   * @param height  The new height
+   */
+  public resize(cx: number, cy: number, width: number, height: number) {
+    // Get the current fixture, so we can preserve sensor state,
+    // density/elasticity/friction, and vertices when we make a new fixture
+    let oldFix = this.body.GetFixtureList()!;
+    // Compute the transform
+    let transform = new b2Transform();
+    transform.SetPositionAngle({ x: cx, y: cy }, this.body.GetAngle());
+
+    // make a new box body
+    this.radius = Math.sqrt(Math.pow(height / 2, 2) + Math.pow(width / 2, 2));
+    let shape = new b2PolygonShape();
+    shape.SetAsBox(width / 2, height / 2);
+    this.body.CreateFixture({ shape });
+
+    // Update dimensions
+    this.w = width;
+    this.h = height;
+
+    // Copy the old fixture's DEF and collision status to the new fixture before
+    // destroying it
+    this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
+    if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
+    this.body.DestroyFixture(oldFix)
+    this.body.SetTransform(transform);
+  }
+};
+
+/** A rigid body whose underlying shape is a convex polygon */
+export class PolygonBody extends RigidBodyBase {
+  /** Vertices */
+  public vertArray: b2Vec2[] = [];
+  /** Width of the bounding box of the polygon */
+  public w: number;
+  /** Height of the bounding box of the polygon */
+  public h: number;
+
+  /**
+   * Construct a PolygonBody
+   *
+   * @param scene       The scene where the body should be created
+   * @param body        The underlying Box2D body
+   * @param polyCfg     Shape information for the polygon
+   * @param radius      The length of the circumscribing radius
+   * @param physicsCfg  Optional physics configuration
+   */
+  private constructor(scene: Scene, body: b2Body, polyCfg: { cx: number, cy: number, vertices: number[], }, radius: number) {
+    super(scene, body, radius)
+    // Transform the vertices into Box2D points, and also compute the polygon's
+    // maximum x and y distances, for computing the culling dimensions
+    let absMaxX = 0, absMaxY = 0;
+    for (let i = 0; i < polyCfg.vertices.length; i += 2) {
+      this.vertArray[i / 2] = new b2Vec2(polyCfg.vertices[i], polyCfg.vertices[i + 1]);
+      absMaxX = Math.max(absMaxX, Math.abs(this.vertArray[i / 2].x))
+      absMaxY = Math.max(absMaxY, Math.abs(this.vertArray[i / 2].y))
+    }
+    this.w = 2 * absMaxX;
+    this.h = 2 * absMaxY;
   }
 
   /**
    * Construct a PolygonBody
    *
-   * @param polygonCfg  The configuration of this PolygonBody
-   * @param scene       The world in which to create the body
-   * @param commonCfg   Additional configuration
+   *
+   * @param polygonCfg                    The basic shape configuration for the
+   *                                      polygon
+   * @param polygonCfg.cx                 X coordinate of the center of the
+   *                                      polygon
+   * @param polygonCfg.cy                 Y coordinate of the center of the
+   *                                      polygon
+   * @param polygonCfg.vertices           Vertices of the polygon, as a stream
+   *                                      of alternating x and y values that are
+   *                                      offsets relative to (cx, cy)
+   * @param scene                         The scene (world or hud) where this
+   *                                      polygon should be created
+   * @param physicsCfg                    A set of configuration options that
+   *                                      can be applied while creating the
+   *                                      polygon
+   * @param physicsCfg.density            The density of the body
+   * @param physicsCfg.elasticity         The elasticity of the body
+   * @param physicsCfg.friction           The friction of the body
+   * @param physicsCfg.disableRotation    Should rotation be disabled?
+   * @param physicsCfg.collisionsEnabled  Do collisions happen, or do other
+   *                                      bodies glide through this?
+   * @param physicsCfg.stickySides        Which sides of the body are sticky, if
+   *                                      any?
+   * @param physicsCfg.stickyDelay        Delay after something stops sticking,
+   *                                      before it can stick again
+   * @param physicsCfg.singleRigidSide    Are collisions only valid from one
+   *                                      direction?
+   * @param physicsCfg.passThroughId      Entities with a matching nonzero Id
+   *                                      don't collide with each other
+   * @param physicsCfg.rotationSpeed      The speed at which to rotate, in
+   *                                      rotations per second
+   * @param physicsCfg.dynamic            Should the body be forced to be
+   *                                      dynamic?
+   *
+   * @returns A rigid body with a Polygon shape
    */
-  public static Polygon(polygonCfg: PolygonCfgOpts, scene: Scene = stage.world, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+  public static Polygon(polygonCfg: { cx: number, cy: number, vertices: number[] }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+    let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: polygonCfg.cx, y: polygonCfg.cy } });
+    // Compute the radius of the circumscribing circle
     let r = 0;
     for (let i = 0; i < polygonCfg.vertices.length; i += 2)
       r = Math.max(r, Math.pow(polygonCfg.vertices[i], 2), + Math.pow(polygonCfg.vertices[i + 1], 2));
-    let rb = new RigidBodyComponent(scene, new PolygonCfg(polygonCfg, commonCfg), Math.sqrt(r), ShapeType.POLYGON);
+    let rb = new PolygonBody(scene, body, polygonCfg, Math.sqrt(r));
     let shape = new b2PolygonShape();
-    shape.Set((rb.props as PolygonCfg).vertArray);
+    shape.Set(rb.vertArray);
     rb.body.CreateFixture({ shape });
-    rb.applyCommonProps();
+    rb.updatePhysics(physicsCfg);
     return rb;
   }
 
-  /** Apply common properties based on the AdvancedRigidBodyConfig */
-  private applyCommonProps() {
-    // Make the entity continuously rotate
-    if (this.props.rotationSpeed != 0) {
-      if (this.body.GetType() == b2BodyType.b2_staticBody) this.body.SetType(b2BodyType.b2_kinematicBody);
-      this.body.SetAngularVelocity(this.props.rotationSpeed * 2 * Math.PI);
+  /**
+   * Resize and re-center a PolygonBody
+   *
+   * @param cx      The new X position
+   * @param cy      The new Y position
+   * @param width   The new width
+   * @param height  The new height
+   */
+  public resize(cx: number, cy: number, width: number, height: number) {
+    // Get the current fixture, so we can preserve sensor state,
+    // density/elasticity/friction, and vertices when we make a new fixture
+    let oldFix = this.body.GetFixtureList()!;
+    // Compute the transform
+    let transform = new b2Transform();
+    transform.SetPositionAngle({ x: cx, y: cy }, this.body.GetAngle());
+
+    // we need to manually scale all the vertices, based on the old verts
+    let xScale = height / this.h;
+    let yScale = width / this.w;
+    let ps = oldFix.GetShape() as b2PolygonShape;
+    let vertices: number[] = [];
+    for (let i = 0; i < ps.m_vertices.length; ++i) {
+      let mTempVector = ps.m_vertices[i];
+      vertices.push(mTempVector.x * xScale);
+      vertices.push(mTempVector.y * yScale);
     }
-    if (this.props.disableRotation)
-      this.body.SetFixedRotation(true);
-    if (this.props.dynamic)
-      this.body.SetType(b2BodyType.b2_dynamicBody);
+    let vertArray: b2Vec2[] = [];
+    for (let i = 0; i < vertices.length; i += 2)
+      vertArray[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
+    this.vertArray = vertArray;
+    // Also re-compute the bounding radius
+    let r = 0;
+    for (let i = 0; i < vertices.length; i += 2)
+      r = Math.max(r, Math.pow(vertices[i], 2), + Math.pow(vertices[i + 1], 2));
+    this.radius = r;
+    let shape = new b2PolygonShape();
+    shape.Set(vertArray);
+    this.body.CreateFixture({ shape });
 
-    this.setPhysics(this.props.density, this.props.elasticity, this.props.friction);
-    this.setCollisionsEnabled(this.props.collisionsEnabled);
-  }
+    // Update new dimensions
+    this.w = width;
+    this.h = height;
 
-  /** Make the entity stop rotating */
-  public clearRotation() {
-    if (this.body.GetType() != b2BodyType.b2_staticBody)
-      this.body.SetAngularVelocity(0);
+    // Copy the old fixture's DEF and collision status to the new fixture before
+    // destroying it
+    this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
+    if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
+    this.body.DestroyFixture(oldFix);
+    this.body.SetTransform(transform);
   }
+};
 
-  /** Report the current velocity of this body */
-  public getVelocity() {
-    return this.body.GetLinearVelocity().Clone();
-  }
-
-  /** Change the velocity of this body */
-  public setVelocity(v: b2Vec2) {
-    return this.body.SetLinearVelocity(v);
-  }
-}
+/**
+ * RigidBodyComponent is the type of any circle/box/polygon rigid body in JetLag
+ */
+export type RigidBodyComponent = CircleBody | BoxBody | PolygonBody;

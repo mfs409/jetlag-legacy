@@ -134,8 +134,8 @@ export class Actor {
     //
     // TODO: This won't work for resizing text.  How should we handle that?
     if (!(this.appearance instanceof TextSprite)) {
-      this.appearance.props.w = width;
-      this.appearance.props.h = height;
+      this.appearance.width = width;
+      this.appearance.height = height;
     }
     this.rigidBody.resize(x, y, width, height);
   }

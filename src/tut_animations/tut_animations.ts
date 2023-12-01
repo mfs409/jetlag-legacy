@@ -1,8 +1,8 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { AnimationSequence, AnimationState, GameConfig } from "../jetlag/Config";
-import { AnimatedSprite, FilledSprite } from "../jetlag/Components/Appearance";
+import { AnimatedSprite, FilledBox } from "../jetlag/Components/Appearance";
 import { ExplicitMovement } from "../jetlag/Components/Movement";
-import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { BoxBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
@@ -79,23 +79,23 @@ export class EmptyGameConfig implements GameConfig {
 export function build_game(_level: number) {
   // Draw four walls, covering the four borders of the world
   Actor.Make({
-    appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: RigidBodyComponent.Box({ cx: 8, cy: .05, width: 16, height: .1 }),
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: BoxBody.Box({ cx: 8, cy: .05, width: 16, height: .1 }),
     role: new Obstacle(),
   });
   Actor.Make({
-    appearance: FilledSprite.Box({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: RigidBodyComponent.Box({ cx: 8, cy: 8.95, width: 16, height: .1 }),
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: BoxBody.Box({ cx: 8, cy: 8.95, width: 16, height: .1 }),
     role: new Obstacle(),
   });
   Actor.Make({
-    appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: RigidBodyComponent.Box({ cx: .05, cy: 4.5, width: .1, height: 9 }),
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: BoxBody.Box({ cx: .05, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
   });
   Actor.Make({
-    appearance: FilledSprite.Box({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: RigidBodyComponent.Box({ cx: 15.95, cy: 4.5, width: .1, height: 9 }),
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: BoxBody.Box({ cx: 15.95, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
   });
 
@@ -154,7 +154,7 @@ export function build_game(_level: number) {
   // .to("spritesheets/alien_thrust_r_6.png",  100).to("spritesheets/alien_thrust_r_7.png",  100)
 
   const hero = Actor.Make({
-    rigidBody: RigidBodyComponent.Box({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
+    rigidBody: BoxBody.Box({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, }),
     role: new Hero(),
     movement: new ExplicitMovement(),

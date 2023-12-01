@@ -1,12 +1,12 @@
 import { b2BodyType, b2Vec2 } from "@box2d/core";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Scene } from "../jetlag/Entities/Scene";
-import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, InertMovement, ProjectileMovement, ProjectileSystemConfigOpts } from "../jetlag/Components/Movement";
+import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, ProjectileMovement, ProjectileSystemConfigOpts } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
-import { RigidBodyComponent } from "../jetlag/Components/RigidBody";
+import { BoxBody } from "../jetlag/Components/RigidBody";
 import { TimedEvent } from "../jetlag/Systems/Timer";
-import { AnimationSequence, BoxCfgOpts, GestureHandlers, AdvancedRigidBodyCfgOpts, ImgConfigOpts, TxtConfigOpts, CircleCfgOpts } from "../jetlag/Config";
-import { Enemy, Hero, Obstacle, Passive, Projectile } from "../jetlag/Components/Role";
+import { AnimationSequence, GestureHandlers, Sides } from "../jetlag/Config";
+import { Enemy, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
@@ -90,45 +90,32 @@ export function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity:
 }
 
 /**
- * Change the gravity in a running level
- *
- * @param newXGravity The new X gravity
- * @param newYGravity The new Y gravity
- */
-export function resetGravity(newXGravity: number, newYGravity: number) {
-  stage.world.physics!.world.SetGravity(new b2Vec2(newXGravity, newYGravity));
-}
-
-/**
  * Draw a box on the scene
  *
  * Note: the box is actually four narrow rectangles
  *
- * @param x0         X coordinate of left side
- * @param y0         Y coordinate of top
- * @param x1         X coordinate of right side
- * @param y1         Y coordinate of bottom
- * @param thickness  How thick should the box be?
- * @param commonCfg  Common extra configuration options for the walls
+ * @param x0          X coordinate of left side
+ * @param y0          Y coordinate of top
+ * @param x1          X coordinate of right side
+ * @param y1          Y coordinate of bottom
+ * @param thickness   How thick should the box be?
+ * @param physicsCfg  Common extra configuration options for the walls
  */
-export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickness: number, commonCfg: AdvancedRigidBodyCfgOpts = {}) {
+export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickness: number, physicsCfg: { density?: number, elasticity?: number, friction?: number, disableRotation?: boolean, collisionsEnabled?: boolean, stickySides?: Sides[], stickyDelay?: number, singleRigidSide?: Sides, passThroughId?: number, rotationSpeed?: number, dynamic?: boolean } = {}) {
   // Bottom box:
   let width = Math.abs(x0 - x1);
   let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
   Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
-    movement: new InertMovement(),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
     role: new Obstacle(),
   });
-  // TODO: we shouldn't need appearance to get debug contexts
 
   // The top only differs by translating the Y from the bottom
   cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
   Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
-    movement: new InertMovement(),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
     role: new Obstacle(),
   });
 
@@ -137,8 +124,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
   Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
-    movement: new InertMovement(),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
     role: new Obstacle(),
   });
 
@@ -146,8 +132,7 @@ export function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, 
   cfg.cx -= (thickness + Math.abs(x0 - x1));
   Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, stage.world, commonCfg),
-    movement: new InertMovement(),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
     role: new Obstacle(),
   });
 }
@@ -173,14 +158,13 @@ export function overlayToWorldCoords(overlay: Scene, x: number, y: number) {
  * @param cfg   Configuration for an image and a box
  * @param tap   The code to run in response to a tap
  */
-export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap: (coords: { x: number; y: number }) => boolean) {
+// TODO: stop needing `any`
+export function addTapControl(scene: Scene, cfg: any, tap: (coords: { x: number; y: number }) => boolean) {
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
   let c = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, scene),
-    movement: new InertMovement(),
-    role: new Passive(),
+    rigidBody: BoxBody.Box(cfg, scene),
   });
   c.gestures = { tap };
   return c;
@@ -196,13 +180,12 @@ export function addTapControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, tap
  * @param panMove   The action to perform when the finger moves
  * @param panStop   The action to perform when the pan event stops
  */
-export function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
+// TODO: stop needing `any`
+export function addPanCallbackControl(scene: Scene, cfg: any, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
   // TODO: it's probably not worth having this helper function
   let c = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, scene),
-    movement: new InertMovement(),
-    role: new Passive(),
+    rigidBody: BoxBody.Box(cfg, scene),
   });
   c.gestures = { panStart, panMove, panStop };
   return c;
@@ -215,7 +198,8 @@ export function addPanCallbackControl(scene: Scene, cfg: ImgConfigOpts & BoxCfgO
  * @param scene Where to draw the region
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
-export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
+// TODO: stop needing `any`
+export function createDragZone(scene: Scene, cfg: any) {
   let foundActor: Actor | undefined;
   // pan start behavior is to update foundActor if there is an actor where
   // the touch began
@@ -258,12 +242,11 @@ export function createDragZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts) {
  * @param scene Where to make the region
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
-export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
+// TODO: stop needing `any`
+export function createFlickZone(overlay: Scene, cfgOpts: any) {
   let c = Actor.Make({
     appearance: new ImageSprite(cfgOpts),
-    rigidBody: RigidBodyComponent.Box(cfgOpts, overlay),
-    movement: new InertMovement(),
-    role: new Passive(),
+    rigidBody: BoxBody.Box(cfgOpts, overlay),
   });
   let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
     // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
@@ -299,14 +282,15 @@ export function createFlickZone(overlay: Scene, cfgOpts: ImgConfigOpts & BoxCfgO
  * @param scene Where to draw the region
  * @param cfg   An ImgConfig object, for the shape/appearance of the region
  */
-export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts) {
+// TODO: stop needing `any`
+export function createPokeToPlaceZone(scene: Scene, cfgOpts: any) {
   stage.gestures.gestureHudFirst = false;
   addTapControl(scene, cfgOpts, (hudCoords: { x: number; y: number }) => {
     let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
     if (!who || !who.rigidBody) return false;
     let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
     let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
-    who.rigidBody?.setCenter(meters.x - who.rigidBody.props.w / 2, meters.y - who.rigidBody.props.h / 2);
+    who.rigidBody?.setCenter(meters.x - who.rigidBody.w / 2, meters.y - who.rigidBody.h / 2);
     stage.storage.setLevel("selected_entity", undefined);
     return true;
   });
@@ -322,7 +306,8 @@ export function createPokeToPlaceZone(scene: Scene, cfgOpts: ImgConfigOpts & Box
  * @param clear     Should the active actor be cleared (so that subsequent
  *                  touches won't change its trajectory)
  */
-export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, velocity: number, clear: boolean) {
+// TODO: stop needing `any`
+export function createPokeToMoveZone(scene: Scene, cfg: any, velocity: number, clear: boolean) {
   stage.gestures.gestureHudFirst = false;
   addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
     let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
@@ -349,7 +334,8 @@ export function createPokeToMoveZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOp
  * @param clear     Should the active actor be cleared (so that subsequent
  *                  touches won't change its trajectory)
  */
-export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpts, velocity: number, clear: boolean) {
+// TODO: stop needing `any`
+export function createPokeToRunZone(scene: Scene, cfg: any, velocity: number, clear: boolean) {
   stage.gestures.gestureHudFirst = false;
   addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
     let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
@@ -380,7 +366,8 @@ export function createPokeToRunZone(scene: Scene, cfg: ImgConfigOpts & BoxCfgOpt
  *                  joystick
  * @param stopOnUp  Should the actor stop when the joystick is released?
  */
-export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfgOpts, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
+// TODO: stop needing `any`
+export function addJoystickControl(scene: Scene, cfgOpts: any, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
   let moving = false;
   function doMove(hudCoords: { x: number; y: number }) {
     moving = true;
@@ -413,12 +400,11 @@ export function addJoystickControl(scene: Scene, cfgOpts: ImgConfigOpts & BoxCfg
  * @param onUpAction      The action to execute once any time the button is
  *                        released
  */
-export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts, whileDownAction?: () => void, onUpAction?: (coords: { x: number; y: number }) => void) {
+// TODO: stop needing `any`
+export function addToggleButton(overlay: Scene, cfg: any, whileDownAction?: () => void, onUpAction?: (coords: { x: number; y: number }) => void) {
   let c = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, overlay),
-    movement: new InertMovement(),
-    role: new Passive(),
+    rigidBody: BoxBody.Box(cfg, overlay),
   });
   let active = false; // will be captured by lambdas below
   let touchDown = () => {
@@ -454,12 +440,11 @@ export function addToggleButton(overlay: Scene, cfg: ImgConfigOpts & BoxCfgOpts,
  * @param offsetY The y distance between the top left of the projectile and the
  *                top left of the actor tossing the projectile
  */
-export function addDirectionalTossButton(overlay: Scene, projectiles: ActorPoolSystem, cfg: ImgConfigOpts & BoxCfgOpts, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
+// TODO: stop needing `any`
+export function addDirectionalTossButton(overlay: Scene, projectiles: ActorPoolSystem, cfg: any, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
   let c = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: RigidBodyComponent.Box(cfg, overlay),
-    movement: new InertMovement(),
-    role: new Passive(),
+    rigidBody: BoxBody.Box(cfg, overlay),
   });
   let v = new b2Vec2(0, 0);
   let isHolding = false;
@@ -606,8 +591,8 @@ export function setShrinkOverTime(actor: Actor, shrinkX: number, shrinkY: number
       x = actor.rigidBody?.getCenter().x ?? 0;
       y = actor.rigidBody?.getCenter().y ?? 0;
     }
-    let w = actor.appearance!.props.w - shrinkX / 20;
-    let h = actor.appearance!.props.h - shrinkY / 20;
+    let w = actor.appearance.width - shrinkX / 20;
+    let h = actor.appearance.height - shrinkY / 20;
     // if the area remains >0, resize it and schedule a timer to run again
     if (w > 0.05 && h > 0.05) {
       actor.resize(x, y, w, h);
@@ -697,28 +682,24 @@ export function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostD
  *
  * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
  */
-export function makeText(scene: Scene, cfgOpts: TxtConfigOpts & BoxCfgOpts, producer: () => string): Actor {
+// TODO: stop needing `any`
+export function makeText(scene: Scene, cfgOpts: any, producer: () => string): Actor {
   return Actor.Make({
     appearance: new TextSprite(cfgOpts, producer),
-    rigidBody: RigidBodyComponent.Box(cfgOpts, scene),
-    movement: new InertMovement(),
-    role: new Passive(),
+    rigidBody: BoxBody.Box(cfgOpts, scene),
   });
 }
 
 /**
  * Put some appropriately-configured projectiles into the projectile system
  *
- * @param scene Where the projectiles will be used
  * @param cfg   Configuration options for the projectiles
  */
-export function populateProjectilePool(scene: Scene, pool: ActorPoolSystem, cfg: ProjectileSystemConfigOpts) {
+export function populateProjectilePool(pool: ActorPoolSystem, cfg: ProjectileSystemConfigOpts) {
   // set up the pool of projectiles
   for (let i = 0; i < cfg.size; ++i) {
-    // TODO:  If we did this differently, then TextSprite and FilledSprite
-    //        wouldn't need clone()
-    let appearance = cfg.appearance.clone();
-    let rigidBody = (cfg.body.hasOwnProperty("radius")) ? RigidBodyComponent.Circle(cfg.body as CircleCfgOpts, scene) : RigidBodyComponent.Box(cfg.body as BoxCfgOpts, scene);
+    let appearance = cfg.appearanceMaker();
+    let rigidBody = cfg.bodyMaker();
     if (cfg.gravityAffectsProjectiles)
       rigidBody.body.SetGravityScale(1);
     rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);

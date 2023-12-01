@@ -564,7 +564,7 @@ export class Hero extends Role {
     this._actor?.sounds?.jump?.play();
 
     // suspend creation of sticky joints, so the hero can actually move
-    this._actor!.rigidBody!.props.stickyDelay = window.performance.now() + 10;
+    this._actor!.rigidBody!.stickyDelay = window.performance.now() + 10;
   }
 
   /**

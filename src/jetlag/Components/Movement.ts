@@ -4,7 +4,6 @@ import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { CameraSystem } from "../Systems/Camera";
 import { AppearanceComponent } from "./Appearance";
-import { CircleCfgOpts, BoxCfgOpts } from "../Config";
 import { SoundEffectComponent } from "./SoundEffect";
 
 /**
@@ -461,14 +460,17 @@ export class HoverFlick {
 /**
  * ProjectileSystemConfigOpts describes the mandatory and optional arguments
  * when configuring a Projectile System
+ *
+ * TODO:  Most of this is not related to the ProjectileMovement, but to other
+ *        aspects of being a projectile... Refactor?
  */
 export interface ProjectileSystemConfigOpts {
   /** The number of projectiles that can ever be on screen at once */
   size: number,
-  /** Configuration for the shape of projectiles' rigid bodies */
-  body: CircleCfgOpts | BoxCfgOpts,
-  /** Configuration for the appearance of projectiles */
-  appearance: AppearanceComponent,
+  /** Make each projectile's initial rigid body */
+  bodyMaker: () => RigidBodyComponent,
+  /** Make each projectile's appearance */
+  appearanceMaker: () => AppearanceComponent,
   /** The amount of damage a projectile can do to enemies */
   strength: number,
   /* A multiplier on projectile speed */
