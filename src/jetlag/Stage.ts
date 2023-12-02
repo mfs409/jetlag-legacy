@@ -36,77 +36,50 @@ import { ImageLibraryService } from "./Services/ImageLibrary";
  *
  * TODO:  It would be nice to have transparency to the (paused) underlying
  *        world, maybe even with effects, when an overlay is showing.
- *
- * TODO:  It should be possible to attach a MusicComponent to the Stage itself,
- *        for music that lives across stages.
  */
 export class Stage {
   /** The physics world in which all actors exist */
   public world!: Scene;
-
   /** A heads-up display */
   public hud!: Scene;
-
   /** The tilt system for the stage */
   public readonly tilt: TiltSystem;
-
   /** Any pause, win, or lose scene that supersedes the world and hud */
   public overlay?: Scene;
-
   /** Background color for the stage being drawn.  Defaults to white */
   public backgroundColor = "#ffffff";
-
   /** The background layers */
   public background!: ParallaxSystem;
-
   /** The foreground layers */
   public foreground!: ParallaxSystem;
-
-  /** Everything related to music */
-  public music: MusicComponent | undefined;
-
+  /** Everything related to music that is controlled on one level at a time */
+  public levelMusic: MusicComponent | undefined;
   /** The Score, suitable for use throughout JetLag */
   readonly score = new ScoreSystem();
-
   /** A console device, for debug messages */
   readonly console: ConsoleService;
-
   /** touch controller, providing gesture inputs */
   readonly gestures: GestureService;
-
   /** keyboard controller, providing key event inputs */
   readonly keyboard: KeyboardService;
-
   /** access to the the device's accelerometer */
   readonly accelerometer: AccelerometerService;
-
   /** rendering support, for drawing to the screen */
   readonly renderer: RendererService;
-
   /** A library of sound and music files */
   readonly musicLibrary: AudioLibraryService;
-
   /** A library of images */
   readonly imageLibrary: ImageLibraryService;
-
-  /**
-   * storage interfaces with the device's persistent storage, and also
-   * provides volatile storage for levels and sessions
-   */
+  /** Background music that doesn't stop when the level changes */
+  public gameMusic: MusicComponent | undefined;
+  /** Persistent storage + volatile storage for a game session and a level */
   readonly storage: StorageService;
-
-  /**
-   * Amount by which fonts need to be scaled to make everything fit on the
-   * screen.
-   */
+  /** Amount to scale fonts so everything fits on the screen. */
   fontScaling = 1;
-
   /** The real screen width */
   screenWidth: number;
-
   /** The real screen height */
   screenHeight: number;
-
   /** The real pixel-meter ratio */
   pixelMeterRatio: number;
 
@@ -137,14 +110,15 @@ export class Stage {
       this.overlay.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
       this.overlay.timer.advance(elapsedMs);
       this.overlay.runRendertimeEvents();
-      // Note that the timer might cancel the overlay, so we can't assume it's still valid...
+      // NB:  The timer might cancel the overlay, so we can't assume it's still
+      //      valid...
       this.overlay?.camera.render(elapsedMs);
       return;
     }
 
     // Only set the color and play music if we don't have an overlay showing
     this.renderer.setFrameColor(this.backgroundColor as any);
-    this.music?.play();
+    this.levelMusic?.play();
 
     // Update the win/lose countdown timers and the stopwatch.  This might end
     // the level.
@@ -184,7 +158,7 @@ export class Stage {
    */
   public switchTo(builder: (index: number, stage: Stage) => void, index: number) {
     // reset music
-    this.music?.stop();
+    this.levelMusic?.stop();
 
     // reset score and storage
     this.score.reset();
@@ -286,9 +260,13 @@ export class Stage {
     this.fontScaling = this.screenWidth / old.x;
   }
 
-  /** Close the window to exit the game */
+  /**
+   * Close the window to exit the game
+   *
+   * TODO: This probably needs special versions for Capacitor and Electron
+   */
   public exit() {
-    this.music?.stop();
+    this.levelMusic?.stop();
     window.close();
   }
 

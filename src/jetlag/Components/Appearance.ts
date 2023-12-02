@@ -84,7 +84,8 @@ export class TextSprite {
     this.color = opts.color;
     this.size = opts.size;
     this.z = coerceZ(opts.z);
-    this.text = Text.makeText("", { fontFamily: this.face, fontSize: this.size, fill: this.color });
+    let sample_text = (typeof this.producer == "string") ? this.producer : this.producer();
+    this.text = Text.makeText(sample_text, { fontFamily: this.face, fontSize: this.size, fill: this.color });
     this.width = this.text.text.width;
     this.height = this.text.text.height;
   }
@@ -100,6 +101,8 @@ export class TextSprite {
     if (this.actor) {
       // Update the text before passing to the renderer!
       this.text.text.text = (typeof this.producer == "string") ? this.producer : this.producer();
+      this.width = this.text.text.width;
+      this.height = this.text.text.height;
       stage.renderer.addTextToFrame(this.text, this.actor.rigidBody, camera, this.center);
     }
   }
@@ -123,6 +126,24 @@ export class TextSprite {
     let res = { width: this.text.text.width / camera.getScale(), height: this.text.text.height / camera.getScale() };
     this.text.text.text = t;
     return res;
+  }
+
+  /**
+   * Change the size of the text.  You shouldn't call this directly.  It gets
+   * called by Actor.resize().
+   *
+   * @param width   The new width
+   * @param height  The new height
+   */
+  resize(width: number, height: number) {
+    let xScale = width * stage.fontScaling / this.width;
+    let yScale = height * stage.fontScaling / this.height;
+    this.size *= xScale;
+    // (this.text.text.style.fontSize as number) *= xScale;
+    this.text.text.width = width * xScale;
+    this.text.text.height = height * yScale;
+    this.width = this.text.text.width;
+    this.height = this.text.text.height;
   }
 }
 
@@ -197,6 +218,18 @@ export class ImageSprite {
 
   /** Perform any custom updates to the text before displaying it */
   prerender(_elapsedMs: number) { }
+
+  /**
+   * Change the size of the image.  You shouldn't call this directly.  It gets
+   * called by Actor.resize().
+   *
+   * @param width   The new width
+   * @param height  The new height
+   */
+  resize(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
 }
 
 /**
@@ -364,7 +397,7 @@ export class AnimatedSprite implements IStateObserver {
     let newAni = this.animations.get(st);
     // [mfs] I suspect that this check rarely passes, because object equality != configOpts equality...
     if (newAni === this.current_ani) return;
-    if (newAni === undefined) { console.log("notfound", st); newAni = this.animations.get(AnimationState.IDLE_E)!; }
+    if (newAni === undefined) { newAni = this.animations.get(AnimationState.IDLE_E)!; }
     this.current_ani = newAni;
     this.activeFrame = 0;
     this.elapsedTime = 0;
@@ -553,6 +586,18 @@ export class AnimatedSprite implements IStateObserver {
     // Now update the cell of the current animation
     this.advanceAnimation(elapsedMs);
   }
+
+  /**
+   * Change the size of the animation.  You shouldn't call this directly.  It
+   * gets called by Actor.resize().
+   *
+   * @param width   The new width
+   * @param height  The new height
+   */
+  resize(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
 }
 
 /**
@@ -611,6 +656,18 @@ export class FilledBox {
 
   /** Perform any custom updates to the box before displaying it */
   prerender(_elapsedMs: number) { }
+
+  /**
+   * Change the size of the box.  You shouldn't call this directly.  It gets
+   * called by Actor.resize().
+   *
+   * @param width   The new width
+   * @param height  The new height
+   */
+  resize(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
 }
 
 /**
@@ -671,6 +728,19 @@ export class FilledCircle {
 
   /** Perform any custom updates to the circle before displaying it */
   prerender(_elapsedMs: number) { }
+
+  /**
+   * Change the size of the circle.  You shouldn't call this directly.  It gets
+   * called by Actor.resize().
+   *
+   * @param width   The new width
+   * @param height  The new height
+   */
+  resize(width: number, height: number) {
+    this.radius = width > height ? width / 2 : height / 2;
+    this.width = 2 * this.radius;
+    this.height = 2 * this.radius;
+  }
 }
 
 /**
@@ -745,6 +815,27 @@ export class FilledPolygon {
 
   /** Perform any custom updates to the polygon before displaying it */
   prerender(_elapsedMs: number) { }
+
+  /**
+   * Change the size of the polygon.  You shouldn't call this directly.  It gets
+   * called by Actor.resize().
+   *
+   * @param width   The new width
+   * @param height  The new height
+   */
+  resize(width: number, height: number) {
+    // we need to manually scale all the vertices, based on the old verts
+    let xScale = width / this.width;
+    let yScale = height / this.height;
+    let vertArray: b2Vec2[] = [];
+    for (let i = 0; i < this.vertices.length; ++i) {
+      let point = this.vertices[i];
+      vertArray.push(new b2Vec2(point.x * xScale, point.y * yScale));
+    }
+    this.vertices = vertArray;
+    this.width = width;
+    this.height = height;
+  }
 }
 
 /**

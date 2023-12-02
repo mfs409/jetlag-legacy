@@ -1,5 +1,5 @@
 import { b2BodyType, b2Vec2 } from "@box2d/core";
-import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Scene } from "../jetlag/Entities/Scene";
 import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, ProjectileMovement, ProjectileSystemConfigOpts } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -60,7 +60,7 @@ export function getVolume() {
  *                  must have been registered as Music, not as a Sound
  */
 export function setMusic(musicName: string) {
-  stage.music = new MusicComponent(stage.musicLibrary.getMusic(musicName));
+  stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic(musicName));
 }
 
 /**
@@ -163,7 +163,7 @@ export function addTapControl(scene: Scene, cfg: any, tap: (coords: { x: number;
   // TODO: we'd have more flexibility if we passed in an appearance, or just got
   // rid of this, but we use it too much for that refactor to be worthwhile.
   let c = Actor.Make({
-    appearance: new ImageSprite(cfg),
+    appearance: new FilledBox(cfg),
     rigidBody: BoxBody.Box(cfg, scene),
   });
   c.gestures = { tap };

@@ -264,35 +264,35 @@ abstract class RigidBodyBase {
    */
   protected updatePhysics(physicsCfg: PhysicsCfg) {
     // Update density/elasticity/friction?
-    if (physicsCfg.density != undefined && physicsCfg.density != 0)
+    if (physicsCfg.density !== undefined && physicsCfg.density != 0)
       this.setPhysics(physicsCfg.density, this.body.GetFixtureList()?.GetRestitution() ?? 0, this.body.GetFixtureList()?.GetFriction() ?? 0)
-    if (physicsCfg.elasticity != undefined)
+    if (physicsCfg.elasticity !== undefined)
       this.setPhysics(this.body.GetFixtureList()?.GetDensity() ?? 1, physicsCfg.elasticity, this.body.GetFixtureList()?.GetFriction() ?? 0)
-    if (physicsCfg.friction != undefined)
+    if (physicsCfg.friction !== undefined)
       this.setPhysics(this.body.GetFixtureList()?.GetDensity() ?? 1, this.body.GetFixtureList()?.GetRestitution() ?? 0, physicsCfg.friction);
 
     // Enable.disable collisions?
-    if (physicsCfg.collisionsEnabled != undefined)
+    if (physicsCfg.collisionsEnabled !== undefined)
       this.setCollisionsEnabled(physicsCfg.collisionsEnabled);
 
     // Update sticky properties?
-    if (physicsCfg.stickyDelay != undefined)
+    if (physicsCfg.stickyDelay !== undefined)
       this.stickyDelay = physicsCfg.stickyDelay;
-    if (physicsCfg.stickySides != undefined) {
+    if (physicsCfg.stickySides !== undefined) {
       this.stickySides = [];
       for (let side of physicsCfg.stickySides ?? []) this.stickySides.push(side);
     }
 
     // Pass-through?
-    if (physicsCfg.passThroughId != undefined)
+    if (physicsCfg.passThroughId !== undefined)
       this.passThroughId = physicsCfg.passThroughId;
 
     // Rigidity?
-    if (physicsCfg.singleRigidSide != undefined)
+    if (physicsCfg.singleRigidSide !== undefined)
       this.singleRigidSide = physicsCfg.singleRigidSide;
 
     // Make the entity continuously rotate?
-    if (physicsCfg.rotationSpeed != undefined) {
+    if (physicsCfg.rotationSpeed !== undefined) {
       if (this.body.GetType() == b2BodyType.b2_staticBody) this.body.SetType(b2BodyType.b2_kinematicBody);
       this.body.SetAngularVelocity(physicsCfg.rotationSpeed * 2 * Math.PI);
     }
@@ -301,6 +301,8 @@ abstract class RigidBodyBase {
     if (physicsCfg.disableRotation) this.body.SetFixedRotation(true);
 
     // Switch the body to dynamic?
+    // TODO:  somehow it seems that nothing is dynamic anymore?  Tilt isn't
+    //        moving anyone...
     if (physicsCfg.dynamic) this.body.SetType(b2BodyType.b2_dynamicBody);
   }
 
@@ -383,6 +385,7 @@ export class CircleBody extends RigidBodyBase {
     let shape = new b2CircleShape();
     shape.m_radius = shapeCfg.radius;
     rb.body.CreateFixture({ shape });
+    rb.setPhysics(1, 0, 0);
     rb.updatePhysics(physicsCfg);
     return rb;
   }
@@ -410,8 +413,8 @@ export class CircleBody extends RigidBodyBase {
     this.body.CreateFixture({ shape });
 
     // Update dimensions
-    this.w = width;
-    this.h = height;
+    this.w = 2 * this.radius;
+    this.h = 2 * this.radius;
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
@@ -487,6 +490,7 @@ export class BoxBody extends RigidBodyBase {
     let shape = new b2PolygonShape();
     shape.SetAsBox(rb.w / 2, rb.h / 2);
     rb.body.CreateFixture({ shape });
+    rb.setPhysics(1, 0, 0);
     rb.updatePhysics(physicsCfg);
     return rb;
   }
@@ -607,6 +611,7 @@ export class PolygonBody extends RigidBodyBase {
     let shape = new b2PolygonShape();
     shape.Set(rb.vertArray);
     rb.body.CreateFixture({ shape });
+    rb.setPhysics(1, 0, 0);
     rb.updatePhysics(physicsCfg);
     return rb;
   }

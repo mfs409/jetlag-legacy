@@ -3,7 +3,7 @@ import { stage } from "../jetlag/Stage";
 import * as Helpers from "./helpers";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
-import { AnimatedSprite, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { AnimatedSprite, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { b2Vec2 } from "@box2d/core";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
@@ -732,7 +732,7 @@ export function buildLevelScreen(level: number) {
       // We are going to put a big black button over the whole screen.
       // Clicking it will get rid of this overlay
       Helpers.addTapControl(overlay,
-        { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
+        { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
         () => { stage.clearOverlay(); return true; });
       // On top of the button, we will write some text, centered around the
       // center of the screen
@@ -803,9 +803,9 @@ export function buildLevelScreen(level: number) {
     // seconds.  Note that the timer for dismissing is a callback within a
     // callback
     stage.installOverlay((overlay: Scene) => {
-      let opts = { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" };
+      let opts = { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" };
       Actor.Make({
-        appearance: new ImageSprite(opts),
+        appearance: new FilledBox(opts),
         rigidBody: BoxBody.Box(opts, overlay),
         movement: new InertMovement(),
         role: new Passive(),
@@ -889,7 +889,7 @@ export function buildLevelScreen(level: number) {
     // And, as you can imagine, we can do lose scenes too.
     stage.score.winSceneBuilder = (overlay: Scene) => {
       Helpers.addTapControl(overlay,
-        { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
+        { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
         () => { stage.switchTo(buildLevelScreen, 15); return true; });
       Helpers.makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
@@ -1010,7 +1010,7 @@ export function buildLevelScreen(level: number) {
       stage.installOverlay((overlay: Scene) => {
         Helpers.addTapControl(
           overlay,
-          { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
+          { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
           () => { stage.clearOverlay(); return true; }
         );
         Helpers.makeText(overlay,
@@ -1177,7 +1177,7 @@ export function buildLevelScreen(level: number) {
     stage.score.loseSceneBuilder = (overlay: Scene) => {
       Helpers.addTapControl(
         overlay,
-        { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
+        { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
         () => { stage.switchTo(buildLevelScreen, 18); return true; }
       );
       Helpers.makeText(overlay,
@@ -2480,9 +2480,9 @@ export function buildLevelScreen(level: number) {
     stage.world.camera.setCameraFocus(h);
 
     // Win by reaching the bottom
-    let boxCfg = { cx: 8, cy: 35.5, width: 16, height: 1, img: "red.png" };
+    let boxCfg = { cx: 8, cy: 35.5, width: 16, height: 1, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
       movement: new InertMovement(),
       role: new Destination(),
@@ -2736,25 +2736,25 @@ export function buildLevelScreen(level: number) {
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
 
     // draw a bucket, as three rectangles
-    let boxCfg = { cx: 8.95, cy: 3.95, width: 0.1, height: 1, img: "red.png" };
+    let boxCfg = { cx: 8.95, cy: 3.95, width: 0.1, height: 1, fillColor: "#FF0000" };
     let leftBucket = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
       movement: new InertMovement(),
       role: new Obstacle(),
     });
 
-    boxCfg = { cx: 10.05, cy: 3.95, width: 0.1, height: 1, img: "red.png" };
+    boxCfg = { cx: 10.05, cy: 3.95, width: 0.1, height: 1, fillColor: "#FF0000" };
     let rightBucket = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
       movement: new InertMovement(),
       role: new Obstacle(),
     });
 
-    boxCfg = { cx: 9.5, cy: 4.4, width: 1.2, height: 0.1, img: "red.png" };
+    boxCfg = { cx: 9.5, cy: 4.4, width: 1.2, height: 0.1, fillColor: "#FF0000" };
     let bottomBucket = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -3608,9 +3608,9 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    let boxCfg = { cx: 1, cy: 1, width: 8, height: 1, img: "red.png" };
+    let boxCfg = { cx: 1, cy: 1, width: 8, height: 1, fillColor: "#FF0000" };
     let ceiling = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -3674,9 +3674,9 @@ export function buildLevelScreen(level: number) {
     // draw a few obstacles that shrink over time, to show that circles and
     // boxes work, we can shrink the X and Y rates independently, and we can opt
     // to center things as they shrink or grow
-    boxCfg = { cx: 2, cy: 8, width: 1, height: 1, img: "red.png" };
+    boxCfg = { cx: 2, cy: 8, width: 1, height: 1, fillColor: "#FF0000" };
     let grow_box = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -3700,6 +3700,44 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle(),
     });
     Helpers.setShrinkOverTime(big_shrink_ball, 0.2, 0.1, false);
+
+    // Hmm, this shrinks in just one timestep?
+    let cfg1 = { cx: 5, cy: 6, vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#0A0305" };
+    let shrink_poly = Actor.Make({
+      appearance: new FilledPolygon(cfg1),
+      rigidBody: PolygonBody.Polygon(cfg1, stage.world),
+      movement: new InertMovement(),
+      role: new Obstacle(),
+    });
+    Helpers.setShrinkOverTime(shrink_poly, 0.2, 0.1, false);
+
+    let cfg2 = { cx: 7, cy: 6, width: 2, height: 2, fillColor: "#F0F0F0" };
+    let shrink_box = Actor.Make({
+      appearance: new FilledBox(cfg2),
+      rigidBody: BoxBody.Box(cfg2, stage.world),
+      movement: new InertMovement(),
+      role: new Obstacle(),
+    });
+    Helpers.setShrinkOverTime(shrink_box, 0.2, 0.1, false);
+
+    let cfg3 = { cx: 9, cy: 6, radius: 1, fillColor: "#0044F0" };
+    let shrink_circle = Actor.Make({
+      appearance: new FilledCircle(cfg3),
+      rigidBody: CircleBody.Circle(cfg3, stage.world),
+      movement: new InertMovement(),
+      role: new Obstacle(),
+    });
+    Helpers.setShrinkOverTime(shrink_circle, 0.2, 0.1, false);
+
+    // Oh no, this shrinks waay too fast, and the rigidbody is really weird
+    let cfg4 = { center: false, width: .1, height: .1, cx: 11, cy: 6, face: "Arial", color: "#FF0000", size: 32 };
+    let shrink_text = Actor.Make({
+      appearance: new TextSprite(cfg4, "Hello"),
+      rigidBody: BoxBody.Box(cfg4, stage.world),
+      movement: new InertMovement(),
+      role: new Obstacle(),
+    });
+    Helpers.setShrinkOverTime(shrink_text, 0.02, 0.01, false);
 
     stage.score.setVictoryEnemyCount(5);
 
@@ -3784,9 +3822,9 @@ export function buildLevelScreen(level: number) {
     (h.movement as ExplicitMovement).addVelocity(0, 10);
 
     // make an obstacle and then connect it to some controls
-    let boxCfg = { cx: 2, cy: 8.75, width: 1, height: 0.5, img: "red.png" };
+    let boxCfg = { cx: 2, cy: 8.75, width: 1, height: 0.5, fillColor: "#FF0000" };
     let o = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 100, elasticity: 1, friction: 0.1 }),
       movement: new ExplicitMovement(),
       role: new Obstacle(),
@@ -3916,7 +3954,7 @@ export function buildLevelScreen(level: number) {
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 18, z: 1 },
           () => "Touch the enemy and it will go away");
         Helpers.addTapControl(overlay,
-          { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png", z: -1 },
+          { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
           () => { stage.clearOverlay(); return true; }
         );
         // add an enemy that is touch-to-defeat
@@ -3938,7 +3976,7 @@ export function buildLevelScreen(level: number) {
       // fixed velocities
       stage.installOverlay((overlay: Scene) => {
         Helpers.addTapControl(overlay,
-          { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png", z: -1 },
+          { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
           () => { stage.clearOverlay(); return true; }
         );
         Helpers.makeText(overlay,
@@ -4089,7 +4127,7 @@ export function buildLevelScreen(level: number) {
         // print a message and pause the game, via PauseScene
         stage.installOverlay((overlay: Scene) => {
           Helpers.addTapControl(overlay,
-            { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
+            { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
             () => { stage.clearOverlay(); return true; }
           );
           Helpers.makeText(overlay,
@@ -4440,7 +4478,7 @@ export function buildLevelScreen(level: number) {
             { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
             () => "Game Paused");
           Helpers.addTapControl(overlay,
-            { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png", z: -1 },
+            { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
             () => { stage.clearOverlay(); return true; }
           );
         });
@@ -4525,18 +4563,18 @@ export function buildLevelScreen(level: number) {
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
 
     // the hero can jump while on this obstacle
-    let boxCfg = { cx: 6, cy: 7, width: 3, height: 0.1, img: "red.png" };
+    let boxCfg = { cx: 6, cy: 7, width: 3, height: 0.1, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1, friction: 0.5 }),
       movement: new InertMovement(),
       role: new Obstacle(),
     });
 
     // the hero can't jump while on this obstacle
-    boxCfg = { cx: 10, cy: 7, width: 3, height: 0.1, img: "red.png" };
+    boxCfg = { cx: 10, cy: 7, width: 3, height: 0.1, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1, friction: 0.5 }),
       movement: new InertMovement(),
       role: new Obstacle({ jumpReEnable: false }),
@@ -4602,9 +4640,9 @@ export function buildLevelScreen(level: number) {
     });
 
     // Here's a wall, and a movable round obstacle
-    let boxCfg = { cx: 7, cy: 1, width: 0.5, height: 5, img: "red.png" };
+    let boxCfg = { cx: 7, cy: 1, width: 0.5, height: 5, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { passThroughId: 7 }),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -4709,9 +4747,9 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // This platform is sticky on top... Jump onto it and watch what happens
-    let platform_cfg = { cx: 2, cy: 6, width: 2, height: 0.25, img: "red.png" };
+    let platform_cfg = { cx: 2, cy: 6, width: 2, height: 0.25, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(platform_cfg),
+      appearance: new FilledBox(platform_cfg),
       rigidBody: BoxBody.Box(platform_cfg, stage.world, { stickySides: [Sides.TOP], density: 100, friction: 0.1 }),
       movement: new PathMovement(new Path().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true),
       role: new Obstacle(),
@@ -4722,9 +4760,9 @@ export function buildLevelScreen(level: number) {
     //
     // It's tempting to think "I'll use some friction here", but isn't the
     // sticky platform nicer?
-    platform_cfg = { cx: 11, cy: 6, width: 2, height: 0.25, img: "red.png" };
+    platform_cfg = { cx: 11, cy: 6, width: 2, height: 0.25, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(platform_cfg),
+      appearance: new FilledBox(platform_cfg),
       rigidBody: BoxBody.Box(platform_cfg, stage.world, { density: 100, friction: 1 }),
       movement: new PathMovement(new Path().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true),
       role: new Obstacle(),
@@ -4776,7 +4814,7 @@ export function buildLevelScreen(level: number) {
       size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorToss: true,
       immuneToCollisions: true, disappearOnCollide: true, range: 40,
       bodyMaker: () => BoxBody.Box({ width: 0.02, height: .5, cx: -100, cy: -100 }, stage.world),
-      appearanceMaker: () => new ImageSprite({ width: 0.02, height: 1, img: "red.png" }),
+      appearanceMaker: () => new FilledBox({ width: 0.02, height: 1, fillColor: "#FF0000" }),
     });
 
     // draw a button for throwing projectiles in many directions. It
@@ -4793,33 +4831,33 @@ export function buildLevelScreen(level: number) {
     // create a box that is easy to fall into, but hard to get out of,
     // by making its sides each "one-sided"
     // TODO: This doesn't seem to be working correctly?
-    let boxCfg = { cx: 4.5, cy: 3.1, width: 3, height: 0.2, img: "red.png" };
+    let boxCfg = { cx: 4.5, cy: 3.1, width: 3, height: 0.2, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.BOTTOM }),
       movement: new InertMovement(),
       role: new Obstacle(),
     });
 
-    boxCfg = { cx: 3.1, cy: 4.5, width: 0.2, height: 3, img: "red.png" };
+    boxCfg = { cx: 3.1, cy: 4.5, width: 0.2, height: 3, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.RIGHT }),
       movement: new InertMovement(),
       role: new Obstacle(),
     });
 
-    boxCfg = { cx: 5.9, cy: 4.5, width: 0.2, height: 3, img: "red.png" };
+    boxCfg = { cx: 5.9, cy: 4.5, width: 0.2, height: 3, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.LEFT }),
       movement: new InertMovement(),
       role: new Obstacle(),
     });
 
-    boxCfg = { cx: 4.5, cy: 7.5, width: 3, height: 0.2, img: "red.png" };
+    boxCfg = { cx: 4.5, cy: 7.5, width: 3, height: 0.2, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.TOP }),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -4957,18 +4995,18 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // the enemy chases the hero, but can't get through the wall
-    cfg = { cx: 14, cy: 2, width: 0.5, height: 0.5, radius: 0.25, img: "red.png" };
+    let ncfg = { cx: 14, cy: 2, width: 0.5, height: 0.5, radius: 0.25, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world, { dynamic: true }),
+      appearance: new FilledBox(ncfg),
+      rigidBody: CircleBody.Circle(ncfg, stage.world, { dynamic: true }),
       movement: new BasicChase(1, h, true, true),
       role: new Enemy(),
     });
     // Remember to make it dynamic, or it *will* go through the wall
 
-    let boxCfg = { cx: 12, cy: 1, width: 0.1, height: 7, img: "red.png" };
+    let boxCfg = { cx: 12, cy: 1, width: 0.1, height: 7, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { passThroughId: 7 }),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -5096,9 +5134,9 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // create a platform that we can jump through from below
-    let platform_cfg = { z: -1, cx: 3, cy: 7.5, width: 2, height: 0.2, img: "red.png" };
+    let platform_cfg = { z: -1, cx: 3, cy: 7.5, width: 2, height: 0.2, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(platform_cfg),
+      appearance: new FilledBox(platform_cfg),
       rigidBody: BoxBody.Box(platform_cfg, stage.world, { collisionsEnabled: true, singleRigidSide: Sides.TOP }),
       movement: new InertMovement(),
       // Set a callback, then re-enable the platform's collision effect.
@@ -5249,7 +5287,7 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
-    let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    let cfg = { cx: 1.25, cy: 6.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { disableRotation: true }),
@@ -5332,9 +5370,9 @@ export function buildLevelScreen(level: number) {
     });
 
     // Note: you must give density to the revolving part...
-    let boxCfg = { cx: 1.5, cy: 4, width: 5, height: 1, img: "red.png" };
+    let boxCfg = { cx: 1.5, cy: 4, width: 5, height: 1, fillColor: "#FF0000" };
     let revolving = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1 }),
       movement: new InertMovement(),
       role: new Obstacle(),
@@ -5404,7 +5442,7 @@ export function buildLevelScreen(level: number) {
         hasPaused = true;
         stage.installOverlay((overlay: Scene) => {
           Helpers.addTapControl(overlay,
-            { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" },
+            { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
             () => { stage.clearOverlay(); return true; }
           );
           Helpers.makeText(overlay,
@@ -5526,7 +5564,7 @@ export function buildLevelScreen(level: number) {
               // clear the pause scene, draw another one
               stage.clearOverlay();
               stage.installOverlay((overlay: Scene) => {
-                Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
+                Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
                   // In a pause scene, we can change things that are in the
                   // world, not just the HUD, so let's give the hero more
                   // strength
@@ -5650,9 +5688,9 @@ export function buildLevelScreen(level: number) {
     Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     // We'll make the body of our car as a hero with just a red square
-    let boxCfg = { cx: 1, cy: 8, width: 2, height: 0.5, img: "red.png" };
+    let boxCfg = { cx: 1, cy: 8, width: 2, height: 0.5, fillColor: "#FF0000" };
     let truck = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1 }),
       movement: new InertMovement(),
       role: new Hero(),
@@ -5827,7 +5865,7 @@ export function buildLevelScreen(level: number) {
       let cfg = { box: true, cx: centerX, cy: centerY, width, height: 0.05, img: "" };
       let body = BoxBody.Box(cfg, stage.world)
       let a = Actor.Make({
-        appearance: new ImageSprite({ width: body.w, height: body.h, img: "red.png" }),
+        appearance: new FilledBox({ width: body.w, height: body.h, fillColor: "#FF0000" }),
         rigidBody: body,
         movement: new InertMovement(),
         role: new Obstacle(),
@@ -5873,18 +5911,18 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // This obstacle is sticky on top, and only rigid on its top
-    let boxCfg = { cx: 2, cy: 6, width: 2, height: 0.25, img: "red.png" };
+    let boxCfg = { cx: 2, cy: 6, width: 2, height: 0.25, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { stickySides: [Sides.TOP], singleRigidSide: Sides.TOP, density: 100, friction: 0.1 }),
       movement: new PathMovement(new Path().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true),
       role: new Obstacle(),
     });
 
     // This obstacle is not sticky, and it is rigid on all sides
-    boxCfg = { cx: 11, cy: 6, width: 2, height: 0.25, img: "red.png" };
+    boxCfg = { cx: 11, cy: 6, width: 2, height: 0.25, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new ImageSprite(boxCfg),
+      appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 100, friction: 1 }),
       movement: new PathMovement(new Path().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true),
       role: new Obstacle(),
@@ -6066,7 +6104,7 @@ export function welcomeMessage(message: string, subMessage: string = "") {
   // Immediately install the overlay, to pause the game
   stage.installOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
-    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => { stage.clearOverlay(); return true; });
+    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => { stage.clearOverlay(); return true; });
     // The text goes in the middle
     Actor.Make({
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
@@ -6095,7 +6133,7 @@ export function welcomeMessage(message: string, subMessage: string = "") {
  */
 export function winMessage(message: string, callback?: () => void) {
   stage.score.winSceneBuilder = (overlay: Scene) => {
-    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
+    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
       stage.clearOverlay();
       stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level);
       return true;
@@ -6114,7 +6152,7 @@ export function winMessage(message: string, callback?: () => void) {
  */
 export function loseMessage(message: string, callback?: () => void) {
   stage.score.loseSceneBuilder = (overlay: Scene) => {
-    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "black.png" }, () => {
+    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
       stage.clearOverlay();
       stage.switchTo(stage.score.onLose.builder, stage.score.onLose.level);
       return true;

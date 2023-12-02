@@ -42,19 +42,19 @@ export function buildSplashScreen(_index: number) {
   // and set it up so that pressing it switches to the first page of the level
   // chooser.
   // test
-  Helpers.addTapControl(stage.hud, { cx: 8, cy: 5.625, width: 2.5, height: 1.25, img: "" }, () => {
+  Helpers.addTapControl(stage.hud, { cx: 8, cy: 5.625, width: 2.5, height: 1.25, fillColor: "#00000000" }, () => {
     stage.switchTo(buildChooserScreen, 1 + 1 - 1);
     return true;
   });
 
   // Do the same, but this button goes to the first help screen
-  Helpers.addTapControl(stage.hud, { cx: 3.2, cy: 6.15, width: 1.8, height: 0.9, img: "" }, () => {
+  Helpers.addTapControl(stage.hud, { cx: 3.2, cy: 6.15, width: 1.8, height: 0.9, fillColor: "#00000000" }, () => {
     stage.switchTo(buildHelpScreen, 1);
     return true;
   });
 
   // Set up the quit button
-  Helpers.addTapControl(stage.hud, { cx: 12.75, cy: 6.1, width: 2, height: 0.9, img: "" }, () => {
+  Helpers.addTapControl(stage.hud, { cx: 12.75, cy: 6.1, width: 2, height: 0.9, fillColor: "#00000000" }, () => {
     stage.exit();
     return true;
   });

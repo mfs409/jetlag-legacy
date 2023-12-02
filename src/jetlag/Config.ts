@@ -48,8 +48,7 @@ export class AnimationSequence {
    *
    * @param loop  Should the animation repeat?
    */
-  constructor(readonly loop: boolean) {
-  }
+  constructor(readonly loop: boolean) { }
 
   /** Return the duration of the entire animation sequence */
   getDuration(): number {
@@ -158,43 +157,26 @@ export interface PhysicsCfg {
 export interface GameConfig {
   /** How many pixels are equivalent to a meter in the game? */
   readonly pixelMeterRatio: number;
-
   /** The default game screen width, in pixels */
   readonly screenDimensions: { width: number, height: number };
-
   /** Should we adapt the game size based on the size of the browser window? */
   readonly adaptToScreenSize: boolean;
-
   /** Should the phone vibrate on certain events? */
   readonly canVibrate: boolean;
-
   /** Should JetLag print an outline around each actor in the game? */
   readonly hitBoxes: boolean;
-
   /** Key for accessing persistent storage */
   readonly storageKey: string;
-
   /** The list of image files that can be used by the game */
   readonly imageNames: string[];
-
   /** The list of audio files that can be used as sound effects by the game */
   readonly soundNames: string[];
-
   /** The list of audio files that can be used as (looping) background music */
   readonly musicNames: string[];
-
   /** The prefix for all resources */
   readonly resourcePrefix: string;
-
-  /**
-   * Should we force the accelerometer to be off? 
-   *
-   * This is useful when developing on a laptop that actually *has* an
-   * accelerometer, because you probably don't want it in that case.
-   */
+  /** Should we force the accelerometer to be off (e.g., some laptops)?  */
   readonly forceAccelerometerOff: boolean;
-
   /** The code that starts drawing levels of the game */
-  // TODO: redesign so that there's no requirement for a level argument?
   readonly gameBuilder: (level: number) => void;
 }

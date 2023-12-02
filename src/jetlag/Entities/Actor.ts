@@ -1,5 +1,5 @@
 import { RigidBodyComponent } from "../Components/RigidBody";
-import { AppearanceComponent, TextSprite } from "../Components/Appearance";
+import { AppearanceComponent } from "../Components/Appearance";
 import { StateEvent, StateManagerComponent } from "../Components/StateManager";
 import { SoundEffectComponent } from "../Components/SoundEffect";
 import { Passive, RoleComponent } from "../Components/Role";
@@ -131,12 +131,7 @@ export class Actor {
    */
   public resize(x: number, y: number, width: number, height: number) {
     // set new height and width of the Render context
-    //
-    // TODO: This won't work for resizing text.  How should we handle that?
-    if (!(this.appearance instanceof TextSprite)) {
-      this.appearance.width = width;
-      this.appearance.height = height;
-    }
+    this.appearance.resize(width, height);
     this.rigidBody.resize(x, y, width, height);
   }
 }
