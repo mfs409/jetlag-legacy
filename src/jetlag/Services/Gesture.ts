@@ -2,7 +2,11 @@ import { Scene } from "../Entities/Scene";
 import { Stage } from "../Stage";
 import Hammer from "hammerjs";
 
-/** GestureService routes gesture events (as defined by hammerjs) to a Stage. */
+/**
+ * GestureService routes gesture events (as defined by hammerjs) to a Stage.
+ *
+ * TODO:  Add a mouse hover event for aiming in desktop games?
+ */
 export class GestureService {
   /**
    * The DOM element that receives gesture events

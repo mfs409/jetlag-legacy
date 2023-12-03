@@ -5,9 +5,6 @@ import { Actor } from "../Entities/Actor";
 import { AnimationSequence, AnimationState } from "../Config";
 import { StateEvent, IStateObserver, ActorState, DIRECTION } from "./StateManager";
 import { stage } from "../Stage";
-import { BoxBody } from "./RigidBody";
-import { InertMovement } from "./Movement";
-import { Passive } from "./Role";
 import { Graphics } from "pixi.js";
 
 /**
@@ -274,41 +271,20 @@ export class AnimatedSprite implements IStateObserver {
    * AnimationStates) 
    */
   animations: Map<AnimationState, AnimationSequence>;
-  /**
-   * Disappearance animations are special, because they can have a different
-   * Geometry than the Entity that they represent, so we store them in a special
-   * bundle
-   */
-  disappear?: {
-    /** The disappear animation */
-    animation: AnimationSequence,
-    /** Dimensions for the animation */
-    dims: b2Vec2,
-    /**
-     * Offset of the animation's center, relative to the corresponding entity's
-     * center
-     */
-    offset: b2Vec2
-  };
 
   /**
    * Build an animation that can be rendered
    *
-   * @param opts                  Configuration information for this
-   *                              AnimationConfig object
-   * @param opts.width            The width of the animation
-   * @param opts.height           The height of the animation
-   * @param opts.animations       A map with the valid animations.  Note that
-   *                              you must include one for IDLE_E, since that is
-   *                              the default animation
-   * @param opts.disappear        An animation to use when making the actor
-   *                              disappear
-   * @param opts.disappearDims    Dimensions for the disappear animation
-   * @param opts.disappearOffset  An offset between the disappear animation and
-   *                              the center of the actor
-   * @param opts.z                An optional z index in the range [-2,2]
+   * @param opts            Configuration information for this AnimationConfig
+   *                        object
+   * @param opts.width      The width of the animation
+   * @param opts.height     The height of the animation
+   * @param opts.animations A map with the valid animations.  Note that you must
+   *                        include one for IDLE_E, since that is the default
+   *                        animation
+   * @param opts.z          An optional z index in the range [-2,2]
    */
-  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, disappear?: AnimationSequence, disappearDims?: { x: number, y: number }, disappearOffset?: { x: number, y: number }, z?: number }) {
+  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, z?: number }) {
     this.width = opts.width;
     this.height = opts.height;
     this.z = coerceZ(opts.z);
@@ -324,15 +300,6 @@ export class AnimatedSprite implements IStateObserver {
         this.animations.set(k, v.clone())
     }
 
-    // Disappearance animations are special, because of their dimension and
-    // offset properties.
-    if (opts.disappear) {
-      this.disappear = {
-        animation: opts.disappear.clone(),
-        dims: new b2Vec2(opts.disappearDims?.x ?? 0, opts.disappearDims?.y ?? 0),
-        offset: new b2Vec2(opts.disappearOffset?.x ?? 0, opts.disappearOffset?.y ?? 0)
-      };
-    }
     this.current_ani = this.animations.get(AnimationState.IDLE_E)!;
   }
 
@@ -371,27 +338,7 @@ export class AnimatedSprite implements IStateObserver {
    * @param event     The event that might have caused `actor`'s state to change
    * @param newState  The new state of `actor`
    */
-  onStateChange(actor: Actor, event: StateEvent, newState: ActorState) {
-    // Should we kick off a disappear animation?
-    if (newState.disappearing) {
-      if (!this.disappear) return; // Exit early... no animation
-
-      let cx = (this.actor?.rigidBody.getCenter().x ?? 0) + this.disappear.offset.x;
-      let cy = (this.actor?.rigidBody.getCenter().y ?? 0) + this.disappear.offset.y;
-      let animations = new Map();
-      animations.set(AnimationState.IDLE_E, this.disappear.animation);
-      let o = Actor.Make({
-        appearance: new AnimatedSprite({ animations, width: this.disappear.dims.x, height: this.disappear.dims.y, z: this.z }),
-        rigidBody: BoxBody.Box({ cx, cy, width: this.disappear.dims.x, height: this.disappear.dims.y, }, actor.scene, { collisionsEnabled: false }),
-        // TODO: will we always want this to be inert, or might we sometimes want to animate it while letting it keep moving / bouncing / etc?
-        movement: new InertMovement(),
-        // TODO: will we always want this to have a Passive role?
-        role: new Passive(),
-      });
-      actor.scene.camera.addEntity(o);
-      return;
-    }
-
+  onStateChange(_actor: Actor, event: StateEvent, newState: ActorState) {
     // Do a regular animation
     let st = AnimatedSprite.getAnimationState(newState);
     let newAni = this.animations.get(st);

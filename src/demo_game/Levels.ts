@@ -5,7 +5,6 @@ import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
 import { AnimatedSprite, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
-import { b2Vec2 } from "@box2d/core";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
 import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive, CollisionExemptions, Projectile } from "../jetlag/Components/Role";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
@@ -3063,9 +3062,10 @@ export function buildLevelScreen(level: number) {
     loseMessage("Try Again");
   }
 
-  // This level introduces jumping animations and disappearance animations.  It
-  // also shows an odd way of moving the world.  There's friction on the floor,
-  // so the hero can only move by tilting while the hero is in the air
+  // This level introduces jumping animations and shows how to make
+  // "disappearance animations".  It also shows an odd way of moving the world.
+  // There's friction on the floor, so the hero can only move by tilting while
+  // the hero is in the air
   else if (level == 50) {
     // In this level, we will have tilt to move left/right, but there is so much
     // friction that tilt will only be effective when the hero is in the air
@@ -3123,32 +3123,30 @@ export function buildLevelScreen(level: number) {
     });
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -5); return true; } }
 
-    // create a goodie that has a disappearance animation. When the
-    // goodie is ready to disappear, we'll remove it, and then we'll run
-    // the disappear animation. That means that we can make it have any
-    // size we want, but we need to offset it from the (defunct)
-    // goodie's position. Note, too, that the final cell is blank, so
-    // that we don't leave a residue on the screen.
-
-    // We can't do a disappearance animation without also having AnimationState.IDLE_E,
-    // but we can cheat and just use one image the whole time.
+    // create a goodie that has a disappearance callback, which we can use to do
+    // a disappearance animation. When the goodie is about to disappear, our
+    // code will install a new actor as the disappearance animation.  That means
+    // that we can make it have any size we want, but we need to offset it from
+    // the (defunct) goodie's position. Note, too, that the final cell is blank,
+    // so that we don't leave a residue on the screen.
     let g_animations = new Map();
     g_animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["star_burst_3.png"] }));
-    let g_cfg = {
-      cx: 2, cy: 7.5, width: 0.5, height: 0.5, radius: 0.25, animations: g_animations,
-      disappear: new AnimationSequence(false)
-        .to("star_burst_3.png", 200)
-        .to("star_burst_2.png", 200)
-        .to("star_burst_1.png", 200)
-        .to("star_burst_4.png", 200),
-      disappearOffset: new b2Vec2(0, 0),
-      disappearDims: new b2Vec2(0.5, 0.5),
-    };
+    let g_cfg = { cx: 2, cy: 7.5, width: 0.5, height: 0.5, radius: 0.25, animations: g_animations };
     Actor.Make({
       appearance: new AnimatedSprite(g_cfg),
       rigidBody: CircleBody.Circle(g_cfg, stage.world),
       movement: new InertMovement(),
       role: new Goodie(),
+      onDisappear: (a: Actor) => {
+        let cx = (a.rigidBody.getCenter().x);
+        let cy = (a.rigidBody.getCenter().y);
+        let animations = new Map();
+        animations.set(AnimationState.IDLE_E, new AnimationSequence(false).to("star_burst_3.png", 200).to("star_burst_2.png", 200).to("star_burst_1.png", 200).to("star_burst_4.png", 200));
+        Actor.Make({
+          appearance: new AnimatedSprite({ animations, width: .5, height: .5 }),
+          rigidBody: BoxBody.Box({ cx, cy, width: .5, height: .5 }, stage.world, { collisionsEnabled: false }),
+        })
+      }
     });
 
     welcomeMessage("Press the hero to make it jump");
@@ -3674,6 +3672,7 @@ export function buildLevelScreen(level: number) {
     // draw a few obstacles that shrink over time, to show that circles and
     // boxes work, we can shrink the X and Y rates independently, and we can opt
     // to center things as they shrink or grow
+    // TODO:  Some of these don't work nicely
     boxCfg = { cx: 2, cy: 8, width: 1, height: 1, fillColor: "#FF0000" };
     let grow_box = Actor.Make({
       appearance: new FilledBox(boxCfg),

@@ -301,8 +301,6 @@ abstract class RigidBodyBase {
     if (physicsCfg.disableRotation) this.body.SetFixedRotation(true);
 
     // Switch the body to dynamic?
-    // TODO:  somehow it seems that nothing is dynamic anymore?  Tilt isn't
-    //        moving anyone...
     if (physicsCfg.dynamic) this.body.SetType(b2BodyType.b2_dynamicBody);
   }
 

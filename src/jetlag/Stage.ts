@@ -71,6 +71,7 @@ export class Stage {
   /** A library of images */
   readonly imageLibrary: ImageLibraryService;
   /** Background music that doesn't stop when the level changes */
+  // TODO: Test this!
   public gameMusic: MusicComponent | undefined;
   /** Persistent storage + volatile storage for a game session and a level */
   readonly storage: StorageService;

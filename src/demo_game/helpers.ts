@@ -1,9 +1,9 @@
 import { b2BodyType, b2Vec2 } from "@box2d/core";
-import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { AppearanceComponent, FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Scene } from "../jetlag/Entities/Scene";
-import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, ProjectileMovement, ProjectileSystemConfigOpts } from "../jetlag/Components/Movement";
+import { ExplicitMovement, Draggable, FlickMovement, HoverFlick, PathMovement, Path, ProjectileMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
-import { BoxBody } from "../jetlag/Components/RigidBody";
+import { BoxBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { TimedEvent } from "../jetlag/Systems/Timer";
 import { AnimationSequence, GestureHandlers, Sides } from "../jetlag/Config";
 import { Enemy, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
@@ -11,6 +11,7 @@ import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { MusicComponent } from "../jetlag/Components/Music";
+import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 
 /** Manage the state of Mute */
 export function toggleMute() {
@@ -693,9 +694,31 @@ export function makeText(scene: Scene, cfgOpts: any, producer: () => string): Ac
 /**
  * Put some appropriately-configured projectiles into the projectile system
  *
- * @param cfg   Configuration options for the projectiles
+ * @param cfg                           Configuration options for the
+ *                                      projectiles
+ * @param cfg.size                      The number of projectiles that can ever
+ *                                      be on screen at once
+ * @param cfg.bodyMaker                 Make each projectile's initial rigid
+ *                                      body
+ * @param cfg.appearanceMaker           Make each projectile's appearance
+ * @param cfg.strength                  The amount of damage a projectile can do
+ *                                      to enemies
+ * @param cfg.multiplier                A multiplier on projectile speed
+ * @param cfg.immuneToCollisions        Should projectiles pass through walls
+ * @param cfg.gravityAffectsProjectiles Should projectiles be subject to gravity
+ * @param cfg.fixedVectorVelocity       A fixed velocity for all projectiles
+ * @param cfg.rotateVectorToss          Should projectiles be rotated in the
+ *                                      direction they are tossed?
+ * @param cfg.soundEffects              A sound to play when a projectile
+ *                                      disappears
+ * @param cfg.randomImageSources        A set of image names to randomly assign
+ *                                      to projectiles' appearance
+ * @param cfg.range                     Limit the range that projectiles can
+ *                                      travel?
+ * @param cfg.disappearOnCollide        Should projectiles disappear when they
+ *                                      collide with each other?
  */
-export function populateProjectilePool(pool: ActorPoolSystem, cfg: ProjectileSystemConfigOpts) {
+export function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: number, bodyMaker: () => RigidBodyComponent, appearanceMaker: () => AppearanceComponent, strength: number, multiplier?: number, immuneToCollisions: boolean, gravityAffectsProjectiles?: boolean, fixedVectorVelocity?: number, rotateVectorToss?: boolean, soundEffects?: SoundEffectComponent, randomImageSources?: string[], range: number, disappearOnCollide: boolean }) {
   // set up the pool of projectiles
   for (let i = 0; i < cfg.size; ++i) {
     let appearance = cfg.appearanceMaker();
@@ -719,7 +742,7 @@ export function populateProjectilePool(pool: ActorPoolSystem, cfg: ProjectileSys
       let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
       if ((dx * dx + dy * dy) > (role.range * role.range)) reclaimer(actor);
     });
-    // TODO: we should be cloning the soundEffects?
+    // TODO: Should we clone the soundEffects?
     let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role, sounds: cfg.soundEffects });
     pool.put(p);
   }

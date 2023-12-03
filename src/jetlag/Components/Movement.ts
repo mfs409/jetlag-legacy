@@ -3,8 +3,6 @@ import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 import { RigidBodyComponent } from "./RigidBody";
 import { CameraSystem } from "../Systems/Camera";
-import { AppearanceComponent } from "./Appearance";
-import { SoundEffectComponent } from "./SoundEffect";
 
 /**
  * Path specifies a set of points that an actor will move among, in order, at a
@@ -457,42 +455,6 @@ export class HoverFlick {
   }
 }
 
-/**
- * ProjectileSystemConfigOpts describes the mandatory and optional arguments
- * when configuring a Projectile System
- *
- * TODO:  Most of this is not related to the ProjectileMovement, but to other
- *        aspects of being a projectile... Refactor?
- */
-export interface ProjectileSystemConfigOpts {
-  /** The number of projectiles that can ever be on screen at once */
-  size: number,
-  /** Make each projectile's initial rigid body */
-  bodyMaker: () => RigidBodyComponent,
-  /** Make each projectile's appearance */
-  appearanceMaker: () => AppearanceComponent,
-  /** The amount of damage a projectile can do to enemies */
-  strength: number,
-  /* A multiplier on projectile speed */
-  multiplier?: number,
-  /** Should projectiles pass through walls */
-  immuneToCollisions: boolean,
-  /** Should projectiles be subject to gravity */
-  gravityAffectsProjectiles?: boolean,
-  /** A fixed velocity for all projectiles */
-  fixedVectorVelocity?: number,
-  /** Should projectiles be rotated in the direction they are tossed? */
-  rotateVectorToss?: boolean,
-  /** A sound to play when a projectile disappears */
-  soundEffects?: SoundEffectComponent,
-  /** A set of image names to randomly assign to projectiles' appearance */
-  randomImageSources?: string[],
-  /** Limit the range that projectiles can travel? */
-  range: number,
-  /** Should projectiles disappear when they collide with each other? */
-  disappearOnCollide: boolean,
-}
-
 /** A rule for how projectiles move */
 export class ProjectileMovement {
   /** The body of the actor to which this movement is attached */
@@ -528,11 +490,15 @@ export class ProjectileMovement {
   }
 
   /**
-   * Construct the Projectile Movement policy from a configuration
+   * Construct a movement policy that is appropriate for projectiles
    *
-   * @param cfg The requested configuration
+   * @param cfg                     The requested configuration
+   * @param cfg.multiplier          A multiplier on projectile speed
+   * @param cfg.fixedVectorVelocity A fixed velocity for all projectiles
+   * @param cfg.rotateVectorToss    Should projectiles be rotated in the
+   *                                direction they are tossed?
    */
-  constructor(cfg: ProjectileSystemConfigOpts) {
+  constructor(cfg: { multiplier?: number, fixedVectorVelocity?: number, rotateVectorToss?: boolean }) {
     this.multiplier = cfg.multiplier ?? 1;
     this.fixedVectorVelocity = cfg.fixedVectorVelocity;
     this.rotateVectorToss = cfg.rotateVectorToss;

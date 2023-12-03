@@ -25,27 +25,22 @@ export class Actor {
 
   /** A set of functions describing how the Actor should respond to gestures. */
   public gestures?: GestureHandlers;
-
   /** The rules for how this Actor should move */
   readonly movement: MovementComponent;
-
   /** The packet of information describing the audio aspects of this Actor */
   readonly sounds: SoundEffectComponent;
-
   /** The behavioral role that this Actor plays within the game */
   readonly role: RoleComponent;
-
   /** The visual representation of this Actor within the game */
   readonly appearance: AppearanceComponent;
-
   /** Extra data that the game designer can attach to the Actor */
   readonly extra: any = {};
-
   /** The current state of this Actor */
   readonly state = new StateManagerComponent();
-
   /** The scene where the Actor exists */
   public scene: Scene;
+  /** Code to run when the actor disappears */
+  readonly onDisappear: undefined | ((a: Actor) => void);
 
   /**
    * Create an Actor
@@ -55,7 +50,7 @@ export class Actor {
    *                and `sounds`
    * @param config.rigidBody See {@link RigidBodyComponent}
    */
-  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent }) {
+  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void }) {
     return new Actor(config);
   }
 
@@ -66,7 +61,7 @@ export class Actor {
    *                `appearance`, and optional `movement`, `role`, `gestures`,
    *                and `sounds`
    */
-  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent }) {
+  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void }) {
     this.scene = config.rigidBody.scene;
 
     this.appearance = config.appearance;
@@ -86,6 +81,7 @@ export class Actor {
       this.gestures = config.gestures;
 
     this.sounds = config.sounds ?? new SoundEffectComponent({});
+    this.onDisappear = config.onDisappear;
   }
 
   /**
@@ -119,6 +115,7 @@ export class Actor {
     // Send a message to subscribers, e.g., in case one of them wants to run a
     // Disappear animation
     this.state.changeState(this, StateEvent.DISAPPEAR);
+    if (this.onDisappear) this.onDisappear(this);
   }
 
   /**
