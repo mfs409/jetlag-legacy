@@ -1,26 +1,26 @@
-// build_tuts.mjs:
-//   Compile/bundle the web app for viewing tutorials, and also all of the 
-//   tutorials
+// build_slides.mjs:
+//   Compile/bundle the web app for viewing slides, and also all of the 
+//   slides
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import esbuildServe from 'esbuild-serve';
-import { TUT_DIST_FOLDER } from './common.mjs';
+import { SLIDE_DIST_FOLDER } from './common.mjs';
 
-// Compute paths to source and destination files for the tutorial viewer web app
+// Compute paths to source and destination files for the slide viewer web app
 const root_folder = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const webapp_src_folder = path.join(root_folder, "src", "viewer");
 const webapp_src_ts = path.join(webapp_src_folder, "viewer.ts");
-const dest_folder = path.join(root_folder, TUT_DIST_FOLDER);
+const dest_folder = path.join(root_folder, SLIDE_DIST_FOLDER);
 const webapp_dest_ts = path.join(dest_folder, "viewer.js");
 
 // CSS and HTML files that need to be copied without any translation
 const src_static_files = [
     ["node_modules/katex/dist/", "katex.min.css"],
     ["node_modules/highlight.js/styles/", "arta.min.css"],
-    ["tutorials/", "tutorials.html"],
-    ["tutorials/", "tutorials.css"],
+    ["slides/", "slides.html"],
+    ["slides/", "slides.css"],
 ];
 
 // Erase and re-build the output folder
@@ -42,26 +42,24 @@ esbuildServe({
     sourcemap: false,
 });
 
-// Now it's time to set up the tutorials
-const tut_src_folder = path.join(root_folder, "tutorials");
-let tutorials = [
-    { tut_name: "tut_getting_started", code_name: "demo_game" },
-    { tut_name: "tut_jetlag_tour", code_name: undefined },
-    { tut_name: "tut_maze_game", code_name: "tut_maze_game" },
+// Now it's time to set up the slides
+const tut_src_folder = path.join(root_folder, "slides");
+let slides = [
+    { slide_name: "slide_example", code_name: undefined },
 ];
 
 // First, copy the .md and subfolder
-for (let t of tutorials) {
-    let mdname = `${t.tut_name}.md`;
-    let subfolder = `${t.tut_name}`;
+for (let t of slides) {
+    let mdname = `${t.slide_name}.md`;
+    let subfolder = `${t.slide_name}`;
     fs.copyFileSync(path.join(tut_src_folder, mdname), path.join(dest_folder, mdname));
     fs.cpSync(path.join(tut_src_folder, subfolder), path.join(dest_folder, subfolder), { recursive: true });
 }
 
 // Next, build each tutorial's game into the destination folder
-for (let t of tutorials) {
+for (let t of slides) {
     if (t.code_name) {
-        build_tutorial_game(t.code_name);
+        build_game(t.code_name);
     }
 }
 
@@ -73,7 +71,7 @@ fs.cpSync(path.join(root_folder, "assets"), path.join(dest_folder, "assets"), { 
  * The expectation is that for a given `target`, this will produce `target.html`
  * and `target.js`.
  */
-function build_tutorial_game(target) {
+function build_game(target) {
     // Figure out path to the source of the target game/tutorial
     let src_folder = path.join(root_folder, "src", target);
 

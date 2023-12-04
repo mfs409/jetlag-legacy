@@ -12,6 +12,11 @@ export const DEV_OUTPUT_FOLDER = "dev-serve";
 export const TUT_DIST_FOLDER = "tut-dist";
 
 /**
+ * The folder where we put build files when preparing slides for distribution
+ */
+export const SLIDE_DIST_FOLDER = "slide-dist";
+
+/**
  * The folder where we put build files when making a single game for
  * distribution
  */
