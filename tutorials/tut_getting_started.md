@@ -2,12 +2,15 @@
 
 In this tutorial, we will discuss how to get started using JetLag.  This
 tutorial doesn't involve much programming.  It only focuses on getting your
-computer set up to start writing games.
+computer set up to start writing games.  When you finish this tutorial, you will
+have a copy of the JetLag code that you are able to run.  You will be able to
+use this as the starting point for learning about games, and also as the
+starting point for making your own game.
 
 ## Required Software
 
 You will need the following programs in order to work with JetLag.  Please note
-that we do not currently support development on phones or ChromeBooks.:
+that we do not currently support development on phones or ChromeBooks:
 
 - A terminal and `git`
     - Every major operating system has at least one terminal program (some even

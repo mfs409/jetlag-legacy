@@ -1,5 +1,9 @@
 # A Tour of JetLag
 
+Description goes here?
+
+## Software Foundations
+
 JetLag is built on top of Pixi.js (for graphics) and Box2D (for physics
 simulation).  Pixi.js and Box2D are general-purpose libraries... they can be
 used to make games, but also for many other purposes.  The main goal of JetLag
