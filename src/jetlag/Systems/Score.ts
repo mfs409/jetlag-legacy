@@ -1,3 +1,4 @@
+import { ImageSprite } from "../Components/Appearance";
 import { Scene } from "../Entities/Scene";
 import { stage } from "../Stage";
 
@@ -75,10 +76,10 @@ export class ScoreSystem {
   public stopWatch = 0;
 
   /** Code for building an overlay to announce that current level is won */
-  public winSceneBuilder?: (overlay: Scene) => void;
+  public winSceneBuilder?: (overlay: Scene, screenshot: ImageSprite) => void;
 
   /** Code for building an overlay to announce that current level is lost */
-  public loseSceneBuilder?: (overlay: Scene) => void;
+  public loseSceneBuilder?: (overlay: Scene, screenshot: ImageSprite) => void;
 
   /** Reset all the scores at the beginning of a new level */
   public reset() {
@@ -278,7 +279,7 @@ export class ScoreSystem {
    * overlay, and then invoke the JetLagManager to choose the next stage
    */
   public winLevel() {
-    if (this.winSceneBuilder) stage.installOverlay(this.winSceneBuilder);
+    if (this.winSceneBuilder) stage.requestOverlay(this.winSceneBuilder);
     else stage.switchTo(this.onWin.builder, this.onWin.level);
   }
 
@@ -287,7 +288,7 @@ export class ScoreSystem {
    * overlay, and then invoke the JetLagManager to choose the next stage
    */
   public loseLevel() {
-    if (this.loseSceneBuilder) stage.installOverlay(this.loseSceneBuilder);
+    if (this.loseSceneBuilder) stage.requestOverlay(this.loseSceneBuilder);
     else stage.switchTo(this.onLose.builder, this.onLose.level);
   }
 }

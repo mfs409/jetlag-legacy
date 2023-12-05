@@ -5,7 +5,7 @@ import { Actor } from "../Entities/Actor";
 import { AnimationSequence, AnimationState } from "../Config";
 import { StateEvent, IStateObserver, ActorState, DIRECTION } from "./StateManager";
 import { stage } from "../Stage";
-import { Graphics } from "pixi.js";
+import { Graphics, Sprite as PixiSprite } from "pixi.js";
 
 /**
  * Validate a filled Box/Circle/Polygon's line/fill information
@@ -25,7 +25,6 @@ function validateFilledConfig(cfg: FilledBox | FilledCircle | FilledPolygon, cfg
   // Validate: if there is no line width or line color, there needs to be a fill color
   else if (cfg.lineWidth === undefined && cfg.fillColor === undefined)
     stage.console.log(`Error: ${cfgName} must have lineWidth or fillColor`);
-
 }
 
 /** Coerce a z value into the range -2...2 */
@@ -227,6 +226,17 @@ export class ImageSprite {
     this.width = width;
     this.height = height;
   }
+
+  /**
+   * An internal method that lets us overwrite the image used by an ImageSprite
+   * with something generated directly by PIXI.  This lets us turn screenshots
+   * into ImageSprites.
+   *
+   * @param pixi_sprite The sprite to use
+   */
+  overrideImage(pixi_sprite: PixiSprite) {
+    this.image.sprite = pixi_sprite;
+  }
 }
 
 /**
@@ -296,7 +306,7 @@ export class AnimatedSprite implements IStateObserver {
     this.height = opts.height;
     this.z = coerceZ(opts.z);
 
-    if (!opts.animations.has(AnimationState.IDLE_E))
+    if (!opts.animations.has(AnimationState.IDLE_E) && !opts.remap?.has(AnimationState.IDLE_E))
       stage.console.log("Error: you must always provide an IDLE_E animation");
 
     // Clone all animations into the map

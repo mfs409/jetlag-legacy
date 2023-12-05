@@ -1,15 +1,16 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { AnimationSequence, AnimationState, GameConfig, Sides } from "../jetlag/Config";
-import { AnimatedSprite, AppearanceComponent, FilledCircle, ImageSprite } from "../jetlag/Components/Appearance";
-import { ExplicitMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { AnimatedSprite, AppearanceComponent, FilledBox, FilledCircle, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { ExplicitMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
-import { Destination, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
+import { Destination, Enemy, Goodie, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { DIRECTION } from "../jetlag/Components/StateManager";
+import { Scene } from "../jetlag/Entities/Scene";
 
 /**
  * GameConfig stores things like screen dimensions and other game configuration,
@@ -69,8 +70,20 @@ export class TutPlatformConfig implements GameConfig {
     "spritesheets/alien_slash_l_0.png", "spritesheets/alien_slash_l_1.png", "spritesheets/alien_slash_l_2.png",
     "spritesheets/alien_slash_l_3.png", "spritesheets/alien_slash_l_4.png", "spritesheets/alien_slash_l_5.png",
 
+    // The bad guy... just walking
+    "spritesheets/lizard_walk_l_0.png", "spritesheets/lizard_walk_l_1.png", "spritesheets/lizard_walk_l_2.png",
+    "spritesheets/lizard_walk_l_3.png", "spritesheets/lizard_walk_l_4.png", "spritesheets/lizard_walk_l_5.png",
+    "spritesheets/lizard_walk_l_6.png", "spritesheets/lizard_walk_l_7.png", "spritesheets/lizard_walk_l_8.png",
+    //
+    "spritesheets/lizard_walk_r_0.png", "spritesheets/lizard_walk_r_1.png", "spritesheets/lizard_walk_r_2.png",
+    "spritesheets/lizard_walk_r_3.png", "spritesheets/lizard_walk_r_4.png", "spritesheets/lizard_walk_r_5.png",
+    "spritesheets/lizard_walk_r_6.png", "spritesheets/lizard_walk_r_7.png", "spritesheets/lizard_walk_r_8.png",
+
     // Layers for Parallax backgrounds
     "mid.png", "back.png",
+
+    // Coins
+    "coin0.png", "coin1.png", "coin2.png", "coin3.png", "coin4.png", "coin5.png", "coin6.png", "coin7.png",
   ];
 
   // The name of the function that builds the initial screen of the game
@@ -146,7 +159,7 @@ export function tut_platform(_level: number) {
 
   let h = Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
-    rigidBody: PolygonBody.Polygon({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1 }),
+    rigidBody: PolygonBody.Polygon({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
     movement: new ExplicitMovement(),
     role: new Hero()
   });
@@ -183,13 +196,120 @@ export function tut_platform(_level: number) {
     appearanceMaker: () => new FilledCircle({ radius: 0.125, fillColor: "#777777", z: 0 }),
   });
 
-  // Add buttons for throwing to the left and right
+  // Throw in the direction the hero is facing
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_TAB, () => {
     if (h.state.current.last_ew == DIRECTION.W || h.state.current.direction == DIRECTION.W || h.state.current.direction == DIRECTION.NW || h.state.current.direction == DIRECTION.SW)
       (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, -.5, .3, -5, 0);
     else
       (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .5, .3, 5, 0)
   });
+
+  Actor.Make({
+    appearance: new FilledBox({ width: 2, height: .2, fillColor: "#444444" }),
+    rigidBody: BoxBody.Box({ width: 2, height: .2, cx: 3, cy: 7.4 }),
+    role: new Obstacle(),
+  })
+
+  Actor.Make({
+    appearance: new FilledBox({ width: 2, height: .2, fillColor: "#444444" }),
+    rigidBody: BoxBody.Box({ width: 2, height: .2, cx: 7, cy: 5.4 }),
+    role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
+  })
+
+  Actor.Make({
+    appearance: new FilledBox({ width: 4, height: .2, fillColor: "#444444" }),
+    rigidBody: BoxBody.Box({ width: 4, height: .2, cx: 13, cy: 3.4 }),
+    role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
+  })
+
+  // Coins on the top platform
+  animations = new Map();
+  animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("coin0.png", 100).to("coin1.png", 100).to("coin2.png", 100).to("coin3.png", 100).to("coin4.png", 100).to("coin5.png", 100).to("coin6.png", 100).to("coin7.png", 100))
+  for (let cx of [11.5, 12.5, 13.5, 14.5]) {
+    Actor.Make({
+      appearance: new AnimatedSprite({ width: .5, height: .5, animations }),
+      rigidBody: CircleBody.Circle({ radius: .25, cx, cy: 3.05 }),
+      role: new Goodie(),
+    });
+  }
+
+  // HUD Coin Counter
+  Actor.Make({
+    appearance: new AnimatedSprite({ width: .5, height: .5, animations }),
+    rigidBody: CircleBody.Circle({ radius: .15, cx: 14.5, cy: 0.5 }, stage.hud),
+    role: new Goodie(),
+  });
+  Actor.Make({
+    appearance: new TextSprite({ center: false, face: "Arial", size: 36, color: "#ffffff" }, () => "x " + stage.score.getGoodieCount(0)),
+    rigidBody: CircleBody.Circle({ radius: .01, cx: 15, cy: 0.25 }, stage.hud),
+    role: new Goodie(),
+  });
+
+
+  animations = new Map();
+  animations.set(AnimationState.WALK_W, new AnimationSequence(true)
+    .to("spritesheets/lizard_walk_l_0.png", 75).to("spritesheets/lizard_walk_l_1.png", 75)
+    .to("spritesheets/lizard_walk_l_2.png", 75).to("spritesheets/lizard_walk_l_3.png", 75)
+    .to("spritesheets/lizard_walk_l_4.png", 75).to("spritesheets/lizard_walk_l_5.png", 75)
+    .to("spritesheets/lizard_walk_l_6.png", 75).to("spritesheets/lizard_walk_l_7.png", 75)
+    .to("spritesheets/lizard_walk_l_8.png", 75));
+
+  animations.set(AnimationState.WALK_E, new AnimationSequence(true)
+    .to("spritesheets/lizard_walk_r_0.png", 75).to("spritesheets/lizard_walk_r_1.png", 75)
+    .to("spritesheets/lizard_walk_r_2.png", 75).to("spritesheets/lizard_walk_r_3.png", 75)
+    .to("spritesheets/lizard_walk_r_4.png", 75).to("spritesheets/lizard_walk_r_5.png", 75)
+    .to("spritesheets/lizard_walk_r_6.png", 75).to("spritesheets/lizard_walk_r_7.png", 75)
+    .to("spritesheets/lizard_walk_r_8.png", 75));
+  remap = new Map();
+  remap.set(AnimationState.IDLE_E, AnimationState.WALK_E);
+  // Enemy to defeat
+  Actor.Make({
+    appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
+    rigidBody: PolygonBody.Polygon({ cx: 14.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
+    movement: new PathMovement(new Path().to(14.5, 8.1).to(18.5, 8.1).to(14.5, 8.1), 2.5, true),
+    role: new Enemy()
+  });
+
+  stage.score.onLose = { level: 1, builder: tut_platform };
+  stage.score.onWin = { level: 1, builder: tut_platform };
+
+  stage.score.winSceneBuilder = (overlay: Scene, _screenshot: ImageSprite) => {
+    Actor.Make({
+      appearance: _screenshot,
+      // appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      gestures: {
+        tap: () => {
+          stage.clearOverlay();
+          stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level);
+          return true;
+        }
+      }
+    });
+    Actor.Make({
+      appearance: new TextSprite({ center: true, face: "Arial", size: 44, color: "#FFFFFF" }, "Great Job!"),
+      rigidBody: CircleBody.Circle({ cx: 8, cy: 4.5, radius: .1 }, overlay),
+    });
+  };
+
+  stage.score.loseSceneBuilder = (overlay: Scene, screenshot: ImageSprite) => {
+    Actor.Make({
+      appearance: screenshot,
+      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      gestures: {
+        tap: () => {
+          stage.clearOverlay();
+          stage.switchTo(stage.score.onLose.builder, stage.score.onLose.level);
+          return true;
+        }
+      }
+    });
+    Actor.Make({
+      appearance: new TextSprite({ center: true, face: "Arial", size: 44, color: "#FFFFFF" }, "Try Again"),
+      rigidBody: CircleBody.Circle({ cx: 8, cy: 4.5, radius: .1 }, overlay),
+    });
+  };
+
 }
 
 // call the function that kicks off the game
@@ -220,12 +340,12 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
 
 
   // The top only differs by translating the Y from the bottom
-  cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
-  Actor.Make({
-    appearance: new ImageSprite(cfg),
-    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
-    role: new Obstacle({ jumpReEnable: false }),
-  });
+  // cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
+  // Actor.Make({
+  //   appearance: new ImageSprite(cfg),
+  //   rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+  //   role: new Obstacle({ jumpReEnableSides: [] }),
+  // });
 
   // Right box:
   let height = Math.abs(y0 - y1);
@@ -233,7 +353,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   Actor.Make({
     appearance: new ImageSprite(cfg),
     rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
-    role: new Obstacle({ jumpReEnable: false }),
+    role: new Obstacle({ jumpReEnableSides: [] }),
   });
 
   // The left only differs by translating the X
@@ -241,7 +361,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   Actor.Make({
     appearance: new ImageSprite(cfg),
     rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
-    role: new Obstacle({ jumpReEnable: false }),
+    role: new Obstacle({ jumpReEnableSides: [] }),
   });
 }
 

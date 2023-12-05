@@ -727,7 +727,7 @@ export function buildLevelScreen(level: number) {
     // the "()=>{}" code says "this is the function that will create the
     // overlay".  It doesn't make the overlay yet... it just tells JetLag
     // how to make the overlay.  We call such code "callbacks"
-    stage.installOverlay((overlay: Scene) => {
+    stage.requestOverlay((overlay: Scene) => {
       // We are going to put a big black button over the whole screen.
       // Clicking it will get rid of this overlay
       Helpers.addTapControl(overlay,
@@ -801,7 +801,7 @@ export function buildLevelScreen(level: number) {
     // disappear by clicking.  Instead, it will disappear after a few
     // seconds.  Note that the timer for dismissing is a callback within a
     // callback
-    stage.installOverlay((overlay: Scene) => {
+    stage.requestOverlay((overlay: Scene) => {
       let opts = { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" };
       Actor.Make({
         appearance: new FilledBox(opts),
@@ -1006,7 +1006,7 @@ export function buildLevelScreen(level: number) {
     // possible to draw a pause scene, it will draw it, so this will cause the
     // game to switch to a pause scene until the overlay gets dismissed
     Helpers.addTapControl(stage.hud, { cx: 15, cy: 3, width: 1, height: 1, img: "pause.png" }, (): boolean => {
-      stage.installOverlay((overlay: Scene) => {
+      stage.requestOverlay((overlay: Scene) => {
         Helpers.addTapControl(
           overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
@@ -1064,7 +1064,7 @@ export function buildLevelScreen(level: number) {
     // Put a button on the HUD to pause the game
     Helpers.addTapControl(stage.hud, { cx: 1, cy: 8, width: 0.4, height: 0.4, img: "pause.png" }, () => {
       // When the button is pressed, draw an overlay scene
-      stage.installOverlay((overlay: Scene) => {
+      stage.requestOverlay((overlay: Scene) => {
         // The scene should have a full-screen background.  Pressing it should
         // resume the game.
         Helpers.addTapControl(
@@ -3920,7 +3920,7 @@ export function buildLevelScreen(level: number) {
 
     // set a timer callback. after three seconds, the callback will run
     stage.world.timer.addEvent(new TimedEvent(2, false, () => {
-      stage.installOverlay((overlay: Scene) => {
+      stage.requestOverlay((overlay: Scene) => {
         Helpers.makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 18, z: 0 },
           () => "Ooh... a draggable enemy");
@@ -3948,7 +3948,7 @@ export function buildLevelScreen(level: number) {
       // actors flash for a moment before the message appears.  To fix that,
       // consider drawing the actors as part of the code that runs when the
       // overlay is tapped.
-      stage.installOverlay((overlay: Scene) => {
+      stage.requestOverlay((overlay: Scene) => {
         Helpers.makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 18, z: 1 },
           () => "Touch the enemy and it will go away");
@@ -3973,7 +3973,7 @@ export function buildLevelScreen(level: number) {
     stage.world.timer.addEvent(new TimedEvent(9, false, () => {
       // draw an enemy, a goodie, and a destination, all with
       // fixed velocities
-      stage.installOverlay((overlay: Scene) => {
+      stage.requestOverlay((overlay: Scene) => {
         Helpers.addTapControl(overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
           () => { stage.clearOverlay(); return true; }
@@ -4124,7 +4124,7 @@ export function buildLevelScreen(level: number) {
         stage.musicLibrary.getSound("high_pitch.ogg").play();
 
         // print a message and pause the game, via PauseScene
-        stage.installOverlay((overlay: Scene) => {
+        stage.requestOverlay((overlay: Scene) => {
           Helpers.addTapControl(overlay,
             { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
             () => { stage.clearOverlay(); return true; }
@@ -4290,7 +4290,7 @@ export function buildLevelScreen(level: number) {
     // Here's some code to run whenever an enemy is defeated
     let onDefeatScript = () => {
       // Make a fresh pause scene
-      stage.installOverlay((overlay: Scene) => {
+      stage.requestOverlay((overlay: Scene) => {
         Helpers.makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#58E2A0", size: 16, z: 0 }, () => "good job, here's a prize");
         Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => { stage.clearOverlay(); return true; });
@@ -4472,7 +4472,7 @@ export function buildLevelScreen(level: number) {
     Helpers.addTapControl(stage.hud,
       { cx: .5, cy: .5, width: .5, height: .5, img: "pause.png" },
       () => {
-        stage.installOverlay((overlay: Scene) => {
+        stage.requestOverlay((overlay: Scene) => {
           Helpers.makeText(overlay,
             { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
             () => "Game Paused");
@@ -4576,7 +4576,7 @@ export function buildLevelScreen(level: number) {
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1, friction: 0.5 }),
       movement: new InertMovement(),
-      role: new Obstacle({ jumpReEnable: false }),
+      role: new Obstacle({ jumpReEnableSides: [] }),
     });
   }
 
@@ -5439,7 +5439,7 @@ export function buildLevelScreen(level: number) {
       () => {
         if (hasPaused) return false;
         hasPaused = true;
-        stage.installOverlay((overlay: Scene) => {
+        stage.requestOverlay((overlay: Scene) => {
           Helpers.addTapControl(overlay,
             { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
             () => { stage.clearOverlay(); return true; }
@@ -5530,7 +5530,7 @@ export function buildLevelScreen(level: number) {
       stage.hud,
       { cx: 0.5, cy: 0.5, width: .5, height: .5, img: "pause.png" },
       () => {
-        stage.installOverlay((overlay: Scene) => {
+        stage.requestOverlay((overlay: Scene) => {
 
           // This button goes back to the Chooser
           Helpers.addTapControl(overlay,
@@ -5562,7 +5562,7 @@ export function buildLevelScreen(level: number) {
             () => {
               // clear the pause scene, draw another one
               stage.clearOverlay();
-              stage.installOverlay((overlay: Scene) => {
+              stage.requestOverlay((overlay: Scene) => {
                 Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
                   // In a pause scene, we can change things that are in the
                   // world, not just the HUD, so let's give the hero more
@@ -6101,7 +6101,7 @@ export function buildLevelScreen(level: number) {
  */
 export function welcomeMessage(message: string, subMessage: string = "") {
   // Immediately install the overlay, to pause the game
-  stage.installOverlay((overlay: Scene) => {
+  stage.requestOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
     Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => { stage.clearOverlay(); return true; });
     // The text goes in the middle

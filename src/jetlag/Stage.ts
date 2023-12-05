@@ -14,6 +14,7 @@ import { StorageService } from "./Services/Storage";
 import { TiltSystem } from "./Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "./Systems/Collisions";
 import { ImageLibraryService } from "./Services/ImageLibrary";
+import { ImageSprite } from "./Components/Appearance";
 
 /**
  * Stage is the container for all of the functionality for the playable portion
@@ -83,17 +84,39 @@ export class Stage {
   screenHeight: number;
   /** The real pixel-meter ratio */
   pixelMeterRatio: number;
+  /** Code to run at the end of the next render step */
+  private afterRender?: () => void;
 
   /**
-   * Put an overlay on top of the game.  This is *not* the HUD.  It's something
-   * that goes on top of everything else, and prevents the game from playing,
-   * such as a pause scene, a win/lose scene, or a welcome scene.
+   * Request that an overlay be put on top of the game.  This is *not* the HUD.
+   * It's something that goes on top of everything else, and prevents the game
+   * from playing, such as a pause scene, a win/lose scene, or a welcome scene.
+   *
+   * NB:  The overlay will not show until the renderer grabs a screenshot.  This
+   *      can take a render cycle or two.
    *
    * @param builder Code for creating the overlay
    */
-  public installOverlay(builder: (overlay: Scene) => void) {
-    this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
-    builder(this.overlay);
+  public requestOverlay(builder: (overlay: Scene, screenshot: ImageSprite) => void) {
+    // clear the last snapshot, so that we'll get one on the next attempt
+    if (this.renderer.lastSnapshot) {
+      this.renderer.lastSnapshot.destroy(true);
+      this.renderer.lastSnapshot = undefined;
+    }
+
+    let action = () => {
+      if (this.renderer.lastSnapshot) {
+        let screenshot = new ImageSprite({ width: 16, height: 9, img: "", z: -2 });
+        screenshot.overrideImage(this.renderer.lastSnapshot);
+        this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
+        builder(this.overlay, screenshot);
+        this.afterRender = undefined;
+      }
+      else {
+        this.afterRender = action;
+      }
+    }
+    this.afterRender = action;
   }
 
   /** Remove the current overlay scene, if any */
@@ -151,6 +174,9 @@ export class Stage {
     this.hud.runRendertimeEvents();
     this.hud.timer.advance(elapsedMs);
     this.hud.camera.render(elapsedMs);
+
+    if (this.afterRender)
+      this.afterRender();
   }
 
   /**

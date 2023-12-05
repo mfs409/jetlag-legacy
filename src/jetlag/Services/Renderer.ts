@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, BlurFilter, NoiseFilter } from "pixi.js";
+import { Application, Container, Graphics, BlurFilter, NoiseFilter, SCALE_MODES, Sprite as PixiSprite } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
 import { stage } from "../Stage";
 import { AppearanceComponent, FilledBox, FilledCircle, FilledPolygon } from "../Components/Appearance";
@@ -40,6 +40,9 @@ export class RendererService {
    * tutorials, otherwise not.
    */
   public suppressHitBoxes = false;
+
+  /** The most recently-taken snapshot */
+  public lastSnapshot?: PixiSprite;
 
   /**
    * Initialize the renderer.
@@ -85,8 +88,13 @@ export class RendererService {
 
       // Add the container to the renderer, so it will show on screen
       this.pixi.stage.addChild(this.main);
+
+      // Grab a snapshot if we don't have one yet
+      if (!this.lastSnapshot)
+        this.lastSnapshot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
     });
   }
+
 
   /**
    * Set the background color of the next frame to a HTML hex value (e.g.,

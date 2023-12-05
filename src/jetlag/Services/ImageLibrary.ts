@@ -22,7 +22,7 @@ export class Sprite {
    * @param imgName the name of the image file to load
    * @param sprite The PIXI sprite to use
    */
-  constructor(readonly imgName: string, readonly sprite: PixiSprite) { }
+  constructor(readonly imgName: string, public sprite: PixiSprite) { }
 
   /**
    * Set the position of the sprite relative to some X/Y anchor point

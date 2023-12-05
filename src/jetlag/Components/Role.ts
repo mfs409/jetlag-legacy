@@ -1,7 +1,7 @@
 import { b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
-import { StateEvent } from "./StateManager";
+import { DIRECTION, StateEvent } from "./StateManager";
 import { AnimatedSprite, ImageSprite } from "./Appearance";
 import { ProjectileMovement } from "./Movement";
 
@@ -535,13 +535,28 @@ export class Hero extends Role {
     // behavior, run it
     if (obstacle.heroCollision) obstacle.heroCollision(o, this._actor!);
 
-    // If this is a wall, then mark us not in the air so we can do more
-    // jumps. Note that sensors should not enable jumps for the hero.
-    if ((this.inAir || this.allowMultiJump) && !sensor && obstacle.jumpReEnable) {
-      this.collisionRules.properties = this.collisionRules.properties.filter(value => value != CollisionExemptions.JUMP_HERO);
-      this.inAir = false;
-      this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.JUMP_HERO)
-      this._actor!.state.changeState(this._actor!, StateEvent.JUMP_N);
+    // If this is a wall with a suitable jumpReEnable side, then mark us not in
+    // the air so we can do more jumps
+    if (this.inAir || this.allowMultiJump) {
+      let reenable = false;
+      let h_t = this.actor!.rigidBody.getCenter().y - this.actor!.rigidBody.h / 2;
+      let h_b = this.actor!.rigidBody.getCenter().y + this.actor!.rigidBody.h / 2;
+      let h_l = this.actor!.rigidBody.getCenter().x - this.actor!.rigidBody.w / 2;
+      let h_r = this.actor!.rigidBody.getCenter().x + this.actor!.rigidBody.w / 2;
+      let o_t = obstacle.actor!.rigidBody.getCenter().y - obstacle.actor!.rigidBody.h / 2;
+      let o_b = obstacle.actor!.rigidBody.getCenter().y + obstacle.actor!.rigidBody.h / 2;
+      let o_l = obstacle.actor!.rigidBody.getCenter().x - obstacle.actor!.rigidBody.w / 2;
+      let o_r = obstacle.actor!.rigidBody.getCenter().x + obstacle.actor!.rigidBody.w / 2;
+      if (obstacle.jumpReEnableSides.indexOf(DIRECTION.N) > -1) reenable = reenable || (h_b <= o_t);
+      if (obstacle.jumpReEnableSides.indexOf(DIRECTION.S) > -1) reenable = reenable || (h_t >= o_b);
+      if (obstacle.jumpReEnableSides.indexOf(DIRECTION.E) > -1) reenable = reenable || (h_l <= o_r);
+      if (obstacle.jumpReEnableSides.indexOf(DIRECTION.W) > -1) reenable = reenable || (h_r >= o_l);
+      if (reenable) {
+        this.collisionRules.properties = this.collisionRules.properties.filter(value => value != CollisionExemptions.JUMP_HERO);
+        this.inAir = false;
+        this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.JUMP_HERO)
+        this._actor!.state.changeState(this._actor!, StateEvent.JUMP_N);
+      }
     }
   }
 
@@ -639,10 +654,10 @@ export class Obstacle extends Role {
    *                                  with an enemy
    * @param cfg.disableHeroCollision  Should the hero bounce off of this
    *                                  obstacle?
-   * @param cfg.jumpReEnable          Does colliding with this obstacle mean the
-   *                                  hero can jump again (default true)
+   * @param cfg.jumpReEnableSides     Which sides "count" for letting a jumping
+   *                                  hero jump again?
    */
-  constructor(cfg: { heroCollision?: (thisActor: Actor, collideActor: Actor) => void, enemyCollision?: (thisActor: Actor, collideActor: Actor) => void, disableHeroCollision?: boolean, jumpReEnable?: false } = {}) {
+  constructor(cfg: { heroCollision?: (thisActor: Actor, collideActor: Actor) => void, enemyCollision?: (thisActor: Actor, collideActor: Actor) => void, disableHeroCollision?: boolean, jumpReEnableSides?: DIRECTION[] } = {}) {
     super();
 
     this.collisionRules.properties.push(CollisionExemptions.OBSTACLE);
@@ -650,7 +665,12 @@ export class Obstacle extends Role {
     this.heroCollision = cfg.heroCollision;
     this.enemyCollision = cfg.enemyCollision;
     if (cfg.disableHeroCollision) this.collisionRules.ignores.push(CollisionExemptions.HERO);
-    this.jumpReEnable = (cfg.jumpReEnable == undefined) ? true : cfg.jumpReEnable;
+    // Switch from default jump-reenable sides (all) to just the specified ones
+    if (cfg.jumpReEnableSides) {
+      this.jumpReEnableSides = [];
+      for (let s of cfg.jumpReEnableSides)
+        this.jumpReEnableSides.push(s);
+    }
   }
 
   /** Code to run when there is a collision involving this role's Actor */
@@ -672,8 +692,8 @@ export class Obstacle extends Role {
   /** This is for when an enemy collides with an obstacle */
   enemyCollision?: (thisActor: Actor, collideActor: Actor) => void;
 
-  /** Indicate that this obstacle counts as a "wall", and stops the current jump */
-  public jumpReEnable = true;
+  /** Which sides of this obstacle count as a "wall" to stop the current jump */
+  public jumpReEnableSides = [DIRECTION.N, DIRECTION.S, DIRECTION.E, DIRECTION.W];
 
   /**
    * Internal method for playing a sound when a hero collides with this
