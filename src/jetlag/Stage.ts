@@ -34,9 +34,6 @@ import { ImageSprite } from "./Components/Appearance";
  * Stage does not manage transitions between scenes on its own. Instead, it has
  * mechanisms (onScreenChange and endLevel) for resetting itself at the
  * beginning of a stage, and cleaning itself up at the end of a stage.
- *
- * TODO:  It would be nice to have transparency to the (paused) underlying
- *        world, maybe even with effects, when an overlay is showing.
  */
 export class Stage {
   /** The physics world in which all actors exist */
@@ -98,16 +95,16 @@ export class Stage {
    * @param builder Code for creating the overlay
    */
   public requestOverlay(builder: (overlay: Scene, screenshot: ImageSprite) => void) {
-    // clear the last snapshot, so that we'll get one on the next attempt
-    if (this.renderer.lastSnapshot) {
-      this.renderer.lastSnapshot.destroy(true);
-      this.renderer.lastSnapshot = undefined;
+    // clear the last screenshot, so that we'll get one on the next attempt
+    if (this.renderer.lastScreenshot) {
+      this.renderer.lastScreenshot.destroy(true);
+      this.renderer.lastScreenshot = undefined;
     }
 
     let action = () => {
-      if (this.renderer.lastSnapshot) {
+      if (this.renderer.lastScreenshot) {
         let screenshot = new ImageSprite({ width: 16, height: 9, img: "", z: -2 });
-        screenshot.overrideImage(this.renderer.lastSnapshot);
+        screenshot.overrideImage(this.renderer.lastScreenshot);
         this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
         builder(this.overlay, screenshot);
         this.afterRender = undefined;

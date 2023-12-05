@@ -41,8 +41,8 @@ export class RendererService {
    */
   public suppressHitBoxes = false;
 
-  /** The most recently-taken snapshot */
-  public lastSnapshot?: PixiSprite;
+  /** The most recently-taken screenshot */
+  public lastScreenshot?: PixiSprite;
 
   /**
    * Initialize the renderer.
@@ -89,9 +89,10 @@ export class RendererService {
       // Add the container to the renderer, so it will show on screen
       this.pixi.stage.addChild(this.main);
 
-      // Grab a snapshot if we don't have one yet
-      if (!this.lastSnapshot)
-        this.lastSnapshot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
+      // Grab a screenshot if we don't have one yet
+      // TODO:  This screenshot includes the HUD.  I don't think we want that.
+      if (!this.lastScreenshot)
+        this.lastScreenshot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
     });
   }
 
@@ -389,7 +390,8 @@ export class RendererService {
    * Apply one of our pre-made filters to the world.  All filter stuff is
    * in-progress
    *
-   * TODO: finish adding filter support
+   * TODO:  Finish adding filter support.  We probably want to do it one Z at a
+   *        time?
    *
    * @param use_blur      Use the blur filter?
    * @param use_ascii     Use the ASCII filter?
