@@ -9,6 +9,7 @@ import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
+import { DIRECTION } from "../jetlag/Components/StateManager";
 
 /**
  * GameConfig stores things like screen dimensions and other game configuration,
@@ -101,8 +102,6 @@ export function tut_platform(_level: number) {
     .to("spritesheets/alien_walk_l_4.png", 75).to("spritesheets/alien_walk_l_5.png", 75)
     .to("spritesheets/alien_walk_l_6.png", 75).to("spritesheets/alien_walk_l_7.png", 75)
     .to("spritesheets/alien_walk_l_8.png", 75));
-  // remap.set(AnimationState.WALK_NW, AnimationState.WALK_W);
-  // remap.set(AnimationState.WALK_SW, AnimationState.WALK_W);
 
   animations.set(AnimationState.WALK_E, new AnimationSequence(true)
     .to("spritesheets/alien_walk_r_0.png", 75).to("spritesheets/alien_walk_r_1.png", 75)
@@ -110,18 +109,12 @@ export function tut_platform(_level: number) {
     .to("spritesheets/alien_walk_r_4.png", 75).to("spritesheets/alien_walk_r_5.png", 75)
     .to("spritesheets/alien_walk_r_6.png", 75).to("spritesheets/alien_walk_r_7.png", 75)
     .to("spritesheets/alien_walk_r_8.png", 75));
-  // remap.set(AnimationState.WALK_NE, AnimationState.WALK_E);
-  // remap.set(AnimationState.WALK_SE, AnimationState.WALK_E);
 
   animations.set(AnimationState.JUMP_W, new AnimationSequence(true)
     .to("spritesheets/alien_cast_l_0.png", 75).to("spritesheets/alien_cast_l_1.png", 75)
     .to("spritesheets/alien_cast_l_2.png", 75).to("spritesheets/alien_cast_l_3.png", 75)
     .to("spritesheets/alien_cast_l_4.png", 8000).to("spritesheets/alien_cast_l_5.png", 75)
     .to("spritesheets/alien_cast_l_6.png", 75));
-  // remap.set(AnimationState.JUMP_NW, AnimationState.JUMP_W);
-  // remap.set(AnimationState.JUMP_SW, AnimationState.JUMP_W);
-  // remap.set(AnimationState.JUMP_IDLE_NW, AnimationState.JUMP_W);
-  // remap.set(AnimationState.JUMP_IDLE_SW, AnimationState.JUMP_W);
   remap.set(AnimationState.JUMP_IDLE_W, AnimationState.JUMP_W);
 
   animations.set(AnimationState.JUMP_E, new AnimationSequence(true)
@@ -129,10 +122,6 @@ export function tut_platform(_level: number) {
     .to("spritesheets/alien_cast_r_2.png", 75).to("spritesheets/alien_cast_r_3.png", 75)
     .to("spritesheets/alien_cast_r_4.png", 8000).to("spritesheets/alien_cast_r_5.png", 75)
     .to("spritesheets/alien_cast_r_6.png", 75));
-  // remap.set(AnimationState.JUMP_NE, AnimationState.JUMP_E);
-  // remap.set(AnimationState.JUMP_SE, AnimationState.JUMP_E);
-  // remap.set(AnimationState.JUMP_IDLE_SE, AnimationState.JUMP_E);
-  // remap.set(AnimationState.JUMP_IDLE_NE, AnimationState.JUMP_E);
   remap.set(AnimationState.JUMP_IDLE_E, AnimationState.JUMP_E);
 
   animations.set(AnimationState.TOSS_W, new AnimationSequence(true)
@@ -140,35 +129,20 @@ export function tut_platform(_level: number) {
     .to("spritesheets/alien_thrust_l_2.png", 10).to("spritesheets/alien_thrust_l_3.png", 10)
     .to("spritesheets/alien_thrust_l_4.png", 75).to("spritesheets/alien_thrust_l_5.png", 50)
     .to("spritesheets/alien_thrust_l_6.png", 50).to("spritesheets/alien_thrust_l_7.png", 50));
-  // remap.set(AnimationState.TOSS_NW, AnimationState.TOSS_W);
-  // remap.set(AnimationState.TOSS_SW, AnimationState.TOSS_W);
   remap.set(AnimationState.TOSS_IDLE_W, AnimationState.TOSS_W);
-  // remap.set(AnimationState.TOSS_IDLE_SW, AnimationState.TOSS_W);
-  // remap.set(AnimationState.TOSS_IDLE_NW, AnimationState.TOSS_W);
 
   animations.set(AnimationState.TOSS_E, new AnimationSequence(true)
     .to("spritesheets/alien_thrust_r_0.png", 10).to("spritesheets/alien_thrust_r_1.png", 10)
     .to("spritesheets/alien_thrust_r_2.png", 10).to("spritesheets/alien_thrust_r_3.png", 10)
     .to("spritesheets/alien_thrust_r_4.png", 75).to("spritesheets/alien_thrust_r_5.png", 50)
     .to("spritesheets/alien_thrust_r_6.png", 50).to("spritesheets/alien_thrust_r_7.png", 50));
-  // remap.set(AnimationState.TOSS_NE, AnimationState.TOSS_E);
-  // remap.set(AnimationState.TOSS_SE, AnimationState.TOSS_E);
   remap.set(AnimationState.TOSS_IDLE_E, AnimationState.TOSS_E);
-  // remap.set(AnimationState.TOSS_IDLE_SE, AnimationState.TOSS_E);
-  // remap.set(AnimationState.TOSS_IDLE_NE, AnimationState.TOSS_E);
 
   animations.set(AnimationState.IDLE_W, new AnimationSequence(true)
     .to("spritesheets/alien_thrust_l_0.png", 750).to("spritesheets/alien_thrust_l_1.png", 75));
-  // remap.set(AnimationState.IDLE_NW, AnimationState.IDLE_W);
-  // remap.set(AnimationState.IDLE_SW, AnimationState.IDLE_W);
-  // remap.set(AnimationState.IDLE_N, AnimationState.IDLE_W);
 
   animations.set(AnimationState.IDLE_E, new AnimationSequence(true)
     .to("spritesheets/alien_thrust_r_0.png", 750).to("spritesheets/alien_thrust_r_1.png", 75));
-  // remap.set(AnimationState.IDLE_NE, AnimationState.IDLE_E);
-  // remap.set(AnimationState.IDLE_SE, AnimationState.IDLE_E);
-  // remap.set(AnimationState.IDLE_S, AnimationState.IDLE_E);
-
 
   let h = Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
@@ -210,12 +184,12 @@ export function tut_platform(_level: number) {
   });
 
   // Add buttons for throwing to the left and right
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_A, () =>
-    (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, -.5, .3, -5, 0)
-  );
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_D, () =>
-    (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .5, .3, 5, 0)
-  );
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_TAB, () => {
+    if (h.state.current.last_ew == DIRECTION.W || h.state.current.direction == DIRECTION.W || h.state.current.direction == DIRECTION.NW || h.state.current.direction == DIRECTION.SW)
+      (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, -.5, .3, -5, 0);
+    else
+      (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .5, .3, 5, 0)
+  });
 }
 
 // call the function that kicks off the game
