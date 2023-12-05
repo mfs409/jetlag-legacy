@@ -271,6 +271,11 @@ export class AnimatedSprite implements IStateObserver {
    * AnimationStates) 
    */
   animations: Map<AnimationState, AnimationSequence>;
+  /**
+   * A function for selecting what animation state to move to when the attached
+   * actor's state changes.  Defaults to the version for overhead-style games.
+   */
+  stateSelector: (oldState: ActorState, newState: ActorState) => AnimationState = AnimatedSprite.overheadAnimationTransitions;
 
   /**
    * Build an animation that can be rendered
@@ -283,8 +288,10 @@ export class AnimatedSprite implements IStateObserver {
    *                        include one for IDLE_E, since that is the default
    *                        animation
    * @param opts.z          An optional z index in the range [-2,2]
+   * @param opts.remap      A map that indicates when an animation for one state
+   *                        should be re-used for another state.
    */
-  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, z?: number }) {
+  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, z?: number, remap?: Map<AnimationState, AnimationState> }) {
     this.width = opts.width;
     this.height = opts.height;
     this.z = coerceZ(opts.z);
@@ -299,6 +306,11 @@ export class AnimatedSprite implements IStateObserver {
       if (v)
         this.animations.set(k, v.clone())
     }
+
+    // Re-map things that we want to use in more than one place
+    if (opts.remap)
+      for (let k of opts.remap.keys())
+        this.animations.set(k, this.animations.get(opts.remap.get(k)!)!)
 
     this.current_ani = this.animations.get(AnimationState.IDLE_E)!;
   }
@@ -337,12 +349,20 @@ export class AnimatedSprite implements IStateObserver {
    * @param actor     The actor whose state is changing.
    * @param event     The event that might have caused `actor`'s state to change
    * @param newState  The new state of `actor`
+   * @param oleState  The old state of `actor`
    */
-  onStateChange(_actor: Actor, event: StateEvent, newState: ActorState) {
-    // Do a regular animation
-    let st = AnimatedSprite.getAnimationState(newState);
+  onStateChange(_actor: Actor, event: StateEvent, newState: ActorState, oldState: ActorState) {
+    // In order to support sideViewAnimationTransitions, we need to take care
+    // not to lose information when a west-facing actor moves directly
+    // upward/downward.  We accomplish this via the old state's last_ew.
+    if (newState.direction == DIRECTION.N || newState.direction == DIRECTION.S)
+      newState.last_ew = oldState.last_ew;
+    else if (newState.direction == DIRECTION.E || newState.direction == DIRECTION.NE || newState.direction == DIRECTION.SE)
+      newState.last_ew = DIRECTION.E;
+    else
+      newState.last_ew = DIRECTION.W;
+    let st = this.stateSelector(oldState, newState);
     let newAni = this.animations.get(st);
-    // [mfs] I suspect that this check rarely passes, because object equality != configOpts equality...
     if (newAni === this.current_ani) return;
     if (newAni === undefined) { newAni = this.animations.get(AnimationState.IDLE_E)!; }
     this.current_ani = newAni;
@@ -360,133 +380,206 @@ export class AnimatedSprite implements IStateObserver {
   }
 
   /**
-   * Figure out what AnimationState to use, given an ActorState
+   * Figure out what AnimationState to use, given an ActorState.  This version
+   * is designed for top-down style games, where the camera seems to be
+   * overhead.
    *
-   * @param s The ActorState from which we will derive an AnimationState
+   * NB:  This is the default version, but there's no guarantee that it is very
+   *      good.  It is used via stateSelector, which can be overridden.  Or you
+   *      could chose to modify it for your game.
+   *
+   * @param oldState  The state that the actor was in
+   * @param newState  The details of the new state the actor is moving to
    */
-  private static getAnimationState(s: ActorState) {
-    // NB:  It's somewhat unavoidable that somewhere we need to have a big chunk
-    //      of code for dealing with the 80 different animations.  Here it is.  
-
-    // TODO:  Despite the above comment, this code needs to be smarter
-    if (s.moving) {
-      if (s.direction == DIRECTION.N) {
-        if (s.crawling) { return AnimationState.CRAWL_N; }
-        else if (s.invincible) { return AnimationState.INV_N; }
-        else if (s.jumping) { return AnimationState.JUMP_N; }
-        else if (s.tossing) { return AnimationState.TOSS_N; }
+  static overheadAnimationTransitions(_oldState: ActorState, newState: ActorState) {
+    // NB:  This version is designed for the case where *all* animations are
+    //      provided, so it explicitly details all of the 80 possible states for
+    //      an overhead game.
+    if (newState.moving) {
+      if (newState.direction == DIRECTION.N) {
+        if (newState.crawling) { return AnimationState.CRAWL_N; }
+        else if (newState.invincible) { return AnimationState.INV_N; }
+        else if (newState.jumping) { return AnimationState.JUMP_N; }
+        else if (newState.tossing) { return AnimationState.TOSS_N; }
         else { return AnimationState.WALK_N; }
       }
-      else if (s.direction == DIRECTION.NE) {
-        if (s.crawling) { return AnimationState.CRAWL_NE; }
-        else if (s.invincible) { return AnimationState.INV_NE; }
-        else if (s.jumping) { return AnimationState.JUMP_NE; }
-        else if (s.tossing) { return AnimationState.TOSS_NE; }
+      else if (newState.direction == DIRECTION.NE) {
+        if (newState.crawling) { return AnimationState.CRAWL_NE; }
+        else if (newState.invincible) { return AnimationState.INV_NE; }
+        else if (newState.jumping) { return AnimationState.JUMP_NE; }
+        else if (newState.tossing) { return AnimationState.TOSS_NE; }
         else { return AnimationState.WALK_NE; }
       }
-      else if (s.direction == DIRECTION.E) {
-        if (s.crawling) { return AnimationState.CRAWL_E; }
-        else if (s.invincible) { return AnimationState.INV_E; }
-        else if (s.jumping) { return AnimationState.JUMP_E; }
-        else if (s.tossing) { return AnimationState.TOSS_E; }
+      else if (newState.direction == DIRECTION.E) {
+        if (newState.crawling) { return AnimationState.CRAWL_E; }
+        else if (newState.invincible) { return AnimationState.INV_E; }
+        else if (newState.jumping) { return AnimationState.JUMP_E; }
+        else if (newState.tossing) { return AnimationState.TOSS_E; }
         else { return AnimationState.WALK_E; }
       }
-      else if (s.direction == DIRECTION.SE) {
-        if (s.crawling) { return AnimationState.CRAWL_SE; }
-        else if (s.invincible) { return AnimationState.INV_SE; }
-        else if (s.jumping) { return AnimationState.JUMP_SE; }
-        else if (s.tossing) { return AnimationState.TOSS_SE; }
+      else if (newState.direction == DIRECTION.SE) {
+        if (newState.crawling) { return AnimationState.CRAWL_SE; }
+        else if (newState.invincible) { return AnimationState.INV_SE; }
+        else if (newState.jumping) { return AnimationState.JUMP_SE; }
+        else if (newState.tossing) { return AnimationState.TOSS_SE; }
         else { return AnimationState.WALK_SE; }
       }
-      else if (s.direction == DIRECTION.S) {
-        if (s.crawling) { return AnimationState.CRAWL_S; }
-        else if (s.invincible) { return AnimationState.INV_S; }
-        else if (s.jumping) { return AnimationState.JUMP_S; }
-        else if (s.tossing) { return AnimationState.TOSS_S; }
+      else if (newState.direction == DIRECTION.S) {
+        if (newState.crawling) { return AnimationState.CRAWL_S; }
+        else if (newState.invincible) { return AnimationState.INV_S; }
+        else if (newState.jumping) { return AnimationState.JUMP_S; }
+        else if (newState.tossing) { return AnimationState.TOSS_S; }
         else { return AnimationState.WALK_S; }
       }
-      else if (s.direction == DIRECTION.SW) {
-        if (s.crawling) { return AnimationState.CRAWL_SW; }
-        else if (s.invincible) { return AnimationState.INV_SW; }
-        else if (s.jumping) { return AnimationState.JUMP_SW; }
-        else if (s.tossing) { return AnimationState.TOSS_SW; }
+      else if (newState.direction == DIRECTION.SW) {
+        if (newState.crawling) { return AnimationState.CRAWL_SW; }
+        else if (newState.invincible) { return AnimationState.INV_SW; }
+        else if (newState.jumping) { return AnimationState.JUMP_SW; }
+        else if (newState.tossing) { return AnimationState.TOSS_SW; }
         else { return AnimationState.WALK_SW; }
       }
-      else if (s.direction == DIRECTION.W) {
-        if (s.crawling) { return AnimationState.CRAWL_W; }
-        else if (s.invincible) { return AnimationState.INV_W; }
-        else if (s.jumping) { return AnimationState.JUMP_W; }
-        else if (s.tossing) { return AnimationState.TOSS_W; }
+      else if (newState.direction == DIRECTION.W) {
+        if (newState.crawling) { return AnimationState.CRAWL_W; }
+        else if (newState.invincible) { return AnimationState.INV_W; }
+        else if (newState.jumping) { return AnimationState.JUMP_W; }
+        else if (newState.tossing) { return AnimationState.TOSS_W; }
         else { return AnimationState.WALK_W; }
       }
-      else if (s.direction == DIRECTION.NW) {
-        if (s.crawling) { return AnimationState.CRAWL_NW; }
-        else if (s.invincible) { return AnimationState.INV_NW; }
-        else if (s.jumping) { return AnimationState.JUMP_NW; }
-        else if (s.tossing) { return AnimationState.TOSS_NW; }
+      else if (newState.direction == DIRECTION.NW) {
+        if (newState.crawling) { return AnimationState.CRAWL_NW; }
+        else if (newState.invincible) { return AnimationState.INV_NW; }
+        else if (newState.jumping) { return AnimationState.JUMP_NW; }
+        else if (newState.tossing) { return AnimationState.TOSS_NW; }
         else { return AnimationState.WALK_NW; }
       }
     }
     else {
-      if (s.direction == DIRECTION.N) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_N; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_N; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_N; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_N; }
+      if (newState.direction == DIRECTION.N) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_N; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_N; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_N; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_N; }
         else { return AnimationState.IDLE_N; }
       }
-      else if (s.direction == DIRECTION.NE) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_NE; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_NE; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_NE; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_NE; }
+      else if (newState.direction == DIRECTION.NE) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_NE; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_NE; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_NE; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_NE; }
         else { return AnimationState.IDLE_NE; }
       }
-      else if (s.direction == DIRECTION.E) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_E; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_E; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_E; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_E; }
+      else if (newState.direction == DIRECTION.E) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_E; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_E; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_E; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_E; }
         else { return AnimationState.IDLE_E; }
       }
-      else if (s.direction == DIRECTION.SE) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_SE; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_SE; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_SE; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_SE; }
+      else if (newState.direction == DIRECTION.SE) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_SE; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_SE; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_SE; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_SE; }
         else { return AnimationState.IDLE_SE; }
       }
-      else if (s.direction == DIRECTION.S) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_S; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_S; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_S; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_S; }
+      else if (newState.direction == DIRECTION.S) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_S; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_S; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_S; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_S; }
         else { return AnimationState.IDLE_S; }
       }
-      else if (s.direction == DIRECTION.SW) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_SW; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_SW; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_SW; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_SW; }
+      else if (newState.direction == DIRECTION.SW) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_SW; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_SW; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_SW; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_SW; }
         else { return AnimationState.IDLE_SW; }
       }
-      else if (s.direction == DIRECTION.W) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_W; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_W; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_W; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_W; }
+      else if (newState.direction == DIRECTION.W) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_W; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_W; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_W; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_W; }
         else { return AnimationState.IDLE_W; }
       }
-      else if (s.direction == DIRECTION.NW) {
-        if (s.crawling) { return AnimationState.CRAWL_IDLE_NW; }
-        else if (s.invincible) { return AnimationState.INV_IDLE_NW; }
-        else if (s.jumping) { return AnimationState.JUMP_IDLE_NW; }
-        else if (s.tossing) { return AnimationState.TOSS_IDLE_NW; }
+      else if (newState.direction == DIRECTION.NW) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_NW; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_NW; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_NW; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_NW; }
         else { return AnimationState.IDLE_NW; }
       }
     }
     // Default case: IDLE_E
     return AnimationState.IDLE_E;
+  }
+
+  /**
+   * Figure out what AnimationState to use, given an ActorState.  This version
+   * is designed for side-view style games, where the camera seems to be at
+   * ground level.
+   *
+   * NB:  As in overheadAnimationTransitions, this may not be good for your
+   *      game, so you can always override it or rewrite it.
+   *
+   * @param oldState  The state that the actor was in
+   * @param newState  The details of the new state the actor is moving to
+   *
+   * @return The new AnimationState for the actor
+   */
+  static sideViewAnimationTransitions(oldState: ActorState, newState: ActorState) {
+    // Check if we used to be facing westward, so we don't lose animation
+    // orientation information on a direct up/down movement.
+    let old_west = oldState.last_ew == DIRECTION.W || oldState.direction == DIRECTION.NW || oldState.direction == DIRECTION.W || oldState.direction == DIRECTION.SW;
+    if (newState.moving) {
+      // For N/S, we preserve the current direction the actor is facing
+      if (newState.direction == DIRECTION.N || newState.direction == DIRECTION.S) {
+        if (newState.crawling) { return old_west ? AnimationState.CRAWL_W : AnimationState.CRAWL_E; }
+        else if (newState.invincible) { return old_west ? AnimationState.INV_W : AnimationState.INV_E; }
+        else if (newState.tossing) { return old_west ? AnimationState.TOSS_W : AnimationState.TOSS_E; }
+        else if (newState.jumping) { return old_west ? AnimationState.JUMP_W : AnimationState.JUMP_E; }
+        else { return old_west ? AnimationState.WALK_W : AnimationState.WALK_E; }
+      }
+      else if (newState.direction == DIRECTION.NE || newState.direction == DIRECTION.SE || newState.direction == DIRECTION.E) {
+        if (newState.crawling) { return AnimationState.CRAWL_E; }
+        else if (newState.invincible) { return AnimationState.INV_E; }
+        else if (newState.tossing) { return AnimationState.TOSS_E; }
+        else if (newState.jumping) { return AnimationState.JUMP_E; }
+        else { return AnimationState.WALK_E; }
+      }
+      else /* (newState.direction == DIRECTION.NW || newState.direction == DIRECTION.SW || newState.direction == DIRECTION.W) */ {
+        if (newState.crawling) { return AnimationState.CRAWL_W; }
+        else if (newState.invincible) { return AnimationState.INV_W; }
+        else if (newState.tossing) { return AnimationState.TOSS_W; }
+        else if (newState.jumping) { return AnimationState.JUMP_W; }
+        else { return AnimationState.WALK_W; }
+      }
+    }
+    else {
+      // For N/S, we preserve the current direction the actor is facing
+      if (newState.direction == DIRECTION.N || newState.direction == DIRECTION.S) {
+        if (newState.crawling) { return old_west ? AnimationState.CRAWL_IDLE_W : AnimationState.CRAWL_IDLE_E; }
+        else if (newState.invincible) { return old_west ? AnimationState.INV_IDLE_W : AnimationState.INV_IDLE_E; }
+        else if (newState.tossing) { return old_west ? AnimationState.TOSS_IDLE_W : AnimationState.TOSS_IDLE_E; }
+        else if (newState.jumping) { return old_west ? AnimationState.JUMP_IDLE_W : AnimationState.JUMP_IDLE_E; }
+        else { return old_west ? AnimationState.IDLE_W : AnimationState.IDLE_E; }
+      }
+      else if (newState.direction == DIRECTION.NE || newState.direction == DIRECTION.SE || newState.direction == DIRECTION.E) {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_E; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_E; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_E; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_E; }
+        else { return AnimationState.IDLE_E; }
+      }
+      else /* (newState.direction == DIRECTION.NW || newState.direction == DIRECTION.SW || newState.direction == DIRECTION.W) */ {
+        if (newState.crawling) { return AnimationState.CRAWL_IDLE_W; }
+        else if (newState.invincible) { return AnimationState.INV_IDLE_W; }
+        else if (newState.tossing) { return AnimationState.TOSS_IDLE_W; }
+        else if (newState.jumping) { return AnimationState.JUMP_IDLE_W; }
+        else { return AnimationState.IDLE_W; }
+      }
+    }
   }
 
   /**

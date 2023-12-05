@@ -246,15 +246,18 @@ abstract class RigidBodyBase {
   public prerender(_elapsedMs: number, actor: Actor) {
     // Broadcast the left/right movement of this entity
     let v = this.body.GetLinearVelocity();
-    if (v.x > 0 && v.y > 0) actor.state.changeState(actor, StateEvent.MOVE_SE);
-    else if (v.x > 0 && v.y < 0) actor.state.changeState(actor, StateEvent.MOVE_NE);
-    else if (v.x > 0 && v.y == 0) actor.state.changeState(actor, StateEvent.MOVE_E);
-    else if (v.x < 0 && v.y > 0) actor.state.changeState(actor, StateEvent.MOVE_SW);
-    else if (v.x < 0 && v.y < 0) actor.state.changeState(actor, StateEvent.MOVE_NW);
-    else if (v.x < 0 && v.y == 0) actor.state.changeState(actor, StateEvent.MOVE_W);
-    else if (v.x == 0 && v.y > 0) actor.state.changeState(actor, StateEvent.MOVE_S);
-    else if (v.x == 0 && v.y < 0) actor.state.changeState(actor, StateEvent.MOVE_N);
-    else if (v.x == 0 && v.y == 0) actor.state.changeState(actor, StateEvent.STOP);
+    // NB: Ignore when the speed is exceedingly small
+    let x = (Math.abs(v.x) < 0.01) ? 0 : v.x;
+    let y = (Math.abs(v.y) < 0.01) ? 0 : v.y;
+    if (x > 0 && y > 0) actor.state.changeState(actor, StateEvent.MOVE_SE);
+    else if (x > 0 && y < 0) actor.state.changeState(actor, StateEvent.MOVE_NE);
+    else if (x > 0 && y == 0) actor.state.changeState(actor, StateEvent.MOVE_E);
+    else if (x < 0 && y > 0) actor.state.changeState(actor, StateEvent.MOVE_SW);
+    else if (x < 0 && y < 0) actor.state.changeState(actor, StateEvent.MOVE_NW);
+    else if (x < 0 && y == 0) actor.state.changeState(actor, StateEvent.MOVE_W);
+    else if (x == 0 && y > 0) actor.state.changeState(actor, StateEvent.MOVE_S);
+    else if (x == 0 && y < 0) actor.state.changeState(actor, StateEvent.MOVE_N);
+    else if (x == 0 && y == 0) actor.state.changeState(actor, StateEvent.STOP);
   }
 
   /**

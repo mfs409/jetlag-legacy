@@ -12,8 +12,9 @@ export interface IStateObserver {
    * @param actor     The actor whose state is changing.
    * @param event     The event that might have caused `actor`'s state to change
    * @param newState  The new state of `actor`
+   * @param oldState  The old state of `actor`
    */
-  onStateChange(actor: Actor, event: StateEvent, newState: ActorState): void;
+  onStateChange(actor: Actor, event: StateEvent, newState: ActorState, old: ActorState): void;
 }
 
 /** The directions an actor can face */
@@ -38,6 +39,22 @@ export class ActorState {
   public crawling = false;
   /** Is the actor disappearing */
   public disappearing = false;
+  /** Special tracking for last E/W direction */
+  public last_ew = DIRECTION.E;
+
+  /** Make a copy of this ActorState */
+  public clone() {
+    let a = new ActorState();
+    a.direction = this.direction;
+    a.moving = this.moving;
+    a.tossing = this.tossing;
+    a.invincible = this.invincible;
+    a.jumping = this.jumping;
+    a.crawling = this.crawling;
+    a.disappearing = this.disappearing;
+    a.last_ew = this.last_ew;
+    return a;
+  }
 }
 
 /**
@@ -76,6 +93,7 @@ export class StateManagerComponent {
   /** Receive a state-change request and if it is for a new state, pass it to observers */
   changeState(actor: Actor, event: StateEvent) {
     let changed = false;
+    let old = this.current.clone();
     switch (event) {
       // Movement events change direction, and un-set idle
       case StateEvent.MOVE_N: changed = this.current.direction != DIRECTION.N || !this.current.moving; this.current.direction = DIRECTION.N; this.current.moving = true; break;
@@ -100,7 +118,8 @@ export class StateManagerComponent {
       // Disappear is a terminal state
       case StateEvent.DISAPPEAR: changed = !this.current.disappearing; this.current.disappearing = true; break;
     }
-    if (changed)
-      this.observers.forEach((so) => so.onStateChange(actor, event, this.current));
+    if (changed) {
+      this.observers.forEach((so) => so.onStateChange(actor, event, this.current, old));
+    }
   }
 }
