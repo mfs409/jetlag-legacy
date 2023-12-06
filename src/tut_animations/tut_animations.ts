@@ -63,7 +63,6 @@ export class EmptyGameConfig implements GameConfig {
   gameBuilder = build_game;
 }
 
-
 /**
  * buildSplashScreen is used to draw the scene that we see when the game starts.
  * In our case, it's just a menu.  The splash screen is mostly just branding: it
@@ -129,33 +128,26 @@ export function build_game(_level: number) {
     .to("spritesheets/alien_walk_r_6.png", 75).to("spritesheets/alien_walk_r_7.png", 75)
     .to("spritesheets/alien_walk_r_8.png", 75));
 
-  animations.set(AnimationState.IDLE_N, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_u_0.png", 750).to("spritesheets/alien_thrust_u_1.png", 75));
-  // .to("spritesheets/alien_thrust_u_2.png",  100).to("spritesheets/alien_thrust_u_3.png",  100)
-  // .to("spritesheets/alien_thrust_u_4.png",  100).to("spritesheets/alien_thrust_u_5.png",  100)
-  // .to("spritesheets/alien_thrust_u_6.png",  100).to("spritesheets/alien_thrust_u_7.png",  100)
+  animations.set(AnimationState.IDLE_N, new AnimationSequence(true).to("spritesheets/alien_thrust_u_0.png", 750).to("spritesheets/alien_thrust_u_1.png", 75));
 
-  animations.set(AnimationState.IDLE_W, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_l_0.png", 750).to("spritesheets/alien_thrust_l_1.png", 75));
-  // .to("spritesheets/alien_thrust_l_2.png",  100).to("spritesheets/alien_thrust_l_3.png",  100)
-  // .to("spritesheets/alien_thrust_l_4.png",  100).to("spritesheets/alien_thrust_l_5.png",  100)
-  // .to("spritesheets/alien_thrust_l_6.png",  100).to("spritesheets/alien_thrust_l_7.png",  100)
+  animations.set(AnimationState.IDLE_W, new AnimationSequence(true).to("spritesheets/alien_thrust_l_0.png", 750).to("spritesheets/alien_thrust_l_1.png", 75));
 
-  animations.set(AnimationState.IDLE_S, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_d_0.png", 750).to("spritesheets/alien_thrust_d_1.png", 75));
-  // .to("spritesheets/alien_thrust_d_2.png",  100).to("spritesheets/alien_thrust_d_3.png",  100)
-  // .to("spritesheets/alien_thrust_d_4.png",  100).to("spritesheets/alien_thrust_d_5.png",  100)
-  // .to("spritesheets/alien_thrust_d_6.png",  100).to("spritesheets/alien_thrust_d_7.png",  100)
+  animations.set(AnimationState.IDLE_S, new AnimationSequence(true).to("spritesheets/alien_thrust_d_0.png", 750).to("spritesheets/alien_thrust_d_1.png", 75));
 
-  animations.set(AnimationState.IDLE_E, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_r_0.png", 750).to("spritesheets/alien_thrust_r_1.png", 75));
-  // .to("spritesheets/alien_thrust_r_2.png",  100).to("spritesheets/alien_thrust_r_3.png",  100)
-  // .to("spritesheets/alien_thrust_r_4.png",  100).to("spritesheets/alien_thrust_r_5.png",  100)
-  // .to("spritesheets/alien_thrust_r_6.png",  100).to("spritesheets/alien_thrust_r_7.png",  100)
+  animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("spritesheets/alien_thrust_r_0.png", 750).to("spritesheets/alien_thrust_r_1.png", 75));
+  let remap = new Map();
+  remap.set(AnimationState.WALK_NW, AnimationState.WALK_W);
+  remap.set(AnimationState.WALK_SW, AnimationState.WALK_W);
+  remap.set(AnimationState.WALK_NE, AnimationState.WALK_E);
+  remap.set(AnimationState.WALK_SE, AnimationState.WALK_E);
+  remap.set(AnimationState.IDLE_NW, AnimationState.IDLE_W);
+  remap.set(AnimationState.IDLE_SW, AnimationState.IDLE_W);
+  remap.set(AnimationState.IDLE_NE, AnimationState.IDLE_E);
+  remap.set(AnimationState.IDLE_SE, AnimationState.IDLE_E);
 
   const hero = Actor.Make({
     rigidBody: BoxBody.Box({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
-    appearance: new AnimatedSprite({ width: 2, height: 2, animations, }),
+    appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
     role: new Hero(),
     movement: new ExplicitMovement(),
   });

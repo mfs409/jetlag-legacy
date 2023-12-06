@@ -3701,7 +3701,7 @@ export function buildLevelScreen(level: number) {
     });
     setShrinkOverTime(big_shrink_ball, 0.2, 0.1, false);
 
-    // Hmm, this shrinks in just one timestep?
+    // Hmm, this shrinks in just one time step?
     let cfg1 = { cx: 5, cy: 6, vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#0A0305" };
     let shrink_poly = Actor.Make({
       appearance: new FilledPolygon(cfg1),
@@ -3729,7 +3729,7 @@ export function buildLevelScreen(level: number) {
     });
     setShrinkOverTime(shrink_circle, 0.2, 0.1, false);
 
-    // Oh no, this shrinks waay too fast, and the rigidbody is really weird
+    // Oh no, this shrinks way too fast, and the rigid body is really weird
     let cfg4 = { center: false, width: .1, height: .1, cx: 11, cy: 6, face: "Arial", color: "#FF0000", size: 32 };
     let shrink_text = Actor.Make({
       appearance: new TextSprite(cfg4, "Hello"),
@@ -4995,10 +4995,10 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // the enemy chases the hero, but can't get through the wall
-    let ncfg = { cx: 14, cy: 2, width: 0.5, height: 0.5, radius: 0.25, fillColor: "#FF0000" };
+    let n_cfg = { cx: 14, cy: 2, width: 0.5, height: 0.5, radius: 0.25, fillColor: "#FF0000" };
     Actor.Make({
-      appearance: new FilledBox(ncfg),
-      rigidBody: CircleBody.Circle(ncfg, stage.world, { dynamic: true }),
+      appearance: new FilledBox(n_cfg),
+      rigidBody: CircleBody.Circle(n_cfg, stage.world, { dynamic: true }),
       movement: new BasicChase(1, h, true, true),
       role: new Enemy(),
     });
