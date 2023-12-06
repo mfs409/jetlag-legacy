@@ -382,9 +382,7 @@ export class AnimatedSprite implements IStateObserver {
     // If it's a toss, then it's our responsibility to figure out when to stop
     // it
     //
-    // TODO: What if the toss animation is long enough that you can get a second
-    //       before the first is done?  Do we need a special case for
-    //       TOSS_Y while in throwing?
+    // NB:  We won't get a TOSS_Y during a TOSS_Y, so this timing trick is safe
     if (event == StateEvent.TOSS_Y)
       this.throwRemain = newAni.getDuration();
   }

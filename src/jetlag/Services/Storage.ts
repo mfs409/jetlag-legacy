@@ -1,5 +1,6 @@
-// TODO:  This needs to be extended to handle persistence better in non-browser
-//        environments, but otherwise it's good.
+// TODO:  Capacitor and Electron will need to use plugins for persistence.
+//        Supporting that will likely introduce a need for some kind of
+//        compile-time switch to pick the right persistence?
 
 /**
  * StorageService provides three key/value stores

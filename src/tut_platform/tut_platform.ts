@@ -418,7 +418,6 @@ export function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: numbe
       let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
       if ((dx * dx + dy * dy) > (role.range * role.range)) reclaimer(actor);
     });
-    // TODO: Should we clone the soundEffects?
     let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role, sounds: cfg.soundEffects });
     pool.put(p);
   }

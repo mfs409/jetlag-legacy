@@ -12,6 +12,12 @@ import { b2Vec2 } from "@box2d/core";
  * initializes the render loop, which fires at a regular interval to tell the
  * game to advance the simulation by some number of milliseconds.  Doing this
  * many times per second is what makes our game work :)
+ *
+ * <!--
+ * As of December 2023, PIXI.js v 7.3.2's '.d.ts' file isn't always exactly
+ * correct.  There are a few `as any` casts in this file for dealing with the
+ * issues.  Re-check these casts as PIXI.js updates.
+ *  -->
  */
 export class RendererService {
   /** The pixi application object is responsible for drawing onto a canvas */
@@ -54,10 +60,6 @@ export class RendererService {
    */
   constructor(screenWidth: number, screenHeight: number, domId: string, debugMode: boolean) {
     // Create a rendering context and attach it to the the DOM
-    //
-    // TODO:  `as any` avoids a warning that seems to stem from the typings
-    //        being stale for PIXI 7.  Be sure to monitor npm for changes that
-    //        will obviate the cast.
     this.pixi = new Application({ width: screenWidth, height: screenHeight, antialias: false });
     document.getElementById(domId)!.appendChild(this.pixi.view as any);
 
@@ -402,9 +404,6 @@ export class RendererService {
       this.main.filters = [this.blur_filter];
     }
     else if (use_ascii) {
-      // TODO:  The 'as any' cast is due to typing issues in Pixi.js.  Keep
-      //        monitoring to see if it becomes obviated by a future update to
-      //        pixi's typings.
       this.main.filters = [this.ascii_filter as any];
     }
     else if (use_sepia_tv) {
@@ -418,9 +417,6 @@ export class RendererService {
       this.old_film_filter.vignetting = .3;
       this.old_film_filter.vignettingAlpha = 1;
       this.old_film_filter.vignettingBlur = .3;
-      // TODO:  The 'as any' casts are due to typing issues in Pixi.js.  Keep
-      //        monitoring to see if they become obviated by a future update to
-      //        pixi's typings.
       this.main.filters = [this.noise_filter, this.godray_filter as any, this.old_film_filter as any];
     }
   }

@@ -9,7 +9,8 @@ import { stage } from "../Stage";
  *
  * TODO:  In 2015, Android accelerometer readings on tablets and phones were
  *        weirdly different, but maybe it's cleaner by now?  It would be good to
- *        check, and also to check iphone/ipad.
+ *        check, and also to check iphone/ipad.  Then implement PORTRAIT
+ *        support.
  */
 export enum AccelerometerMode { LANDSCAPE, PORTRAIT }
 
@@ -52,7 +53,6 @@ export class AccelerometerService {
       return;
     }
     if (mode != AccelerometerMode.LANDSCAPE) {
-      // TODO: start supporting PORTRAIT mode?
       stage.console.log("Unsupported device orientation mode");
       this.tiltSupported = false;
       return;

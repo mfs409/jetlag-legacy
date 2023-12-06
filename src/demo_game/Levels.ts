@@ -1,20 +1,21 @@
-import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement } from "../jetlag/Components/Movement";
+import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
-import * as Helpers from "./helpers";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
-import { AnimatedSprite, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { AnimatedSprite, AppearanceComponent, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
-import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
+import { BoxBody, CircleBody, PolygonBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive, CollisionExemptions, Projectile } from "../jetlag/Components/Role";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { TimedEvent } from "../jetlag/Systems/Timer";
-import { AnimationSequence, AnimationState, Sides } from "../jetlag/Config";
+import { AnimationSequence, AnimationState, GestureHandlers, Sides } from "../jetlag/Config";
 import { SvgSystem } from "../jetlag/Systems/Svg";
 import { buildSplashScreen } from "./Splash";
 import { buildChooserScreen } from "./Chooser";
 import { AdvancedCollisionSystem } from "../jetlag/Systems/Collisions";
+import { MusicComponent } from "../jetlag/Components/Music";
+import { b2Vec2, b2BodyType } from "@box2d/core";
 
 /**
  * buildLevelScreen is used to draw the playable levels of the game
@@ -44,7 +45,7 @@ export function buildLevelScreen(level: number) {
     // is going to have an equal effect if we tilt left, right, up, or down.
     // You can think about this kind of game like you're rolling a ball on a
     // flat surface, by tilting the surface.
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
 
     // Create a circular hero whose top left corner is at (2, 3), with a
     // diameter of .8 meters.  Use the "green_ball" image (from the "assets"
@@ -98,7 +99,7 @@ export function buildLevelScreen(level: number) {
   // little nicer.
   else if (level == 2) {
     // start by setting everything like in level 1
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -122,7 +123,7 @@ export function buildLevelScreen(level: number) {
     // add a bounding box so the hero can't fall off the screen.  Hover your
     // mouse over 'drawBoundingBox' to learn about what the parameters mean.
     // This really should have a box width, instead of hard-coding it
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    drawBoundingBox(0, 0, 16, 9, .1);
 
     // In the same way that we make "win" messages, we can also make a "welcome"
     // message to show before the level starts.  Again, there is a lot of code
@@ -135,7 +136,7 @@ export function buildLevelScreen(level: number) {
   // density/elasticity/friction to the ball and walls, so we get a nicer
   // behavior.
   else if (level == 3) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -163,7 +164,7 @@ export function buildLevelScreen(level: number) {
     // Assign some density, elasticity, and friction to the bounding box.
     //
     // Note:  You should see what happens when you change these numbers.
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 0.9 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 0.9 });
 
     // This welcome message is also a good reminder: when you're testing a game,
     // don't just try to win... test out all the behaviors that you expect, even
@@ -177,8 +178,8 @@ export function buildLevelScreen(level: number) {
   // matter which hero goes to which destination.
   else if (level == 4) {
     // Let's start with the easy stuff:
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 0.9 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 0.9 });
     winMessage("Great Job");
     // In the next line, notice how the pair of characters "\n" will cause a
     // newline to appear in the text.
@@ -237,8 +238,8 @@ export function buildLevelScreen(level: number) {
   // destination.
   else if (level == 5) {
     // Configure things like in the previous level
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     welcomeMessage("All heroes must\nreach the destination");
     winMessage("Great Job");
 
@@ -282,10 +283,10 @@ export function buildLevelScreen(level: number) {
   else if (level == 6) {
     // To turn on "tilt as velocity", all we need to do is pass in an extra
     // "true" to "enableTilt"
-    Helpers.enableTilt(10, 10, true);
+    enableTilt(10, 10, true);
 
     // The rest of this level should be pretty familiar by now :)
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     welcomeMessage("Tilt can change velocity, instead of\n" + "applying a force to actors.");
     winMessage("Great Job");
 
@@ -313,8 +314,8 @@ export function buildLevelScreen(level: number) {
   // lost, and there will be an option to try again.
   else if (level == 7) {
     // Let's start with the familiar stuff
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
@@ -359,8 +360,8 @@ export function buildLevelScreen(level: number) {
   // along a fixed path, not just enemies.
   else if (level == 8) {
     // Let's set up everything except the enemy, just like in the previous level
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -408,8 +409,8 @@ export function buildLevelScreen(level: number) {
   // points, so that the enemy returns to its starting point
   else if (level == 9) {
     // Just about everything in this level is the same as the previous level :)
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -449,8 +450,8 @@ export function buildLevelScreen(level: number) {
   // enemy, too.  We'll also see that we can make actors rotate.
   else if (level == 10) {
     // So far, we've set up all our levels like this:
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
@@ -481,7 +482,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // Play some music
-    Helpers.setMusic("tune.ogg");
+    stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic("tune.ogg"));
 
     stage.score.setVictoryDestination(1);
     winMessage("Great Job");
@@ -499,8 +500,8 @@ export function buildLevelScreen(level: number) {
   else if (level == 11) {
     // make the level really big, and set up tilt
     stage.world.camera.setBounds(0, 0, 64, 36);
-    Helpers.drawBoundingBox(0, 0, 64, 36, .1, { density: 1, elasticity: .3, friction: .4 });
-    Helpers.enableTilt(10, 10);
+    drawBoundingBox(0, 0, 64, 36, .1, { density: 1, elasticity: .3, friction: .4 });
+    enableTilt(10, 10);
 
     // put the hero and destination far apart
     let cfg = { cx: 1, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
@@ -534,11 +535,11 @@ export function buildLevelScreen(level: number) {
     // is turned on, we'll be able to see an outline of the two rectangles. You
     // could also use images, but if you did, you'd probably want to use some
     // transparency so that they don't cover up the gameplay.
-    Helpers.addTapControl(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, () => {
+    addTapControl(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, () => {
       if (stage.world.camera.getScale() > 50) stage.world.camera.setScale(stage.world.camera.getScale() - 10);
       return true;
     });
-    Helpers.addTapControl(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, () => {
+    addTapControl(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, () => {
       if (stage.world.camera.getScale() < 200) stage.world.camera.setScale(stage.world.camera.getScale() + 20);
       return true;
     });
@@ -581,7 +582,7 @@ export function buildLevelScreen(level: number) {
   // whole "welcome message" from scratch
   else if (level == 12) {
     // Put a border around the level, and create a hero and destination
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1, cy: 5, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -614,7 +615,7 @@ export function buildLevelScreen(level: number) {
     // something that gets multiplied by the joystick value (you can use
     // fractions, negatives, etc).  Lastly, we'll say that when the player
     // releases the joystick, the actor should stop moving.
-    Helpers.addJoystickControl(stage.hud,
+    addJoystickControl(stage.hud,
       { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5, stopOnUp: true });
 
@@ -730,7 +731,7 @@ export function buildLevelScreen(level: number) {
     stage.requestOverlay((overlay: Scene) => {
       // We are going to put a big black button over the whole screen.
       // Clicking it will get rid of this overlay
-      Helpers.addTapControl(overlay,
+      addTapControl(overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
         () => { stage.clearOverlay(); return true; });
       // On top of the button, we will write some text, centered around the
@@ -738,7 +739,7 @@ export function buildLevelScreen(level: number) {
       //
       // You might think it's weird that we're using a callback to create the
       // text.  It'll make more sense later.
-      Helpers.makeText(overlay,
+      makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "An obstacle's appearance may\nnot match its physics");
       // Note that we are putting tap controls and text on 'overlay', but
@@ -755,7 +756,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 13) {
     // Put a border around the level, and create a hero and destination.  Control the hero
     // with a joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 1, cy: 5, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -775,7 +776,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // note: releasing the joystick no longer stops the hero
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: false });
+    addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: false });
 
     // These obstacles have interesting elasticity and friction values
     cfg = { cx: 4, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
@@ -809,10 +810,10 @@ export function buildLevelScreen(level: number) {
         movement: new InertMovement(),
         role: new Passive(),
       });
-      Helpers.makeText(overlay,
+      makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "Obstacles can have different amounts\nof friction and elasticity");
-      Helpers.makeText(overlay,
+      makeText(overlay,
         { cx: 0.5, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 16, z: 0 },
         () => "(Releasing the joystick does not stop the hero anymore)");
       overlay.timer.addEvent(new TimedEvent(4, false, () => stage.clearOverlay()));
@@ -824,7 +825,7 @@ export function buildLevelScreen(level: number) {
   // game.  In this example, the collection of goodies "enables" a destination.
   else if (level == 14) {
     // set up a hero, destination, bounding box, and joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1, cy: 5, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
@@ -849,7 +850,7 @@ export function buildLevelScreen(level: number) {
     });
 
     stage.score.setVictoryDestination(1);
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
+    addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
     // Add some stationary goodies.
     //
@@ -878,7 +879,7 @@ export function buildLevelScreen(level: number) {
     // let's put a display on the screen to see how many goodies we've
     // collected. This shows why we want a callback for specifying the text to
     // put on the screen
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 20, z: 2 },
       () => stage.score.getGoodieCount(0) + "/2 Goodies");
 
@@ -887,10 +888,10 @@ export function buildLevelScreen(level: number) {
     // Set up a win scene that also plays a sound.  This should look familiar.
     // And, as you can imagine, we can do lose scenes too.
     stage.score.winSceneBuilder = (overlay: Scene) => {
-      Helpers.addTapControl(overlay,
+      addTapControl(overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
         () => { stage.switchTo(buildLevelScreen, 15); return true; });
-      Helpers.makeText(overlay,
+      makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "Great Job");
       stage.musicLibrary.getSound("win_sound.ogg").play();
@@ -901,7 +902,7 @@ export function buildLevelScreen(level: number) {
   // actor, so we'll move destinations, goodies, and obstacles, too.
   else if (level == 15) {
     // start with a hero who is controlled via Joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 1, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -910,7 +911,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
+    addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
     // make a destination that moves, and that requires one goodie to be collected before it
     // works
@@ -942,7 +943,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
       () => stage.score.getGoodieCount(0) + " Goodies");
 
@@ -955,7 +956,7 @@ export function buildLevelScreen(level: number) {
   // time limit for the level, and we can pause the game.
   else if (level == 16) {
     // Set up a hero who is controlled by the joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -964,7 +965,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addJoystickControl(
+    addJoystickControl(
       stage.hud,
       { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
@@ -985,14 +986,14 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryGoodies(5, 0, 0, 0);
 
     // put the goodie count on the screen
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: .25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 14, z: 2 },
       () => stage.score.getGoodieCount(0) + "/5 Goodies");
 
     // put a simple countdown on the screen.  The first line says "15 seconds", the second
     // actually draws something on the screen showing remaining time
     stage.score.setLoseCountdownRemaining(15);
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { cx: .25, cy: 1.25, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0));
 
@@ -1005,14 +1006,14 @@ export function buildLevelScreen(level: number) {
     // JetLag how to draw a pause scene".  Whenever JetLag sees that it's
     // possible to draw a pause scene, it will draw it, so this will cause the
     // game to switch to a pause scene until the overlay gets dismissed
-    Helpers.addTapControl(stage.hud, { cx: 15, cy: 3, width: 1, height: 1, img: "pause.png" }, (): boolean => {
+    addTapControl(stage.hud, { cx: 15, cy: 3, width: 1, height: 1, img: "pause.png" }, (): boolean => {
       stage.requestOverlay((overlay: Scene) => {
-        Helpers.addTapControl(
+        addTapControl(
           overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
           () => { stage.clearOverlay(); return true; }
         );
-        Helpers.makeText(overlay,
+        makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
           () => "Game Paused");
       });
@@ -1034,8 +1035,8 @@ export function buildLevelScreen(level: number) {
   // This level also has a Pause scene.
   else if (level == 17) {
     // start with a hero who is controlled via tilt, and a destination
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 3, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1057,27 +1058,27 @@ export function buildLevelScreen(level: number) {
     // Make the stopwatch start counting, by giving it an initial value of 0
     // Then draw the stopwatch value onto the HUD
     stage.score.setStopwatch(0);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 0.1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (stage.score.getStopwatch() ?? 0).toFixed(0) + " seconds");
 
     // Put a button on the HUD to pause the game
-    Helpers.addTapControl(stage.hud, { cx: 1, cy: 8, width: 0.4, height: 0.4, img: "pause.png" }, () => {
+    addTapControl(stage.hud, { cx: 1, cy: 8, width: 0.4, height: 0.4, img: "pause.png" }, () => {
       // When the button is pressed, draw an overlay scene
       stage.requestOverlay((overlay: Scene) => {
         // The scene should have a full-screen background.  Pressing it should
         // resume the game.
-        Helpers.addTapControl(
+        addTapControl(
           overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, img: "noise.png" },
           () => { stage.clearOverlay(); return true; }
         );
         // Put some text on the pause scene
-        Helpers.makeText(overlay,
+        makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 0 },
           () => "Game Paused");
         // Add a button for going back to the main menu
-        Helpers.addTapControl(
+        addTapControl(
           overlay,
           { cx: 15.5, cy: .5, width: 0.4, height: 0.4, img: "back_arrow.png" },
           () => {
@@ -1141,8 +1142,8 @@ export function buildLevelScreen(level: number) {
   // that prints
   else if (level == 18) {
     // set up a basic world.  Tilt will control one enemy, and also the hero
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
     Actor.Make({
@@ -1166,7 +1167,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // draw a strength meter to show this hero's strength
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { cx: 0.5, cy: .5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => (h.role as Hero).strength + " Strength");
 
@@ -1174,12 +1175,12 @@ export function buildLevelScreen(level: number) {
     // The trick here is that our code can change endText to say other things
     let endText = "Try Again";
     stage.score.loseSceneBuilder = (overlay: Scene) => {
-      Helpers.addTapControl(
+      addTapControl(
         overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
         () => { stage.switchTo(buildLevelScreen, 18); return true; }
       );
-      Helpers.makeText(overlay,
+      makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => endText);
     };
@@ -1227,7 +1228,7 @@ export function buildLevelScreen(level: number) {
   // shows that we can put a time limit on a level
   else if (level == 19) {
     // start with a hero who is controlled via Joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1236,7 +1237,7 @@ export function buildLevelScreen(level: number) {
       // Give the hero enough strength to beat the enemies
       role: new Hero({ strength: 5 }),
     });
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
+    addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
     // draw two enemies.  Remember, each does 2 units of damage
     cfg = { cx: 6, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
@@ -1257,7 +1258,7 @@ export function buildLevelScreen(level: number) {
 
     // Start a countdown with 10 seconds, and put a timer on the HUD
     stage.score.setLoseCountdownRemaining(10);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0));
 
@@ -1273,7 +1274,7 @@ export function buildLevelScreen(level: number) {
   // can win by defeating a specific number of enemies, instead of all enemies.
   else if (level == 20) {
     // start with a hero who is controlled via Joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1281,7 +1282,7 @@ export function buildLevelScreen(level: number) {
       movement: new ExplicitMovement(),
       role: new Hero(),
     });
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
+    addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
     // draw an enemy.  By default, it does 2 units of damage.  If it disappears,
     // it will make a sound
@@ -1319,7 +1320,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // Display the hero's strength
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => (h.role as Hero).strength + " Strength");
 
@@ -1336,7 +1337,7 @@ export function buildLevelScreen(level: number) {
   // makes the hero invincible for a little while...
   else if (level == 21) {
     // start with a hero who is controlled via Joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1344,7 +1345,7 @@ export function buildLevelScreen(level: number) {
       movement: new ExplicitMovement(),
       role: new Hero(),
     });
-    Helpers.addJoystickControl(
+    addJoystickControl(
       stage.hud,
       { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
@@ -1390,17 +1391,17 @@ export function buildLevelScreen(level: number) {
     // display a goodie count for type-1 goodies.  This shows that the count
     // doesn't increase, since we provided an 'onCollect' that didn't increase
     // the count.
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: .5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
       () => stage.score.getGoodieCount(0) + " Goodies");
 
     // Show how much invincibility is remaining
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
       () => (h.role as Hero).invincibleRemaining.toFixed(0) + " Invincibility");
 
     // put a frames-per-second display on the screen.
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#C8C864", size: 16, z: 2 },
       () => stage.renderer.getFPS().toFixed(0) + " fps");
 
@@ -1413,7 +1414,7 @@ export function buildLevelScreen(level: number) {
   // for negative points.
   else if (level == 22) {
     // start with a hero who is controlled via Joystick
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1422,7 +1423,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
+    addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
     // Set up a destination that requires 7 type-1 goodies
     cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
@@ -1454,7 +1455,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // print a goodie count to show how the count goes up and down
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 7, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 18, z: 2 },
       () => "Your score is: " + stage.score.getGoodieCount(0));
 
@@ -1467,8 +1468,8 @@ export function buildLevelScreen(level: number) {
   // useful for having angled walls in a maze
   else if (level == 23) {
     // start with a hero who is controlled via tilt, and a destination
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    Helpers.enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1488,7 +1489,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // Create a "drag zone": a region on the HUD that accepts finger drag gestures
-    Helpers.createDragZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
+    createDragZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
 
     // draw two obstacles that we can drag
     let boxCfg = { cx: 15, cy: 2, width: 0.75, height: 0.75, img: "purple_ball.png" };
@@ -1529,7 +1530,7 @@ export function buildLevelScreen(level: number) {
   // to that location. Double-tapping an obstacle removes it.
   else if (level == 24) {
     // start with a hero who is controlled via Joystick, and a destination
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: .75, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1592,7 +1593,7 @@ export function buildLevelScreen(level: number) {
         return true;
       }
     };
-    Helpers.createPokeToPlaceZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
+    createPokeToPlaceZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
 
     boxCfg = { cx: 14, cy: 2, width: 2, height: 0.25, img: "purple_ball.png" };
     let horizontal_obstacle = Actor.Make({
@@ -1619,7 +1620,7 @@ export function buildLevelScreen(level: number) {
     // Note that we need to make the joystick *after* the pokeToPlaceZone,
     // or else our interaction with the zone will prevent the joystick from
     // working
-    Helpers.addJoystickControl(
+    addJoystickControl(
       stage.hud,
       { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
@@ -1632,7 +1633,7 @@ export function buildLevelScreen(level: number) {
   // In this level, the enemy chases the hero
   else if (level == 25) {
     // start with a hero who is controlled via Joystick, and a destination
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1641,7 +1642,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addJoystickControl(stage.hud,
+    addJoystickControl(stage.hud,
       { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
     );
@@ -1684,7 +1685,7 @@ export function buildLevelScreen(level: number) {
   // sounds when we collide with it or tap it
   else if (level == 26) {
     // start with a hero who is controlled via Joystick, and a destination
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1693,7 +1694,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addJoystickControl(stage.hud,
+    addJoystickControl(stage.hud,
       { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
     );
@@ -1741,15 +1742,15 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
-    Helpers.addJoystickControl(stage.hud,
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    addJoystickControl(stage.hud,
       { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
     );
 
     // We won't add a destination... instead, the level will end in victory after 25 seconds
     stage.score.setWinCountdownRemaining(25);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
       (stage.score.getWinCountdownRemaining() ?? 0).toFixed(0));
 
@@ -1780,8 +1781,8 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
-    Helpers.addJoystickControl(stage.hud,
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    addJoystickControl(stage.hud,
       { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
       { actor: h, scale: 5 }
     );
@@ -1822,8 +1823,8 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
-    Helpers.enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    enableTilt(10, 10);
     cfg = { cx: 8, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -1837,7 +1838,7 @@ export function buildLevelScreen(level: number) {
     // Here's a function that draws a purple ball at x,y
     let make = (hudCoords: { x: number, y: number }): boolean => {
       // Always convert the hud coordinates to world coordinates
-      let pixels = Helpers.overlayToWorldCoords(stage.hud, hudCoords.x, hudCoords.y);
+      let pixels = overlayToWorldCoords(stage.hud, hudCoords.x, hudCoords.y);
       cfg = { cx: pixels.x, cy: pixels.y, radius: .25, width: .5, height: .5, img: "purple_ball.png" };
       let o = Actor.Make({
         appearance: new ImageSprite(cfg),
@@ -1852,7 +1853,7 @@ export function buildLevelScreen(level: number) {
     // "Pan" means "drag", more or less.  It has three parts: the initial
     // down-press, the drag, and the release.  Let's say that whenever anyone
     // drags anywhere on the screen, we'll call "make"
-    Helpers.addPanCallbackControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, make, make, make);
+    addPanCallbackControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, make, make, make);
     welcomeMessage("Draw on the screen\nto make obstacles appear");
     winMessage("Great Job");
     loseMessage("Try Again");
@@ -1863,7 +1864,7 @@ export function buildLevelScreen(level: number) {
   // the Y dimension pushing everything down. This is much like gravity on
   // earth. The only way to move things, then, is by flicking them.
   else if (level == 30) {
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // This is new: we'll create a level with a constant force downward in the Y
     // dimension
@@ -1892,7 +1893,7 @@ export function buildLevelScreen(level: number) {
     // A "flick zone" will receive swipe gestures and apply them directly to the
     // actor whose movement is "FlickMovement" and whose position is the start
     // point of the swipe.
-    Helpers.createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
+    createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
 
     // create an obstacle that can be flicked
     cfg = { cx: 6, cy: 6, width: 0.8, height: 0.8, radius: 0.4, img: "purple_ball.png" };
@@ -1919,9 +1920,9 @@ export function buildLevelScreen(level: number) {
     stage.world.camera.setBounds(0, 0, 3 * 16, 9);
     stage.world.setGravity(0, 10);
     // turn on tilt, but only in the X dimension
-    Helpers.enableTilt(10, 0);
+    enableTilt(10, 0);
 
-    Helpers.drawBoundingBox(0, 0, 3 * 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 3 * 16, 9, .1, { density: 1, friction: 1 });
 
     // Add a hero and destination
     let cfg = { cx: 0.25, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -1962,8 +1963,8 @@ export function buildLevelScreen(level: number) {
     // Start with a repeat of the previous level
     stage.world.camera.setBounds(0, 0, 128, 9);
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
-    Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 7.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2006,13 +2007,13 @@ export function buildLevelScreen(level: number) {
     });
 
     // Add some text on the HUD to show how far the hero has traveled
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 16, z: 2 },
       () => Math.floor(h.rigidBody?.getCenter().x ?? 0) + " m");
 
     // Add some text about the previous best score.  Notice that it's not on the
     // HUD, so we only see it when the hero is at the beginning of the level
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { cx: 0.1, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 12, z: 0 },
       () => "best: " + (stage.storage.getPersistent("HighScore32") ?? "0") + "M"),
 
@@ -2040,8 +2041,8 @@ export function buildLevelScreen(level: number) {
     // Start like in the previous level
     stage.world.camera.setBounds(0, 0, 128, 9);
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
-    Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2088,8 +2089,8 @@ export function buildLevelScreen(level: number) {
     // friction
     stage.world.camera.setBounds(0, 0, 128, 9);
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
-    Helpers.drawBoundingBox(0, 0, 128, 9, .1, { density: 1 });
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 128, 9, .1, { density: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2117,7 +2118,7 @@ export function buildLevelScreen(level: number) {
     // delay (in this case, 9000 milliseconds) to prevent rapid re-jumping.  If
     // you make it 0, you still can't jump while in the air, but you can jump as
     // soon as you land.
-    Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, Helpers.jumpAction(h, 0, -10, 9000));
+    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, jumpAction(h, 0, -10, 9000));
     // set up the backgrounds
     stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 0, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
@@ -2150,7 +2151,7 @@ export function buildLevelScreen(level: number) {
     // Note: we can go above the trees
     stage.world.camera.setBounds(0, 0, 64, 15);
     stage.world.setGravity(0, 10);
-    Helpers.drawBoundingBox(0, 0, 64, 15, .1, { density: 1 });
+    drawBoundingBox(0, 0, 64, 15, .1, { density: 1 });
     let boxCfg = { cx: 0.25, cy: 10, width: 0.75, height: 0.75, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
@@ -2171,7 +2172,7 @@ export function buildLevelScreen(level: number) {
 
     // Now we'll say that the destination is as high as the screen, so reaching
     // the end means victory
-    Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, Helpers.jumpAction(h, 0, -5, 0));
+    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, jumpAction(h, 0, -5, 0));
     boxCfg = { cx: 63.5, cy: 7.5, width: 0.5, height: 15, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(boxCfg),
@@ -2185,7 +2186,7 @@ export function buildLevelScreen(level: number) {
     // Draw some random scattered enemies.  They'll be between 10 and 60 in X,
     // and between 0 and 14 in the Y
     for (let i = 0; i < 30; ++i) {
-      let cfg = { cx: 10 + Helpers.getRandom(50), cy: Helpers.getRandom(14), radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
+      let cfg = { cx: 10 + getRandom(50), cy: getRandom(14), radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
@@ -2207,12 +2208,12 @@ export function buildLevelScreen(level: number) {
   // appearance of an actor, instead of just using a single image.
   else if (level == 36) {
     stage.world.camera.setBounds(0, 0, 48, 9);
-    Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 48, 9, .1, { density: 1, friction: 1 });
     // We do two new things here.  First, we provide animations in the hero's
     // configuration
     let animations = new Map();
-    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
-    animations.set(AnimationState.IDLE_W, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_1.png", "flip_leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_W, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_1.png", "flip_leg_star_1.png"] }));
 
     let h_cfg = {
       cx: .4, cy: .4, width: 0.8, height: 0.8, radius: 0.4, animations,
@@ -2251,10 +2252,10 @@ export function buildLevelScreen(level: number) {
     // draw some buttons for moving the hero.  These are "toggle" buttons: they
     // run some code when they are pressed, and other code when they are
     // released.
-    Helpers.addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ExplicitMovement).updateXVelocity(-5), () => (h.movement as ExplicitMovement).updateXVelocity(0));
-    Helpers.addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ExplicitMovement).updateXVelocity(5), () => (h.movement as ExplicitMovement).updateXVelocity(0));
-    Helpers.addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
-    Helpers.addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(-5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ExplicitMovement).updateXVelocity(-5), () => (h.movement as ExplicitMovement).updateXVelocity(0));
+    addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ExplicitMovement).updateXVelocity(5), () => (h.movement as ExplicitMovement).updateXVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(-5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
     // One thing you'll notice about these buttons is that unexpected things
     // happen if you slide your finger off of them.  Be sure to try to do things
     // like that when testing your code.  Maybe you'll decide you like the
@@ -2270,7 +2271,7 @@ export function buildLevelScreen(level: number) {
   // we give the hero a fixed velocity, and only control its up/down movement.
   else if (level == 37) {
     stage.world.camera.setBounds(0, 0, 48, 9);
-    Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1 });
+    drawBoundingBox(0, 0, 48, 9, .1, { density: 1 });
     let cfg = { cx: 47, cy: 8, radius: 0.5, width: 1, height: 1, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2311,8 +2312,8 @@ export function buildLevelScreen(level: number) {
     });
 
     // draw the up/down controls that cover the whole screen
-    Helpers.addToggleButton(stage.hud, { cx: 8, cy: 2.25, width: 16, height: 4.5, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(-5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
-    Helpers.addToggleButton(stage.hud, { cx: 8, cy: 6.75, width: 16, height: 4.5, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 2.25, width: 16, height: 4.5, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(-5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 6.75, width: 16, height: 4.5, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
 
     welcomeMessage("Press screen borders\nto move up and down");
     winMessage("Great Job");
@@ -2325,7 +2326,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 38) {
     stage.world.camera.setBounds(0, 0, 48, 9);
     stage.world.setGravity(0, 10);
-    Helpers.drawBoundingBox(0, 0, 48, 9, .1, { density: 1, elasticity: 0.3 });
+    drawBoundingBox(0, 0, 48, 9, .1, { density: 1, elasticity: 0.3 });
     let cfg = { cx: 47, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2349,7 +2350,7 @@ export function buildLevelScreen(level: number) {
 
     // to enable crawling, we just draw a crawl button on the screen
     // Be sure to hover over "crawlOn" and "crawlOff" to see what they do
-    Helpers.addToggleButton(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => (h.role as Hero).crawlOn(Math.PI / 2), () => (h.role as Hero).crawlOff(Math.PI / 2));
+    addToggleButton(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => (h.role as Hero).crawlOn(Math.PI / 2), () => (h.role as Hero).crawlOff(Math.PI / 2));
 
     // make an enemy who we can only defeat by colliding with it while crawling
     cfg = { cx: 40, cy: 8, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
@@ -2370,7 +2371,7 @@ export function buildLevelScreen(level: number) {
   // where the player puts obstacles in place, then starts the hero moving.
   else if (level == 39) {
     stage.world.setGravity(0, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1 });
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     Actor.Make({
@@ -2392,7 +2393,7 @@ export function buildLevelScreen(level: number) {
     });
     stage.world.camera.setCameraFocus(h);
 
-    Helpers.setTouchAndGo(h, 5, 0);
+    setTouchAndGo(h, 5, 0);
 
     welcomeMessage("Press the hero to start moving");
     winMessage("Great Job");
@@ -2404,7 +2405,7 @@ export function buildLevelScreen(level: number) {
   // between a hero and an obstacle to achieve this effect.
   else if (level == 40) {
     stage.world.camera.setBounds(0, 0, 160, 9);
-    Helpers.drawBoundingBox(0, 0, 160, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 160, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2433,7 +2434,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Sensor(Helpers.setSpeedBoost(5, 0, 2)),
+      role: new Sensor(setSpeedBoost(5, 0, 2)),
     });
 
     // place a slow-down obstacle that lasts for 3 seconds
@@ -2442,7 +2443,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Sensor(Helpers.setSpeedBoost(-2, 0, 3)),
+      role: new Sensor(setSpeedBoost(-2, 0, 3)),
     });
 
     // place a permanent +3 speedup obstacle... the -1 means "forever"
@@ -2451,7 +2452,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
       movement: new InertMovement(),
-      role: new Sensor(Helpers.setSpeedBoost(3, 0)),
+      role: new Sensor(setSpeedBoost(3, 0)),
     });
 
     // This isn't a very fun level, since there's no way to change the hero's
@@ -2466,8 +2467,8 @@ export function buildLevelScreen(level: number) {
   else if (level == 41) {
     // set up a level where tilt only makes the hero move up and down
     stage.world.camera.setBounds(0, 0, 16, 36);
-    Helpers.enableTilt(0, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 36, .1, { density: 1, friction: 1 });
+    enableTilt(0, 10);
+    drawBoundingBox(0, 0, 16, 36, .1, { density: 1, friction: 1 });
     let cfg = { cx: 2, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2505,11 +2506,11 @@ export function buildLevelScreen(level: number) {
   // level, we throw projectiles by touching the hero, and the projectile always
   // goes in the same direction
   else if (level == 42) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     // Just for fun, we'll have an auto-scrolling background, to make it look
     // like we're moving all the time
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Make a hero and an enemy that slowly moves toward the hero
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -2535,7 +2536,7 @@ export function buildLevelScreen(level: number) {
     // projectiles in flight at any time.  Once a projectile hits a wall or
     // enemy, it stops being "in flight", so we can throw another.
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 3, strength: 1, disappearOnCollide: true, range: 40, immuneToCollisions: true, bodyMaker: () => CircleBody.Circle({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }),
     });
@@ -2567,8 +2568,8 @@ export function buildLevelScreen(level: number) {
   else if (level == 43) {
     // Set up a scrolling background for the level
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "front.png" }), speed: -5 / 1000, isHorizontal: false, isAuto: true });
-    Helpers.enableTilt(1, 1, true);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(1, 1, true);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 8, cy: 4.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2601,7 +2602,7 @@ export function buildLevelScreen(level: number) {
     // set up a pool of projectiles, but now once the projectiles travel more
     // than 9 meters, they disappear
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 100, strength: 1, range: 9, immuneToCollisions: true, disappearOnCollide: true,
       bodyMaker: () => CircleBody.Circle({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }),
@@ -2611,8 +2612,8 @@ export function buildLevelScreen(level: number) {
     // as long as it is held, but only throws once every 100 milliseconds.
     // Throwing to the left flies out of the top of the hero.  Throwing to the
     // right flies out of the bottom.
-    Helpers.addToggleButton(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatToss(projectiles, h, 100, 0, -.5, -30, 0), undefined);
-    Helpers.addToggleButton(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.makeRepeatToss(projectiles, h, 100, 0, .5, 30, 0), undefined);
+    addToggleButton(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, makeRepeatToss(projectiles, h, 100, 0, -.5, -30, 0), undefined);
+    addToggleButton(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, makeRepeatToss(projectiles, h, 100, 0, .5, 30, 0), undefined);
 
     welcomeMessage("Press left and right to throw projectiles");
     winMessage("Great Job");
@@ -2621,8 +2622,8 @@ export function buildLevelScreen(level: number) {
 
   // this level shows how to change the amount of damage a projectile can do
   else if (level == 44) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2650,14 +2651,14 @@ export function buildLevelScreen(level: number) {
     // damage.  Note that we make our projectiles immune to collisions.  This is
     // important if we don't want them colliding with the hero.
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 3, strength: 2, immuneToCollisions: true, disappearOnCollide: true, range: 40,
       bodyMaker: () => BoxBody.Box({ width: .1, height: .4, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new ImageSprite({ width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 })
     });
 
     // this button only throws one projectile per press...
-    Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
+    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
       () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, 0, 0, 0, -10); return true; });
 
     welcomeMessage("Defeat all enemies to win");
@@ -2673,7 +2674,7 @@ export function buildLevelScreen(level: number) {
 
     // Note: the height of the bounding box is set so that enemies can be drawn off screen
     // and then fall downward
-    Helpers.drawBoundingBox(0, -2, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, -2, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 8.5, cy: 0.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
     let h = Actor.Make({
@@ -2689,7 +2690,7 @@ export function buildLevelScreen(level: number) {
     // hero we press, the faster the projectile goes, so we multiply the velocity by .8 to
     // slow it down a bit
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       disappearOnCollide: true,
       size: 100, bodyMaker: () => CircleBody.Circle({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }), strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
@@ -2697,12 +2698,12 @@ export function buildLevelScreen(level: number) {
 
     // Draw a button for throwing projectiles in many directions.  Again, note
     // that if we hold the button, it keeps throwing
-    Helpers.addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
+    addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
 
     // We'll set up a timer, so that enemies keep falling from the sky
     stage.world.timer.addEvent(new TimedEvent(1, true, () => {
       // get a random number between 0.0 and 15.0
-      let x = Helpers.getRandom(151) / 10;
+      let x = getRandom(151) / 10;
       cfg = { cx: x, cy: -1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
       Actor.Make({
         appearance: new ImageSprite(cfg),
@@ -2723,7 +2724,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 46) {
     // In this level, there is no way to move the hero left and right, but it can jump
     stage.world.setGravity(0, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: .4, cy: 0.4, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -2772,7 +2773,7 @@ export function buildLevelScreen(level: number) {
 
     // Set up a projectile pool with 5 projectiles
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 5,
       bodyMaker: () => CircleBody.Circle({ radius: 0.25, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
@@ -2786,8 +2787,8 @@ export function buildLevelScreen(level: number) {
 
     // cover "most" of the screen with a button for throwing projectiles.  This
     // ensures that we can still tap the hero to make it jump
-    Helpers.addTapControl(stage.hud, { cx: 8.5, cy: 4.5, width: 15, height: 9, img: "" },
-      Helpers.TossDirectionalAction(stage.hud, projectiles, h, 0, 0)
+    addTapControl(stage.hud, { cx: 8.5, cy: 4.5, width: 15, height: 9, img: "" },
+      TossDirectionalAction(stage.hud, projectiles, h, 0, 0)
     );
 
 
@@ -2831,7 +2832,7 @@ export function buildLevelScreen(level: number) {
   // fire on a building.
   else if (level == 47) {
     // In this level, we can press the screen to move left and right
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 0.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -2841,12 +2842,12 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 1, cy: 4.5, width: 2, height: 9, img: "" },
       () => (h.movement as ExplicitMovement).updateXVelocity(-5),
       () => (h.movement as ExplicitMovement).updateXVelocity(0)
     );
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 15, cy: 4.5, width: 2, height: 9, img: "" },
       () => (h.movement as ExplicitMovement).updateXVelocity(5),
       () => (h.movement as ExplicitMovement).updateXVelocity(0)
@@ -2855,7 +2856,7 @@ export function buildLevelScreen(level: number) {
     // Set up our projectiles.  One thing we add here is a sound when they
     // disappear
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 100,
       bodyMaker: () => CircleBody.Circle({ radius: 0.25, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
@@ -2918,7 +2919,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryEnemyCount();
 
     // put a count of defeated enemies on the screen
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => stage.score.getEnemiesDefeated() + " Enemies Defeated");
 
@@ -2930,8 +2931,8 @@ export function buildLevelScreen(level: number) {
   // This level shows that we can have moveable enemies that reproduce. Be
   // careful... it is possible to make a lot of enemies really quickly
   else if (level == 48) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Make a hero who moves via tilt
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -3024,7 +3025,7 @@ export function buildLevelScreen(level: number) {
   // this level shows simple animation. Every entity can have a default
   // animation.
   else if (level == 49) {
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -3042,7 +3043,7 @@ export function buildLevelScreen(level: number) {
     // Note that "AnimationState.IDLE_E" is the default animation, and the only one that
     // is required.  it is both the default, and what to use for an Actor who
     // is facing to the right and standing still.
-    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_2.png", "leg_star_3.png", "leg_star_4.png"] }));
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_2.png", "leg_star_3.png", "leg_star_4.png"] }));
     let h_cfg = {
       cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4,
       animations,
@@ -3055,7 +3056,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
+    addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
 
     welcomeMessage("The hero is animated");
     winMessage("Great Job");
@@ -3070,8 +3071,8 @@ export function buildLevelScreen(level: number) {
     // In this level, we will have tilt to move left/right, but there is so much
     // friction that tilt will only be effective when the hero is in the air
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     stage.backgroundColor = "#17b4ff";
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
@@ -3130,7 +3131,7 @@ export function buildLevelScreen(level: number) {
     // the (defunct) goodie's position. Note, too, that the final cell is blank,
     // so that we don't leave a residue on the screen.
     let g_animations = new Map();
-    g_animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["star_burst_3.png"] }));
+    g_animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 1000, repeat: true, images: ["star_burst_3.png"] }));
     let g_cfg = { cx: 2, cy: 7.5, width: 0.5, height: 0.5, radius: 0.25, animations: g_animations };
     Actor.Make({
       appearance: new AnimatedSprite(g_cfg),
@@ -3156,8 +3157,8 @@ export function buildLevelScreen(level: number) {
   // this level shows that projectiles can be animated, and that we can
   // animate the hero while it throws a projectile
   else if (level == 51) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
@@ -3171,7 +3172,7 @@ export function buildLevelScreen(level: number) {
 
     // set up our hero
     let animations = new Map();
-    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["color_star_1.png"] }));
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 1000, repeat: true, images: ["color_star_1.png"] }));
     // set up an animation when the hero throws:
     animations.set(AnimationState.TOSS_E, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
     animations.set(AnimationState.TOSS_NE, new AnimationSequence(false).to("color_star_4.png", 200).to("color_star_5.png", 400));
@@ -3207,8 +3208,8 @@ export function buildLevelScreen(level: number) {
     // make a projectile pool and give an animation pattern for the projectiles
     let projectiles = new ActorPoolSystem();
     let p_animations = new Map();
-    p_animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }));
-    Helpers.populateProjectilePool(projectiles, {
+    p_animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 100, repeat: true, images: ["fly_star_1.png", "fly_star_2.png"] }));
+    populateProjectilePool(projectiles, {
       size: 100,
       bodyMaker: () => CircleBody.Circle({ radius: 0.25, cx: -100, cy: -100 }, stage.world),
       appearanceMaker: () => new AnimatedSprite({ width: 0.5, height: 0.5, animations: p_animations, z: 0 }),
@@ -3226,8 +3227,8 @@ export function buildLevelScreen(level: number) {
   // make some enemies that aren't affected by invincibility, and some
   // that can even damage the hero while it is invincible.
   else if (level == 52) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 15, cy: 1, width: 0.5, height: 0.5, radius: 0.25, img: "mustard_ball.png" };
     Actor.Make({
@@ -3325,14 +3326,14 @@ export function buildLevelScreen(level: number) {
       }),
     });
 
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
       () => stage.score.getGoodieCount(0) + " Goodies");
 
     // draw a picture when the level is won, and don't print text...
     // this particular picture isn't very useful
     stage.score.winSceneBuilder = (overlay: Scene) => {
-      Helpers.addTapControl(
+      addTapControl(
         overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, img: "fade.png" },
         () => { stage.switchTo(buildLevelScreen, 53); return true; }
@@ -3350,7 +3351,7 @@ export function buildLevelScreen(level: number) {
   // game, then States.ts is where you'll want to do some work.
   else if (level == 53) {
     stage.world.setGravity(0, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3 });
 
     let cfg = { cx: 15, cy: 8.5, width: 0.5, height: 0.5, radius: 0.25, img: "mustard_ball.png" };
     Actor.Make({
@@ -3365,7 +3366,7 @@ export function buildLevelScreen(level: number) {
     // make a hero with fixed velocity, and give it crawl and jump
     // animations
     let animations = new Map();
-    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 100, repeat: true, images: ["leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 100, repeat: true, images: ["leg_star_1.png"] }));
     let jumping = new AnimationSequence(true).to("leg_star_5.png", 200).to("leg_star_6.png", 200).to("leg_star_7.png", 200).to("leg_star_8.png", 200);
     animations.set(AnimationState.JUMP_E, jumping);
     animations.set(AnimationState.JUMP_NE, jumping);
@@ -3393,8 +3394,8 @@ export function buildLevelScreen(level: number) {
     // stage.world.camera.setCameraFocus(h);
 
     // enable hero jumping and crawling
-    Helpers.addTapControl(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, Helpers.jumpAction(h, 0, -8, 0));
-    Helpers.addToggleButton(stage.hud,
+    addTapControl(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, jumpAction(h, 0, -8, 0));
+    addToggleButton(stage.hud,
       { cx: 12, cy: 4.5, width: 8, height: 9, img: "" },
       () => (h.role as Hero).crawlOn(Math.PI / 2),
       () => (h.role as Hero).crawlOff(Math.PI / 2)
@@ -3412,12 +3413,12 @@ export function buildLevelScreen(level: number) {
 
     // include a picture on the "try again" screen
     stage.score.loseSceneBuilder = (overlay: Scene) => {
-      Helpers.addTapControl(
+      addTapControl(
         overlay,
         { cx: 8, cy: 4.5, width: 16, height: 9, img: "fade.png" },
         () => { stage.switchTo(buildLevelScreen, 53); return true; }
       );
-      Helpers.makeText(overlay,
+      makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
         () => "Oh well...");
     };
@@ -3432,7 +3433,7 @@ export function buildLevelScreen(level: number) {
   // are collected, or allow the hero to switch its animation depending on how
   // many enemies it has collided with.
   else if (level == 54) {
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // create 7 goodies, each of which adds 1 to the hero's strength
     for (let i = 0; i < 7; ++i) {
@@ -3490,14 +3491,14 @@ export function buildLevelScreen(level: number) {
       }),
     });
 
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
+    addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
   }
 
   // We can use obstacles to defeat enemies, and we can control which enemies
   // the obstacle can defeat, by using obstacle-enemy collision callbacks
   else if (level == 55) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
@@ -3546,7 +3547,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryEnemyCount(4);
 
     // put an enemy defeated count on the screen, in red with a small font
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.5, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#FF0000", size: 10, z: 2 },
       () => stage.score.getEnemiesDefeated() + "/4 Enemies Defeated");
 
@@ -3594,8 +3595,8 @@ export function buildLevelScreen(level: number) {
   else if (level == 56) {
     // Negative gravity... the hero is going to float upward!
     stage.world.setGravity(0, -10);
-    Helpers.enableTilt(10, 0);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Make a hero who is blocked from moving upward by a shrinking ceiling
     let cfg = { cx: 2, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -3614,7 +3615,7 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle(),
     });
 
-    Helpers.setShrinkOverTime(ceiling, 0.1, 0.1, true);
+    setShrinkOverTime(ceiling, 0.1, 0.1, true);
 
     // make an obstacle that causes the hero to throw Projectiles when touched
     //
@@ -3634,7 +3635,7 @@ export function buildLevelScreen(level: number) {
 
     // set up our projectiles.  There are only 20... throw them carefully
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 3, strength: 2,
       bodyMaker: () => CircleBody.Circle({ radius: 0.25, cx: -100, cy: -100 }, stage.world),
       disappearOnCollide: true,
@@ -3646,7 +3647,7 @@ export function buildLevelScreen(level: number) {
     projectiles.setLimit(20);
 
     // show how many shots are left
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.5, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 12, z: 2 },
       () => projectiles.getRemaining() + " projectiles left");
 
@@ -3680,7 +3681,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(grow_box, -1, 0, false);
+    setShrinkOverTime(grow_box, -1, 0, false);
 
     cfg = { cx: 3, cy: 7, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
     let small_shrink_ball = Actor.Make({
@@ -3689,7 +3690,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(small_shrink_ball, 0.1, 0.2, true);
+    setShrinkOverTime(small_shrink_ball, 0.1, 0.2, true);
 
     cfg = { cx: 11, cy: 6, radius: 1, width: 2, height: 2, img: "purple_ball.png" };
     let big_shrink_ball = Actor.Make({
@@ -3698,7 +3699,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(big_shrink_ball, 0.2, 0.1, false);
+    setShrinkOverTime(big_shrink_ball, 0.2, 0.1, false);
 
     // Hmm, this shrinks in just one timestep?
     let cfg1 = { cx: 5, cy: 6, vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#0A0305" };
@@ -3708,7 +3709,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(shrink_poly, 0.2, 0.1, false);
+    setShrinkOverTime(shrink_poly, 0.2, 0.1, false);
 
     let cfg2 = { cx: 7, cy: 6, width: 2, height: 2, fillColor: "#F0F0F0" };
     let shrink_box = Actor.Make({
@@ -3717,7 +3718,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(shrink_box, 0.2, 0.1, false);
+    setShrinkOverTime(shrink_box, 0.2, 0.1, false);
 
     let cfg3 = { cx: 9, cy: 6, radius: 1, fillColor: "#0044F0" };
     let shrink_circle = Actor.Make({
@@ -3726,7 +3727,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(shrink_circle, 0.2, 0.1, false);
+    setShrinkOverTime(shrink_circle, 0.2, 0.1, false);
 
     // Oh no, this shrinks waay too fast, and the rigidbody is really weird
     let cfg4 = { center: false, width: .1, height: .1, cx: 11, cy: 6, face: "Arial", color: "#FF0000", size: 32 };
@@ -3736,7 +3737,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Obstacle(),
     });
-    Helpers.setShrinkOverTime(shrink_text, 0.02, 0.01, false);
+    setShrinkOverTime(shrink_text, 0.02, 0.01, false);
 
     stage.score.setVictoryEnemyCount(5);
 
@@ -3753,8 +3754,8 @@ export function buildLevelScreen(level: number) {
   // doesn't do anything, but it looks nice...
   else if (level == 57) {
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     welcomeMessage("Press to rotate the hero");
     winMessage("Great Job");
@@ -3782,12 +3783,12 @@ export function buildLevelScreen(level: number) {
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
 
     // add buttons for rotating the hero
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 4, cy: 4.5, width: 8, height: 9, img: "" },
       () => (h.role as Hero).increaseRotation(-0.05),
       () => (h.role as Hero).increaseRotation(-0.05)
     );
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 12, cy: 4.5, width: 8, height: 9, img: "" },
       () => (h.role as Hero).increaseRotation(0.05),
       () => (h.role as Hero).increaseRotation(0.05)
@@ -3797,7 +3798,7 @@ export function buildLevelScreen(level: number) {
   // we can attach movement buttons to any moveable entity, so in this case, we
   // attach it to an obstacle to get an Arkanoid-like effect.
   else if (level == 58) {
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    drawBoundingBox(0, 0, 16, 9, .1);
 
     let cfg = { cx: 14, cy: 1, radius: 0.125, width: 0.25, height: 0.25, img: "mustard_ball.png" };
     Actor.Make({
@@ -3829,13 +3830,13 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle(),
     });
 
-    Helpers.addToggleButton(
+    addToggleButton(
       stage.hud,
       { cx: 4, cy: 4.5, width: 8, height: 9, img: "" },
       () => (o.movement as ExplicitMovement).updateXVelocity(-5),
       () => (o.movement as ExplicitMovement).updateXVelocity(0)
     );
-    Helpers.addToggleButton(
+    addToggleButton(
       stage.hud,
       { cx: 12, cy: 4.5, width: 8, height: 9, img: "" },
       () => (o.movement as ExplicitMovement).updateXVelocity(5),
@@ -3846,11 +3847,11 @@ export function buildLevelScreen(level: number) {
   // In this level, we'll use some timers that happen after certain amounts of
   // time elapse.
   else if (level == 59) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Things will appear  and disappear...");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
@@ -3898,8 +3899,8 @@ export function buildLevelScreen(level: number) {
 
   // This level uses timers to make more of the level appear over time
   else if (level == 60) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
@@ -3921,10 +3922,10 @@ export function buildLevelScreen(level: number) {
     // set a timer callback. after three seconds, the callback will run
     stage.world.timer.addEvent(new TimedEvent(2, false, () => {
       stage.requestOverlay((overlay: Scene) => {
-        Helpers.makeText(overlay,
+        makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 18, z: 0 },
           () => "Ooh... a draggable enemy");
-        Helpers.addTapControl(overlay,
+        addTapControl(overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
           () => { stage.clearOverlay(); return true; }
         );
@@ -3937,7 +3938,7 @@ export function buildLevelScreen(level: number) {
           movement: new Draggable(true),
           role: new Enemy(),
         });
-        Helpers.createDragZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
+        createDragZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
       });
     }));
 
@@ -3949,10 +3950,10 @@ export function buildLevelScreen(level: number) {
       // consider drawing the actors as part of the code that runs when the
       // overlay is tapped.
       stage.requestOverlay((overlay: Scene) => {
-        Helpers.makeText(overlay,
+        makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 18, z: 1 },
           () => "Touch the enemy and it will go away");
-        Helpers.addTapControl(overlay,
+        addTapControl(overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
           () => { stage.clearOverlay(); return true; }
         );
@@ -3965,7 +3966,7 @@ export function buildLevelScreen(level: number) {
           role: new Enemy(),
         });
 
-        Helpers.defeatOnTouch(touch_enemy.role as Enemy);
+        defeatOnTouch(touch_enemy.role as Enemy);
       });
     }));
 
@@ -3974,11 +3975,11 @@ export function buildLevelScreen(level: number) {
       // draw an enemy, a goodie, and a destination, all with
       // fixed velocities
       stage.requestOverlay((overlay: Scene) => {
-        Helpers.addTapControl(overlay,
+        addTapControl(overlay,
           { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
           () => { stage.clearOverlay(); return true; }
         );
-        Helpers.makeText(overlay,
+        makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 18, z: 1 },
           () => "Now you can see the rest of the level");
         cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
@@ -4031,11 +4032,11 @@ export function buildLevelScreen(level: number) {
   // of a screen, so that we'd never see the drawing of stuff taking place, but
   // for this demo, that's actually a nice effect.
   else if (level == 61) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Keep going right!");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 64, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 64, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     stage.world.camera.setBounds(0, 0, 64, 9);
 
     let cfg = { cx: 2, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -4047,7 +4048,7 @@ export function buildLevelScreen(level: number) {
     });
 
     stage.world.camera.setCameraFocus(h);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => stage.score.getGoodieCount(0) + " Goodies");
     stage.score.setVictoryDestination(1);
 
@@ -4125,11 +4126,11 @@ export function buildLevelScreen(level: number) {
 
         // print a message and pause the game, via PauseScene
         stage.requestOverlay((overlay: Scene) => {
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
             () => { stage.clearOverlay(); return true; }
           );
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
             () => "The destination is now available");
 
@@ -4150,11 +4151,11 @@ export function buildLevelScreen(level: number) {
 
   // this level demonstrates callbacks that happen when we touch an obstacle.
   else if (level == 62) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Touching the obstacle won't work until\nyou collect a goodie");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
@@ -4229,13 +4230,13 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("There are five ways to defeat an enemy");
     winMessage("You did it!");
 
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1);
 
     // make a hero and give it some strength, so it can defeat an enemy via
     // collision.
     let animations = new Map();
-    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 1000, repeat: true, images: ["green_ball.png"] }));
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 1000, repeat: true, images: ["green_ball.png"] }));
     let inv = new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100);
     for (let s of [AnimationState.INV_E, AnimationState.INV_NE, AnimationState.INV_SE, AnimationState.INV_W, AnimationState.INV_SW, AnimationState.INV_NW, AnimationState.INV_N, AnimationState.INV_S])
       animations.set(s, inv);
@@ -4265,7 +4266,7 @@ export function buildLevelScreen(level: number) {
     // Tapping the hero will throw a projectile, which is another way to defeat
     // enemies
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 100, strength: 1,
       immuneToCollisions: true,
       range: 40,
@@ -4285,20 +4286,20 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle({ enemyCollision: (_thisActor: Actor, collideActor: Actor) => { if (collideActor.extra.info === "weak") (collideActor.role as Enemy).defeat(true, undefined); } }),
     });
     // We'll use flicking to move the obstacle
-    Helpers.createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
+    createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
 
     // Here's some code to run whenever an enemy is defeated
     let onDefeatScript = () => {
       // Make a fresh pause scene
       stage.requestOverlay((overlay: Scene) => {
-        Helpers.makeText(overlay,
+        makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#58E2A0", size: 16, z: 0 }, () => "good job, here's a prize");
-        Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => { stage.clearOverlay(); return true; });
+        addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => { stage.clearOverlay(); return true; });
 
         // Draw a goodie on the screen somewhat randomly as a reward... picking
         // in the range 0-8,0-15 ensures that with width and height of 1, the
         // goodie stays on screen
-        cfg = { cx: Helpers.getRandom(15) + .5, cy: Helpers.getRandom(8) + .5, radius: 0.5, width: 1, height: 1, img: "blue_ball.png" };
+        cfg = { cx: getRandom(15) + .5, cy: getRandom(8) + .5, radius: 0.5, width: 1, height: 1, img: "blue_ball.png" };
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world),
@@ -4342,7 +4343,7 @@ export function buildLevelScreen(level: number) {
       movement: new InertMovement(),
       role: new Enemy({ onDefeated: onDefeatScript }),
     });
-    Helpers.defeatOnTouch(e4.role as Enemy);
+    defeatOnTouch(e4.role as Enemy);
 
     cfg = { cx: 1, cy: 8, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
     Actor.Make({
@@ -4361,11 +4362,11 @@ export function buildLevelScreen(level: number) {
   // increment scores inside of the callback code, which lets us activate the
   // destination on an obstacle collision
   else if (level == 64) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Only stars can reach the destination");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
@@ -4375,7 +4376,7 @@ export function buildLevelScreen(level: number) {
       role: new Hero(),
     });
 
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => stage.score.getGoodieCount(0) + " Goodies");
 
     // the destination won't work until some goodies are collected...
@@ -4425,7 +4426,7 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("Press anywhere to throw a ball");
     winMessage("You Survived!");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // draw a hero, and a button for throwing projectiles in many directions.
     // Note that this is going to look like an "asteroids" game, with a hero
@@ -4443,20 +4444,20 @@ export function buildLevelScreen(level: number) {
     // set up our pool of projectiles, then set them to have a fixed
     // velocity when using the vector throw mechanism
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
       bodyMaker: () => CircleBody.Circle({ radius: 0.1, cx: -100, cy: -100 }, stage.world),
       disappearOnCollide: true,
       immuneToCollisions: true,
       appearanceMaker: () => new ImageSprite({ width: 0.2, height: 0.2, img: "grey_ball.png" }),
     });
-    Helpers.addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
+    addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
 
     // we're going to win by "surviving" for 25 seconds... with no enemies, that
     // shouldn't be too hard.  Let's put the timer on the HUD, so the player
     // knows how much time remains.
     stage.score.setWinCountdownRemaining(25);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 2, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#C0C0C0", size: 16, z: 2 },
       () => "" + (stage.score.getWinCountdownRemaining() ?? 0).toFixed(2) + "s remaining");
 
@@ -4469,14 +4470,14 @@ export function buildLevelScreen(level: number) {
     // Let's put a button for pausing the game, so we can see that it pauses the
     // timer.  Notice that we have to draw it *after* the throw button, or else
     // the throw button will cover it.
-    Helpers.addTapControl(stage.hud,
+    addTapControl(stage.hud,
       { cx: .5, cy: .5, width: .5, height: .5, img: "pause.png" },
       () => {
         stage.requestOverlay((overlay: Scene) => {
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
             () => "Game Paused");
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
             () => { stage.clearOverlay(); return true; }
           );
@@ -4494,7 +4495,7 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("Flick the hero into the destination");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let boxCfg = { cx: 1, cy: 7, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
     Actor.Make({
@@ -4503,7 +4504,7 @@ export function buildLevelScreen(level: number) {
       movement: new HoverFlick(1, 7, 0.7),
       role: new Hero(),
     });
-    Helpers.createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
+    createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
 
     // place an enemy, let it fall
     let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
@@ -4535,11 +4536,11 @@ export function buildLevelScreen(level: number) {
   // re-enabled upon a collision.
   else if (level == 67) {
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
+    enableTilt(10, 0);
     welcomeMessage("Press the hero to make it jump");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     Actor.Make({
@@ -4585,11 +4586,11 @@ export function buildLevelScreen(level: number) {
   // It also shows how things can move through walls.
   else if (level == 68) {
     // set up a simple level
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("You can walk through the wall");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Make a hero who moves via tilt
     let cfg = { cx: 5.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
@@ -4664,16 +4665,16 @@ export function buildLevelScreen(level: number) {
   // teleported.  Here, we'll say that when we poke the screen, the actor starts
   // moving toward that point.
   else if (level == 69) {
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    drawBoundingBox(0, 0, 16, 9, .1);
     welcomeMessage("Poke the hero, then  where you want it to go.");
     winMessage("Great Job");
     loseMessage("Try Again");
 
     // Let's set up a hero
     let animations = new Map();
-    let r = Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] });
+    let r = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] });
     animations.set(AnimationState.IDLE_E, r);
-    let l = Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
+    let l = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
     animations.set(AnimationState.IDLE_W, l);
     animations.set(AnimationState.IDLE_NW, l);
     animations.set(AnimationState.IDLE_SW, l);
@@ -4697,7 +4698,7 @@ export function buildLevelScreen(level: number) {
     // location, ...
     //
     // Be sure to move left/right/up/down, to see if the animations are working
-    Helpers.createPokeToMoveZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, false);
+    createPokeToMoveZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, false);
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
@@ -4723,7 +4724,7 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("Press screen borders to move the hero");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -4768,11 +4769,11 @@ export function buildLevelScreen(level: number) {
     });
 
     // draw some buttons for moving the hero
-    Helpers.addToggleButton(stage.hud, { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
+    addToggleButton(stage.hud, { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
       () => (h.movement as ExplicitMovement).updateXVelocity(-5),
       () => (h.movement as ExplicitMovement).updateXVelocity(0)
     );
-    Helpers.addToggleButton(stage.hud, { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
+    addToggleButton(stage.hud, { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
       () => (h.movement as ExplicitMovement).updateXVelocity(5),
       () => (h.movement as ExplicitMovement).updateXVelocity(0)
     );
@@ -4782,11 +4783,11 @@ export function buildLevelScreen(level: number) {
   // direction of travel. Also, this level shows how to do walls that can be
   // passed through in one direction.
   else if (level == 71) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Press anywhere to shoot a laser beam");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -4809,7 +4810,7 @@ export function buildLevelScreen(level: number) {
     // set up a pool of projectiles with fixed velocity, and with
     // rotation
     let projectiles = new ActorPoolSystem();
-    Helpers.populateProjectilePool(projectiles, {
+    populateProjectilePool(projectiles, {
       size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorToss: true,
       immuneToCollisions: true, disappearOnCollide: true, range: 40,
       bodyMaker: () => BoxBody.Box({ width: 0.02, height: .5, cx: -100, cy: -100 }, stage.world),
@@ -4819,7 +4820,7 @@ export function buildLevelScreen(level: number) {
     // draw a button for throwing projectiles in many directions. It
     // only covers half the screen, to show how such an effect would
     // behave
-    Helpers.addDirectionalTossButton(stage.hud,
+    addDirectionalTossButton(stage.hud,
       projectiles, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, h, 100, 0, 0);
 
     // Warning!  If you make these projectiles any longer, and if you are not
@@ -4867,11 +4868,11 @@ export function buildLevelScreen(level: number) {
   // really mean, because you need to get the exact right number of each goodie
   // type.
   else if (level == 72) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Green, Red, Blue, and Grey balls are goodies\nBut how many of each are needed?");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 8.25, radius: 0.4, width: 0.8, height: 0.8, img: "leg_star_1.png" };
     Actor.Make({
@@ -4896,22 +4897,22 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // Announce how many of each goodie have been collected
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => stage.score.getGoodieCount(0) + " blue");
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => stage.score.getGoodieCount(1) + " green");
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => stage.score.getGoodieCount(2) + " red");
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1, cy: 2.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 20, z: 2 },
       () => stage.score.getGoodieCount(3) + " gray");
 
     // You only get 20 seconds to finish the level
     stage.score.setLoseCountdownRemaining(20);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 15, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 },
       () => (stage.score.getLoseCountdownRemaining() ?? 0).toFixed() + "");
 
@@ -4970,11 +4971,11 @@ export function buildLevelScreen(level: number) {
   // this level shows passthrough objects and chase again, to help
   // get you thinking about chase and dynamic bodies
   else if (level == 73) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("You can walk through the wall");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -5019,7 +5020,7 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("Press anywhere to speed up");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
+    drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
 
     let cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     Actor.Make({
@@ -5051,7 +5052,7 @@ export function buildLevelScreen(level: number) {
 
     // draw a turbo boost button that covers the whole screen... make sure its
     // "up" speed matches the hero velocity
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
       () => (h.movement as ExplicitMovement).updateVelocity(15, 0),
       () => (h.movement as ExplicitMovement).updateVelocity(4, 0)
@@ -5066,7 +5067,7 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("Press anywhere to start moving");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
+    drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
 
     let cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     Actor.Make({
@@ -5094,10 +5095,10 @@ export function buildLevelScreen(level: number) {
 
     // This control has a dampening effect, so that on release, the hero
     // slowly stops
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      Helpers.makeXYDampenedMotionAction(h, 10, 0, 0),
-      Helpers.makeXYDampenedMotionAction(h, 10, 0, 1)
+      makeXYDampenedMotionAction(h, 10, 0, 0),
+      makeXYDampenedMotionAction(h, 10, 0, 1)
     );
   }
 
@@ -5106,11 +5107,11 @@ export function buildLevelScreen(level: number) {
   // it, to give a jump-like boost.
   else if (level == 76) {
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
+    enableTilt(10, 0);
     welcomeMessage("One-sided + Callbacks");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -5149,17 +5150,17 @@ export function buildLevelScreen(level: number) {
   // moving after the screen is released. We will also show the Fact
   // interface.
   else if (level == 77) {
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    drawBoundingBox(0, 0, 16, 9, .1);
     welcomeMessage("Poke the hero, then  where you want it to go.");
     winMessage("Great Job");
     loseMessage("Try Again");
 
-    let w = Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
+    let w = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
     let animations = new Map();
     // TODO:  AnimatedSprite::getAnimationState is rather lackluster right now,
     //        leading to a lot of redundancy in these situations.  Consider
     //        something better?
-    animations.set(AnimationState.IDLE_E, Helpers.makeAnimation({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
     animations.set(AnimationState.IDLE_W, w);
     animations.set(AnimationState.IDLE_NW, w);
     animations.set(AnimationState.IDLE_SW, w);
@@ -5179,7 +5180,7 @@ export function buildLevelScreen(level: number) {
 
     h.gestures = { tap: () => { stage.storage.setLevel("selected_entity", h); return true; } };
     // Be sure to change to "false" and see what happens
-    Helpers.createPokeToRunZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, true);
+    createPokeToRunZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, true);
 
     let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
@@ -5204,31 +5205,31 @@ export function buildLevelScreen(level: number) {
     // To test it out, we have three facts (all are just numbers).  You can
     // press the buttons to increment the numbers.  Then exit the level or
     // refresh the page, and watch what happens.
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1.25, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
       () => "Level: " + (stage.storage.getLevel("level test") ?? -1));
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1.25, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
       () => "Session: " + (stage.storage.getSession("session test") ?? -1));
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1.25, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
       () => "Game: " + (stage.storage.getPersistent("game test") ?? "-1"));
 
-    Helpers.addTapControl(stage.hud,
+    addTapControl(stage.hud,
       { cx: .5, cy: 0.65, width: 0.5, height: 0.5, img: "red_ball.png" },
       () => {
         stage.storage.setLevel("level test", "" + (1 + parseInt(stage.storage.getLevel("level test") ?? -1)));
         return true;
       }
     );
-    Helpers.addTapControl(stage.hud,
+    addTapControl(stage.hud,
       { cx: .5, cy: 1.15, width: 0.5, height: 0.5, img: "blue_ball.png" },
       () => {
         stage.storage.setSession("session test", "" + (1 + parseInt(stage.storage.getSession("session test") ?? -1)));
         return true;
       }
     );
-    Helpers.addTapControl(stage.hud,
+    addTapControl(stage.hud,
       { cx: .5, cy: 1.65, width: 0.5, height: 0.5, img: "green_ball.png" },
       () => {
         stage.storage.setPersistent("game test", "" + (1 + parseInt(stage.storage.getPersistent("game test") ?? "-1")));
@@ -5241,11 +5242,11 @@ export function buildLevelScreen(level: number) {
   // gravity.
   else if (level == 78) {
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
+    enableTilt(10, 0);
     welcomeMessage("Testing Gravity Defy?");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
@@ -5280,11 +5281,11 @@ export function buildLevelScreen(level: number) {
   // nicely.  If that's going to be a problem for your game, you might want to
   // work on the shrink code and then share it with me :)
   else if (level == 79) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("Testing Polygons");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     let cfg = { cx: 1.25, cy: 6.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
@@ -5314,17 +5315,17 @@ export function buildLevelScreen(level: number) {
       role: new Obstacle(),
     });
 
-    Helpers.setShrinkOverTime(o, 0.1, 0.1, true);
+    setShrinkOverTime(o, 0.1, 0.1, true);
   }
 
   // This level shows that we can defeat enemies by jumping on them
   else if (level == 80) {
     stage.world.setGravity(0, 10);
-    Helpers.enableTilt(10, 0);
+    enableTilt(10, 0);
     welcomeMessage("Press the hero to make it jump");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     stage.score.setVictoryEnemyCount(1);
 
     // set up a simple jumping hero
@@ -5354,11 +5355,11 @@ export function buildLevelScreen(level: number) {
   // for revolute joints, which let one rigid body revolve around another.  In
   // this demo, we'll have limits to the joints, kind of like pinball flippers.
   else if (level == 81) {
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("The revolving obstacle will move the hero");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     let cfg = { cx: 5, cy: 8, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
     Actor.Make({
@@ -5410,7 +5411,7 @@ export function buildLevelScreen(level: number) {
   // Demonstrate one-time callback controls
   else if (level == 82) {
     // start by setting everything up just like in level 1
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -5429,22 +5430,22 @@ export function buildLevelScreen(level: number) {
 
     stage.score.setVictoryDestination(1);
     winMessage("Great Job");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    drawBoundingBox(0, 0, 16, 9, .1);
     welcomeMessage("Reach the destination\nto win this level");
 
     // add a pause button
     let hasPaused = false;
-    let pause_button = Helpers.addTapControl(stage.hud,
+    let pause_button = addTapControl(stage.hud,
       { cx: 0.3, cy: 0.3, width: 0.5, height: 0.5, img: "pause.png" },
       () => {
         if (hasPaused) return false;
         hasPaused = true;
         stage.requestOverlay((overlay: Scene) => {
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
             () => { stage.clearOverlay(); return true; }
           );
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 0 },
             () => "you can only pause once...");
         });
@@ -5460,8 +5461,8 @@ export function buildLevelScreen(level: number) {
   // This might be useful if your hero needs to pick things up and move them
   // places.
   else if (level == 83) {
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
     Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -5501,11 +5502,11 @@ export function buildLevelScreen(level: number) {
   else if (level == 84) {
     // We have a level that is un-winnable, because you need to defeat the
     // enemy, but don't have enough strength.
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     welcomeMessage("The pause scene is interactive");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -5526,44 +5527,44 @@ export function buildLevelScreen(level: number) {
 
     // Create a pause scene that has a back button on it, and a button
     // for pausing the level
-    Helpers.addTapControl(
+    addTapControl(
       stage.hud,
       { cx: 0.5, cy: 0.5, width: .5, height: .5, img: "pause.png" },
       () => {
         stage.requestOverlay((overlay: Scene) => {
 
           // This button goes back to the Chooser
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: .75, cy: .75, width: .5, height: .5, img: "red_ball.png" },
             () => { stage.clearOverlay(); stage.switchTo(buildChooserScreen, 4); return true; }
           );
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { cx: 1.25, cy: 0.65, center: false, width: .1, height: .1, face: "Arial", color: "#FF0000", size: 24 }, () => "Back to chooser");
 
           // This one wins instantly
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: .75, cy: 1.75, width: .5, height: .5, img: "blue_ball.png" },
             () => { stage.clearOverlay(); stage.score.winLevel(); return true; }
           );
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { cx: 1.25, cy: 1.65, center: false, width: .1, height: .1, face: "Arial", color: "#0000FF", size: 24 }, () => "Win Instantly");
 
           // This one loses instantly
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: .75, cy: 2.75, width: .5, height: .5, img: "purple_ball.png" },
             () => { stage.clearOverlay(); stage.score.loseLevel(); return true; });
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { cx: 1.25, cy: 2.65, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 24 }, () => "Lose Instantly");
 
           // This one opens another pause scene, to show how we can chain pause
           // scenes together
-          Helpers.addTapControl(overlay,
+          addTapControl(overlay,
             { cx: .75, cy: 3.75, width: .5, height: .5, img: "green_ball.png" },
             () => {
               // clear the pause scene, draw another one
               stage.clearOverlay();
               stage.requestOverlay((overlay: Scene) => {
-                Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
+                addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
                   // In a pause scene, we can change things that are in the
                   // world, not just the HUD, so let's give the hero more
                   // strength
@@ -5571,13 +5572,13 @@ export function buildLevelScreen(level: number) {
                   stage.clearOverlay();
                   return true;
                 });
-                Helpers.makeText(overlay,
+                makeText(overlay,
                   { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
                   () => "You are now powered up!");
               });
               return true;
             });
-          Helpers.makeText(overlay,
+          makeText(overlay,
             { cx: 1.25, cy: 3.65, center: false, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 24 }, () => "Another Pause Scene");
         });
         return true;
@@ -5592,8 +5593,8 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
     loseMessage("Try Again");
 
-    Helpers.enableTilt(10, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    enableTilt(10, 10);
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // This hero must survive
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -5638,7 +5639,7 @@ export function buildLevelScreen(level: number) {
   // It is possible for a button to control many Actors at once!
   else if (level == 86) {
     stage.world.setGravity(0, 10);
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { elasticity: 1, friction: 0.1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { elasticity: 1, friction: 0.1 });
     welcomeMessage("Keep pressing until a hero makes it to the destination");
     winMessage("Great Job");
     loseMessage("Try Again");
@@ -5669,10 +5670,10 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // Tapping this button will make all the heroes bounce a bit
-    Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
+    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
       for (let h of heroes) {
         // The bounce is a bit chaotic in the x dimension, but always upward.
-        (h.movement as ExplicitMovement).setAbsoluteVelocity(5 - Helpers.getRandom(10), -3);
+        (h.movement as ExplicitMovement).setAbsoluteVelocity(5 - getRandom(10), -3);
       }
       return true;
     });
@@ -5684,7 +5685,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 87) {
     stage.world.setGravity(0, 10);
     // If the ground and wheels don't have friction, then this level won't work!
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
 
     // We'll make the body of our car as a hero with just a red square
     let boxCfg = { cx: 1, cy: 8, width: 2, height: 0.5, fillColor: "#FF0000" };
@@ -5736,7 +5737,7 @@ export function buildLevelScreen(level: number) {
     welcomeMessage("Press to make the hero go up");
     winMessage("Great Job");
     loseMessage("Try Again");
-    Helpers.drawBoundingBox(0, 0, 300000, 9, .1);
+    drawBoundingBox(0, 0, 300000, 9, .1);
 
     // make a hero, have the camera follow it
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -5750,7 +5751,7 @@ export function buildLevelScreen(level: number) {
     stage.world.camera.setCameraFocus(h);
 
     // touching the screen makes the hero go upwards
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
       () => (h.movement as ExplicitMovement).updateYVelocity(-5),
       () => (h.movement as ExplicitMovement).updateYVelocity(0)
@@ -5766,7 +5767,7 @@ export function buildLevelScreen(level: number) {
 
     // we win by collecting 10 goodies...
     stage.score.setVictoryGoodies(10, 0, 0, 0);
-    Helpers.makeText(stage.hud,
+    makeText(stage.hud,
       { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 },
       () => stage.score.getGoodieCount(0) + " goodies");
 
@@ -5794,8 +5795,8 @@ export function buildLevelScreen(level: number) {
       let cfg = {
         // It's at least 8 meters ahead of the sensor, so that we won't see it
         // appear on screen.
-        cx: sensor.rigidBody!.getCenter().x + 8 + Helpers.getRandom(10),
-        cy: .25 + Helpers.getRandom(8),
+        cx: sensor.rigidBody!.getCenter().x + 8 + getRandom(10),
+        cy: .25 + getRandom(8),
         width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png",
       };
       Actor.Make({
@@ -5807,8 +5808,8 @@ export function buildLevelScreen(level: number) {
 
       // Now draw a goodie.  It should be at least 9 ahead of the sensor
       cfg = {
-        cx: (sensor.rigidBody?.getCenter().x ?? 0) + 9 + Helpers.getRandom(10),
-        cy: .25 + Helpers.getRandom(8),
+        cx: (sensor.rigidBody?.getCenter().x ?? 0) + 9 + getRandom(10),
+        cy: .25 + getRandom(8),
         width: 0.5, radius: 0.25, height: 0.5, img: "blue_ball.png",
       };
       Actor.Make({
@@ -5835,9 +5836,9 @@ export function buildLevelScreen(level: number) {
   else if (level == 89) {
     // We'll use tilt and jump to control the hero in this level
     stage.world.camera.setBounds(0, 0, 32, 18);
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
 
-    Helpers.drawBoundingBox(0, 0, 32, 18, .1, { density: 1, elasticity: .3, friction: 1 });
+    drawBoundingBox(0, 0, 32, 18, .1, { density: 1, elasticity: .3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -5888,7 +5889,7 @@ export function buildLevelScreen(level: number) {
     winMessage("Great Job");
     loseMessage("Try Again");
 
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -5928,12 +5929,12 @@ export function buildLevelScreen(level: number) {
     })
 
     // draw some buttons for moving the hero
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
       () => (h.movement as ExplicitMovement).updateXVelocity(-5),
       () => (h.movement as ExplicitMovement).updateXVelocity(0)
     );
-    Helpers.addToggleButton(stage.hud,
+    addToggleButton(stage.hud,
       { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
       () => (h.movement as ExplicitMovement).updateXVelocity(5),
       () => (h.movement as ExplicitMovement).updateXVelocity(0)
@@ -5957,7 +5958,7 @@ export function buildLevelScreen(level: number) {
     ];
 
     // Draw a border around the level
-    Helpers.drawBoundingBox(0, 0, 16, 9, 0.1, { density: 1, elasticity: 0.3, friction: 1 });
+    drawBoundingBox(0, 0, 16, 9, 0.1, { density: 1, elasticity: 0.3, friction: 1 });
 
     // Create a hero controlled explicitly via special touches
     let heroCfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
@@ -6011,7 +6012,7 @@ export function buildLevelScreen(level: number) {
     });
 
     // Draw a joystick on the HUD to control the hero
-    Helpers.addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
+    addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5, stopOnUp: true });
 
     winMessage("Great Job");
   }
@@ -6019,7 +6020,7 @@ export function buildLevelScreen(level: number) {
   else if (level == 92) {
 
     // start by setting everything like in level 1
-    Helpers.enableTilt(10, 10);
+    enableTilt(10, 10);
     let cfg = { cx: 2, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
@@ -6057,7 +6058,7 @@ export function buildLevelScreen(level: number) {
     // add a bounding box so the hero can't fall off the screen.  Hover your
     // mouse over 'drawBoundingBox' to learn about what the parameters mean.
     // This really should have a box width, instead of hard-coding it
-    Helpers.drawBoundingBox(0, 0, 16, 9, .1);
+    drawBoundingBox(0, 0, 16, 9, .1);
 
     // In the same way that we make "win" messages, we can also make a "welcome"
     // message to show before the level starts.  Again, there is a lot of code
@@ -6077,7 +6078,7 @@ export function buildLevelScreen(level: number) {
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => stage.switchTo(buildChooserScreen, Math.ceil(level / 24)));
 
   // Put the level number in the top right corner of every level
-  Helpers.makeText(stage.hud,
+  makeText(stage.hud,
     { cx: 15, cy: 0.5, center: false, width: .1, height: .1, face: "arial", color: "#872436", size: 22, z: 2 },
     () => "Level " + level);
 
@@ -6099,11 +6100,11 @@ export function buildLevelScreen(level: number) {
  *
  * @param message The message to display
  */
-export function welcomeMessage(message: string, subMessage: string = "") {
+function welcomeMessage(message: string, subMessage: string = "") {
   // Immediately install the overlay, to pause the game
   stage.requestOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
-    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => { stage.clearOverlay(); return true; });
+    addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => { stage.clearOverlay(); return true; });
     // The text goes in the middle
     Actor.Make({
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
@@ -6130,14 +6131,14 @@ export function welcomeMessage(message: string, subMessage: string = "") {
  * @param message   The message to display in the middle of the screen
  * @param callback  Code to run when the win message first appears
  */
-export function winMessage(message: string, callback?: () => void) {
+function winMessage(message: string, callback?: () => void) {
   stage.score.winSceneBuilder = (overlay: Scene) => {
-    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
+    addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
       stage.clearOverlay();
       stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level);
       return true;
     });
-    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     if (callback) callback();
   };
 }
@@ -6149,14 +6150,705 @@ export function winMessage(message: string, callback?: () => void) {
  * @param message   The message to display in the middle of the screen
  * @param callback  Code to run when the lose message first appears
  */
-export function loseMessage(message: string, callback?: () => void) {
+function loseMessage(message: string, callback?: () => void) {
   stage.score.loseSceneBuilder = (overlay: Scene) => {
-    Helpers.addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
+    addTapControl(overlay, { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" }, () => {
       stage.clearOverlay();
       stage.switchTo(stage.score.onLose.builder, stage.score.onLose.level);
       return true;
     });
-    Helpers.makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    makeText(overlay, { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
     if (callback) callback();
   };
+}
+
+/**
+ * Generate a random whole number x in the range [0,max)
+ *
+ * @param max The largest number returned will be one less than max
+ */
+function getRandom(max: number) { return Math.floor(Math.random() * max); }
+
+/**
+ * Turn on accelerometer support, so that tilt can control actors in this
+ * level.  Note that if the accelerometer is disabled, this code will set
+ * the arrow keys to simulate tilt.
+ *
+ * @param xGravityMax Max X force that the accelerometer can produce
+ * @param yGravityMax Max Y force that the accelerometer can produce
+ */
+function enableTilt(xGravityMax: number, yGravityMax: number, asVelocity: boolean = false) {
+  stage.tilt.tiltMax.Set(xGravityMax, yGravityMax);
+
+  if (!stage.accelerometer.tiltSupported) {
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
+
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
+  }
+
+  stage.tilt.tiltVelocityOverride = asVelocity;
+}
+
+/**
+ * Draw a box on the scene
+ *
+ * Note: the box is actually four narrow rectangles
+ *
+ * @param x0          X coordinate of left side
+ * @param y0          Y coordinate of top
+ * @param x1          X coordinate of right side
+ * @param y1          Y coordinate of bottom
+ * @param thickness   How thick should the box be?
+ * @param physicsCfg  Common extra configuration options for the walls
+ */
+function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickness: number, physicsCfg: { density?: number, elasticity?: number, friction?: number, disableRotation?: boolean, collisionsEnabled?: boolean, stickySides?: Sides[], stickyDelay?: number, singleRigidSide?: Sides, passThroughId?: number, rotationSpeed?: number, dynamic?: boolean } = {}) {
+  // Bottom box:
+  let width = Math.abs(x0 - x1);
+  let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
+  Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    role: new Obstacle(),
+  });
+
+  // The top only differs by translating the Y from the bottom
+  cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
+  Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    role: new Obstacle(),
+  });
+
+  // Right box:
+  let height = Math.abs(y0 - y1);
+  cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
+  Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    role: new Obstacle(),
+  });
+
+  // The left only differs by translating the X
+  cfg.cx -= (thickness + Math.abs(x0 - x1));
+  Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    role: new Obstacle(),
+  });
+}
+
+/**
+ * Convert coordinates on the overlay to coordinates in the world
+ *
+ * @param x The x coordinate, in meters, on the overlay
+ * @param y The y coordinate, in meters, on the overlay
+ *
+ * @return  A pair {x,y} that represents the world coordinates, in meters
+ */
+function overlayToWorldCoords(overlay: Scene, x: number, y: number) {
+  let pixels1 = overlay.camera.metersToScreen(x, y);
+  let pixels2 = stage.world.camera.screenToMeters(pixels1.x, pixels1.y);
+  return pixels2;
+}
+
+/**
+ * Add a button that performs an action when clicked.
+ *
+ * @param scene The scene where the button should go
+ * @param cfg   Configuration for an image and a box
+ * @param tap   The code to run in response to a tap
+ */
+// TODO: stop needing `any`
+function addTapControl(scene: Scene, cfg: any, tap: (coords: { x: number; y: number }) => boolean) {
+  // TODO: we'd have more flexibility if we passed in an appearance, or just got
+  // rid of this, but we use it too much for that refactor to be worthwhile.
+  let c = Actor.Make({
+    appearance: new FilledBox(cfg),
+    rigidBody: BoxBody.Box(cfg, scene),
+  });
+  c.gestures = { tap };
+  return c;
+}
+
+/**
+ * Add a control that runs custom code when pressed, on any finger movement, and
+ * when released
+ *
+ * @param scene     The scene where the control should be drawn
+ * @param cfg       Configuration for an image and a box
+ * @param panStart  The action to perform when the pan event starts
+ * @param panMove   The action to perform when the finger moves
+ * @param panStop   The action to perform when the pan event stops
+ */
+// TODO: stop needing `any`
+function addPanCallbackControl(scene: Scene, cfg: any, panStart: (coords: { x: number; y: number }) => boolean, panMove: (coords: { x: number; y: number }) => boolean, panStop: (coords: { x: number; y: number }) => boolean) {
+  // TODO: it's probably not worth having this helper function
+  let c = Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, scene),
+  });
+  c.gestures = { panStart, panMove, panStop };
+  return c;
+}
+
+/**
+ * Create a region on screen, such that any Actor inside of that region that
+ * has been marked draggable can be dragged anywhere within that region.
+ *
+ * @param scene Where to draw the region
+ * @param cfg   An ImgConfig object, for the shape/appearance of the region
+ */
+// TODO: stop needing `any`
+function createDragZone(scene: Scene, cfg: any) {
+  let foundActor: Actor | undefined;
+  // pan start behavior is to update foundActor if there is an actor where
+  // the touch began
+  let pan_start = (hudCoords: { x: number; y: number }) => {
+    // Need to turn the meters of the hud into screen pixels, so that
+    // world can convert to its meters
+    let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let world_coords = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    // If world actor with draggable, we're good
+    for (let actor of stage.world.physics!.actorsAt(world_coords)) {
+      if (actor.movement instanceof Draggable) {
+        foundActor = actor;
+        return true;
+      }
+    }
+    return false;
+  };
+  // pan move behavior is to change the actor position based on the new
+  // coord
+  let pan_move = (hudCoords: { x: number; y: number }) => {
+    // need an actor, and need coords in pixels
+    if (!foundActor) return false;
+    let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    // TODO: appearance or rigidBody?
+    foundActor.rigidBody?.setCenter(meters.x, meters.y);
+    return true;
+  };
+  // pan stop behavior is to stop tracking this actor
+  let pan_stop = () => {
+    foundActor = undefined;
+    return false;
+  };
+  addPanCallbackControl(scene, cfg, pan_start, pan_move, pan_stop);
+}
+
+/**
+ * Create a region on screen that is able to receive swipe gestures
+ *
+ * @param scene Where to make the region
+ * @param cfg   An ImgConfig object, for the shape/appearance of the region
+ */
+// TODO: stop needing `any`
+function createFlickZone(overlay: Scene, cfgOpts: any) {
+  let c = Actor.Make({
+    appearance: new ImageSprite(cfgOpts),
+    rigidBody: BoxBody.Box(cfgOpts, overlay),
+  });
+  let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
+    // Need to turn the meters of the hud into screen pixels, so that world can convert to its meters
+    let screenCoord1 = overlay.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
+    let worldCoord1 = stage.world.camera.screenToMeters(screenCoord1.x, screenCoord1.y);
+    // If world actor with flickMultiplier, we're good
+    let movement: FlickMovement | HoverFlick | undefined = undefined;
+    for (let actor of stage.world.physics!.actorsAt(worldCoord1)) {
+      if (!(actor.movement instanceof FlickMovement) && !(actor.movement instanceof HoverFlick))
+        return true;
+      if (actor.movement.multiplier === 0) return false;
+      movement = actor.movement;
+      break;
+    }
+    if (!movement) return false;
+
+    // Figure out the velocity to apply, then apply it
+    let v = new b2Vec2(hudCoord2.x, hudCoord2.y)
+    v = v.Subtract(hudCoord1);
+    v.Normalize();
+    v.Scale(movement.multiplier * 2000 / time);
+    movement.updateVelocity(v.x, v.y);
+    return true;
+  };
+  c.gestures = { swipe };
+  return c;
+}
+
+/**
+ * Create a region on scene, such that touching the region will cause
+ * the current active actor to immediately relocate to that place.
+ *
+ * @param scene Where to draw the region
+ * @param cfg   An ImgConfig object, for the shape/appearance of the region
+ */
+// TODO: stop needing `any`
+function createPokeToPlaceZone(scene: Scene, cfgOpts: any) {
+  stage.gestures.gestureHudFirst = false;
+  addTapControl(scene, cfgOpts, (hudCoords: { x: number; y: number }) => {
+    let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
+    if (!who || !who.rigidBody) return false;
+    let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    who.rigidBody?.setCenter(meters.x - who.rigidBody.w / 2, meters.y - who.rigidBody.h / 2);
+    stage.storage.setLevel("selected_entity", undefined);
+    return true;
+  });
+}
+
+/**
+ * Create a region on a scene, such that touching the region will cause
+ * the current active actor to move to that place.
+ *
+ * @param scene     Where to draw the region
+ * @param cfg       An ImgConfig object, for the shape/appearance of the region
+ * @param velocity  The speed at which the actor should move
+ * @param clear     Should the active actor be cleared (so that subsequent
+ *                  touches won't change its trajectory)
+ */
+// TODO: stop needing `any`
+function createPokeToMoveZone(scene: Scene, cfg: any, velocity: number, clear: boolean) {
+  stage.gestures.gestureHudFirst = false;
+  addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
+    let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
+    if (!who || !who.rigidBody) return false;
+    let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    let r = new Path().to(who.rigidBody.getCenter().x, who.rigidBody.getCenter().y).to(meters.x, meters.y);
+    who.rigidBody.body.SetLinearVelocity({ x: 0, y: 0 });
+    who.rigidBody.body.SetAngularVelocity(0);
+    (who.movement as PathMovement).resetPath(r, velocity, false);
+    if (clear) stage.storage.setLevel("selected_entity", undefined);
+    return true;
+  });
+}
+
+/**
+ * Create a region on a scene, such that touching the region will cause
+ * the current active actor to move toward that place (but not stop when it
+ * gets there).
+ *
+ * @scene           Where to draw the region
+ * @param cfg       An ImgConfig object, for the shape/appearance of the region
+ * @param velocity  The speed at which the actor should move
+ * @param clear     Should the active actor be cleared (so that subsequent
+ *                  touches won't change its trajectory)
+ */
+// TODO: stop needing `any`
+function createPokeToRunZone(scene: Scene, cfg: any, velocity: number, clear: boolean) {
+  stage.gestures.gestureHudFirst = false;
+  addTapControl(scene, cfg, (hudCoords: { x: number; y: number }) => {
+    let who = stage.storage.getLevel("selected_entity") as Actor | undefined;
+    if (!who || !who.rigidBody) return false;
+    let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    // TODO: for dx and dy, appearance or rigidBody?
+    let dx = meters.x - who.rigidBody.getCenter().x;
+    let dy = meters.y - who.rigidBody.getCenter().y;
+    let hy = Math.sqrt(dx * dx + dy * dy) / velocity;
+    let v = new b2Vec2(dx / hy, dy / hy);
+    who.rigidBody.body.SetAngularVelocity(0);
+    who.rigidBody.body.SetLinearVelocity(v);
+    if (clear) stage.storage.setLevel("selected_entity", undefined);
+    return true;
+  });
+}
+
+/**
+ * Draw a touchable region of the screen that acts as a joystick.  As the
+ * user performs Pan actions within the region, the actor's velocity should
+ * change accordingly.
+ *
+ * @param scene     Where to draw the joystick
+ * @param cfgOpts   An ImgConfig object, for the appearance of the joystick
+ * @param actor     The actor to move with this joystick
+ * @param scale     A value to use to scale the velocity produced by the
+ *                  joystick
+ * @param stopOnUp  Should the actor stop when the joystick is released?
+ */
+// TODO: stop needing `any`
+function addJoystickControl(scene: Scene, cfgOpts: any, cfg: { actor: Actor, scale?: number, stopOnUp?: boolean }) {
+  let moving = false;
+  function doMove(hudCoords: { x: number; y: number }) {
+    moving = true;
+    (cfg.actor.movement as ExplicitMovement).setAbsoluteVelocity(
+      (cfg.scale ?? 1) * (hudCoords.x - cfgOpts.cx),
+      (cfg.scale ?? 1) * (hudCoords.y - cfgOpts.cy));
+    return true;
+  }
+  function doStop() {
+    if (!moving) return true;
+    moving = false;
+    if (!!cfg.stopOnUp) {
+      (cfg.actor.movement as ExplicitMovement).setAbsoluteVelocity(0, 0);
+      cfg.actor.rigidBody?.clearRotation();
+    }
+    return true;
+  }
+  return addPanCallbackControl(scene, cfgOpts, doMove, doMove, doStop);
+}
+
+/**
+ * Add a button that has one behavior while it is being pressed, and another
+ * when it is released
+ *
+ * @param scene           Where to draw the button
+ * @param cfg             An ImgConfig object, which will specify how to draw
+ *                        the button
+ * @param whileDownAction The action to execute, repeatedly, whenever the button
+ *                        is pressed
+ * @param onUpAction      The action to execute once any time the button is
+ *                        released
+ */
+// TODO: stop needing `any`
+function addToggleButton(overlay: Scene, cfg: any, whileDownAction?: () => void, onUpAction?: (coords: { x: number; y: number }) => void) {
+  let c = Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, overlay),
+  });
+  let active = false; // will be captured by lambdas below
+  let touchDown = () => {
+    active = true;
+    return true;
+  };
+  let touchUp = (hudCoords: { x: number; y: number }) => {
+    if (!active) return false;
+    active = false;
+    if (onUpAction) onUpAction(hudCoords);
+    return true;
+  };
+  c.gestures = { touchDown, touchUp };
+  // Put the control and events in the appropriate lists
+  stage.world.repeatEvents.push(() => { if (active && whileDownAction) whileDownAction(); });
+  return c;
+}
+
+/**
+ * The default behavior for tossing is to toss in a straight line. If we
+ * instead desire that the projectiles have some sort of aiming to them, we need
+ * to use this method, which tosses toward where the screen was pressed
+ *
+ * Note: you probably want to use an invisible button that covers the screen...
+ *
+ * @param scene   Where to draw the button
+ * @param cfg     Configuration for an image and a box
+ * @param actor   The actor who should toss the projectile
+ * @param msDelay A delay between tosses, so that holding doesn't lead to too
+ *                many tosses at once
+ * @param offsetX The x distance between the top left of the projectile and the
+ *                top left of the actor tossing the projectile
+ * @param offsetY The y distance between the top left of the projectile and the
+ *                top left of the actor tossing the projectile
+ */
+// TODO: stop needing `any`
+function addDirectionalTossButton(overlay: Scene, projectiles: ActorPoolSystem, cfg: any, actor: Actor, msDelay: number, offsetX: number, offsetY: number) {
+  let c = Actor.Make({
+    appearance: new ImageSprite(cfg),
+    rigidBody: BoxBody.Box(cfg, overlay),
+  });
+  let v = new b2Vec2(0, 0);
+  let isHolding = false;
+  let touchDown = (hudCoords: { x: number; y: number }) => {
+    isHolding = true;
+    let pixels = overlay.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    v.x = world.x;
+    v.y = world.y;
+    return true;
+  };
+  let touchUp = () => {
+    isHolding = false;
+    return true;
+  };
+  let panMove = (hudCoords: { x: number; y: number }) => {
+    let pixels = overlay.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    v.x = world.x;
+    v.y = world.y;
+    return isHolding;
+  };
+  c.gestures = { touchDown, touchUp, panMove };
+
+  let mLastToss = 0;
+  stage.world.repeatEvents.push(() => {
+    if (isHolding) {
+      let now = new Date().getTime();
+      if (mLastToss + msDelay < now) {
+        mLastToss = now;
+        // TODO: fix ??
+        (projectiles.get()?.role as Projectile | undefined)?.tossAt(actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, v.x, v.y, actor, offsetX, offsetY);
+      }
+    }
+  });
+  return c;
+}
+
+/**
+ * Return a function for moving an actor in the X and Y directions, with
+ * dampening on release. This action can be used by a Control.
+ *
+ * @param actor     The actor to move
+ * @param xRate     The rate at which the actor should move in the X direction
+ *                  (negative values are allowed)
+ * @param yRate     The rate at which the actor should move in the Y direction
+ *                  (negative values are allowed)
+ * @param dampening The dampening factor
+ */
+function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: number, dampening: number) {
+  // TODO:  I think that dampening should only get set once per actor, but right
+  //        now that's not true
+  (actor.movement as ExplicitMovement).setDamping(dampening);
+  return () => (actor.movement as ExplicitMovement).updateVelocity(xRate, yRate);
+}
+
+/**
+ * Return a function that makes an actor toss a projectile in a direction that
+ * relates to how the screen was touched
+ *
+ * @param scene   The scene that was touched
+ * @param actor   The actor who should toss the projectile
+ * @param offsetX The x distance between the top left of the projectile and the
+ *                top left of the actor tossing the projectile
+ * @param offsetY The y distance between the top left of the projectile and the
+ *                top left of the actor tossing the projectile
+ */
+function TossDirectionalAction(scene: Scene, projectiles: ActorPoolSystem, actor: Actor, offsetX: number, offsetY: number) {
+  return (hudCoords: { x: number; y: number }) => {
+    let pixels = scene.camera.metersToScreen(hudCoords.x, hudCoords.y);
+    let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+    (projectiles.get()?.role as Projectile | undefined)?.tossAt(actor.rigidBody?.getCenter().x ?? 0, actor.rigidBody?.getCenter().y ?? 0, world.x, world.y, actor, offsetX, offsetY);
+    return true;
+  };
+}
+
+/**
+ * Return a function for making an actor toss a projectile if enough time has
+ * transpired
+ *
+ * @param actor     The actor who should toss the projectile
+ * @param msDelay   A delay between tosses, so that holding doesn't lead to too
+ *                  many tosses at once
+ * @param offsetX   The x distance between the top left of the projectile and
+ *                  the top left of the actor tossing the projectile
+ * @param offsetY   The y distance between the top left of the projectile and
+ *                  the top left of the actor tossing the projectile
+ * @param velocityX The X velocity of the projectile when it is tossed
+ * @param velocityY The Y velocity of the projectile when it is tossed
+ */
+function makeRepeatToss(projectiles: ActorPoolSystem, actor: Actor, msDelay: number, offsetX: number, offsetY: number, velocityX: number, velocityY: number) {
+  let last = 0;
+  return () => {
+    let now = new Date().getTime();
+    if (last + msDelay < now) {
+      last = now;
+      (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(actor, offsetX, offsetY, velocityX, velocityY);
+    }
+  };
+}
+
+/**
+ * Return a function that makes a hero jump.
+ *
+ * @param hero    The hero who we want to jump
+ * @param msDelay If there should be time between being allowed to jump
+ */
+function jumpAction(hero: Actor, x: number, y: number, msDelay: number) {
+  let mLastJump = 0;
+  return () => {
+    let now = new Date().getTime();
+    if ((mLastJump + msDelay) < now) {
+      mLastJump = now;
+      (hero.role as Hero).jump(x, y);
+      return true;
+    }
+    return false;
+  };
+}
+
+/**
+ * Indicate that this actor should shrink over time.  Note that using negative
+ * values will lead to growing instead of shrinking.
+ *
+ * @param actor         The Actor who should shrink over time
+ * @param shrinkX       The number of meters by which the X dimension should
+ *                      shrink each second
+ * @param shrinkY       The number of meters by which the Y dimension should
+ *                      shrink each second
+ * @param keepCentered  Should the actor's center point stay the same as it
+ *                      shrinks, or should its top left corner stay in the same
+ *                      position
+ */
+function setShrinkOverTime(actor: Actor, shrinkX: number, shrinkY: number, keepCentered: boolean) {
+  let done = false;
+  let te = new TimedEvent(0.05, true, () => {
+    if (done) return;
+    // NB: we shrink 20 times per second
+    let x = 0, y = 0;
+    if (keepCentered) {
+      x = (actor.rigidBody?.getCenter().x ?? 0) + shrinkX / 20 / 2;
+      y = (actor.rigidBody?.getCenter().y ?? 0) + shrinkY / 20 / 2;
+    } else {
+      x = actor.rigidBody?.getCenter().x ?? 0;
+      y = actor.rigidBody?.getCenter().y ?? 0;
+    }
+    let w = actor.appearance.width - shrinkX / 20;
+    let h = actor.appearance.height - shrinkY / 20;
+    // if the area remains >0, resize it and schedule a timer to run again
+    if (w > 0.05 && h > 0.05) {
+      actor.resize(x, y, w, h);
+    } else {
+      actor.remove();
+      done = true;
+    }
+  });
+  stage.world.timer.addEvent(te);
+}
+
+/**
+ * Indicate that if the player touches this enemy, the enemy will be removed
+ * from the game.  Note that this can vibrate the phone :)
+ *
+ * @param enemy The enemy to defeat
+ */
+function defeatOnTouch(enemy: Enemy) {
+  // TODO: It's probably not worth having this as its own function?
+  if (enemy.actor!.gestures == undefined) enemy.actor!.gestures = new GestureHandlers();
+  enemy.actor!.gestures.tap = () => {
+    stage.vibrate(100);
+    enemy.defeat(true);
+    enemy.actor!.gestures!.tap = undefined;
+    return true;
+  };
+}
+
+/**
+ * Indicate that upon a touch, this Actor should begin moving with a specific
+ * velocity
+ *
+ * @param a The actor to start moving
+ * @param x Velocity in X dimension
+ * @param y Velocity in Y dimension
+ */
+function setTouchAndGo(e: Actor, x: number, y: number) {
+  if (!e.gestures) e.gestures = new GestureHandlers();
+  e.gestures.tap = () => {
+    let body = e.rigidBody?.body;
+    if (!body) return false;
+    // if it was hovering, its body type won't be Dynamic
+    if (body.GetType() != b2BodyType.b2_dynamicBody)
+      body.SetType(b2BodyType.b2_dynamicBody);
+    (e.movement as ExplicitMovement).setAbsoluteVelocity(x, y);
+    // turn off isTouchAndGo, so we can't double-touch
+    e.gestures!.tap = undefined;
+    return true;
+  };
+}
+
+/**
+ * Return a function that changes the speed of an actor, based on a collision.
+ *
+ * @param boostAmountX  The amount of X velocity to add
+ * @param boostAmountY  The amount of Y velocity to add
+ * @param boostDuration How long should the boost last (forever if not provided)
+ */
+function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostDuration: number | undefined = undefined) {
+  return (_self: Actor, h: Actor) => {
+    // boost the speed
+    let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
+    let x = v.x + boostAmountX;
+    let y = v.y + boostAmountY;
+    (h.movement as ExplicitMovement).updateVelocity(x, y);
+    // now set a timer to un-boost the speed
+    if (boostDuration != undefined) {
+      stage.world.timer.addEvent(
+        new TimedEvent(boostDuration, false, () => {
+          let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
+          let x = v.x - boostAmountX;
+          let y = v.y - boostAmountY;
+          (h.movement as ExplicitMovement).updateVelocity(x, y);
+        })
+      );
+    }
+  };
+}
+
+/**
+ * Create an Actor whose appearance is text.  Since every Actor needs to have a
+ * body, this will create a simple body to accompany the actor.
+ *
+ * @param scene     The scene where the Text should be made
+ * @param cfgOpts   Text configuration options
+ * @param producer  A callback for making the text for this Actor
+ *
+ * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
+ */
+// TODO: stop needing `any`
+function makeText(scene: Scene, cfgOpts: any, producer: () => string): Actor {
+  return Actor.Make({
+    appearance: new TextSprite(cfgOpts, producer),
+    rigidBody: BoxBody.Box(cfgOpts, scene),
+  });
+}
+
+/**
+ * Put some appropriately-configured projectiles into the projectile system
+ *
+ * @param cfg                           Configuration options for the
+ *                                      projectiles
+ * @param cfg.size                      The number of projectiles that can ever
+ *                                      be on screen at once
+ * @param cfg.bodyMaker                 Make each projectile's initial rigid
+ *                                      body
+ * @param cfg.appearanceMaker           Make each projectile's appearance
+ * @param cfg.strength                  The amount of damage a projectile can do
+ *                                      to enemies
+ * @param cfg.multiplier                A multiplier on projectile speed
+ * @param cfg.immuneToCollisions        Should projectiles pass through walls
+ * @param cfg.gravityAffectsProjectiles Should projectiles be subject to gravity
+ * @param cfg.fixedVectorVelocity       A fixed velocity for all projectiles
+ * @param cfg.rotateVectorToss          Should projectiles be rotated in the
+ *                                      direction they are tossed?
+ * @param cfg.soundEffects              A sound to play when a projectile
+ *                                      disappears
+ * @param cfg.randomImageSources        A set of image names to randomly assign
+ *                                      to projectiles' appearance
+ * @param cfg.range                     Limit the range that projectiles can
+ *                                      travel?
+ * @param cfg.disappearOnCollide        Should projectiles disappear when they
+ *                                      collide with each other?
+ */
+function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: number, bodyMaker: () => RigidBodyComponent, appearanceMaker: () => AppearanceComponent, strength: number, multiplier?: number, immuneToCollisions: boolean, gravityAffectsProjectiles?: boolean, fixedVectorVelocity?: number, rotateVectorToss?: boolean, soundEffects?: SoundEffectComponent, randomImageSources?: string[], range: number, disappearOnCollide: boolean }) {
+  // set up the pool of projectiles
+  for (let i = 0; i < cfg.size; ++i) {
+    let appearance = cfg.appearanceMaker();
+    let rigidBody = cfg.bodyMaker();
+    if (cfg.gravityAffectsProjectiles)
+      rigidBody.body.SetGravityScale(1);
+    rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
+    let reclaimer = (actor: Actor) => {
+      pool.put(actor);
+      actor.enabled = false;
+    }
+    let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide, reclaimer, randomImageSources: cfg.randomImageSources });
+    // Put in some code for eliminating the projectile quietly if it has
+    // traveled too far
+    role.prerenderTasks.push((_elapsedMs: number, actor?: Actor) => {
+      if (!actor) return;
+      if (!actor.enabled) return;
+      let role = actor.role as Projectile;
+      let body = actor.rigidBody.body;
+      let dx = Math.abs(body.GetPosition().x - role.rangeFrom.x);
+      let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
+      if ((dx * dx + dy * dy) > (role.range * role.range)) reclaimer(actor);
+    });
+    // TODO: Should we clone the soundEffects?
+    let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role, sounds: cfg.soundEffects });
+    pool.put(p);
+  }
 }

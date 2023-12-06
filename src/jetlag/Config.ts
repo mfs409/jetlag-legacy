@@ -80,6 +80,23 @@ export class AnimationSequence {
     this.steps.push({ cell: stage.imageLibrary.getSprite(imgName), duration });
     return this;
   }
+
+  /**
+   * Create a "simple" animation (i.e., one that shows each of a set of images
+   * for the same amount of time)
+   *
+   * @param timePerFrame  The time to show each image
+   * @param repeat        True if the animation should repeat when it reaches
+   *                      the end
+   * @param imgNames      The names of the images that comprise the animation
+   *
+   * @return The animation
+   */
+  static makeSimple(cfg: { timePerFrame: number, repeat: boolean, images: string[] }) {
+    let a = new AnimationSequence(cfg.repeat);
+    cfg.images.forEach((i) => a.to(i, cfg.timePerFrame));
+    return a;
+  }
 }
 
 /**

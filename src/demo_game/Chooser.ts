@@ -2,7 +2,6 @@
 
 import { Actor } from "../jetlag/Entities/Actor";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import * as Helpers from "./helpers";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { BoxBody } from "../jetlag/Components/RigidBody";
@@ -10,6 +9,7 @@ import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
 import { buildSplashScreen } from "./Splash";
 import { buildLevelScreen } from "./Levels";
+import { MusicComponent } from "../jetlag/Components/Music";
 
 /**
  * buildChooserScreen draws the level chooser screens.
@@ -33,7 +33,7 @@ export function buildChooserScreen(index: number) {
   // individually place each button exactly where you want it.
   if (index == 1) {
     // set up background and music
-    Helpers.setMusic("tune.ogg");
+    stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic("tune.ogg"));
     Actor.Make({
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
@@ -80,7 +80,7 @@ export function buildChooserScreen(index: number) {
   // does everything for screens 2, 3, and 4!
   else {
     // set up background and music
-    Helpers.setMusic("tune.ogg");
+    stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic("tune.ogg"));
     Actor.Make({
       appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),

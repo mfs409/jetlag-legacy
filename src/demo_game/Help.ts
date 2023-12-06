@@ -1,14 +1,12 @@
-// Last review: 08-10-2023
-
 import { Actor } from "../jetlag/Entities/Actor";
-import { ImageSprite } from "../jetlag/Components/Appearance";
-import * as Helpers from "./helpers";
+import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { CircleBody } from "../jetlag/Components/RigidBody";
+import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { InertMovement } from "../jetlag/Components/Movement";
 import { Passive } from "../jetlag/Components/Role";
 import { buildSplashScreen } from "./Splash";
+import { Scene } from "../jetlag/Entities/Scene";
 
 /**
  * buildHelpScreen draws the help screens.  Technically, a help screen can be
@@ -40,7 +38,7 @@ export function buildHelpScreen(index: number) {
     stage.backgroundColor = "#19698e";
 
     // put some information and pictures on the screen
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "The levels of this game demonstrate JetLag features");
 
@@ -51,7 +49,7 @@ export function buildHelpScreen(index: number) {
       movement: new InertMovement(),
       role: new Passive(),
     });
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 1.5, cy: 2.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "You control the hero");
 
@@ -62,7 +60,7 @@ export function buildHelpScreen(index: number) {
       movement: new InertMovement(),
       role: new Passive(),
     });
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 1.5, cy: 3.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Collect these goodies");
 
@@ -73,7 +71,7 @@ export function buildHelpScreen(index: number) {
       movement: new InertMovement(),
       role: new Passive(),
     });
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 1.5, cy: 4.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Avoid or defeat enemies");
 
@@ -84,7 +82,7 @@ export function buildHelpScreen(index: number) {
       movement: new InertMovement(),
       role: new Passive(),
     });
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 1.5, cy: 5.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Reach the destination");
 
@@ -95,7 +93,7 @@ export function buildHelpScreen(index: number) {
       movement: new InertMovement(),
       role: new Passive(),
     });
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 1.5, cy: 6.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "These are walls");
 
@@ -106,16 +104,16 @@ export function buildHelpScreen(index: number) {
       movement: new InertMovement(),
       role: new Passive(),
     });
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 1.5, cy: 7.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
       () => "Throw projectiles");
 
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: false, cx: 11, cy: 8.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 24, z: 0 },
       () => "(All image files are stored in the assets folder)");
 
     // set up a control to go to the next help level on screen tap
-    Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
+    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
       stage.switchTo(buildHelpScreen, 2);
       return true;
     });
@@ -125,10 +123,10 @@ export function buildHelpScreen(index: number) {
   else if (index == 2) {
     // This is just like the previous screen, but with different text
     stage.backgroundColor = "#19698e";
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
       () => "Read, Write, Play");
-    Helpers.makeText(stage.world,
+    makeText(stage.world,
       { center: true, cx: 8, cy: 5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
       () => `As you play through the levels of the sample game, be sure to read the code that accompanies
 each world.  The levels aren't meant to be "hard", or even really "fun".  They are meant to show
@@ -144,9 +142,46 @@ Start with the "Levels.ts" file in the "src/game" folder, then move on to other 
 until you have a plan for how to build your next game.`);
 
     // set up a control to go to the splash screen on screen tap
-    Helpers.addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
+    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
       stage.switchTo(buildSplashScreen, 1);
       return true;
     });
   }
+}
+
+/**
+ * Create an Actor whose appearance is text.  Since every Actor needs to have a
+ * body, this will create a simple body to accompany the actor.
+ *
+ * @param scene     The scene where the Text should be made
+ * @param cfgOpts   Text configuration options
+ * @param producer  A callback for making the text for this Actor
+ *
+ * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
+ */
+// TODO: stop needing `any`
+function makeText(scene: Scene, cfgOpts: any, producer: () => string): Actor {
+  return Actor.Make({
+    appearance: new TextSprite(cfgOpts, producer),
+    rigidBody: BoxBody.Box(cfgOpts, scene),
+  });
+}
+
+/**
+ * Add a button that performs an action when clicked.
+ *
+ * @param scene The scene where the button should go
+ * @param cfg   Configuration for an image and a box
+ * @param tap   The code to run in response to a tap
+ */
+// TODO: stop needing `any`
+function addTapControl(scene: Scene, cfg: any, tap: (coords: { x: number; y: number }) => boolean) {
+  // TODO: we'd have more flexibility if we passed in an appearance, or just got
+  // rid of this, but we use it too much for that refactor to be worthwhile.
+  let c = Actor.Make({
+    appearance: new FilledBox(cfg),
+    rigidBody: BoxBody.Box(cfg, scene),
+  });
+  c.gestures = { tap };
+  return c;
 }

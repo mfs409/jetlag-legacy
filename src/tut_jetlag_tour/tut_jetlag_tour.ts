@@ -1,18 +1,16 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { GameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon, TextSprite } from "../jetlag/Components/Appearance";
-import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
+import { AppearanceComponent, FilledBox, FilledCircle, FilledPolygon, TextSprite } from "../jetlag/Components/Appearance";
+import { ExplicitMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
-import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
+import { BoxBody, CircleBody, PolygonBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { GridSystem } from "../jetlag/Systems/Grid";
 import { Destination, Enemy, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { TimedEvent } from "../jetlag/Systems/Timer";
-
-// TODO: Stop needing this
-import * as Helpers from "../demo_game/helpers";
+import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 
 /** Configuration information for the tut_jetlag_tour game */
 export class TutJetlagTour implements GameConfig {
@@ -65,7 +63,7 @@ function tut_jetlag_tour(level: number) {
 
         // Set up projectiles
         let projectiles = new ActorPoolSystem();
-        Helpers.populateProjectilePool(projectiles, {
+        populateProjectilePool(projectiles, {
             size: 20, strength: 1, disappearOnCollide: true, bodyMaker: () => CircleBody.Circle({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
             appearanceMaker: () => new FilledCircle({ radius: .125, fillColor: "#bbbbbb", z: 0 }), range: 10, immuneToCollisions: true,
         });
@@ -177,6 +175,62 @@ function tut_jetlag_tour(level: number) {
     }
 }
 
+/**
+ * Put some appropriately-configured projectiles into the projectile system
+ *
+ * @param cfg                           Configuration options for the
+ *                                      projectiles
+ * @param cfg.size                      The number of projectiles that can ever
+ *                                      be on screen at once
+ * @param cfg.bodyMaker                 Make each projectile's initial rigid
+ *                                      body
+ * @param cfg.appearanceMaker           Make each projectile's appearance
+ * @param cfg.strength                  The amount of damage a projectile can do
+ *                                      to enemies
+ * @param cfg.multiplier                A multiplier on projectile speed
+ * @param cfg.immuneToCollisions        Should projectiles pass through walls
+ * @param cfg.gravityAffectsProjectiles Should projectiles be subject to gravity
+ * @param cfg.fixedVectorVelocity       A fixed velocity for all projectiles
+ * @param cfg.rotateVectorToss          Should projectiles be rotated in the
+ *                                      direction they are tossed?
+ * @param cfg.soundEffects              A sound to play when a projectile
+ *                                      disappears
+ * @param cfg.randomImageSources        A set of image names to randomly assign
+ *                                      to projectiles' appearance
+ * @param cfg.range                     Limit the range that projectiles can
+ *                                      travel?
+ * @param cfg.disappearOnCollide        Should projectiles disappear when they
+ *                                      collide with each other?
+ */
+function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: number, bodyMaker: () => RigidBodyComponent, appearanceMaker: () => AppearanceComponent, strength: number, multiplier?: number, immuneToCollisions: boolean, gravityAffectsProjectiles?: boolean, fixedVectorVelocity?: number, rotateVectorToss?: boolean, soundEffects?: SoundEffectComponent, randomImageSources?: string[], range: number, disappearOnCollide: boolean }) {
+    // set up the pool of projectiles
+    for (let i = 0; i < cfg.size; ++i) {
+        let appearance = cfg.appearanceMaker();
+        let rigidBody = cfg.bodyMaker();
+        if (cfg.gravityAffectsProjectiles)
+            rigidBody.body.SetGravityScale(1);
+        rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
+        let reclaimer = (actor: Actor) => {
+            pool.put(actor);
+            actor.enabled = false;
+        }
+        let role = new Projectile({ damage: cfg.strength, range: cfg.range, disappearOnCollide: cfg.disappearOnCollide, reclaimer, randomImageSources: cfg.randomImageSources });
+        // Put in some code for eliminating the projectile quietly if it has
+        // traveled too far
+        role.prerenderTasks.push((_elapsedMs: number, actor?: Actor) => {
+            if (!actor) return;
+            if (!actor.enabled) return;
+            let role = actor.role as Projectile;
+            let body = actor.rigidBody.body;
+            let dx = Math.abs(body.GetPosition().x - role.rangeFrom.x);
+            let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
+            if ((dx * dx + dy * dy) > (role.range * role.range)) reclaimer(actor);
+        });
+        // TODO: Should we clone the soundEffects?
+        let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(cfg), role, sounds: cfg.soundEffects });
+        pool.put(p);
+    }
+}
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new TutJetlagTour());
