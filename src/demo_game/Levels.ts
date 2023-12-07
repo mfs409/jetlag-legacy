@@ -1,11 +1,11 @@
-import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, InertMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
 import { AnimatedSprite, AppearanceComponent, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { BoxBody, CircleBody, PolygonBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
-import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, Passive, CollisionExemptions, Projectile } from "../jetlag/Components/Role";
+import { Hero, Destination, Enemy, Goodie, Obstacle, Sensor, CollisionExemptions, Projectile } from "../jetlag/Components/Role";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
 import { TimedEvent } from "../jetlag/Systems/Timer";
@@ -73,7 +73,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -113,7 +112,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -154,7 +152,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -217,7 +214,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(dest_cfg),
       rigidBody: CircleBody.Circle(dest_cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -225,7 +221,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(dest_cfg),
       rigidBody: CircleBody.Circle(dest_cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -266,7 +261,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination({ capacity: 2 }),
       sounds: new SoundEffectComponent({ arrive: "high_pitch.ogg" }),
     });
@@ -302,7 +296,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -329,7 +322,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -343,7 +335,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       // Remember that the name "e" doesn't really matter.  What makes this Actor
       // an enemy, instead of a Destination or Hero, is that we assign it the
       // "Enemy" role.
@@ -374,7 +365,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -423,7 +413,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -467,7 +456,6 @@ export function buildLevelScreen(level: number) {
       // If we want to make something rotate, we can do it like this.  The ".5"
       // means one rotation per second
       rigidBody: CircleBody.Circle(cfg, stage.world, { rotationSpeed: .5 }),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -516,7 +504,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -560,8 +547,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
           rigidBody: BoxBody.Box({ cx: x + 8, cy: y + 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
-          movement: new InertMovement(),
-          role: new Passive(),
         });
       }
     }
@@ -598,7 +583,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -629,7 +613,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -638,7 +621,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -647,7 +629,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -656,7 +637,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -667,7 +647,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(oval_cfg),
       rigidBody: CircleBody.Circle(oval_cfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -676,7 +655,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -685,7 +663,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -693,7 +670,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 0.7, height: 0.8, img: "noise.png" }),
       rigidBody: BoxBody.Box({ cx: 14, cy: 1, width: 0.5, height: 0.6 }, stage.world, { friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -709,7 +685,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(polyCfg),
       rigidBody: PolygonBody.Polygon(polyCfg, stage.world, { rotationSpeed: .25 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -769,7 +744,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -783,7 +757,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { elasticity: 100 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -791,7 +764,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 10, friction: 100 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -807,8 +779,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new FilledBox(opts),
         rigidBody: BoxBody.Box(opts, overlay),
-        movement: new InertMovement(),
-        role: new Passive(),
       });
       makeText(overlay,
         { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
@@ -839,7 +809,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       // There are four "types" of goodies in JetLag, meaning we have four
       // different scores.  We'll say that the destination won't accept heroes
       // until the score is at least 2,0,0,0.  We achieve this by adding a bit
@@ -864,7 +833,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie(),
     });
 
@@ -872,7 +840,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie(),
     });
 
@@ -977,7 +944,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie(),
       });
     }
@@ -1049,7 +1015,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1110,7 +1075,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Sensor(padMaker(-10)),
     });
 
@@ -1119,7 +1083,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Sensor(padMaker(5)),
     });
 
@@ -1128,7 +1091,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { rotationSpeed: 2 }),
-      movement: new InertMovement(),
       role: new Sensor(padMaker(0.2)),
     });
 
@@ -1149,7 +1111,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1196,7 +1157,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
-      movement: new InertMovement(),
       role: new Enemy({ damage: 4, onDefeatHero: () => { endText = "How did you hit me?"; }, disableHeroCollision: true }),
     });
 
@@ -1244,7 +1204,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -1252,7 +1211,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -1290,7 +1248,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
       sounds: new SoundEffectComponent({ defeat: "slow_down.ogg" }),
     });
@@ -1300,7 +1257,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ damage: 100 }),
     });
 
@@ -1309,7 +1265,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie({
         onCollect: (_g: Actor, h: Actor) => {
           (h.role as Hero).strength = 2 + (h.role as Hero).strength;
@@ -1357,7 +1312,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
-        movement: new InertMovement(),
         role: new Enemy(),
       });
     }
@@ -1383,7 +1337,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getEnemiesDefeated() >= 5; } }),
     });
     stage.score.setVictoryDestination(1);
@@ -1430,7 +1383,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 7; } }),
     });
 
@@ -1441,7 +1393,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, -2); return true; } }),
     });
 
@@ -1450,7 +1401,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, 9); return true; } }),
     });
 
@@ -1482,7 +1432,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1543,7 +1492,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1554,8 +1502,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
-      movement: new InertMovement(),
-      role: new Passive(),
     });
 
     // make a few obstacles that we can poke
@@ -1563,7 +1509,6 @@ export function buildLevelScreen(level: number) {
     let vertical_obstacle = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { elasticity: 100 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -1599,7 +1544,6 @@ export function buildLevelScreen(level: number) {
     let horizontal_obstacle = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { elasticity: 100 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     // We can write the code more succinctly the second time around...
@@ -1651,7 +1595,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1662,8 +1605,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -2 }),
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
-      movement: new InertMovement(),
-      role: new Passive(),
     });
 
     // create an enemy who chases the hero
@@ -1703,7 +1644,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1714,7 +1654,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1, friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
       sounds: new SoundEffectComponent({ collide: "high_pitch.ogg" })
     });
@@ -1759,7 +1698,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -1792,7 +1730,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1829,7 +1766,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1843,7 +1779,6 @@ export function buildLevelScreen(level: number) {
       let o = Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world, { elasticity: 2 }),
-        movement: new InertMovement(),
         role: new Obstacle(),
       });
       // Let's make it disappear quietly after 10 seconds...
@@ -1875,7 +1810,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1937,7 +1871,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -1977,7 +1910,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2056,7 +1988,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2105,7 +2036,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2134,7 +2064,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -2177,7 +2106,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2190,7 +2118,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Enemy(),
       });
     }
@@ -2231,7 +2158,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2245,7 +2171,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -2276,7 +2201,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2299,7 +2223,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -2307,7 +2230,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -2331,7 +2253,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2357,7 +2278,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ defeatByCrawl: true }),
     });
 
@@ -2377,7 +2297,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2420,7 +2339,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2433,7 +2351,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Sensor(setSpeedBoost(5, 0, 2)),
     });
 
@@ -2442,7 +2359,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Sensor(setSpeedBoost(-2, 0, 3)),
     });
 
@@ -2451,7 +2367,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Sensor(setSpeedBoost(3, 0)),
     });
 
@@ -2484,7 +2399,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -2586,7 +2500,6 @@ export function buildLevelScreen(level: number) {
     let left_enemy = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
     (left_enemy.role as Enemy).damage = 10;
@@ -2594,7 +2507,6 @@ export function buildLevelScreen(level: number) {
     let right_enemy = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
     (right_enemy.role as Enemy).damage = 10;
@@ -2641,7 +2553,6 @@ export function buildLevelScreen(level: number) {
       let e = Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
-        movement: new InertMovement(),
         role: new Enemy(),
       });
       (e.role as Enemy).damage = 2 * i;
@@ -2680,7 +2591,6 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Hero(),
     });
 
@@ -2729,7 +2639,6 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 5, friction: 1 }),
-      movement: new InertMovement(),
       role: new Hero(),
     });
 
@@ -2740,7 +2649,6 @@ export function buildLevelScreen(level: number) {
     let leftBucket = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -2748,7 +2656,6 @@ export function buildLevelScreen(level: number) {
     let rightBucket = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -2756,7 +2663,6 @@ export function buildLevelScreen(level: number) {
     let bottomBucket = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -2814,7 +2720,6 @@ export function buildLevelScreen(level: number) {
       let hint = Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world, { collisionsEnabled: false }),
-        movement: new InertMovement(),
         role: new Obstacle(),
       });
       // Make sure that when projectiles hit the obstacle, nothing happens
@@ -2877,7 +2782,6 @@ export function buildLevelScreen(level: number) {
     let e = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
       sounds: new SoundEffectComponent({ defeat: "low_pitch.ogg" })
     });
@@ -2896,7 +2800,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world),
-          movement: new InertMovement(),
           role: new Enemy(),
           sounds: new SoundEffectComponent({ defeat: "low_pitch.ogg" }),
         });
@@ -2907,7 +2810,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world),
-          movement: new InertMovement(),
           role: new Enemy(),
           sounds: new SoundEffectComponent({ defeat: "low_pitch.ogg" }),
         });
@@ -2948,7 +2850,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
     stage.score.setVictoryDestination(1);
@@ -3030,7 +2931,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3082,7 +2982,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3136,7 +3035,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new AnimatedSprite(g_cfg),
       rigidBody: CircleBody.Circle(g_cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie(),
       onDisappear: (a: Actor) => {
         let cx = (a.rigidBody.getCenter().x);
@@ -3164,7 +3062,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3234,7 +3131,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3296,7 +3192,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
-        movement: new InertMovement(),
         role,
         sounds,
       });
@@ -3357,7 +3252,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3407,7 +3301,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(eBoxCfg),
       rigidBody: BoxBody.Box(eBoxCfg, stage.world, { density: 5, elasticity: 0.3, friction: 0.6 }),
-      movement: new InertMovement(),
       role: new Enemy({ defeatByCrawl: true }),
     });
 
@@ -3441,7 +3334,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie({
           onCollect: (_g: Actor, h: Actor) => {
             (h.role as Hero).strength = 1 + (h.role as Hero).strength;
@@ -3455,7 +3347,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3468,7 +3359,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Enemy({ damage: 1, disableHeroCollision: true }),
       });
     }
@@ -3513,7 +3403,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -3521,7 +3410,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -3529,7 +3417,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -3537,7 +3424,6 @@ export function buildLevelScreen(level: number) {
     let big_enemy = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
     // We can use "extra" to put some more information onto any actor
@@ -3611,7 +3497,6 @@ export function buildLevelScreen(level: number) {
     let ceiling = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -3626,7 +3511,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { collisionsEnabled: false }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     o.gestures = {
@@ -3656,7 +3540,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -3665,7 +3548,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Enemy(),
       });
     }
@@ -3678,7 +3560,6 @@ export function buildLevelScreen(level: number) {
     let grow_box = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(grow_box, -1, 0, false);
@@ -3687,7 +3568,6 @@ export function buildLevelScreen(level: number) {
     let small_shrink_ball = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(small_shrink_ball, 0.1, 0.2, true);
@@ -3696,7 +3576,6 @@ export function buildLevelScreen(level: number) {
     let big_shrink_ball = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(big_shrink_ball, 0.2, 0.1, false);
@@ -3706,7 +3585,6 @@ export function buildLevelScreen(level: number) {
     let shrink_poly = Actor.Make({
       appearance: new FilledPolygon(cfg1),
       rigidBody: PolygonBody.Polygon(cfg1, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(shrink_poly, 0.2, 0.1, false);
@@ -3715,7 +3593,6 @@ export function buildLevelScreen(level: number) {
     let shrink_box = Actor.Make({
       appearance: new FilledBox(cfg2),
       rigidBody: BoxBody.Box(cfg2, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(shrink_box, 0.2, 0.1, false);
@@ -3724,7 +3601,6 @@ export function buildLevelScreen(level: number) {
     let shrink_circle = Actor.Make({
       appearance: new FilledCircle(cfg3),
       rigidBody: CircleBody.Circle(cfg3, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(shrink_circle, 0.2, 0.1, false);
@@ -3734,7 +3610,6 @@ export function buildLevelScreen(level: number) {
     let shrink_text = Actor.Make({
       appearance: new TextSprite(cfg4, "Hello"),
       rigidBody: BoxBody.Box(cfg4, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     setShrinkOverTime(shrink_text, 0.02, 0.01, false);
@@ -3765,7 +3640,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3804,7 +3678,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3865,7 +3738,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -3876,7 +3748,6 @@ export function buildLevelScreen(level: number) {
     let disappear_enemy = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
     stage.world.timer.addEvent(new TimedEvent(2, false, () => disappear_enemy.remove()));
@@ -3962,7 +3833,6 @@ export function buildLevelScreen(level: number) {
         let touch_enemy = Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
-          movement: new InertMovement(),
           role: new Enemy(),
         });
 
@@ -3986,7 +3856,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world),
-          movement: new InertMovement(),
           role: new Destination(),
         });
 
@@ -3994,7 +3863,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
-          movement: new InertMovement(),
           role: new Enemy(),
         });
 
@@ -4002,7 +3870,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world),
-          movement: new InertMovement(),
           role: new Goodie(),
         });
       });
@@ -4016,7 +3883,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Obstacle(),
       });
       spawnLoc++;
@@ -4071,7 +3937,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie({
           onCollect: () => {
             collects++;
@@ -4138,7 +4003,6 @@ export function buildLevelScreen(level: number) {
           Actor.Make({
             appearance: new ImageSprite(cfg),
             rigidBody: CircleBody.Circle(cfg, stage.world),
-            movement: new InertMovement(),
             role: new Destination(),
           });
         });
@@ -4171,7 +4035,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) > 3; } }),
     });
 
@@ -4182,7 +4045,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1, friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
       sounds: new SoundEffectComponent({ disappear: "high_pitch.ogg" }),
     });
@@ -4199,7 +4061,6 @@ export function buildLevelScreen(level: number) {
           Actor.Make({
             appearance: new ImageSprite(cfg),
             rigidBody: CircleBody.Circle(cfg, stage.world),
-            movement: new InertMovement(),
             role: new Goodie(),
           });
         }
@@ -4211,7 +4072,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie({
         onCollect: (_g: Actor, _h: Actor) => {
           stage.musicLibrary.getSound("low_pitch.ogg").play();
@@ -4259,7 +4119,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Goodie({ onCollect: (_g: Actor, h: Actor) => { (h.role as Hero).invincibleRemaining = 15; return true; } }),
     });
 
@@ -4303,7 +4162,6 @@ export function buildLevelScreen(level: number) {
         Actor.Make({
           appearance: new ImageSprite(cfg),
           rigidBody: CircleBody.Circle(cfg, stage.world),
-          movement: new InertMovement(),
           role: new Goodie(),
         });
       });
@@ -4315,7 +4173,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ onDefeated: onDefeatScript }),
     });
 
@@ -4323,7 +4180,6 @@ export function buildLevelScreen(level: number) {
     let e2 = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ onDefeated: onDefeatScript }),
     });
     e2.extra.info = "weak";
@@ -4332,7 +4188,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ onDefeated: onDefeatScript }),
     });
 
@@ -4340,7 +4195,6 @@ export function buildLevelScreen(level: number) {
     let e4 = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ onDefeated: onDefeatScript }),
     });
     defeatOnTouch(e4.role as Enemy);
@@ -4349,7 +4203,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ onDefeated: onDefeatScript }),
     });
 
@@ -4384,7 +4237,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination({
         onAttemptArrival: () => {
           return stage.score.getGoodieCount(0) >= 4 && stage.score.getGoodieCount(1) >= 1 && stage.score.getGoodieCount(2) >= 3;
@@ -4399,7 +4251,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1, friction: 1 }),
-      movement: new InertMovement(),
       role: new Sensor(),
     });
 
@@ -4436,7 +4287,6 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Hero(),
     });
 
@@ -4521,7 +4371,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -4546,7 +4395,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -4567,7 +4415,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1, friction: 0.5 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -4576,7 +4423,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1, friction: 0.5 }),
-      movement: new InertMovement(),
       role: new Obstacle({ jumpReEnableSides: [] }),
     });
   }
@@ -4605,7 +4451,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -4644,7 +4489,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { passThroughId: 7 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     // The hero can pass through this wall, because both have the same
@@ -4704,7 +4548,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -4741,7 +4584,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
     stage.score.setVictoryDestination(1);
@@ -4801,7 +4643,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -4835,7 +4676,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.BOTTOM }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -4843,7 +4683,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.RIGHT }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -4851,7 +4690,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.LEFT }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -4859,7 +4697,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { singleRigidSide: Sides.TOP }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
   }
@@ -4889,7 +4726,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination({
         onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 1 && stage.score.getGoodieCount(1) == 2 && stage.score.getGoodieCount(2) == 3 && stage.score.getGoodieCount(3) == 1; }
       }),
@@ -4922,7 +4758,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, 1); return true; } }),
       });
 
@@ -4930,7 +4765,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(1, 1); return true; } }),
       });
 
@@ -4938,7 +4772,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(2, 1); return true; } }),
       });
 
@@ -4946,7 +4779,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(3, 1); return true; } }),
       });
     }
@@ -4957,7 +4789,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: CircleBody.Circle(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle({
         heroCollision: () => {
           // add 15 seconds to the timer, remove the obstacle
@@ -4988,7 +4819,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5008,7 +4838,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { passThroughId: 7 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
   }
@@ -5026,7 +4855,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5073,7 +4901,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5127,7 +4954,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5138,7 +4964,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new FilledBox(platform_cfg),
       rigidBody: BoxBody.Box(platform_cfg, stage.world, { collisionsEnabled: true, singleRigidSide: Sides.TOP }),
-      movement: new InertMovement(),
       // Set a callback, then re-enable the platform's collision effect.
       role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as ExplicitMovement).updateYVelocity(-5) }),
     });
@@ -5186,7 +5011,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5299,7 +5123,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5311,7 +5134,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(polyCfg),
       rigidBody: PolygonBody.Polygon(polyCfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -5346,7 +5168,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy({ defeatByJump: true }),
     });
   }
@@ -5374,7 +5195,6 @@ export function buildLevelScreen(level: number) {
     let revolving = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -5382,7 +5202,6 @@ export function buildLevelScreen(level: number) {
     let anchor = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
 
@@ -5394,7 +5213,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5424,7 +5242,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5467,7 +5284,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5519,7 +5335,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Enemy(),
     });
 
@@ -5629,7 +5444,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5663,7 +5477,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5692,7 +5505,6 @@ export function buildLevelScreen(level: number) {
     let truck = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world, { density: 1 }),
-      movement: new InertMovement(),
       role: new Hero(),
     });
 
@@ -5700,7 +5512,6 @@ export function buildLevelScreen(level: number) {
     let backWheel = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 3, friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     backWheel.rigidBody.setRevoluteJoint(truck, -1, 0.5, 0, 0);
@@ -5710,7 +5521,6 @@ export function buildLevelScreen(level: number) {
     let frontWheel = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 3, friction: 1 }),
-      movement: new InertMovement(),
       role: new Obstacle(),
     });
     frontWheel.rigidBody.setRevoluteJoint(truck, 1, 0.5, 0, 0);
@@ -5720,7 +5530,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5780,7 +5589,6 @@ export function buildLevelScreen(level: number) {
     let sensor = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: BoxBody.Box(boxCfg, stage.world),
-      movement: new InertMovement(),
       role: new Sensor(),
     });
 
@@ -5802,7 +5610,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Enemy(),
       });
 
@@ -5815,7 +5622,6 @@ export function buildLevelScreen(level: number) {
       Actor.Make({
         appearance: new ImageSprite(cfg),
         rigidBody: CircleBody.Circle(cfg, stage.world),
-        movement: new InertMovement(),
         role: new Goodie(),
       });
 
@@ -5852,7 +5658,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world, { density: 1, friction: 0.1 }),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5867,7 +5672,6 @@ export function buildLevelScreen(level: number) {
       let a = Actor.Make({
         appearance: new FilledBox({ width: body.w, height: body.h, fillColor: "#FF0000" }),
         rigidBody: body,
-        movement: new InertMovement(),
         role: new Obstacle(),
       });
       a.rigidBody.setRotation(rotation);
@@ -5904,7 +5708,6 @@ export function buildLevelScreen(level: number) {
     Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Destination(),
     });
 
@@ -5978,7 +5781,6 @@ export function buildLevelScreen(level: number) {
           Actor.Make({
             rigidBody: BoxBody.Box(wallCfg, stage.world, { friction: 1 }),
             appearance: new ImageSprite(wallCfg),
-            movement: new InertMovement(),
             role: new Obstacle(),
           });
         } else if (cell === "G") {
@@ -5986,7 +5788,6 @@ export function buildLevelScreen(level: number) {
           Actor.Make({
             appearance: new ImageSprite(goodieCfg),
             rigidBody: CircleBody.Circle(goodieCfg, stage.world),
-            movement: new InertMovement(),
             role: new Goodie(),
           });
         }
@@ -6000,14 +5801,11 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(destCfg),
       rigidBody: CircleBody.Circle(destCfg, stage.world),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 1; } }),
-      movement: new InertMovement(),
     });
     stage.score.setVictoryDestination(1);
 
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#3C46FF", size: 20, z: 2 }, () => 3 - stage.score.getGoodieCount(0) + " Remaining Goodies"),
-      role: new Passive(),
-      movement: new InertMovement(),
       rigidBody: BoxBody.Box({ cx: 1, cy: 0.25, width: .1, height: .1 }, stage.hud),
     });
 
@@ -6036,7 +5834,6 @@ export function buildLevelScreen(level: number) {
     let o = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
       role: new Obstacle({
         heroCollision: () => {
           let t = Actor.Make({
@@ -6109,16 +5906,12 @@ function welcomeMessage(message: string, subMessage: string = "") {
     Actor.Make({
       rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
-      movement: new InertMovement(),
-      role: new Passive(),
     });
     // The subtext goes below the main text
     if (subMessage != "") {
       Actor.Make({
         rigidBody: BoxBody.Box({ cx: 8, cy: 6, width: .1, height: .1 }, overlay),
         appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage),
-        movement: new InertMovement(),
-        role: new Passive(),
       });
     }
   });
