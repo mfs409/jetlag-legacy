@@ -3,10 +3,7 @@ import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appeara
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
-import { InertMovement } from "../jetlag/Components/Movement";
-import { Passive } from "../jetlag/Components/Role";
 import { buildSplashScreen } from "./Splash";
-import { Scene } from "../jetlag/Entities/Scene";
 
 /**
  * buildHelpScreen draws the help screens.  Technically, a help screen can be
@@ -17,9 +14,9 @@ import { Scene } from "../jetlag/Entities/Scene";
  * For the purposes of this demonstration, there are two Help screens.  That
  * way, we can show how to move from one to the next.
  *
- * @param index Which help screen should be displayed
+ * @param level Which help screen should be displayed
  */
-export function buildHelpScreen(index: number) {
+export function buildHelpScreen(level: number) {
   // This line ensures that, no matter what level we draw, the ESCAPE key is
   // configured to go back to the Splash.  We don't go to Splash on down-press
   // of ESCAPE, but when the key is released.
@@ -27,7 +24,7 @@ export function buildHelpScreen(index: number) {
 
   // Our first scene describes the color coding that we use for the different
   // entities in the game
-  if (index == 1) {
+  if (level == 1) {
     // Note that this code is exactly the same as in Levels.ts, except that
     // there is no notion of "winning".  So, for example, based on our
     // configuration object, we should expect this Help screen to be drawn in a
@@ -38,97 +35,86 @@ export function buildHelpScreen(index: number) {
     stage.backgroundColor = "#19698e";
 
     // put some information and pictures on the screen
-    makeText(stage.world,
-      { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
-      () => "The levels of this game demonstrate JetLag features");
-
-    let cfg = { cx: 0.75, cy: 2.5, radius: 0.375, width: 0.75, height: 0.75, img: "green_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
-      role: new Passive(),
+      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, }, "The levels of this game demonstrate JetLag features"),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 1, width: .1, height: .1 }),
     });
-    makeText(stage.world,
-      { center: false, cx: 1.5, cy: 2.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
-      () => "You control the hero");
 
-    cfg = { cx: 0.75, cy: 3.5, radius: 0.375, width: 0.75, height: 0.75, img: "blue_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
-      role: new Passive(),
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "green_ball.png" }),
+      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 2.5, radius: 0.375 }),
     });
-    makeText(stage.world,
-      { center: false, cx: 1.5, cy: 3.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
-      () => "Collect these goodies");
-
-    cfg = { cx: 0.75, cy: 4.5, radius: 0.375, width: 0.75, height: 0.75, img: "red_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
-      role: new Passive(),
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "You control the hero"),
+      rigidBody: BoxBody.Box({ cx: 1.5, cy: 2.25, width: .1, height: .1, }),
     });
-    makeText(stage.world,
-      { center: false, cx: 1.5, cy: 4.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
-      () => "Avoid or defeat enemies");
 
-    cfg = { cx: 0.75, cy: 5.5, radius: 0.375, width: 0.75, height: 0.75, img: "mustard_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
-      role: new Passive(),
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "blue_ball.png" }),
+      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 3.5, radius: 0.375 }),
     });
-    makeText(stage.world,
-      { center: false, cx: 1.5, cy: 5.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
-      () => "Reach the destination");
-
-    cfg = { cx: 0.75, cy: 6.5, radius: 0.375, width: 0.75, height: 0.75, img: "purple_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
-      role: new Passive(),
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Collect these goodies"),
+      rigidBody: BoxBody.Box({ cx: 1.5, cy: 3.25, width: .1, height: .1 }),
     });
-    makeText(stage.world,
-      { center: false, cx: 1.5, cy: 6.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
-      () => "These are walls");
 
-    cfg = { cx: 0.75, cy: 7.5, radius: 0.375, width: 0.75, height: 0.75, img: "grey_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: CircleBody.Circle(cfg, stage.world),
-      movement: new InertMovement(),
-      role: new Passive(),
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "red_ball.png" }),
+      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 4.5, radius: 0.375 }),
     });
-    makeText(stage.world,
-      { center: false, cx: 1.5, cy: 7.25, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 0 },
-      () => "Throw projectiles");
+    Actor.Make({
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Avoid or defeat enemies"),
+      rigidBody: BoxBody.Box({ cx: 1.5, cy: 4.25, width: .1, height: .1 }),
+    });
 
-    makeText(stage.world,
-      { center: false, cx: 11, cy: 8.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 24, z: 0 },
-      () => "(All image files are stored in the assets folder)");
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "mustard_ball.png" }),
+      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 5.5, radius: 0.375 }),
+    });
+    Actor.Make({
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Reach the destination"),
+      rigidBody: BoxBody.Box({ cx: 1.5, cy: 5.25, width: .1, height: .1 }),
+    });
 
-    // set up a control to go to the next help level on screen tap
-    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
-      stage.switchTo(buildHelpScreen, 2);
-      return true;
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
+      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 6.5, radius: 0.375 }),
+    });
+    Actor.Make({
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "These are walls"),
+      rigidBody: BoxBody.Box({ cx: 1.5, cy: 6.25, width: .1, height: .1 }),
+    });
+
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "grey_ball.png" }),
+      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 7.5, radius: 0.375 }),
+    });
+    Actor.Make({
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Throw projectiles"),
+      rigidBody: BoxBody.Box({ cx: 1.5, cy: 7.25, width: .1, height: .1 }),
+    });
+
+    Actor.Make({
+      appearance: new TextSprite({ center: false, face: "Arial", color: "#FFFFFF", size: 24 }, "(All image files are stored in the assets folder)"),
+      rigidBody: BoxBody.Box({ cx: 11, cy: 8.5, width: .1, height: .1 }),
+    });
+
+    // Tap anywhere to go to the next screen
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }), // the fourth "00" is the alpha channel, for invisibility
+      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }),
+      gestures: { tap: () => { stage.switchTo(buildHelpScreen, 2); return true; } }
     });
   }
-
   // Our second help scene is just here to show that it is possible to have more than one help scene.
-  else if (index == 2) {
+  else if (level == 2) {
     // This is just like the previous screen, but with different text
     stage.backgroundColor = "#19698e";
-    makeText(stage.world,
-      { center: true, cx: 8, cy: 1, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 },
-      () => "Read, Write, Play");
-    makeText(stage.world,
-      { center: true, cx: 8, cy: 5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
-      () => `As you play through the levels of the sample game, be sure to read the code that accompanies
+    Actor.Make({
+      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56 }, "Read, Write, Play"),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 1, width: .1, height: .1 }),
+    });
+    let big_text = `As you play through the levels of the sample game, be sure to read the code that accompanies
 each world.  The levels aren't meant to be "hard", or even really "fun".  They are meant to show
 you how to use the different features of JetLag, and to show you how the same features can
 be used in many different ways, to achieve very different styles of game play.  JetLag has been
@@ -139,49 +125,17 @@ If you're not sure where to start, consider making small changes to the levels, 
 the numbers that are passed to different functions.
 
 Start with the "Levels.ts" file in the "src/game" folder, then move on to other files in that folder,
-until you have a plan for how to build your next game.`);
+until you have a plan for how to build your next game.`;
+    Actor.Make({
+      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 32 }, big_text),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 5, width: .1, height: .1 }),
+    });
 
-    // set up a control to go to the splash screen on screen tap
-    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
-      stage.switchTo(buildSplashScreen, 1);
-      return true;
+    // Tap anywhere to go back to the splash screen
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
+      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }),
+      gestures: { tap: () => { stage.switchTo(buildSplashScreen, 2); return true; } }
     });
   }
-}
-
-/**
- * Create an Actor whose appearance is text.  Since every Actor needs to have a
- * body, this will create a simple body to accompany the actor.
- *
- * @param scene     The scene where the Text should be made
- * @param cfgOpts   Text configuration options
- * @param producer  A callback for making the text for this Actor
- *
- * @returns An actor whose appearance is a TextSprite based on `cfgOpts`
- */
-// TODO: stop needing `any`
-function makeText(scene: Scene, cfgOpts: any, producer: () => string): Actor {
-  return Actor.Make({
-    appearance: new TextSprite(cfgOpts, producer),
-    rigidBody: BoxBody.Box(cfgOpts, scene),
-  });
-}
-
-/**
- * Add a button that performs an action when clicked.
- *
- * @param scene The scene where the button should go
- * @param cfg   Configuration for an image and a box
- * @param tap   The code to run in response to a tap
- */
-// TODO: stop needing `any`
-function addTapControl(scene: Scene, cfg: any, tap: (coords: { x: number; y: number }) => boolean) {
-  // TODO: we'd have more flexibility if we passed in an appearance, or just got
-  // rid of this, but we use it too much for that refactor to be worthwhile.
-  let c = Actor.Make({
-    appearance: new FilledBox(cfg),
-    rigidBody: BoxBody.Box(cfg, scene),
-  });
-  c.gestures = { tap };
-  return c;
 }

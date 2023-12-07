@@ -1,12 +1,8 @@
-// Last review: 08-10-2023
-
 import { Actor } from "../jetlag/Entities/Actor";
-import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { BoxBody } from "../jetlag/Components/RigidBody";
-import { InertMovement } from "../jetlag/Components/Movement";
-import { Passive } from "../jetlag/Components/Role";
 import { buildSplashScreen } from "./Splash";
 import { buildLevelScreen } from "./Levels";
 import { MusicComponent } from "../jetlag/Components/Music";
@@ -14,7 +10,7 @@ import { MusicComponent } from "../jetlag/Components/Music";
 /**
  * buildChooserScreen draws the level chooser screens.
  *
- * Since we have 90 demo levels, and we show 24 levels per screen, our chooser
+ * Since we have 92 demo levels, and we show 24 levels per screen, our chooser
  * will have 4 screens.
  *
  * @param index Which screen of the chooser should be displayed
@@ -27,79 +23,38 @@ export function buildChooserScreen(index: number) {
   // configured to go back to the Splash
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_ESCAPE, () => { stage.switchTo(buildSplashScreen, 1); });
 
-  // screen 1: show levels 1 --> 24
-  //
-  // When you need maximum control, this style of code is best: you can
-  // individually place each button exactly where you want it.
-  if (index == 1) {
-    // set up background and music
-    stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic("tune.ogg"));
-    Actor.Make({
-      appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
-      movement: new InertMovement(),
-      role: new Passive(),
-    });
+  // start the music
+  stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic("tune.ogg"));
 
-    // We'll have margins of 1.25 on the left and right, a margin of 1 on
-    // the bottom, and three rows of eight buttons each, with each button
-    // 1.25x1.25 meters, and .5 meters between buttons
-    drawLevelButton(1.25, 3.25, 1.25, 1.25, 1);
-    drawLevelButton(3.0, 3.25, 1.25, 1.25, 2);
-    drawLevelButton(4.75, 3.25, 1.25, 1.25, 3);
-    drawLevelButton(6.5, 3.25, 1.25, 1.25, 4);
-    drawLevelButton(8.25, 3.25, 1.25, 1.25, 5);
-    drawLevelButton(10.0, 3.25, 1.25, 1.25, 6);
-    drawLevelButton(11.75, 3.25, 1.25, 1.25, 7);
-    drawLevelButton(13.5, 3.25, 1.25, 1.25, 8);
+  // Paint the background white
+  stage.backgroundColor = "#FFFFFF";
 
-    drawLevelButton(1.25, 5, 1.25, 1.25, 9);
-    drawLevelButton(3.0, 5, 1.25, 1.25, 10);
-    drawLevelButton(4.75, 5, 1.25, 1.25, 11);
-    drawLevelButton(6.5, 5, 1.25, 1.25, 12);
-    drawLevelButton(8.25, 5, 1.25, 1.25, 13);
-    drawLevelButton(10.0, 5, 1.25, 1.25, 14);
-    drawLevelButton(11.75, 5, 1.25, 1.25, 15);
-    drawLevelButton(13.5, 5, 1.25, 1.25, 16);
+  // Draw a brown box at the top of the screen, put some text in it
+  Actor.Make({
+    appearance: new FilledBox({ width: 16, height: 2.3, fillColor: "#523216" }),
+    rigidBody: BoxBody.Box({ cx: 8, cy: 1.15, width: 16, height: 2.3 }, stage.world, { collisionsEnabled: false }),
+  });
+  Actor.Make({
+    appearance: new TextSprite({ center: true, face: "Arial", size: 120, color: "#FFFFFF" }, "Choose a Level"),
+    rigidBody: BoxBody.Box({ cx: 8, cy: 1.15, width: .1, height: .1 }),
+  });
 
-    drawLevelButton(1.25, 6.75, 1.25, 1.25, 17);
-    drawLevelButton(3.0, 6.75, 1.25, 1.25, 18);
-    drawLevelButton(4.75, 6.75, 1.25, 1.25, 19);
-    drawLevelButton(6.5, 6.75, 1.25, 1.25, 20);
-    drawLevelButton(8.25, 6.75, 1.25, 1.25, 21);
-    drawLevelButton(10.0, 6.75, 1.25, 1.25, 22);
-    drawLevelButton(11.75, 6.75, 1.25, 1.25, 23);
-    drawLevelButton(13.5, 6.75, 1.25, 1.25, 24);
+  // We'll have margins of 1.25 on the left and right, a margin of 1 on
+  // the bottom, and three rows of eight buttons each, with each button
+  // 1.25x1.25 meters, and .5 meters between buttons
 
-    // draw the navigation buttons
-    drawNextButton(15, 5.125, 1, 1, 2);
-    drawSplashButton(15, 8, 1, 1);
-  }
-  // Of course, if we don't need all that control, we can leverage the structure
-  // that we're trying to achieve, and we can write a lot less code.  This block
-  // does everything for screens 2, 3, and 4!
-  else {
-    // set up background and music
-    stage.levelMusic = new MusicComponent(stage.musicLibrary.getMusic("tune.ogg"));
-    Actor.Make({
-      appearance: new ImageSprite({ width: 16, height: 9, img: "chooser.png" }),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
-      movement: new InertMovement(),
-      role: new Passive(),
-    });
-    for (let row = 0, y = 3.25, l = 24 * (index - 1) + 1; row < 3; ++row, y += 1.75) {
-      let x = 1.25;
-      for (let i = 0; i < 8; ++i, ++l, x += 1.75) {
-        // Only draw a button if we're less than or equal to 90, since
-        // that's our last level
-        if (l <= 92) drawLevelButton(x, y, 1.25, 1.25, l);
-      }
+  for (let row = 0, y = 3.25, l = 24 * (index - 1) + 1; row < 3; ++row, y += 1.75) {
+    let x = 1.25;
+    for (let i = 0; i < 8; ++i, ++l, x += 1.75) {
+      // Only draw a button if we're less than or equal to 90, since
+      // that's our last level
+      if (l <= 92) drawLevelButton(x, y, 1.25, 1.25, l);
     }
-    // draw the navigation buttons
-    if (index < 4) drawNextButton(15, 5.125, 1, 1, index + 1);
-    drawPrevButton(0, 5.125, 1, 1, index - 1);
-    drawSplashButton(15, 8, 1, 1);
   }
+  // draw the navigation buttons
+  if (index < 4) drawNextButton(15, 5.125, 1, 1, index + 1);
+  if (index > 1) drawPrevButton(0, 5.125, 1, 1, index - 1);
+  drawSplashButton(15, 8, 1, 1);
 }
 
 /**
@@ -118,8 +73,6 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   let tile = Actor.Make({
     appearance: new ImageSprite(cfg),
     rigidBody: BoxBody.Box(cfg, stage.world),
-    movement: new InertMovement(),
-    role: new Passive(),
   });
 
   // attach a callback and print the level number with a touchCallback, and then put text on top of it
@@ -130,8 +83,6 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
     rigidBody: BoxBody.Box(cfg, stage.world, { collisionsEnabled: false }),
-    movement: new InertMovement(),
-    role: new Passive(),
   });
 }
 
@@ -150,8 +101,6 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
   let btn = Actor.Make({
     appearance: img,
     rigidBody: BoxBody.Box(cfg, stage.world),
-    movement: new InertMovement(),
-    role: new Passive(),
   });
   let tap = () => {
     stage.switchTo(buildChooserScreen, chooserLevel);
@@ -175,8 +124,6 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
   let btn = Actor.Make({
     appearance: img,
     rigidBody: BoxBody.Box(cfg, stage.world),
-    movement: new InertMovement(),
-    role: new Passive(),
   });
   let tap = () => {
     stage.switchTo(buildChooserScreen, chooserLevel);
@@ -199,8 +146,6 @@ function drawSplashButton(x: number, y: number, width: number, height: number) {
   let btn = Actor.Make({
     appearance: img,
     rigidBody: BoxBody.Box(cfg, stage.world),
-    movement: new InertMovement(),
-    role: new Passive(),
   });
   let tap = () => {
     stage.switchTo(buildSplashScreen, 1);
