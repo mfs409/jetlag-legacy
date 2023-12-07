@@ -36,54 +36,12 @@ export class TutPlatformConfig implements GameConfig {
   musicNames = [];
   soundNames = [];
   imageNames = [
-    // We'll use these for walking
-    "spritesheets/alien_walk_l_0.png", "spritesheets/alien_walk_l_1.png", "spritesheets/alien_walk_l_2.png",
-    "spritesheets/alien_walk_l_3.png", "spritesheets/alien_walk_l_4.png", "spritesheets/alien_walk_l_5.png",
-    "spritesheets/alien_walk_l_6.png", "spritesheets/alien_walk_l_7.png", "spritesheets/alien_walk_l_8.png",
-    //
-    "spritesheets/alien_walk_r_0.png", "spritesheets/alien_walk_r_1.png", "spritesheets/alien_walk_r_2.png",
-    "spritesheets/alien_walk_r_3.png", "spritesheets/alien_walk_r_4.png", "spritesheets/alien_walk_r_5.png",
-    "spritesheets/alien_walk_r_6.png", "spritesheets/alien_walk_r_7.png", "spritesheets/alien_walk_r_8.png",
-
-    // We'll use these for tossing projectiles
-    "spritesheets/alien_thrust_l_0.png", "spritesheets/alien_thrust_l_1.png", "spritesheets/alien_thrust_l_2.png",
-    "spritesheets/alien_thrust_l_3.png", "spritesheets/alien_thrust_l_4.png", "spritesheets/alien_thrust_l_5.png",
-    "spritesheets/alien_thrust_l_6.png", "spritesheets/alien_thrust_l_7.png",
-    //
-    "spritesheets/alien_thrust_r_0.png", "spritesheets/alien_thrust_r_1.png", "spritesheets/alien_thrust_r_2.png",
-    "spritesheets/alien_thrust_r_3.png", "spritesheets/alien_thrust_r_4.png", "spritesheets/alien_thrust_r_5.png",
-    "spritesheets/alien_thrust_r_6.png", "spritesheets/alien_thrust_r_7.png",
-
-    // We'll use these for jumping
-    "spritesheets/alien_cast_r_0.png", "spritesheets/alien_cast_r_1.png", "spritesheets/alien_cast_r_2.png",
-    "spritesheets/alien_cast_r_3.png", "spritesheets/alien_cast_r_4.png", "spritesheets/alien_cast_r_5.png",
-    "spritesheets/alien_cast_r_6.png",
-    //
-    "spritesheets/alien_cast_l_0.png", "spritesheets/alien_cast_l_1.png", "spritesheets/alien_cast_l_2.png",
-    "spritesheets/alien_cast_l_3.png", "spritesheets/alien_cast_l_4.png", "spritesheets/alien_cast_l_5.png",
-    "spritesheets/alien_cast_l_6.png",
-
-    // We'll use these for punching
-    "spritesheets/alien_slash_r_0.png", "spritesheets/alien_slash_r_1.png", "spritesheets/alien_slash_r_2.png",
-    "spritesheets/alien_slash_r_3.png", "spritesheets/alien_slash_r_4.png", "spritesheets/alien_slash_r_5.png",
-    //
-    "spritesheets/alien_slash_l_0.png", "spritesheets/alien_slash_l_1.png", "spritesheets/alien_slash_l_2.png",
-    "spritesheets/alien_slash_l_3.png", "spritesheets/alien_slash_l_4.png", "spritesheets/alien_slash_l_5.png",
-
-    // The bad guy... just walking
-    "spritesheets/lizard_walk_l_0.png", "spritesheets/lizard_walk_l_1.png", "spritesheets/lizard_walk_l_2.png",
-    "spritesheets/lizard_walk_l_3.png", "spritesheets/lizard_walk_l_4.png", "spritesheets/lizard_walk_l_5.png",
-    "spritesheets/lizard_walk_l_6.png", "spritesheets/lizard_walk_l_7.png", "spritesheets/lizard_walk_l_8.png",
-    //
-    "spritesheets/lizard_walk_r_0.png", "spritesheets/lizard_walk_r_1.png", "spritesheets/lizard_walk_r_2.png",
-    "spritesheets/lizard_walk_r_3.png", "spritesheets/lizard_walk_r_4.png", "spritesheets/lizard_walk_r_5.png",
-    "spritesheets/lizard_walk_r_6.png", "spritesheets/lizard_walk_r_7.png", "spritesheets/lizard_walk_r_8.png",
-
+    // Sprite sheets for the alien and lizard
+    "alien.json", "lizard.json",
     // Layers for Parallax backgrounds
     "mid.png", "back.png",
-
-    // Coins
-    "coin0.png", "coin1.png", "coin2.png", "coin3.png", "coin4.png", "coin5.png", "coin6.png", "coin7.png",
+    // Sprite sheet with the coins (and other stuff that we don't use)
+    "sprites.json",
   ];
 
   // The name of the function that builds the initial screen of the game
@@ -110,52 +68,52 @@ export function tut_platform(_level: number) {
 
   let remap = new Map();
   animations.set(AnimationState.WALK_W, new AnimationSequence(true)
-    .to("spritesheets/alien_walk_l_0.png", 75).to("spritesheets/alien_walk_l_1.png", 75)
-    .to("spritesheets/alien_walk_l_2.png", 75).to("spritesheets/alien_walk_l_3.png", 75)
-    .to("spritesheets/alien_walk_l_4.png", 75).to("spritesheets/alien_walk_l_5.png", 75)
-    .to("spritesheets/alien_walk_l_6.png", 75).to("spritesheets/alien_walk_l_7.png", 75)
-    .to("spritesheets/alien_walk_l_8.png", 75));
+    .to("alien_walk_l_0.png", 75).to("alien_walk_l_1.png", 75)
+    .to("alien_walk_l_2.png", 75).to("alien_walk_l_3.png", 75)
+    .to("alien_walk_l_4.png", 75).to("alien_walk_l_5.png", 75)
+    .to("alien_walk_l_6.png", 75).to("alien_walk_l_7.png", 75)
+    .to("alien_walk_l_8.png", 75));
 
   animations.set(AnimationState.WALK_E, new AnimationSequence(true)
-    .to("spritesheets/alien_walk_r_0.png", 75).to("spritesheets/alien_walk_r_1.png", 75)
-    .to("spritesheets/alien_walk_r_2.png", 75).to("spritesheets/alien_walk_r_3.png", 75)
-    .to("spritesheets/alien_walk_r_4.png", 75).to("spritesheets/alien_walk_r_5.png", 75)
-    .to("spritesheets/alien_walk_r_6.png", 75).to("spritesheets/alien_walk_r_7.png", 75)
-    .to("spritesheets/alien_walk_r_8.png", 75));
+    .to("alien_walk_r_0.png", 75).to("alien_walk_r_1.png", 75)
+    .to("alien_walk_r_2.png", 75).to("alien_walk_r_3.png", 75)
+    .to("alien_walk_r_4.png", 75).to("alien_walk_r_5.png", 75)
+    .to("alien_walk_r_6.png", 75).to("alien_walk_r_7.png", 75)
+    .to("alien_walk_r_8.png", 75));
 
   animations.set(AnimationState.JUMP_W, new AnimationSequence(true)
-    .to("spritesheets/alien_cast_l_0.png", 75).to("spritesheets/alien_cast_l_1.png", 75)
-    .to("spritesheets/alien_cast_l_2.png", 75).to("spritesheets/alien_cast_l_3.png", 75)
-    .to("spritesheets/alien_cast_l_4.png", 8000).to("spritesheets/alien_cast_l_5.png", 75)
-    .to("spritesheets/alien_cast_l_6.png", 75));
+    .to("alien_cast_l_0.png", 75).to("alien_cast_l_1.png", 75)
+    .to("alien_cast_l_2.png", 75).to("alien_cast_l_3.png", 75)
+    .to("alien_cast_l_4.png", 8000).to("alien_cast_l_5.png", 75)
+    .to("alien_cast_l_6.png", 75));
   remap.set(AnimationState.JUMP_IDLE_W, AnimationState.JUMP_W);
 
   animations.set(AnimationState.JUMP_E, new AnimationSequence(true)
-    .to("spritesheets/alien_cast_r_0.png", 75).to("spritesheets/alien_cast_r_1.png", 75)
-    .to("spritesheets/alien_cast_r_2.png", 75).to("spritesheets/alien_cast_r_3.png", 75)
-    .to("spritesheets/alien_cast_r_4.png", 8000).to("spritesheets/alien_cast_r_5.png", 75)
-    .to("spritesheets/alien_cast_r_6.png", 75));
+    .to("alien_cast_r_0.png", 75).to("alien_cast_r_1.png", 75)
+    .to("alien_cast_r_2.png", 75).to("alien_cast_r_3.png", 75)
+    .to("alien_cast_r_4.png", 8000).to("alien_cast_r_5.png", 75)
+    .to("alien_cast_r_6.png", 75));
   remap.set(AnimationState.JUMP_IDLE_E, AnimationState.JUMP_E);
 
   animations.set(AnimationState.TOSS_W, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_l_0.png", 10).to("spritesheets/alien_thrust_l_1.png", 10)
-    .to("spritesheets/alien_thrust_l_2.png", 10).to("spritesheets/alien_thrust_l_3.png", 10)
-    .to("spritesheets/alien_thrust_l_4.png", 75).to("spritesheets/alien_thrust_l_5.png", 50)
-    .to("spritesheets/alien_thrust_l_6.png", 50).to("spritesheets/alien_thrust_l_7.png", 50));
+    .to("alien_thrust_l_0.png", 10).to("alien_thrust_l_1.png", 10)
+    .to("alien_thrust_l_2.png", 10).to("alien_thrust_l_3.png", 10)
+    .to("alien_thrust_l_4.png", 75).to("alien_thrust_l_5.png", 50)
+    .to("alien_thrust_l_6.png", 50).to("alien_thrust_l_7.png", 50));
   remap.set(AnimationState.TOSS_IDLE_W, AnimationState.TOSS_W);
 
   animations.set(AnimationState.TOSS_E, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_r_0.png", 10).to("spritesheets/alien_thrust_r_1.png", 10)
-    .to("spritesheets/alien_thrust_r_2.png", 10).to("spritesheets/alien_thrust_r_3.png", 10)
-    .to("spritesheets/alien_thrust_r_4.png", 75).to("spritesheets/alien_thrust_r_5.png", 50)
-    .to("spritesheets/alien_thrust_r_6.png", 50).to("spritesheets/alien_thrust_r_7.png", 50));
+    .to("alien_thrust_r_0.png", 10).to("alien_thrust_r_1.png", 10)
+    .to("alien_thrust_r_2.png", 10).to("alien_thrust_r_3.png", 10)
+    .to("alien_thrust_r_4.png", 75).to("alien_thrust_r_5.png", 50)
+    .to("alien_thrust_r_6.png", 50).to("alien_thrust_r_7.png", 50));
   remap.set(AnimationState.TOSS_IDLE_E, AnimationState.TOSS_E);
 
   animations.set(AnimationState.IDLE_W, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_l_0.png", 750).to("spritesheets/alien_thrust_l_1.png", 75));
+    .to("alien_thrust_l_0.png", 750).to("alien_thrust_l_1.png", 75));
 
   animations.set(AnimationState.IDLE_E, new AnimationSequence(true)
-    .to("spritesheets/alien_thrust_r_0.png", 750).to("spritesheets/alien_thrust_r_1.png", 75));
+    .to("alien_thrust_r_0.png", 750).to("alien_thrust_r_1.png", 75));
 
   let h = Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
@@ -248,18 +206,18 @@ export function tut_platform(_level: number) {
 
   animations = new Map();
   animations.set(AnimationState.WALK_W, new AnimationSequence(true)
-    .to("spritesheets/lizard_walk_l_0.png", 75).to("spritesheets/lizard_walk_l_1.png", 75)
-    .to("spritesheets/lizard_walk_l_2.png", 75).to("spritesheets/lizard_walk_l_3.png", 75)
-    .to("spritesheets/lizard_walk_l_4.png", 75).to("spritesheets/lizard_walk_l_5.png", 75)
-    .to("spritesheets/lizard_walk_l_6.png", 75).to("spritesheets/lizard_walk_l_7.png", 75)
-    .to("spritesheets/lizard_walk_l_8.png", 75));
+    .to("lizard_walk_l_0.png", 75).to("lizard_walk_l_1.png", 75)
+    .to("lizard_walk_l_2.png", 75).to("lizard_walk_l_3.png", 75)
+    .to("lizard_walk_l_4.png", 75).to("lizard_walk_l_5.png", 75)
+    .to("lizard_walk_l_6.png", 75).to("lizard_walk_l_7.png", 75)
+    .to("lizard_walk_l_8.png", 75));
 
   animations.set(AnimationState.WALK_E, new AnimationSequence(true)
-    .to("spritesheets/lizard_walk_r_0.png", 75).to("spritesheets/lizard_walk_r_1.png", 75)
-    .to("spritesheets/lizard_walk_r_2.png", 75).to("spritesheets/lizard_walk_r_3.png", 75)
-    .to("spritesheets/lizard_walk_r_4.png", 75).to("spritesheets/lizard_walk_r_5.png", 75)
-    .to("spritesheets/lizard_walk_r_6.png", 75).to("spritesheets/lizard_walk_r_7.png", 75)
-    .to("spritesheets/lizard_walk_r_8.png", 75));
+    .to("lizard_walk_r_0.png", 75).to("lizard_walk_r_1.png", 75)
+    .to("lizard_walk_r_2.png", 75).to("lizard_walk_r_3.png", 75)
+    .to("lizard_walk_r_4.png", 75).to("lizard_walk_r_5.png", 75)
+    .to("lizard_walk_r_6.png", 75).to("lizard_walk_r_7.png", 75)
+    .to("lizard_walk_r_8.png", 75));
   remap = new Map();
   remap.set(AnimationState.IDLE_E, AnimationState.WALK_E);
   // Enemy to defeat

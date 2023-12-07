@@ -35,10 +35,7 @@ class TutMazeGameConfig implements GameConfig {
     resourcePrefix = "./assets/";
     musicNames = [];
     soundNames = [];
-    imageNames = [
-        // The non-animated actors in the game
-        "green_ball.png", "mustard_ball.png", "red_ball.png", "blue_ball.png", "grey_ball.png",
-    ];
+    imageNames = ["sprites.json"];
 
     // The name of the function that builds the initial screen of the game
     gameBuilder = tut_maze_game;

@@ -41,6 +41,7 @@ export class TutJetlagTour implements GameConfig {
  * @param level Which level should be displayed
  */
 function tut_jetlag_tour(level: number) {
+    level = 2;
     // A "clocked" game: turn and shoot
     if (level == 1) {
         // Draw a grid on the screen, covering the whole visible area
