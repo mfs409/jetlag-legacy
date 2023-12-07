@@ -45,9 +45,25 @@ esbuildServe({
 // Now it's time to set up the tutorials
 const tut_src_folder = path.join(root_folder, "tutorials");
 let tutorials = [
-    { tut_name: "tut_getting_started", code_name: "demo_game" },
-    { tut_name: "tut_jetlag_tour", code_name: undefined },
+    { tut_name: "tut_assets_audio_animations", code_name: "tut_assets_audio_animations" },
+    { tut_name: "tut_collision", code_name: "tut_collision" },
+    { tut_name: "tut_endless_runner_game", code_name: "tut_endless_runner_game" },
+    { tut_name: "tut_gestures_projectiles", code_name: "tut_gestures_projectiles" },
+    { tut_name: "tut_getting_started", code_name: "tut_getting_started" },
+    { tut_name: "tut_joints", code_name: "tut_joints" },
     { tut_name: "tut_maze_game", code_name: "tut_maze_game" },
+    { tut_name: "tut_misc_starter_games", code_name: "tut_misc_starter_games" },
+    { tut_name: "tut_movement_physics", code_name: "tut_movement_physics" },
+    { tut_name: "tut_overhead_fight_farm_game", code_name: "tut_overhead_fight_farm_game" },
+    { tut_name: "tut_overview", code_name: "tut_overview" },
+    { tut_name: "tut_package_desktop", code_name: "tut_package_desktop" },
+    { tut_name: "tut_package_mobile", code_name: "tut_package_mobile" },
+    { tut_name: "tut_platformer_game", code_name: "tut_platformer_game" },
+    { tut_name: "tut_simulation_conway", code_name: "tut_simulation_conway" },
+    { tut_name: "tut_storage", code_name: "tut_storage" },
+    { tut_name: "tut_text_hud", code_name: "tut_text_hud" },
+    { tut_name: "tut_timers", code_name: "tut_timers" },
+    { tut_name: "tut_types_of_stages", code_name: "tut_types_of_stages" },
 ];
 
 // First, copy the .md and subfolder
