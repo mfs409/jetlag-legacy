@@ -32,35 +32,11 @@ export class EmptyGameConfig implements GameConfig {
   musicNames = [];
   soundNames = [];
   imageNames = [
-    "spritesheets/alien_walk_d_0.png", "spritesheets/alien_walk_d_1.png", "spritesheets/alien_walk_d_2.png",
-    "spritesheets/alien_walk_d_3.png", "spritesheets/alien_walk_d_4.png", "spritesheets/alien_walk_d_5.png",
-    "spritesheets/alien_walk_d_6.png", "spritesheets/alien_walk_d_7.png", "spritesheets/alien_walk_d_8.png",
-    "spritesheets/alien_walk_l_0.png", "spritesheets/alien_walk_l_1.png", "spritesheets/alien_walk_l_2.png",
-    "spritesheets/alien_walk_l_3.png", "spritesheets/alien_walk_l_4.png", "spritesheets/alien_walk_l_5.png",
-    "spritesheets/alien_walk_l_6.png", "spritesheets/alien_walk_l_7.png", "spritesheets/alien_walk_l_8.png",
-    "spritesheets/alien_walk_r_0.png", "spritesheets/alien_walk_r_1.png", "spritesheets/alien_walk_r_2.png",
-    "spritesheets/alien_walk_r_3.png", "spritesheets/alien_walk_r_4.png", "spritesheets/alien_walk_r_5.png",
-    "spritesheets/alien_walk_r_6.png", "spritesheets/alien_walk_r_7.png", "spritesheets/alien_walk_r_8.png",
-    "spritesheets/alien_walk_u_0.png", "spritesheets/alien_walk_u_1.png", "spritesheets/alien_walk_u_2.png",
-    "spritesheets/alien_walk_u_3.png", "spritesheets/alien_walk_u_4.png", "spritesheets/alien_walk_u_5.png",
-    "spritesheets/alien_walk_u_6.png", "spritesheets/alien_walk_u_7.png", "spritesheets/alien_walk_u_8.png",
-
-    "spritesheets/alien_thrust_d_0.png", "spritesheets/alien_thrust_d_1.png", "spritesheets/alien_thrust_d_2.png",
-    "spritesheets/alien_thrust_d_3.png", "spritesheets/alien_thrust_d_4.png", "spritesheets/alien_thrust_d_5.png",
-    "spritesheets/alien_thrust_d_6.png", "spritesheets/alien_thrust_d_7.png",
-    "spritesheets/alien_thrust_l_0.png", "spritesheets/alien_thrust_l_1.png", "spritesheets/alien_thrust_l_2.png",
-    "spritesheets/alien_thrust_l_3.png", "spritesheets/alien_thrust_l_4.png", "spritesheets/alien_thrust_l_5.png",
-    "spritesheets/alien_thrust_l_6.png", "spritesheets/alien_thrust_l_7.png",
-    "spritesheets/alien_thrust_r_0.png", "spritesheets/alien_thrust_r_1.png", "spritesheets/alien_thrust_r_2.png",
-    "spritesheets/alien_thrust_r_3.png", "spritesheets/alien_thrust_r_4.png", "spritesheets/alien_thrust_r_5.png",
-    "spritesheets/alien_thrust_r_6.png", "spritesheets/alien_thrust_r_7.png",
-    "spritesheets/alien_thrust_u_0.png", "spritesheets/alien_thrust_u_1.png", "spritesheets/alien_thrust_u_2.png",
-    "spritesheets/alien_thrust_u_3.png", "spritesheets/alien_thrust_u_4.png", "spritesheets/alien_thrust_u_5.png",
-    "spritesheets/alien_thrust_u_6.png", "spritesheets/alien_thrust_u_7.png",
+    "alien.json"
   ];
 
   // The name of the function that builds the initial screen of the game
-  gameBuilder = build_game;
+  gameBuilder = tut_animations;
 }
 
 /**
@@ -75,7 +51,7 @@ export class EmptyGameConfig implements GameConfig {
  *
  * @param level Which splash screen should be displayed
  */
-export function build_game(_level: number) {
+export function tut_animations(_level: number) {
   // Draw four walls, covering the four borders of the world
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
@@ -101,40 +77,38 @@ export function build_game(_level: number) {
   // Draw a hero.  Note that the animations are pretty tricky
   let animations = new Map();
   animations.set(AnimationState.WALK_N, new AnimationSequence(true)
-    .to("spritesheets/alien_walk_u_0.png", 75).to("spritesheets/alien_walk_u_1.png", 75)
-    .to("spritesheets/alien_walk_u_2.png", 75).to("spritesheets/alien_walk_u_3.png", 75)
-    .to("spritesheets/alien_walk_u_4.png", 75).to("spritesheets/alien_walk_u_5.png", 75)
-    .to("spritesheets/alien_walk_u_6.png", 75).to("spritesheets/alien_walk_u_7.png", 75)
-    .to("spritesheets/alien_walk_u_8.png", 75));
+    .to("alien_walk_u_0.png", 75).to("alien_walk_u_1.png", 75)
+    .to("alien_walk_u_2.png", 75).to("alien_walk_u_3.png", 75)
+    .to("alien_walk_u_4.png", 75).to("alien_walk_u_5.png", 75)
+    .to("alien_walk_u_6.png", 75).to("alien_walk_u_7.png", 75)
+    .to("alien_walk_u_8.png", 75));
 
   animations.set(AnimationState.WALK_W, new AnimationSequence(true)
-    .to("spritesheets/alien_walk_l_0.png", 75).to("spritesheets/alien_walk_l_1.png", 75)
-    .to("spritesheets/alien_walk_l_2.png", 75).to("spritesheets/alien_walk_l_3.png", 75)
-    .to("spritesheets/alien_walk_l_4.png", 75).to("spritesheets/alien_walk_l_5.png", 75)
-    .to("spritesheets/alien_walk_l_6.png", 75).to("spritesheets/alien_walk_l_7.png", 75)
-    .to("spritesheets/alien_walk_l_8.png", 75));
+    .to("alien_walk_l_0.png", 75).to("alien_walk_l_1.png", 75)
+    .to("alien_walk_l_2.png", 75).to("alien_walk_l_3.png", 75)
+    .to("alien_walk_l_4.png", 75).to("alien_walk_l_5.png", 75)
+    .to("alien_walk_l_6.png", 75).to("alien_walk_l_7.png", 75)
+    .to("alien_walk_l_8.png", 75));
 
   animations.set(AnimationState.WALK_S, new AnimationSequence(true)
-    .to("spritesheets/alien_walk_d_0.png", 75).to("spritesheets/alien_walk_d_1.png", 75)
-    .to("spritesheets/alien_walk_d_2.png", 75).to("spritesheets/alien_walk_d_3.png", 75)
-    .to("spritesheets/alien_walk_d_4.png", 75).to("spritesheets/alien_walk_d_5.png", 75)
-    .to("spritesheets/alien_walk_d_6.png", 75).to("spritesheets/alien_walk_d_7.png", 75)
-    .to("spritesheets/alien_walk_d_8.png", 75));
+    .to("alien_walk_d_0.png", 75).to("alien_walk_d_1.png", 75)
+    .to("alien_walk_d_2.png", 75).to("alien_walk_d_3.png", 75)
+    .to("alien_walk_d_4.png", 75).to("alien_walk_d_5.png", 75)
+    .to("alien_walk_d_6.png", 75).to("alien_walk_d_7.png", 75)
+    .to("alien_walk_d_8.png", 75));
 
   animations.set(AnimationState.WALK_E, new AnimationSequence(true)
-    .to("spritesheets/alien_walk_r_0.png", 75).to("spritesheets/alien_walk_r_1.png", 75)
-    .to("spritesheets/alien_walk_r_2.png", 75).to("spritesheets/alien_walk_r_3.png", 75)
-    .to("spritesheets/alien_walk_r_4.png", 75).to("spritesheets/alien_walk_r_5.png", 75)
-    .to("spritesheets/alien_walk_r_6.png", 75).to("spritesheets/alien_walk_r_7.png", 75)
-    .to("spritesheets/alien_walk_r_8.png", 75));
+    .to("alien_walk_r_0.png", 75).to("alien_walk_r_1.png", 75)
+    .to("alien_walk_r_2.png", 75).to("alien_walk_r_3.png", 75)
+    .to("alien_walk_r_4.png", 75).to("alien_walk_r_5.png", 75)
+    .to("alien_walk_r_6.png", 75).to("alien_walk_r_7.png", 75)
+    .to("alien_walk_r_8.png", 75));
 
-  animations.set(AnimationState.IDLE_N, new AnimationSequence(true).to("spritesheets/alien_thrust_u_0.png", 750).to("spritesheets/alien_thrust_u_1.png", 75));
+  animations.set(AnimationState.IDLE_N, new AnimationSequence(true).to("alien_thrust_u_0.png", 750).to("alien_thrust_u_1.png", 75));
+  animations.set(AnimationState.IDLE_W, new AnimationSequence(true).to("alien_thrust_l_0.png", 750).to("alien_thrust_l_1.png", 75));
+  animations.set(AnimationState.IDLE_S, new AnimationSequence(true).to("alien_thrust_d_0.png", 750).to("alien_thrust_d_1.png", 75));
+  animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("alien_thrust_r_0.png", 750).to("alien_thrust_r_1.png", 75));
 
-  animations.set(AnimationState.IDLE_W, new AnimationSequence(true).to("spritesheets/alien_thrust_l_0.png", 750).to("spritesheets/alien_thrust_l_1.png", 75));
-
-  animations.set(AnimationState.IDLE_S, new AnimationSequence(true).to("spritesheets/alien_thrust_d_0.png", 750).to("spritesheets/alien_thrust_d_1.png", 75));
-
-  animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("spritesheets/alien_thrust_r_0.png", 750).to("spritesheets/alien_thrust_r_1.png", 75));
   let remap = new Map();
   remap.set(AnimationState.WALK_NW, AnimationState.WALK_W);
   remap.set(AnimationState.WALK_SW, AnimationState.WALK_W);
@@ -161,6 +135,14 @@ export function build_game(_level: number) {
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ExplicitMovement).updateYVelocity(5)));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ExplicitMovement).updateXVelocity(-5)));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ExplicitMovement).updateXVelocity(5)));
+
+  // TODO: Make some "collecting stuff"
+  // TODO: Make some "crafting"
+  // TODO: Make some "watering plants" (toss) (pirate_thrust) (pirate_walk)
+  // TODO: Make some "sword" (toss) (pirate_slash_s) (pirate_walk_s)
+  // TODO: Make some "invincibility"
+  // TODO: Persist across sessions
+  // TODO: Good stuff across "days"
 }
 
 // call the function that kicks off the game
