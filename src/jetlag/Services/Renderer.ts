@@ -48,6 +48,8 @@ export class RendererService {
   public suppressHitBoxes = false;
 
   /** The most recently-taken screenshot */
+  // TODO:  Welcome overlays have a flashing problem with the current screenshot
+  //        code
   public lastScreenshot?: PixiSprite;
 
   /**
