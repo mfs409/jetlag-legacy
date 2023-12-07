@@ -82,8 +82,17 @@ export class ImageLibraryService {
    */
   loadAssets(callback: () => void) {
     Assets.load(this.config.imageNames).then((textures) => {
-      for (let imgName of this.config.imageNames)
-        this.textures.set(imgName, textures[imgName])
+      for (let imgName of this.config.imageNames) {
+        // If we loaded a sprite sheet, then we need to deconstruct it to get
+        // all its image names.  Otherwise it's easy...
+        if (imgName.match(".json") != null) {
+          for (let o of Object.keys(textures[imgName].textures))
+            this.textures.set(o, textures[imgName].textures[o]);
+        }
+        else {
+          this.textures.set(imgName, textures[imgName]);
+        }
+      }
       callback();
     })
   }
