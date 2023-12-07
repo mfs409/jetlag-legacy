@@ -55,22 +55,22 @@ export function tut_animations(_level: number) {
   // Draw four walls, covering the four borders of the world
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: BoxBody.Box({ cx: 8, cy: .05, width: 16, height: .1 }),
+    rigidBody: new BoxBody({ cx: 8, cy: .05, width: 16, height: .1 }),
     role: new Obstacle(),
   });
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 8.95, width: 16, height: .1 }),
+    rigidBody: new BoxBody({ cx: 8, cy: 8.95, width: 16, height: .1 }),
     role: new Obstacle(),
   });
   Actor.Make({
     appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: BoxBody.Box({ cx: .05, cy: 4.5, width: .1, height: 9 }),
+    rigidBody: new BoxBody({ cx: .05, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
   });
   Actor.Make({
     appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: BoxBody.Box({ cx: 15.95, cy: 4.5, width: .1, height: 9 }),
+    rigidBody: new BoxBody({ cx: 15.95, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
   });
 
@@ -120,7 +120,7 @@ export function tut_animations(_level: number) {
   remap.set(AnimationState.IDLE_SE, AnimationState.IDLE_E);
 
   const hero = Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
+    rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
     role: new Hero(),
     movement: new ExplicitMovement(),

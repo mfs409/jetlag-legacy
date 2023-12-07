@@ -68,20 +68,20 @@ export function build_game(_level: number) {
   stage.tilt.tiltVelocityOverride = false;
 
   Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
+    rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
     appearance: new FilledBox({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
     role: new Obstacle(),
   })
 
   Actor.Make({
-    rigidBody: CircleBody.Circle({ cx: 5, cy: 2, radius: .5 }, stage.world),
+    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
     appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
     role: new Hero(),
     movement: new TiltMovement(),
   })
 
   Actor.Make({
-    rigidBody: PolygonBody.Polygon({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -.5, 0] }, stage.world),
+    rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -.5, 0] }, stage.world),
     appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
     role: new Obstacle(),
   })

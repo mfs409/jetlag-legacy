@@ -32,11 +32,11 @@ export function buildChooserScreen(index: number) {
   // Draw a brown box at the top of the screen, put some text in it
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: 2.3, fillColor: "#523216" }),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 1.15, width: 16, height: 2.3 }, stage.world, { collisionsEnabled: false }),
+    rigidBody: new BoxBody({ cx: 8, cy: 1.15, width: 16, height: 2.3 }, stage.world, { collisionsEnabled: false }),
   });
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 120, color: "#FFFFFF" }, "Choose a Level"),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 1.15, width: .1, height: .1 }),
+    rigidBody: new BoxBody({ cx: 8, cy: 1.15, width: .1, height: .1 }),
   });
 
   // We'll have margins of 1.25 on the left and right, a margin of 1 on
@@ -72,7 +72,7 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   let cfg = { cx: x + width / 2, cy: y + height / 2, width: width, height: height, img: "level_tile.png" };
   let tile = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: BoxBody.Box(cfg, stage.world),
+    rigidBody: new BoxBody(cfg, stage.world),
   });
 
   // attach a callback and print the level number with a touchCallback, and then put text on top of it
@@ -82,7 +82,7 @@ function drawLevelButton(x: number, y: number, width: number, height: number, wh
   tile.gestures = { tap };
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => whichLevel + ""),
-    rigidBody: BoxBody.Box(cfg, stage.world, { collisionsEnabled: false }),
+    rigidBody: new BoxBody(cfg, stage.world, { collisionsEnabled: false }),
   });
 }
 
@@ -100,7 +100,7 @@ function drawPrevButton(x: number, y: number, width: number, height: number, cho
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
     appearance: img,
-    rigidBody: BoxBody.Box(cfg, stage.world),
+    rigidBody: new BoxBody(cfg, stage.world),
   });
   let tap = () => {
     stage.switchTo(buildChooserScreen, chooserLevel);
@@ -123,7 +123,7 @@ function drawNextButton(x: number, y: number, width: number, height: number, cho
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
     appearance: img,
-    rigidBody: BoxBody.Box(cfg, stage.world),
+    rigidBody: new BoxBody(cfg, stage.world),
   });
   let tap = () => {
     stage.switchTo(buildChooserScreen, chooserLevel);
@@ -145,7 +145,7 @@ function drawSplashButton(x: number, y: number, width: number, height: number) {
   let img = new ImageSprite(cfg);
   let btn = Actor.Make({
     appearance: img,
-    rigidBody: BoxBody.Box(cfg, stage.world),
+    rigidBody: new BoxBody(cfg, stage.world),
   });
   let tap = () => {
     stage.switchTo(buildSplashScreen, 1);

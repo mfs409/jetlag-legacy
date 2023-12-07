@@ -37,72 +37,72 @@ export function buildHelpScreen(level: number) {
     // put some information and pictures on the screen
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, }, "The levels of this game demonstrate JetLag features"),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 1, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 8, cy: 1, width: .1, height: .1 }),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "green_ball.png" }),
-      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 2.5, radius: 0.375 }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 2.5, radius: 0.375 }),
     });
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "You control the hero"),
-      rigidBody: BoxBody.Box({ cx: 1.5, cy: 2.25, width: .1, height: .1, }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 2.25, width: .1, height: .1, }),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "blue_ball.png" }),
-      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 3.5, radius: 0.375 }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 3.5, radius: 0.375 }),
     });
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Collect these goodies"),
-      rigidBody: BoxBody.Box({ cx: 1.5, cy: 3.25, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 3.25, width: .1, height: .1 }),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "red_ball.png" }),
-      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 4.5, radius: 0.375 }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 4.5, radius: 0.375 }),
     });
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Avoid or defeat enemies"),
-      rigidBody: BoxBody.Box({ cx: 1.5, cy: 4.25, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 4.25, width: .1, height: .1 }),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "mustard_ball.png" }),
-      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 5.5, radius: 0.375 }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 5.5, radius: 0.375 }),
     });
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Reach the destination"),
-      rigidBody: BoxBody.Box({ cx: 1.5, cy: 5.25, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 5.25, width: .1, height: .1 }),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
-      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 6.5, radius: 0.375 }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 6.5, radius: 0.375 }),
     });
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "These are walls"),
-      rigidBody: BoxBody.Box({ cx: 1.5, cy: 6.25, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 6.25, width: .1, height: .1 }),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "grey_ball.png" }),
-      rigidBody: CircleBody.Circle({ cx: 0.75, cy: 7.5, radius: 0.375 }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 7.5, radius: 0.375 }),
     });
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Throw projectiles"),
-      rigidBody: BoxBody.Box({ cx: 1.5, cy: 7.25, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 7.25, width: .1, height: .1 }),
     });
 
     Actor.Make({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#FFFFFF", size: 24 }, "(All image files are stored in the assets folder)"),
-      rigidBody: BoxBody.Box({ cx: 11, cy: 8.5, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 11, cy: 8.5, width: .1, height: .1 }),
     });
 
     // Tap anywhere to go to the next screen
     Actor.Make({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }), // the fourth "00" is the alpha channel, for invisibility
-      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
       gestures: { tap: () => { stage.switchTo(buildHelpScreen, 2); return true; } }
     });
   }
@@ -112,7 +112,7 @@ export function buildHelpScreen(level: number) {
     stage.backgroundColor = "#19698e";
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56 }, "Read, Write, Play"),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 1, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 8, cy: 1, width: .1, height: .1 }),
     });
     let big_text = `As you play through the levels of the sample game, be sure to read the code that accompanies
 each world.  The levels aren't meant to be "hard", or even really "fun".  They are meant to show
@@ -128,13 +128,13 @@ Start with the "Levels.ts" file in the "src/game" folder, then move on to other 
 until you have a plan for how to build your next game.`;
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 32 }, big_text),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 5, width: .1, height: .1 }),
+      rigidBody: new BoxBody({ cx: 8, cy: 5, width: .1, height: .1 }),
     });
 
     // Tap anywhere to go back to the splash screen
     Actor.Make({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
       gestures: { tap: () => { stage.switchTo(buildSplashScreen, 2); return true; } }
     });
   }

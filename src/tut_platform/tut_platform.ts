@@ -117,7 +117,7 @@ export function tut_platform(_level: number) {
 
   let h = Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
-    rigidBody: PolygonBody.Polygon({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
+    rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
     movement: new ExplicitMovement(),
     role: new Hero()
   });
@@ -134,7 +134,7 @@ export function tut_platform(_level: number) {
 
   Actor.Make({
     appearance: new FilledCircle({ radius: 0.4, fillColor: "#ff7575" }),
-    rigidBody: CircleBody.Circle({ cx: 31, cy: 8.25, radius: 0.4, }, stage.world),
+    rigidBody: new CircleBody({ cx: 31, cy: 8.25, radius: 0.4, }, stage.world),
     role: new Destination(),
   });
 
@@ -150,7 +150,7 @@ export function tut_platform(_level: number) {
   let projectiles = new ActorPoolSystem();
   populateProjectilePool(projectiles, {
     size: 100, strength: 1, range: 16, immuneToCollisions: true, disappearOnCollide: true, // gravityAffectsProjectiles: false,
-    bodyMaker: () => CircleBody.Circle({ radius: 0.125, cx: -100, cy: -100 }, stage.world, { density: 0.01, elasticity: 1 }),
+    bodyMaker: () => new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, stage.world, { density: 0.01, elasticity: 1 }),
     appearanceMaker: () => new FilledCircle({ radius: 0.125, fillColor: "#777777", z: 0 }),
   });
 
@@ -164,19 +164,19 @@ export function tut_platform(_level: number) {
 
   Actor.Make({
     appearance: new FilledBox({ width: 2, height: .2, fillColor: "#444444" }),
-    rigidBody: BoxBody.Box({ width: 2, height: .2, cx: 3, cy: 7.4 }),
+    rigidBody: new BoxBody({ width: 2, height: .2, cx: 3, cy: 7.4 }),
     role: new Obstacle(),
   })
 
   Actor.Make({
     appearance: new FilledBox({ width: 2, height: .2, fillColor: "#444444" }),
-    rigidBody: BoxBody.Box({ width: 2, height: .2, cx: 7, cy: 5.4 }),
+    rigidBody: new BoxBody({ width: 2, height: .2, cx: 7, cy: 5.4 }),
     role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
   })
 
   Actor.Make({
     appearance: new FilledBox({ width: 4, height: .2, fillColor: "#444444" }),
-    rigidBody: BoxBody.Box({ width: 4, height: .2, cx: 13, cy: 3.4 }),
+    rigidBody: new BoxBody({ width: 4, height: .2, cx: 13, cy: 3.4 }),
     role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
   })
 
@@ -186,7 +186,7 @@ export function tut_platform(_level: number) {
   for (let cx of [11.5, 12.5, 13.5, 14.5]) {
     Actor.Make({
       appearance: new AnimatedSprite({ width: .5, height: .5, animations }),
-      rigidBody: CircleBody.Circle({ radius: .25, cx, cy: 3.05 }),
+      rigidBody: new CircleBody({ radius: .25, cx, cy: 3.05 }),
       role: new Goodie(),
     });
   }
@@ -194,12 +194,12 @@ export function tut_platform(_level: number) {
   // HUD Coin Counter
   Actor.Make({
     appearance: new AnimatedSprite({ width: .5, height: .5, animations }),
-    rigidBody: CircleBody.Circle({ radius: .15, cx: 14.5, cy: 0.5 }, stage.hud),
+    rigidBody: new CircleBody({ radius: .15, cx: 14.5, cy: 0.5 }, stage.hud),
     role: new Goodie(),
   });
   Actor.Make({
     appearance: new TextSprite({ center: false, face: "Arial", size: 36, color: "#ffffff" }, () => "x " + stage.score.getGoodieCount(0)),
-    rigidBody: CircleBody.Circle({ radius: .01, cx: 15, cy: 0.25 }, stage.hud),
+    rigidBody: new CircleBody({ radius: .01, cx: 15, cy: 0.25 }, stage.hud),
     role: new Goodie(),
   });
 
@@ -223,7 +223,7 @@ export function tut_platform(_level: number) {
   // Enemy to defeat
   Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
-    rigidBody: PolygonBody.Polygon({ cx: 14.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
+    rigidBody: new PolygonBody({ cx: 14.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
     movement: new PathMovement(new Path().to(14.5, 8.1).to(18.5, 8.1).to(14.5, 8.1), 2.5, true),
     role: new Enemy()
   });
@@ -235,7 +235,7 @@ export function tut_platform(_level: number) {
     Actor.Make({
       appearance: _screenshot,
       // appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
       gestures: {
         tap: () => {
           stage.clearOverlay();
@@ -246,14 +246,14 @@ export function tut_platform(_level: number) {
     });
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", size: 44, color: "#FFFFFF" }, "Great Job!"),
-      rigidBody: CircleBody.Circle({ cx: 8, cy: 4.5, radius: .1 }, overlay),
+      rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .1 }, overlay),
     });
   };
 
   stage.score.loseSceneBuilder = (overlay: Scene, screenshot: ImageSprite) => {
     Actor.Make({
       appearance: screenshot,
-      rigidBody: BoxBody.Box({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
       gestures: {
         tap: () => {
           stage.clearOverlay();
@@ -264,7 +264,7 @@ export function tut_platform(_level: number) {
     });
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", size: 44, color: "#FFFFFF" }, "Try Again"),
-      rigidBody: CircleBody.Circle({ cx: 8, cy: 4.5, radius: .1 }, overlay),
+      rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .1 }, overlay),
     });
   };
 
@@ -291,7 +291,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
   let floor = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    rigidBody: new BoxBody(cfg, stage.world, physicsCfg),
     role: new Obstacle(),
   });
   (floor.role as Obstacle).onProjectileCollision = () => false;
@@ -301,7 +301,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   // cfg.cy -= (thickness + Math.abs(y0 - y1));// = { box: true, cx: x0 + width / 2, cy: y0 - height / 2 + .5, width, height, img: "" };
   // Actor.Make({
   //   appearance: new ImageSprite(cfg),
-  //   rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+  //   rigidBody: new BoxBody(cfg, stage.world, physicsCfg),
   //   role: new Obstacle({ jumpReEnableSides: [] }),
   // });
 
@@ -310,7 +310,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
   Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    rigidBody: new BoxBody(cfg, stage.world, physicsCfg),
     role: new Obstacle({ jumpReEnableSides: [] }),
   });
 
@@ -318,7 +318,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   cfg.cx -= (thickness + Math.abs(x0 - x1));
   Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: BoxBody.Box(cfg, stage.world, physicsCfg),
+    rigidBody: new BoxBody(cfg, stage.world, physicsCfg),
     role: new Obstacle({ jumpReEnableSides: [] }),
   });
 }

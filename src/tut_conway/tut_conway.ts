@@ -106,31 +106,31 @@ export function tut_conway(level: number) {
 
   // Make the UI
   Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 6, cy: 42.5, width: 10, height: 4 }, stage.hud),
+    rigidBody: new BoxBody({ cx: 6, cy: 42.5, width: 10, height: 4 }, stage.hud),
     appearance: new TextSprite({ center: true, face: "Arial", size: 36, color: "#000000" }, () => sim_running ? "Running" : "Paused"),
     gestures: { tap: () => { sim_running = !sim_running; return true; } }
   });
 
   Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 18, cy: 42.5, width: 10, height: 4 }, stage.hud),
+    rigidBody: new BoxBody({ cx: 18, cy: 42.5, width: 10, height: 4 }, stage.hud),
     appearance: new TextSprite({ center: true, face: "Arial", size: 36, color: "#000000" }, () => mod_mode ? "wrap: ON" : "wrap: OFF"),
     gestures: { tap: () => { if (!sim_running) mod_mode = !mod_mode; return true; } }
   });
 
   Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 30, cy: 42.5, width: 10, height: 4 }, stage.hud),
+    rigidBody: new BoxBody({ cx: 30, cy: 42.5, width: 10, height: 4 }, stage.hud),
     appearance: new TextSprite({ center: true, face: "Arial", size: 36, color: "#000000" }, () => "Speed: " + (SPEED_MAX - speed_limit)),
     gestures: { tap: () => { speed_limit = (speed_limit + SPEED_MAX - 1) % SPEED_MAX; return true; } }
   });
 
   Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 42, cy: 42.5, width: 10, height: 4 }, stage.hud),
+    rigidBody: new BoxBody({ cx: 42, cy: 42.5, width: 10, height: 4 }, stage.hud),
     appearance: new TextSprite({ center: true, face: "Arial", size: 36, color: "#000000" }, () => "Level: " + level),
     gestures: { tap: () => { stage.switchTo(tut_conway, next_level); return true; } }
   });
 
   Actor.Make({
-    rigidBody: BoxBody.Box({ cx: 49, cy: 41.6, width: .1, height: .1 }, stage.hud),
+    rigidBody: new BoxBody({ cx: 49, cy: 41.6, width: .1, height: .1 }, stage.hud),
     appearance: new TextSprite({ center: false, face: "Arial", size: 36, color: "#000000" }, () => names[level - 1]),
   });
 
@@ -145,7 +145,7 @@ export function tut_conway(level: number) {
     let cols = [] as Actor[];
     for (let col = 0; col < COLS; ++col) {
       let cell = Actor.Make({
-        rigidBody: BoxBody.Box({ cx: col + .5, cy: row + .5, width: 1, height: 1 }),
+        rigidBody: new BoxBody({ cx: col + .5, cy: row + .5, width: 1, height: 1 }),
         appearance: new FilledBox({ width: 1, height: 1, fillColor: "#FFFFFF" }),
         gestures: {
           tap: () => {

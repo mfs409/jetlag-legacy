@@ -50,7 +50,7 @@ function tut_jetlag_tour(level: number) {
         // Make a hero, let the camera follow it
         let h = Actor.Make({
             appearance: new FilledPolygon({ vertices: [0, -.5, .25, .5, -.25, .5], fillColor: "#0000ff", lineWidth: 3, lineColor: "#000044", z: 1 }),
-            rigidBody: PolygonBody.Polygon({ cx: 8, cy: 4.5, vertices: [0, -.5, .25, .5, -.25, .5] }, stage.world, { collisionsEnabled: false }),
+            rigidBody: new PolygonBody({ cx: 8, cy: 4.5, vertices: [0, -.5, .25, .5, -.25, .5] }, stage.world, { collisionsEnabled: false }),
             role: new Hero({ strength: 1 }),
             movement: new ExplicitMovement(),
         });
@@ -65,7 +65,7 @@ function tut_jetlag_tour(level: number) {
         // Set up projectiles
         let projectiles = new ActorPoolSystem();
         populateProjectilePool(projectiles, {
-            size: 20, strength: 1, disappearOnCollide: true, bodyMaker: () => CircleBody.Circle({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
+            size: 20, strength: 1, disappearOnCollide: true, bodyMaker: () => new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
             appearanceMaker: () => new FilledCircle({ radius: .125, fillColor: "#bbbbbb", z: 0 }), range: 10, immuneToCollisions: true,
         });
 
@@ -86,7 +86,7 @@ function tut_jetlag_tour(level: number) {
             let sx = 9 * Math.sin(angle) + hx, sy = 9 * Math.cos(angle) + hy;
             Actor.Make({
                 appearance: new FilledCircle({ radius: .5, fillColor: "#F01100" }),
-                rigidBody: CircleBody.Circle({ cx: sx, cy: sy, radius: .5 }, stage.world),
+                rigidBody: new CircleBody({ cx: sx, cy: sy, radius: .5 }, stage.world),
                 role: new Enemy({ damage: 1 }),
                 movement: new PathMovement(new Path().to(sx, sy).to(hx, hy), 3, false),
             });
@@ -115,29 +115,29 @@ function tut_jetlag_tour(level: number) {
         // Draw four walls, covering the four borders of the world
         Actor.Make({
             appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
-            rigidBody: BoxBody.Box({ cx: 16, cy: .05, width: 32, height: .1 }),
+            rigidBody: new BoxBody({ cx: 16, cy: .05, width: 32, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
             appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
-            rigidBody: BoxBody.Box({ cx: 16, cy: 8.95, width: 32, height: .1 }),
+            rigidBody: new BoxBody({ cx: 16, cy: 8.95, width: 32, height: .1 }),
             role: new Obstacle(),
         });
         Actor.Make({
             appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: BoxBody.Box({ cx: .05, cy: 4.5, width: .1, height: 9 }),
+            rigidBody: new BoxBody({ cx: .05, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
         Actor.Make({
             appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-            rigidBody: BoxBody.Box({ cx: 31.95, cy: 4.5, width: .1, height: 9 }),
+            rigidBody: new BoxBody({ cx: 31.95, cy: 4.5, width: .1, height: 9 }),
             role: new Obstacle(),
         });
 
         // Make a hero, let the camera follow it
         let h = Actor.Make({
             appearance: new FilledCircle({ radius: .75, fillColor: "#0000ff", lineWidth: 3, lineColor: "#000044" }),
-            rigidBody: CircleBody.Circle({ cx: 3, cy: 3, radius: .75 }),
+            rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .75 }),
             role: new Hero(),
             movement: new ExplicitMovement(),
             gestures: { tap: () => { (h.movement as ExplicitMovement).updateYVelocity(-8); return true; } },
@@ -153,7 +153,7 @@ function tut_jetlag_tour(level: number) {
         // Make a destination
         Actor.Make({
             appearance: new FilledCircle({ radius: .5, fillColor: "#00ff00", lineWidth: 3, lineColor: "#004400" }),
-            rigidBody: CircleBody.Circle({ cx: 31, cy: 6, radius: .5 }),
+            rigidBody: new CircleBody({ cx: 31, cy: 6, radius: .5 }),
             role: new Destination(),
             movement: new ExplicitMovement(),
         });
@@ -161,11 +161,11 @@ function tut_jetlag_tour(level: number) {
         // Draw a box, and write a timer on it.  Both go on the HUD
         Actor.Make({
             appearance: new FilledBox({ width: .75, height: .75, fillColor: "#eeeeee", lineWidth: 3, lineColor: "#000000" }),
-            rigidBody: BoxBody.Box({ cx: 8, cy: .75, width: .75, height: .75 }, stage.hud),
+            rigidBody: new BoxBody({ cx: 8, cy: .75, width: .75, height: .75 }, stage.hud),
         });
         Actor.Make({
             appearance: new TextSprite({ center: true, face: "Arial", color: "#444444", size: 48 }, () => (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0)),
-            rigidBody: BoxBody.Box({ cx: 8, cy: .75, width: 1.8, height: 1 }, stage.hud),
+            rigidBody: new BoxBody({ cx: 8, cy: .75, width: 1.8, height: 1 }, stage.hud),
         });
 
         // Set up the score

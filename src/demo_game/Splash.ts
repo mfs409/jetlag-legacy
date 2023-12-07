@@ -31,36 +31,36 @@ export function buildSplashScreen(_level: number) {
   // Draw a brown box at the top of the screen, put some text in it
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: 3, fillColor: "#523216" }),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 1.5, width: 16, height: 3 }),
+    rigidBody: new BoxBody({ cx: 8, cy: 1.5, width: 16, height: 3 }),
   });
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 120, color: "#FFFFFF" }, "JetLag Demo"),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 1.25, width: .1, height: .1 }),
+    rigidBody: new BoxBody({ cx: 8, cy: 1.25, width: .1, height: .1 }),
   });
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 56, color: "#FFFFFF" }, "2D Games for Web and Mobile"),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 2.4, width: .1, height: .1 }),
+    rigidBody: new BoxBody({ cx: 8, cy: 2.4, width: .1, height: .1 }),
   });
 
   // Draw some text.  Tapping its *rigidBody* will go to the first page of the
   // level chooser
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 96, color: "#000000" }, "Play"),
-    rigidBody: BoxBody.Box({ cx: 8, cy: 5.625, width: 2.5, height: 1.25 }),
+    rigidBody: new BoxBody({ cx: 8, cy: 5.625, width: 2.5, height: 1.25 }),
     gestures: { tap: () => { stage.switchTo(buildChooserScreen, 1); return true; } }
   });
 
   // Make some text for going to the help screen
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 72, color: "#000000" }, "Help"),
-    rigidBody: BoxBody.Box({ cx: 3.2, cy: 6.15, width: 1.8, height: 0.9 }),
+    rigidBody: new BoxBody({ cx: 3.2, cy: 6.15, width: 1.8, height: 0.9 }),
     gestures: { tap: () => { stage.switchTo(buildHelpScreen, 1); return true; } }
   });
 
   // Make a quit button
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 72, color: "#000000" }, "Quit"),
-    rigidBody: BoxBody.Box({ cx: 12.75, cy: 6.15, width: 1.8, height: 0.9 }),
+    rigidBody: new BoxBody({ cx: 12.75, cy: 6.15, width: 1.8, height: 0.9 }),
     gestures: { tap: () => { stage.exit(); return true; } }
   });
 
@@ -68,7 +68,7 @@ export function buildSplashScreen(_level: number) {
   let cfg = { box: true, cx: 15, cy: 8, width: 0.75, height: 0.75, img: "audio_off.png" };
   let mute = Actor.Make({
     appearance: new ImageSprite(cfg),
-    rigidBody: BoxBody.Box(cfg, stage.world),
+    rigidBody: new BoxBody(cfg, stage.world),
   });
   // If the game is not muted, switch the image
   if (getVolume())

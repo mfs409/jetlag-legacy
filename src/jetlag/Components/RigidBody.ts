@@ -12,7 +12,7 @@ import { PhysicsCfg, Sides } from "../Config";
  */
 abstract class RigidBodyBase {
   /** A debug context for drawing the "hit box" */
-  readonly debug: DebugSprite | undefined;
+  public debug: DebugSprite | undefined;
   /** A definition for when we attach a revolute joint to this entity */
   revJointDef?: b2RevoluteJointDef;
   /** A joint that allows this entity to revolve around another */
@@ -27,17 +27,17 @@ abstract class RigidBodyBase {
   singleRigidSide?: Sides;
   /** A joint for fusing entities together when one is "sticky" */
   public distJoint?: b2DistanceJoint;
+  /** The physics body */
+  public body!: b2Body;
+  /** Radius of a circumscribed circle, for culling */
+  public radius!: number;
 
   /**
-   * Create a rigid body
+   * Construct a RigidBody
    *
-   * @param scene       The physics world where this body exists
-   * @param body        The physics body
-   * @param radius      The radius of a circumscribed circle, for culling
+   * @param scene The physics world where this body exists
    */
-  protected constructor(readonly scene: Scene, readonly body: b2Body, public radius: number) {
-    if (stage.config.hitBoxes) this.debug = new DebugSprite();
-  }
+  protected constructor(readonly scene: Scene) { }
 
   /**
    * Create a revolute joint between this entity and some other entity. Note that
@@ -322,26 +322,10 @@ abstract class RigidBodyBase {
 
 /** A rigid body whose underlying shape is a circle */
 export class CircleBody extends RigidBodyBase {
-  /** Radius */
-  r: number;
   /** Width of the circle */
   w: number;
   /** Height of the circle */
   h: number;
-
-  /**
-   * Construct a CircleBody
-   *
-   * @param scene       The scene where the body should be created
-   * @param body        The underlying Box2D body
-   * @param circleCfg   Shape information for the circle
-   */
-  private constructor(scene: Scene, body: b2Body, circleCfg: { cx: number, cy: number, radius: number }) {
-    super(scene, body, circleCfg.radius);
-    this.w = 2 * circleCfg.radius;
-    this.h = 2 * circleCfg.radius;
-    this.r = circleCfg.radius;
-  }
 
   /**
    * Construct a CircleBody
@@ -380,15 +364,20 @@ export class CircleBody extends RigidBodyBase {
    *
    * @returns A rigid body with a Circle shape
    */
-  public static Circle(shapeCfg: { cx: number, cy: number, radius: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
-    let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: shapeCfg.cx, y: shapeCfg.cy } });
-    let rb = new CircleBody(scene, body, shapeCfg);
+  constructor(circleCfg: { cx: number, cy: number, radius: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+    super(scene);
+    let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: circleCfg.cx, y: circleCfg.cy } });
+    this.body = body;
+    this.radius = circleCfg.radius;
+    if (stage.config.hitBoxes) this.debug = new DebugSprite();
+    this.w = 2 * circleCfg.radius;
+    this.h = 2 * circleCfg.radius;
+
     let shape = new b2CircleShape();
-    shape.m_radius = shapeCfg.radius;
-    rb.body.CreateFixture({ shape });
-    rb.setPhysics(1, 0, 0);
-    rb.updatePhysics(physicsCfg);
-    return rb;
+    shape.m_radius = circleCfg.radius;
+    this.body.CreateFixture({ shape });
+    this.setPhysics(1, 0, 0);
+    this.updatePhysics(physicsCfg);
   }
 
   /**
@@ -436,20 +425,6 @@ export class BoxBody extends RigidBodyBase {
   /**
    * Construct a BoxBody
    *
-   * @param scene       The scene where the body should be created
-   * @param body        The underlying Box2D body
-   * @param boxCfg      Shape information for the box
-   * @param physicsCfg  Optional physics configuration
-   */
-  private constructor(scene: Scene, body: b2Body, boxCfg: { cx: number, cy: number, width: number, height: number }) {
-    super(scene, body, Math.sqrt(Math.pow(boxCfg.height / 2, 2) + Math.pow(boxCfg.width / 2, 2)));
-    this.w = boxCfg.width;
-    this.h = boxCfg.height;
-  }
-
-  /**
-   * Construct a BoxBody
-   *
    *
    * @param boxCfg                        The basic shape configuration for the
    *                                      box
@@ -485,15 +460,19 @@ export class BoxBody extends RigidBodyBase {
    *
    * @returns A rigid body with a Box shape
    */
-  public static Box(boxCfg: { cx: number, cy: number, width: number, height: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+  constructor(boxCfg: { cx: number, cy: number, width: number, height: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+    super(scene);
     let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: boxCfg.cx, y: boxCfg.cy } });
-    let rb = new BoxBody(scene, body, boxCfg);
+    this.body = body;
+    this.radius = Math.sqrt(Math.pow(boxCfg.height / 2, 2) + Math.pow(boxCfg.width / 2, 2))
+    if (stage.config.hitBoxes) this.debug = new DebugSprite();
+    this.w = boxCfg.width;
+    this.h = boxCfg.height;
     let shape = new b2PolygonShape();
-    shape.SetAsBox(rb.w / 2, rb.h / 2);
-    rb.body.CreateFixture({ shape });
-    rb.setPhysics(1, 0, 0);
-    rb.updatePhysics(physicsCfg);
-    return rb;
+    shape.SetAsBox(this.w / 2, this.h / 2);
+    this.body.CreateFixture({ shape });
+    this.setPhysics(1, 0, 0);
+    this.updatePhysics(physicsCfg);
   }
 
   /**
@@ -543,29 +522,6 @@ export class PolygonBody extends RigidBodyBase {
   /**
    * Construct a PolygonBody
    *
-   * @param scene       The scene where the body should be created
-   * @param body        The underlying Box2D body
-   * @param polyCfg     Shape information for the polygon
-   * @param radius      The length of the circumscribing radius
-   * @param physicsCfg  Optional physics configuration
-   */
-  private constructor(scene: Scene, body: b2Body, polyCfg: { cx: number, cy: number, vertices: number[], }, radius: number) {
-    super(scene, body, radius)
-    // Transform the vertices into Box2D points, and also compute the polygon's
-    // maximum x and y distances, for computing the culling dimensions
-    let absMaxX = 0, absMaxY = 0;
-    for (let i = 0; i < polyCfg.vertices.length; i += 2) {
-      this.vertArray[i / 2] = new b2Vec2(polyCfg.vertices[i], polyCfg.vertices[i + 1]);
-      absMaxX = Math.max(absMaxX, Math.abs(this.vertArray[i / 2].x))
-      absMaxY = Math.max(absMaxY, Math.abs(this.vertArray[i / 2].y))
-    }
-    this.w = 2 * absMaxX;
-    this.h = 2 * absMaxY;
-  }
-
-  /**
-   * Construct a PolygonBody
-   *
    *
    * @param polygonCfg                    The basic shape configuration for the
    *                                      polygon
@@ -602,19 +558,33 @@ export class PolygonBody extends RigidBodyBase {
    *
    * @returns A rigid body with a Polygon shape
    */
-  public static Polygon(polygonCfg: { cx: number, cy: number, vertices: number[] }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+  constructor(polygonCfg: { cx: number, cy: number, vertices: number[] }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+    super(scene);
     let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: polygonCfg.cx, y: polygonCfg.cy } });
     // Compute the radius of the circumscribing circle
     let r = 0;
     for (let i = 0; i < polygonCfg.vertices.length; i += 2)
       r = Math.max(r, Math.pow(polygonCfg.vertices[i], 2), + Math.pow(polygonCfg.vertices[i + 1], 2));
-    let rb = new PolygonBody(scene, body, polygonCfg, Math.sqrt(r));
+
+    if (stage.config.hitBoxes) this.debug = new DebugSprite();
+    // Transform the vertices into Box2D points, and also compute the polygon's
+    // maximum x and y distances, for computing the culling dimensions
+    let absMaxX = 0, absMaxY = 0;
+    for (let i = 0; i < polygonCfg.vertices.length; i += 2) {
+      this.vertArray[i / 2] = new b2Vec2(polygonCfg.vertices[i], polygonCfg.vertices[i + 1]);
+      absMaxX = Math.max(absMaxX, Math.abs(this.vertArray[i / 2].x))
+      absMaxY = Math.max(absMaxY, Math.abs(this.vertArray[i / 2].y))
+    }
+    this.w = 2 * absMaxX;
+    this.h = 2 * absMaxY;
+
+    this.body = body;
+    this.radius = Math.sqrt(r);
     let shape = new b2PolygonShape();
-    shape.Set(rb.vertArray);
-    rb.body.CreateFixture({ shape });
-    rb.setPhysics(1, 0, 0);
-    rb.updatePhysics(physicsCfg);
-    return rb;
+    shape.Set(this.vertArray);
+    this.body.CreateFixture({ shape });
+    this.setPhysics(1, 0, 0);
+    this.updatePhysics(physicsCfg);
   }
 
   /**
