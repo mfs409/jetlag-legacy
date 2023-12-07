@@ -15,7 +15,7 @@ export class DemoGameConfig implements GameConfig {
   // When you deploy your game, you'll want to change all of these
   canVibrate = true;
   forceAccelerometerOff = true;
-  storageKey = "com.me.my_jetlag_game.storage";
+  storageKey = "--no-key--";
   hitBoxes = true;
 
   // Here's where we name all the images/sounds/background music files.  You'll

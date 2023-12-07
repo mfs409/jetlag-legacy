@@ -14,7 +14,7 @@ reach down into the full power of Pixi.js and Box2D when you need to.
 
 The following picture gives a sense for how everything fits together:
 
-![JetLag, Pixi.js, and Box2D](tut_jetlag_tour/layers.png)
+![JetLag, Pixi.js, and Box2D](tut_overview/layers.png)
 
 At the top-most level, JetLag provides Components, Entities, Services, Systems,
 and a Stage, which represent the key parts of your game.  We're going to discuss
@@ -33,7 +33,7 @@ features visible.  One important aspect of this design is that your code can
 evolve over time, gradually using more and more of Box2D and Pixi.js.  This
 design will help you to avoid the problem illustrated in the next picture:
 
-![Avoiding the Complexity Cliff](tut_jetlag_tour/cliff.png)
+![Avoiding the Complexity Cliff](tut_overview/cliff.png)
 
 Before we start the tour, there is one more important topic to discuss.  If
 you're looking at that first picture and thinking "I don't want my game to run
@@ -197,7 +197,7 @@ works is by imagining that there is a camera filming your world.  The camera
 should follow the action, zoomed in on the most important part.  The following
 picture can be helpful in understanding the idea:
 
-![The Camera and the World](tut_jetlag_tour/camera.png)
+![The Camera and the World](tut_overview/camera.png)
 
 In the picture, the shape with the red outline is the world.  The shape with the purple outline is the camera.  The blue dotted lines show a projection from the world onto the camera, so that we can see just a portion of the world at any time.
 
@@ -208,7 +208,7 @@ visible all the time.
 
 ## Putting It All Together: Our First "Game"
 
-![Our First Game](tut_jetlag_tour/grid.png)
+![Our First Game](tut_overview/grid.png)
 
 
 In LibLOL, the coordinate system starts in the bottom left corner.  So (0, 0) is bottom left, and as we move up and to the right, the y and x values get larger, respectively.

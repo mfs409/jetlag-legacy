@@ -25,7 +25,7 @@ class TutMazeGameConfig implements GameConfig {
     canVibrate = false;
     forceAccelerometerOff = true;
     // This game does not use any local persistent storage
-    storageKey = "";
+    storageKey = "--no-key--";
     // For now, we're in debug mode, so print console messages and show hitboxes
     hitBoxes = true;
 

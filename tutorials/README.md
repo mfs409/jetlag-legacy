@@ -29,7 +29,7 @@ To make a new tutorial, please follow these steps:
 This tutorial is not about what JetLag is or how JetLag works.  It is just about
 how to get JetLag running on your computer.
 
-### A Quick Tour
+### An Overview of JetLag
 
 This tutorial gives a quick tour of the key ideas in JetLag.  It introduces the
 key ideas: a physics simulator, a graphics engine, a camera, actors, and events.
@@ -48,8 +48,8 @@ win and lose scenes, and encourages thinking about "when things run".
 ### Assets, Audio, and Animations
 
 This tutorial focuses on the key asset types in JetLag: images, sounds, and
-sprite sheets.  It also discusses the `index.html` file and how to get different
-fonts into your game.
+sprite sheets.  It briefly discusses texture packing.  It also discusses the
+`index.html` file and how to get different fonts into your game.
 
 ### Introduction to Simulation: Conway's Game of Life
 
