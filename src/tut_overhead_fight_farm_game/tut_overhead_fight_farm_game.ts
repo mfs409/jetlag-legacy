@@ -202,7 +202,7 @@ export function tut_overhead_fight_farm_game(level: number) {
               rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, overlay),
               appearance: new TextSprite({ face: "Arial", size: 36, color: "#FFFFFF", center: true }, "Good Night..."),
             });
-          });
+          }, false);
         }
       })
     })
@@ -415,7 +415,7 @@ export function tut_overhead_fight_farm_game(level: number) {
               rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, overlay),
               appearance: new TextSprite({ face: "Arial", size: 36, color: "#FFFFFF", center: true }, "Good Night..."),
             });
-          });
+          }, false);
         }
       })
     })

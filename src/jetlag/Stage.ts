@@ -89,22 +89,28 @@ export class Stage {
    * It's something that goes on top of everything else, and prevents the game
    * from playing, such as a pause scene, a win/lose scene, or a welcome scene.
    *
-   * NB:  The overlay will not show until the renderer grabs a screenshot.  This
-   *      can take a render cycle or two.
-   *
-   * @param builder Code for creating the overlay
+   * @param builder           Code for creating the overlay
+   * @param requestScreenshot Should the overlay delay for a cycle or two, so a
+   *                          screenshot can be taken first?
    */
-  public requestOverlay(builder: (overlay: Scene, screenshot: ImageSprite) => void) {
-    // clear the last screenshot, so that we'll get one on the next attempt
-    if (this.renderer.lastScreenshot) {
-      this.renderer.lastScreenshot.destroy(true);
-      this.renderer.lastScreenshot = undefined;
+  public requestOverlay(builder: (overlay: Scene, screenshot?: ImageSprite) => void, requestScreenshot: boolean) {
+    if (!requestScreenshot) {
+      this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
+      builder(this.overlay, undefined);
+      return;
     }
 
+    // clear the last screenshot, request a new one
+    if (this.renderer.mostRecentScreenShot) {
+      this.renderer.mostRecentScreenShot.destroy(true);
+      this.renderer.mostRecentScreenShot = undefined;
+    }
+    this.renderer.screenshotRequested = true;
+
     let action = () => {
-      if (this.renderer.lastScreenshot) {
+      if (this.renderer.mostRecentScreenShot) {
         let screenshot = new ImageSprite({ width: 16, height: 9, img: "", z: -2 });
-        screenshot.overrideImage(this.renderer.lastScreenshot);
+        screenshot.overrideImage(this.renderer.mostRecentScreenShot);
         this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
         builder(this.overlay, screenshot);
         this.afterRender = undefined;

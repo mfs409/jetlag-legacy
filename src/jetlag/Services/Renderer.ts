@@ -48,9 +48,10 @@ export class RendererService {
   public suppressHitBoxes = false;
 
   /** The most recently-taken screenshot */
-  // TODO:  Welcome overlays have a flashing problem with the current screenshot
-  //        code
-  public lastScreenshot?: PixiSprite;
+  public mostRecentScreenShot?: PixiSprite;
+
+  /** Is someone requesting that a new screenshot be taken? */
+  public screenshotRequested = false;
 
   /**
    * Initialize the renderer.
@@ -95,8 +96,10 @@ export class RendererService {
 
       // Grab a screenshot if we don't have one yet
       // TODO:  This screenshot includes the HUD.  I don't think we want that.
-      if (!this.lastScreenshot)
-        this.lastScreenshot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
+      if (this.screenshotRequested) {
+        this.screenshotRequested = false;
+        this.mostRecentScreenShot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
+      }
     });
   }
 

@@ -231,9 +231,9 @@ export function tut_platform(_level: number) {
   stage.score.onLose = { level: 1, builder: tut_platform };
   stage.score.onWin = { level: 1, builder: tut_platform };
 
-  stage.score.winSceneBuilder = (overlay: Scene, _screenshot: ImageSprite) => {
+  stage.score.winSceneBuilder = (overlay: Scene, _screenshot?: ImageSprite) => {
     Actor.Make({
-      appearance: _screenshot,
+      appearance: _screenshot!,
       // appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
       gestures: {
@@ -250,9 +250,9 @@ export function tut_platform(_level: number) {
     });
   };
 
-  stage.score.loseSceneBuilder = (overlay: Scene, screenshot: ImageSprite) => {
+  stage.score.loseSceneBuilder = (overlay: Scene, screenshot?: ImageSprite) => {
     Actor.Make({
-      appearance: screenshot,
+      appearance: screenshot!,
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
       gestures: {
         tap: () => {
