@@ -105,6 +105,8 @@ export function tut_animations(_level: number) {
   animations.set(AnimationState.IDLE_N, new AnimationSequence(true).to("alien_thrust_u_0.png", 750).to("alien_thrust_u_1.png", 75));
   animations.set(AnimationState.IDLE_W, new AnimationSequence(true).to("alien_thrust_l_0.png", 750).to("alien_thrust_l_1.png", 75));
   animations.set(AnimationState.IDLE_S, new AnimationSequence(true).to("alien_thrust_d_0.png", 750).to("alien_thrust_d_1.png", 75));
+  // demonstrate skip-to:
+  // animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("alien_thrust_r_0.png", 7500).to("alien_thrust_r_1.png", 7500));
   animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("alien_thrust_r_0.png", 750).to("alien_thrust_r_1.png", 75));
 
   let remap = new Map();
@@ -123,6 +125,9 @@ export function tut_animations(_level: number) {
     role: new Hero(),
     movement: new ExplicitMovement(),
   });
+
+  // Demonstrate skip-to
+  //  (hero.appearance as AnimatedSprite).skipTo(1, 7000);
 
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as ExplicitMovement).updateYVelocity(0)));
   stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ExplicitMovement).updateYVelocity(0)));

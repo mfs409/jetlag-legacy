@@ -430,6 +430,17 @@ export function buildLevelScreen(level: number) {
       role: new Enemy(),
     });
 
+    // This is extra, for testing skip_to and waypoint callbacks
+    let e2 = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      movement: new PathMovement(new Path().to(14, 8.6).to(12, 0.4).to(14, 8.6), 4, true
+        , (which: number) => console.log(which)
+      ),
+      role: new Enemy(),
+    });
+    (e2.movement as PathMovement).skip_to(1);
+
     loseMessage("Try Again");
     winMessage("Great Job");
   }
@@ -3152,15 +3163,7 @@ export function buildLevelScreen(level: number) {
     animations.set(AnimationState.INV_N, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
     animations.set(AnimationState.INV_S, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
 
-    let h_cfg = {
-      cx: 0.25,
-      cy: 5.25,
-      width: 0.8,
-      height: 0.8,
-      radius: 0.4,
-      img: "color_star_1.png",
-      animations,
-    };
+    let h_cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "color_star_1.png", animations };
     Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6 }),

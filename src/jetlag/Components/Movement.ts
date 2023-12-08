@@ -40,12 +40,7 @@ export class Path {
   public getNumPoints() { return this.points.length; }
 }
 
-/**
- * A rule for moving along a fixed path
- *
- * TODO:  We should have a way to advance the actor along the path "as if" it
- *        had been going for x milliseconds
- */
+/** A rule for moving along a fixed path */
 export class PathMovement {
   /** The Actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
@@ -66,6 +61,31 @@ export class PathMovement {
   /** Index of the next point in the path */
   private nextIndex = -1;
 
+  /**
+   * Skip forward to one of the waypoints of the path.  Fails silently if the
+   * given waypoint is out of bounds for the current path length.
+   *
+   * @param waypoint  The waypoint to skip to.
+   */
+  public skip_to(waypoint: number) {
+    this.done = false;
+    if (waypoint == 0) {
+      this.start();
+    }
+    else if (waypoint >= this.path.getNumPoints()) {
+      return; // Error: point out of bounds
+    }
+    else if (this.rigidBody) {
+      // Move to the waypoint, then start moving to next
+      let transform = new b2Transform().SetPositionAngle(this.path.getPoint(waypoint), this._rigidBody!.body.GetAngle());
+      this.rigidBody.body.SetTransform(transform);
+      this.nextIndex = waypoint + 1;
+      if (this.nextIndex == this.path.getNumPoints())
+        this.nextIndex = 1;
+      this.goToNext();
+    }
+  }
+
   /** Stop processing a path, and stop the actor too */
   private halt() {
     if (!this.rigidBody) return;
@@ -83,6 +103,7 @@ export class PathMovement {
     p.Scale(this.velocity);
     this.rigidBody!.breakDistJoints();
     this.rigidBody!.body.SetLinearVelocity(p);
+    if (this.waypointCallback) this.waypointCallback(this.nextIndex);
   }
 
   /** Begin running a path */
@@ -99,13 +120,15 @@ export class PathMovement {
   /**
    * Create a policy for moving an actor along a fixed path
    *
-   * TODO: Consider having a callback for when the path stops?
-   *
-   * @param path      The path on which to move
-   * @param velocity  The speed at which the actor should move 
-   * @param loop      Should the path repeat infinitely, or just run once?
+   * @param path              The path on which to move
+   * @param velocity          The speed at which the actor should move
+   * @param loop              Should the path repeat infinitely, or just run
+   *                          once?
+   * @param waypointCallback  Code to run each time a waypoint of the path is
+   *                          reached.  It will be given the index of the *next*
+   *                          waypoint.
    */
-  constructor(private path: Path, private velocity: number, private loop: boolean) {
+  constructor(private path: Path, private velocity: number, private loop: boolean, private waypointCallback?: (which: number) => void) {
     if (path.getNumPoints() < 2) {
       stage.console.log("Error: path must have at least two points");
       this.halt();

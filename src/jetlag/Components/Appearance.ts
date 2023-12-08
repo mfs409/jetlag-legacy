@@ -245,9 +245,6 @@ export class ImageSprite {
  * (right-facing) animation is the default.  AnimatedSprite can be notified when
  * an Entity's state changes, so that it can switch to the animation associated
  * with the new state.
- *
- * TODO:  Add a way to advance to a frame, and advance the elapsed time in that
- *        frame
  */
 export class AnimatedSprite implements IStateObserver {
   /** The Actor to which this AnimatedSprite is attached */
@@ -286,6 +283,23 @@ export class AnimatedSprite implements IStateObserver {
    * actor's state changes.  Defaults to the version for overhead-style games.
    */
   stateSelector: (oldState: ActorState, newState: ActorState) => AnimationState = AnimatedSprite.overheadAnimationTransitions;
+
+  /**
+   * Skip to the `index`th cell of the animation, and move forward within it by
+   * `elapsed` milliseconds.  Does nothing (and prints no error) if the index is
+   * out of bounds.
+   *
+   * @param index   The 0-based index of the cell of the animation within the
+   *                current AnimationSequence
+   * @param elapsed Act as if thisow many milliseconds within the new cell have
+   *                passed.
+   */
+  public skipTo(index: number, elapsed: number) {
+    if (this.current_ani.steps.length > index) {
+      this.activeFrame = index;
+      this.elapsedTime = elapsed;
+    }
+  }
 
   /**
    * Build an animation that can be rendered
