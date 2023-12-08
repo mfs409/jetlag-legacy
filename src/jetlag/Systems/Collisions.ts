@@ -192,21 +192,23 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
           }
           // Should we disable a one-sided collision?
           if (oneSided && other && !oneSided.rigidBody!.distJoint && !other.rigidBody!.distJoint) {
-            let worldManiFold = new b2WorldManifold();
-            contact.GetWorldManifold(worldManiFold);
-            let numPoints = worldManiFold.points.length;
-            for (let i = 0; i < numPoints; i++) {
-              let xy = new b2Vec2(0, 0);
-              // TODO: I don't think this should be using velocity... can't it just use position?
-              other.rigidBody?.body.GetLinearVelocityFromWorldPoint(worldManiFold.points[i], xy);
-              // disable based on the value of isOneSided and the vector between
-              // the entities
-              if (oneSided.rigidBody!.singleRigidSide == Sides.TOP && xy.y < 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.singleRigidSide == Sides.LEFT && xy.y > 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.singleRigidSide == Sides.RIGHT && xy.x > 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.singleRigidSide == Sides.BOTTOM && xy.x < 0) contact.SetEnabled(false);
+            if (true) {
+              let ot = oneSided.rigidBody.getCenter().y - oneSided.rigidBody.h / 2;
+              let ob = oneSided.rigidBody.getCenter().y + oneSided.rigidBody.h / 2;
+              let ol = oneSided.rigidBody.getCenter().x - oneSided.rigidBody.w / 2;
+              let or = oneSided.rigidBody.getCenter().x + oneSided.rigidBody.w / 2;
+              let ct = other.rigidBody.getCenter().y - other.rigidBody.h / 2;
+              let cb = other.rigidBody.getCenter().y + other.rigidBody.h / 2;
+              let cl = other.rigidBody.getCenter().x - other.rigidBody.w / 2;
+              let cr = other.rigidBody.getCenter().x + other.rigidBody.w / 2;
+              let vx = other.rigidBody.getVelocity().x;
+              let vy = other.rigidBody.getVelocity().y;
+              if (oneSided.rigidBody!.singleRigidSide == Sides.TOP && cb >= ot && vy <= 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.LEFT && cr >= ol && vx <= 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.RIGHT && cl <= or && vx >= 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.BOTTOM && ct <= ob && vy >= 0) contact.SetEnabled(false);
+
             }
-            return;
           }
 
           // If at least one entity is sticky, then see about making them stick

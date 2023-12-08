@@ -4658,7 +4658,7 @@ export function buildLevelScreen(level: number) {
     populateProjectilePool(projectiles, {
       size: 100, strength: 1, fixedVectorVelocity: 10, rotateVectorToss: true,
       immuneToCollisions: true, disappearOnCollide: true, range: 40,
-      bodyMaker: () => new BoxBody({ width: 0.02, height: .5, cx: -100, cy: -100 }, stage.world),
+      bodyMaker: () => new BoxBody({ width: 0.02, height: .5, cx: -100, cy: -100 }, stage.world, { collisionsEnabled: false }),
       appearanceMaker: () => new FilledBox({ width: 0.02, height: 1, fillColor: "#FF0000" }),
     });
 
@@ -6626,7 +6626,7 @@ function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: number, body
     let rigidBody = cfg.bodyMaker();
     if (cfg.gravityAffectsProjectiles)
       rigidBody.body.SetGravityScale(1);
-    rigidBody.setCollisionsEnabled(cfg.immuneToCollisions);
+    rigidBody.setCollisionsEnabled(!cfg.immuneToCollisions);
     let reclaimer = (actor: Actor) => {
       pool.put(actor);
       actor.enabled = false;
