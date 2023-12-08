@@ -104,26 +104,22 @@ export class AnimationSequence {
  * code to run in response to each of the gestures that JetLag supports.
  */
 export class GestureHandlers {
-  /**
-   * Construct a set of GestureHandlers
-   *
-   * @param tap       code to run when this actor is tapped
-   * @param panStart  code to run on a pan start event
-   * @param panMove   code to run on a pan move event
-   * @param panStop   code to run on a pan stop event
-   * @param touchDown code to run on a down press event
-   * @param touchUp   code to run on a release event
-   * @param swipe     code to run on a swipe event
-   */
-  constructor(
-    public tap?: (worldCoords: { x: number, y: number }) => boolean,
-    public panStart?: (worldCoords: { x: number, y: number }) => boolean,
-    public panMove?: (worldCoords: { x: number, y: number }) => boolean,
-    public panStop?: (worldCoords: { x: number, y: number }) => boolean,
-    public touchDown?: (worldCoords: { x: number, y: number }) => boolean,
-    public touchUp?: (worldCoords: { x: number, y: number }) => boolean,
-    public swipe?: (point1: { x: number, y: number }, point2: { x: number, y: number }, time: number) => boolean
-  ) { }
+  /** code to run when this actor is tapped */
+  public tap?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a pan start event */
+  public panStart?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a pan move event */
+  public panMove?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a pan stop event */
+  public panStop?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a down press event */
+  public touchDown?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a release event */
+  public touchUp?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a swipe event */
+  public swipe?: (point1: { x: number, y: number }, point2: { x: number, y: number }, time: number) => boolean;
+  /** code to run when the mouse hovers over the actor */
+  public mouseHover?: (worldCoords: { x: number, y: number }) => boolean;
 }
 
 /**

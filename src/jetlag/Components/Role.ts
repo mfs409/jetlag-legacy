@@ -354,40 +354,29 @@ export class Hero extends Role {
   /** Code to run when the hero's strength changes */
   public onStrengthChange?: (h: Actor) => void;
 
-  /**
-   * Track if the hero is in the air, so that it can't jump when it isn't
-   * touching anything. This does not quite work as desired, but is good
-   * enough for JetLag.
-   */
-  // TODO: Why do we need this when we have a state machine?
-  private inAir = false;
+  /** Indicate that the hero can jump infinitely often while in the air */
+  private allowMultiJump = false;
 
-  /** Indicate that the hero can jump while in the air */
-  // TODO: also support "double jump"?
-  // TODO: why is jump part of hero instead of part of movement?
-  public allowMultiJump = false;
+  /** Allow the hero to do > but not infinite jumps while in the air */
+  private numJumpsAllowed = 1;
 
-  /** Is the hero currently in crawl mode? */
-  // TODO: why is crawl part of hero instead of part of movement
-  private crawling = false;
-
-  // TODO: where should duck and climb go?
-
-  /** For tracking the current amount of rotation of the hero */
-  private currentRotation = 0;
+  /** Count how many jumps we have */
+  private currJumps = 0;
 
   /** 
    * Construct a Hero role
    *
    * @param cfg                   Configuration information for the hero
    * @param cfg.strength          The hero's strength (default 1)
-   * @param cfg.allowMultiJump    True if the hero can jump when in mid-jump
+   * @param cfg.allowMultiJump    True if the hero can jump infinitely often
+   *                              when in mid-jump
    * @param cfg.onStrengthChange  Code to run on any change to the hero's
    *                              strength
    * @param cfg.mustSurvive       Does the level end immediately if this hero is
    *                              defeated?
+   * @param cfg.numJumpsAllowed   Use 2 to enable double-jumps, etc.
    */
-  constructor(cfg: { strength?: number, allowMultiJump?: boolean, onStrengthChange?: (h: Actor) => void, mustSurvive?: boolean } = {}) {
+  constructor(cfg: { strength?: number, allowMultiJump?: boolean, onStrengthChange?: (h: Actor) => void, mustSurvive?: boolean, numJumpsAllowed?: number } = {}) {
     super();
 
     // Heroes don't collide with goodies or destinations
@@ -399,6 +388,7 @@ export class Hero extends Role {
     if (cfg.strength != undefined)
       this._strength = cfg.strength;
     this.allowMultiJump = !!cfg.allowMultiJump;
+    this.numJumpsAllowed = Math.max(1, cfg.numJumpsAllowed ?? 0);
     this.onStrengthChange = cfg.onStrengthChange;
     this.mustSurvive = !!cfg.mustSurvive;
 
@@ -486,12 +476,12 @@ export class Hero extends Role {
       enemy.defeat(true, this._actor!);
     }
     // defeat by crawling?
-    else if (this.crawling && enemy.defeatByCrawl) {
+    else if (this.actor?.state.current.crawling && enemy.defeatByCrawl) {
       enemy.defeat(true, this._actor!);
     }
     // defeat by jumping only if the hero's bottom is above the enemy's
     // head
-    else if (this.inAir && enemy.defeatByJump &&
+    else if (this.actor?.state.current.jumping && enemy.defeatByJump &&
       ((this._actor!.rigidBody.getCenter().y) <= (enemy.actor!.rigidBody.getCenter().y))) {
       enemy.defeat(true, this._actor!);
     }
@@ -529,7 +519,7 @@ export class Hero extends Role {
       sensor = sensor && fixtures.IsSensor();
 
     // reset rotation of hero if this obstacle is not a sensor
-    if (this.currentRotation != 0 && !sensor) this.increaseRotation(-this.currentRotation);
+    // if (this.currentRotation != 0 && !sensor) this.increaseRotation(-this.currentRotation);
 
     // if there is code attached to the obstacle for modifying the hero's
     // behavior, run it
@@ -537,7 +527,7 @@ export class Hero extends Role {
 
     // If this is a wall with a suitable jumpReEnable side, then mark us not in
     // the air so we can do more jumps
-    if (this.inAir || this.allowMultiJump) {
+    if (this.actor?.state.current.jumping || this.allowMultiJump) {
       let reenable = false;
       let h_t = this.actor!.rigidBody.getCenter().y - this.actor!.rigidBody.h / 2;
       let h_b = this.actor!.rigidBody.getCenter().y + this.actor!.rigidBody.h / 2;
@@ -553,7 +543,6 @@ export class Hero extends Role {
       if (obstacle.jumpReEnableSides.indexOf(DIRECTION.W) > -1) reenable = reenable || (h_r >= o_l);
       if (reenable) {
         this.collisionRules.properties = this.collisionRules.properties.filter(value => value != CollisionExemptions.JUMP_HERO);
-        this.inAir = false;
         this.collisionRules.ignores = this.collisionRules.ignores.filter(value => value != CollisionExemptions.JUMP_HERO)
         this._actor!.state.changeState(this._actor!, StateEvent.JUMP_N);
       }
@@ -562,8 +551,9 @@ export class Hero extends Role {
 
   /** Make the hero jump, unless it is in the air and not multi-jump */
   public jump(x: number, y: number) {
-    // NB: multi-jump prevents us from ever setting mInAir, so this is safe:
-    if (this.inAir) return;
+    if (!this.actor?.state.current.jumping) this.currJumps = 0;
+    if (!this.allowMultiJump && this.currJumps >= this.numJumpsAllowed) return;
+    this.currJumps += 1;
 
     this.collisionRules.properties = this.collisionRules.properties.filter(v => v != CollisionExemptions.JUMP_HERO);
     this.collisionRules.properties.push(CollisionExemptions.JUMP_HERO);
@@ -574,7 +564,6 @@ export class Hero extends Role {
     this._actor!.rigidBody.breakDistJoints();
     this._actor!.rigidBody.body.SetLinearVelocity(new b2Vec2(x, y));
 
-    if (!this.allowMultiJump) this.inAir = true;
     this._actor!.state.changeState(this._actor!, StateEvent.JUMP_Y);
     this._actor?.sounds?.jump?.play();
 
@@ -587,12 +576,11 @@ export class Hero extends Role {
    *
    * @param rotate The amount to rotate the actor when the crawl starts
    */
-  crawlOn(rotate: number) {
-    if (!this._actor!.rigidBody || this.crawling) return;
+  public crawlOn(rotate: number) {
+    if (!this._actor!.rigidBody || this.actor?.state.current.crawling) return;
     let body = this._actor!.rigidBody.body;
     this.collisionRules.properties = this.collisionRules.properties.filter(v => v != CollisionExemptions.CRAWL_HERO);
     this.collisionRules.properties.push(CollisionExemptions.CRAWL_HERO);
-    this.crawling = true;
     let transform = new b2Transform();
     transform.SetPositionAngle(body.GetPosition(), body.GetAngle() + rotate);
     body.SetTransform(transform);
@@ -605,10 +593,9 @@ export class Hero extends Role {
    * @param rotate The amount to rotate the actor when the crawl ends
    */
   public crawlOff(rotate: number) {
-    if (!this.crawling || !this._actor!.rigidBody) return;
+    if (!this.actor?.state.current.crawling || !this._actor!.rigidBody) return;
     let body = this._actor!.rigidBody.body;
     this.collisionRules.properties = this.collisionRules.properties.filter(value => value != CollisionExemptions.CRAWL_HERO)
-    this.crawling = false;
     let transform = new b2Transform();
     transform.SetPositionAngle(body.GetPosition(), body.GetAngle() - rotate);
     body.SetTransform(transform);
@@ -616,21 +603,18 @@ export class Hero extends Role {
   }
 
   /**
-   * Change the rotation of the hero if it is in the middle of a jump
+   * Change the rotation of the hero
    *
    * @param delta How much to add to the current rotation
    */
-  // TODO: Why only if in the middle of a jump?
   public increaseRotation(delta: number) {
     let body = this._actor!.rigidBody.body;
     if (!body) return;
-    if (this.inAir) {
-      this.currentRotation += delta;
-      body.SetAngularVelocity(0);
-      let transform = new b2Transform();
-      transform.SetPositionAngle(body.GetPosition(), this.currentRotation);
-      body.SetTransform(transform);
-    }
+    let rot = body.GetAngle() + delta;
+    body.SetAngularVelocity(0);
+    let transform = new b2Transform();
+    transform.SetPositionAngle(body.GetPosition(), rot);
+    body.SetTransform(transform);
   }
 }
 

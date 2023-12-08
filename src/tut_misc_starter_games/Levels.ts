@@ -1992,7 +1992,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
       movement: new TiltMovement(),
-      role: new Hero(),
+      role: new Hero({ numJumpsAllowed: 2 }),
       sounds: new SoundEffectComponent({ jump: "flap_flap.ogg" }),
     });
 
@@ -3264,15 +3264,15 @@ export function buildLevelScreen(level: number) {
     // make a hero with fixed velocity, and give it crawl and jump
     // animations
     let animations = new Map();
-    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 100, repeat: true, images: ["leg_star_1.png"] }));
-    let jumping = new AnimationSequence(true).to("leg_star_5.png", 200).to("leg_star_6.png", 200).to("leg_star_7.png", 200).to("leg_star_8.png", 200);
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 100, repeat: true, images: ["color_star_1.png", "color_star_2.png"] }));
+    let jumping = new AnimationSequence(true).to("color_star_3.png", 200).to("color_star_4.png", 200).to("color_star_5.png", 200);
     animations.set(AnimationState.JUMP_E, jumping);
     animations.set(AnimationState.JUMP_NE, jumping);
     animations.set(AnimationState.JUMP_SE, jumping);
     animations.set(AnimationState.JUMP_IDLE_E, jumping);
     animations.set(AnimationState.JUMP_IDLE_NE, jumping);
     animations.set(AnimationState.JUMP_IDLE_SE, jumping);
-    let crawling = new AnimationSequence(true).to("leg_star_1.png", 100).to("leg_star_2.png", 300).to("leg_star_3.png", 300).to("leg_star_4.png", 100);
+    let crawling = new AnimationSequence(true).to("color_star_6.png", 100).to("color_star_7.png", 300).to("color_star_8.png", 300);
     animations.set(AnimationState.CRAWL_E, crawling);
     animations.set(AnimationState.CRAWL_NE, crawling);
     animations.set(AnimationState.CRAWL_SE, crawling);
@@ -3650,7 +3650,7 @@ export function buildLevelScreen(level: number) {
     stage.score.setVictoryDestination(1);
 
     // make the hero jump on tap, so that we can see it spin in the air
-    cfg = { cx: 4, cy: 8, width: 0.5, height: 0.5, radius: 0.25, img: "leg_star_1.png" };
+    cfg = { cx: 4, cy: 8, width: 0.5, height: 0.5, radius: 0.25, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 1, friction: 0.6 }),

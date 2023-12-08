@@ -430,6 +430,17 @@ export function buildLevelScreen(level: number) {
       role: new Enemy(),
     });
 
+    // This is extra, for testing skip_to and waypoint callbacks
+    let e2 = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      movement: new PathMovement(new Path().to(14, 8.6).to(12, 0.4).to(14, 8.6), 4, true
+        , (which: number) => console.log(which)
+      ),
+      role: new Enemy(),
+    });
+    (e2.movement as PathMovement).skip_to(1);
+
     loseMessage("Try Again");
     winMessage("Great Job");
   }
@@ -721,7 +732,7 @@ export function buildLevelScreen(level: number) {
       // we can still access world.  This means, for example, that you
       // could have a button that lets the user choose a character, and
       // then use world to add that character as the hero :)
-    });
+    }, false);
   }
 
   // This level plays around with physics a little bit, to show how friction and
@@ -787,7 +798,7 @@ export function buildLevelScreen(level: number) {
         { cx: 0.5, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#00FFFF", size: 16, z: 0 },
         () => "(Releasing the joystick does not stop the hero anymore)");
       overlay.timer.addEvent(new TimedEvent(4, false, () => stage.clearOverlay()));
-    });
+    }, false);
   }
 
   // This level introduces goodies. Goodies are something that we collect.  We
@@ -982,7 +993,7 @@ export function buildLevelScreen(level: number) {
         makeText(overlay,
           { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
           () => "Game Paused");
-      });
+      }, true);
       return true;
     });
 
@@ -1030,6 +1041,7 @@ export function buildLevelScreen(level: number) {
     // Put a button on the HUD to pause the game
     addTapControl(stage.hud, { cx: 1, cy: 8, width: 0.4, height: 0.4, img: "pause.png" }, () => {
       // When the button is pressed, draw an overlay scene
+      // TODO: Ensure this does can get a screenshot?
       stage.requestOverlay((overlay: Scene) => {
         // The scene should have a full-screen background.  Pressing it should
         // resume the game.
@@ -1052,7 +1064,7 @@ export function buildLevelScreen(level: number) {
             return true;
           }
         );
-      });
+      }, true);
       return true;
     });
 
@@ -3152,15 +3164,7 @@ export function buildLevelScreen(level: number) {
     animations.set(AnimationState.INV_N, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
     animations.set(AnimationState.INV_S, new AnimationSequence(true).to("color_star_5.png", 100).to("color_star_6.png", 100).to("color_star_7.png", 100).to("color_star_8.png", 100));
 
-    let h_cfg = {
-      cx: 0.25,
-      cy: 5.25,
-      width: 0.8,
-      height: 0.8,
-      radius: 0.4,
-      img: "color_star_1.png",
-      animations,
-    };
+    let h_cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "color_star_1.png", animations };
     Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6 }),
@@ -3810,7 +3814,7 @@ export function buildLevelScreen(level: number) {
           role: new Enemy(),
         });
         createDragZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
-      });
+      }, false);
     }));
 
     // set another callback that runs after 6 seconds (note: time
@@ -3837,7 +3841,7 @@ export function buildLevelScreen(level: number) {
         });
 
         defeatOnTouch(touch_enemy.role as Enemy);
-      });
+      }, false);
     }));
 
     // set a callback that runs after 9 seconds.
@@ -3872,7 +3876,7 @@ export function buildLevelScreen(level: number) {
           rigidBody: new CircleBody(cfg, stage.world),
           role: new Goodie(),
         });
-      });
+      }, false);
     }));
 
     // Lastly, we can make a timer callback that runs over and over
@@ -4005,7 +4009,7 @@ export function buildLevelScreen(level: number) {
             rigidBody: new CircleBody(cfg, stage.world),
             role: new Destination(),
           });
-        });
+        }, false);
       }
     };
 
@@ -4164,7 +4168,7 @@ export function buildLevelScreen(level: number) {
           rigidBody: new CircleBody(cfg, stage.world),
           role: new Goodie(),
         });
-      });
+      }, false);
     };
 
     // now draw our enemies... we need enough to be able to test that all five
@@ -4331,7 +4335,7 @@ export function buildLevelScreen(level: number) {
             { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
             () => { stage.clearOverlay(); return true; }
           );
-        });
+        }, false);
         return true;
       }
     );
@@ -5265,7 +5269,7 @@ export function buildLevelScreen(level: number) {
           makeText(overlay,
             { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 0 },
             () => "you can only pause once...");
-        });
+        }, false);
         // When the pause button draws the pause screen, it also disables the
         // pause button, so there can be no more pausing...
         pause_button.enabled = false;
@@ -5347,7 +5351,6 @@ export function buildLevelScreen(level: number) {
       { cx: 0.5, cy: 0.5, width: .5, height: .5, img: "pause.png" },
       () => {
         stage.requestOverlay((overlay: Scene) => {
-
           // This button goes back to the Chooser
           addTapControl(overlay,
             { cx: .75, cy: .75, width: .5, height: .5, img: "red_ball.png" },
@@ -5390,12 +5393,12 @@ export function buildLevelScreen(level: number) {
                 makeText(overlay,
                   { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
                   () => "You are now powered up!");
-              });
+              }, false);
               return true;
             });
           makeText(overlay,
             { cx: 1.25, cy: 3.65, center: false, width: .1, height: .1, face: "Arial", color: "#00FF00", size: 24 }, () => "Another Pause Scene");
-        });
+        }, false);
         return true;
       });
   }
@@ -5914,7 +5917,7 @@ function welcomeMessage(message: string, subMessage: string = "") {
         appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 20, z: 0 }, () => subMessage),
       });
     }
-  });
+  }, false);
 }
 
 /**

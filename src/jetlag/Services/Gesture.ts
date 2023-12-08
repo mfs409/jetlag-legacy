@@ -2,11 +2,7 @@ import { Scene } from "../Entities/Scene";
 import { Stage } from "../Stage";
 import Hammer from "hammerjs";
 
-/**
- * GestureService routes gesture events (as defined by hammerjs) to a Stage.
- *
- * TODO:  Add a mouse hover event for aiming in desktop games?
- */
+/*** GestureService routes gesture events (as defined by hammerjs) to a Stage */
 export class GestureService {
   /**
    * The DOM element that receives gesture events
@@ -35,6 +31,27 @@ export class GestureService {
     this.elt.oncontextmenu = function (this: HTMLElement, _ev: PointerEvent) {
       return false;
     } as any;
+
+    let mouseFunc = (ev: MouseEvent) => {
+      let overlay_coords = stage.overlay?.camera.screenToMeters(ev.clientX, ev.clientY);
+      let world_coords = stage.world.camera.screenToMeters(ev.clientX, ev.clientY);
+      let hud_coords = stage.hud.camera.screenToMeters(ev.clientX, ev.clientY);
+      // If we have an overlay scene right now, let it handle the tap
+      if (stage.overlay) {
+        this.mouseHover(stage.overlay, overlay_coords!);
+      }
+      // Handle in hud or world
+      else if (this.gestureHudFirst) {
+        if (this.mouseHover(stage.hud, hud_coords)) return;
+        this.mouseHover(stage.world, world_coords);
+      } else {
+        if (this.mouseHover(stage.world, world_coords)) return;
+        this.mouseHover(stage.hud, hud_coords);
+      }
+    }
+
+    this.elt.onmouseover = (ev: MouseEvent) => { mouseFunc(ev); };
+    this.elt.onmousemove = (ev: MouseEvent) => { mouseFunc(ev); };
 
     // Set up handlers for all the Hammer events
     let hammer = new Hammer(this.elt);
@@ -133,6 +150,20 @@ export class GestureService {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor.gestures?.tap)
         if (actor.gestures.tap(coords))
+          return true;
+    return false;
+  }
+
+  /**
+   * Handle a mouse over or mouse move action
+   *
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
+   */
+  private mouseHover(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor.gestures?.mouseHover)
+        if (actor.gestures.mouseHover(coords))
           return true;
     return false;
   }

@@ -12,6 +12,10 @@ import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { DIRECTION } from "../jetlag/Components/StateManager";
 import { Scene } from "../jetlag/Entities/Scene";
 
+// TODO: Climb?
+
+// TODO: Get rid of the projectile helper?
+
 /**
  * GameConfig stores things like screen dimensions and other game configuration,
  * as well as the names of all the assets (images and sounds) used by this game.

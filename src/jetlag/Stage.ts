@@ -57,7 +57,7 @@ export class Stage {
   /** A console device, for debug messages */
   readonly console: ConsoleService;
   /** touch controller, providing gesture inputs */
-  readonly gestures: GestureService;
+  public gestures!: GestureService;
   /** keyboard controller, providing key event inputs */
   readonly keyboard: KeyboardService;
   /** access to the the device's accelerometer */
@@ -235,7 +235,6 @@ export class Stage {
     // Configure the services
     this.storage = new StorageService();
     this.musicLibrary = new AudioLibraryService(config);
-    this.gestures = new GestureService(domId, this);
     this.keyboard = new KeyboardService();
     this.accelerometer = new AccelerometerService(AccelerometerMode.LANDSCAPE, config.forceAccelerometerOff);
     this.renderer = new RendererService(this.screenWidth, this.screenHeight, domId, this.config.hitBoxes);
@@ -259,6 +258,7 @@ export class Stage {
 
     // Load the images asynchronously, then start rendering
     this.imageLibrary.loadAssets(() => {
+      this.gestures = new GestureService(domId, this);
       this.switchTo(this.config.gameBuilder, level!);
       this.renderer.startRenderLoop();
     });
