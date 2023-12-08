@@ -31,9 +31,7 @@ export class EmptyGameConfig implements GameConfig {
   resourcePrefix = "./assets/";
   musicNames = [];
   soundNames = [];
-  imageNames = [
-    "alien.json"
-  ];
+  imageNames = ["alien.json"];
 
   // The name of the function that builds the initial screen of the game
   gameBuilder = tut_animations;
@@ -135,14 +133,6 @@ export function tut_animations(_level: number) {
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ExplicitMovement).updateYVelocity(5)));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ExplicitMovement).updateXVelocity(-5)));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ExplicitMovement).updateXVelocity(5)));
-
-  // TODO: Make some "collecting stuff"
-  // TODO: Make some "crafting"
-  // TODO: Make some "watering plants" (toss) (pirate_thrust) (pirate_walk)
-  // TODO: Make some "sword" (toss) (pirate_slash_s) (pirate_walk_s)
-  // TODO: Make some "invincibility"
-  // TODO: Persist across sessions
-  // TODO: Good stuff across "days"
 }
 
 // call the function that kicks off the game

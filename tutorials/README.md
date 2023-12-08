@@ -24,15 +24,15 @@ To make a new tutorial, please follow these steps:
 
 ## Tutorial Table of Contents
 
-### Getting Started
+### Getting Started [Do This Last]
 
 This tutorial is not about what JetLag is or how JetLag works.  It is just about
 how to get JetLag running on your computer.
 
 ### An Overview of JetLag
 
-This tutorial gives a quick tour of the key ideas in JetLag.  It introduces the
-key ideas: a physics simulator, a graphics engine, a camera, actors, and events.
+This tutorial gives a quick tour of the key ideas in JetLag.  It discusses the
+physics simulator, graphics engine, camera, actors, and events.
 
 ### A Maze Game
 

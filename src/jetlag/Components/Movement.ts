@@ -465,8 +465,6 @@ export class ProjectileMovement {
     if (this.rigidBody.body.GetType() == b2BodyType.b2_staticBody)
       this.rigidBody?.body.SetType(b2BodyType.b2_kinematicBody);
     this.rigidBody.body.SetBullet(true);
-    this.rigidBody.body.SetGravityScale(0);
-    this.rigidBody.setCollisionsEnabled(false);
     this.rigidBody.body.SetFixedRotation(true); // disable rotation...
   }
   private _rigidBody?: RigidBodyComponent;
