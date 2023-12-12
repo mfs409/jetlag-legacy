@@ -39,11 +39,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * build the different levels of our "maze game" tutorial
+ * Build the levels of the game.
  *
- * @param level level of the tutorial should be built?
+ * @param level Which level should be displayed
  */
-function game(level: number) {
+function builder(level: number) {
     // Level 1 is the final game, without hitboxes, suitable for the start of
     // the tutorial
     if (level == 1) {
@@ -183,8 +183,8 @@ function game(level: number) {
             });
         };
 
-        stage.score.onLose = { level: level, builder: game };
-        stage.score.onWin = { level: level, builder: game };
+        stage.score.onLose = { level: level, builder: builder };
+        stage.score.onWin = { level: level, builder: builder };
     }
 
     // Don't forget: before diving into the code, present the configuration
@@ -242,8 +242,8 @@ function game(level: number) {
         stage.score.setVictoryDestination(1);
 
         // Win/Lose transitions
-        stage.score.onLose = { level: level, builder: game };
-        stage.score.onWin = { level: level, builder: game };
+        stage.score.onLose = { level: level, builder: builder };
+        stage.score.onWin = { level: level, builder: builder };
     }
     // Level 4 adds a wall and a goodie, plus borders
     else if (level == 4) {
@@ -310,8 +310,8 @@ function game(level: number) {
         });
         stage.score.setVictoryDestination(1);
 
-        stage.score.onLose = { level: level, builder: game };
-        stage.score.onWin = { level: level, builder: game };
+        stage.score.onLose = { level: level, builder: builder };
+        stage.score.onWin = { level: level, builder: builder };
     }
     // Level 5 adds a fancy way to make walls and goodies
     else if (level == 5) {
@@ -399,8 +399,8 @@ function game(level: number) {
         });
         stage.score.setVictoryDestination(1);
 
-        stage.score.onLose = { level: level, builder: game };
-        stage.score.onWin = { level: level, builder: game };
+        stage.score.onLose = { level: level, builder: builder };
+        stage.score.onWin = { level: level, builder: builder };
     }
     // Level 6 "Activates" the destination and adds some helpful text
     else if (level == 6) {
@@ -494,8 +494,8 @@ function game(level: number) {
             rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
-        stage.score.onLose = { level: level, builder: game };
-        stage.score.onWin = { level: level, builder: game };
+        stage.score.onLose = { level: level, builder: builder };
+        stage.score.onWin = { level: level, builder: builder };
     }
     // Level 7 finishes by adding an enemy and win/lose builders (but leaves on
     // the hitboxes)
@@ -634,10 +634,10 @@ function game(level: number) {
             });
         };
 
-        stage.score.onLose = { level: level, builder: game };
-        stage.score.onWin = { level: level, builder: game };
+        stage.score.onLose = { level: level, builder: builder };
+        stage.score.onWin = { level: level, builder: builder };
     }
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);

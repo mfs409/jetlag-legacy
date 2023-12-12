@@ -35,18 +35,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * buildSplashScreen is used to draw the scene that we see when the game starts.
- * In our case, it's just a menu.  The splash screen is mostly just branding: it
- * usually just has a big logo and then buttons for going to the level chooser,
- * the store, and the help scenes.  On a phone, it should also have a button for
- * quitting the app.
+ * Build the levels of the game.
  *
- * There is usually only one splash screen, but JetLag allows for many, so there
- * is an index parameter.  In this code, we just ignore the index.
- *
- * @param level Which splash screen should be displayed
+ * @param level Which level should be displayed
  */
-function game(_level: number) {
+function builder(_level: number) {
   // Draw four walls, covering the four borders of the world
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
@@ -138,4 +131,4 @@ function game(_level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);

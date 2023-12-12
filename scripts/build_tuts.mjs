@@ -60,10 +60,10 @@ let tutorials = [
     { tut_name: "tut_package_mobile", code_name: "tut_package_mobile" },
     { tut_name: "tut_platformer_game", code_name: "tut_platformer_game" },
     { tut_name: "tut_simulation_conway", code_name: "tut_simulation_conway" },
+    { tut_name: "tut_stage_transitions", code_name: "tut_stage_transitions" },
     { tut_name: "tut_storage", code_name: "tut_storage" },
     { tut_name: "tut_text_hud", code_name: "tut_text_hud" },
     { tut_name: "tut_timers", code_name: "tut_timers" },
-    { tut_name: "tut_types_of_stages", code_name: "tut_types_of_stages" },
 ];
 
 // First, copy the .md and subfolder

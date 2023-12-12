@@ -33,12 +33,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * Build the levels of the game.  In this game, level 1 is farming, and level 2
- * is fighting.
+ * Build the levels of the game.
  *
  * @param level Which level should be displayed
  */
-function game(level: number) {
+function builder(level: number) {
   if (level == 1) {
     if (!stage.storage.getSession("day"))
       stage.storage.setSession("day", 1);
@@ -75,7 +74,7 @@ function game(level: number) {
     Actor.Make({
       appearance: new FilledCircle({ radius: .5, fillColor: "#000000" }),
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: .5 }),
-      role: new Sensor(() => stage.switchTo(game, 2))
+      role: new Sensor(() => stage.switchTo(builder, 2))
     });
 
     // Draw a hero.  Note that the animations are pretty tricky
@@ -207,7 +206,7 @@ function game(level: number) {
                 tap: () => {
                   stage.clearOverlay();
                   stage.storage.setSession("day", 1 + (stage.storage.getSession("day")));
-                  stage.switchTo(game, 1); return true;
+                  stage.switchTo(builder, 1); return true;
                 }
               },
             });
@@ -300,7 +299,7 @@ function game(level: number) {
     Actor.Make({
       appearance: new FilledCircle({ radius: .5, fillColor: "#000000" }),
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: .5 }),
-      role: new Sensor(() => stage.switchTo(game, 1))
+      role: new Sensor(() => stage.switchTo(builder, 1))
     });
 
     // Draw a hero.  Note that the animations are pretty tricky
@@ -429,8 +428,8 @@ function game(level: number) {
       role: new Enemy({ damage: 1, onDefeated: () => { stage.storage.setSession("lizards", 1 + stage.storage.getSession("lizards")); } })
     });
 
-    stage.score.onLose = { level, builder: game };
-    stage.score.onWin = { level, builder: game };
+    stage.score.onLose = { level, builder: builder };
+    stage.score.onWin = { level, builder: builder };
 
     // How many enemies have we defeated
     if (!stage.storage.getSession("lizards"))
@@ -447,7 +446,7 @@ function game(level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);
 
 /**
  * Put some appropriately-configured projectiles into the projectile system

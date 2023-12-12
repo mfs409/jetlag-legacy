@@ -706,15 +706,20 @@ export class Sensor extends Role {
   /** The actor associated with this Role */
   public get actor() { return this._actor; }
 
+  /** The code to run when the hero crosses the sensor */
+  public heroCollision?: (thisActor: Actor, collideActor: Actor) => void;
+
   /** 
    * Construct a Sensor by providing some code to run when a hero passes over
    * this sensor 
    *
-   * @param heroCollision The code to run when the hero crosses the Sensor
+   * @param cfg               Configuration options for this sensor
+   * @param cfg.heroCollision The code to run when the hero crosses the Sensor
    */
-  constructor(public heroCollision?: (thisActor: Actor, collideActor: Actor) => void) {
+  constructor(cfg: { heroCollision?: (thisActor: Actor, collideActor: Actor) => void } = {}) {
     super();
     this.collisionRules.properties.push(CollisionExemptions.SENSOR);
+    this.heroCollision = cfg.heroCollision;
   }
 }
 
@@ -760,7 +765,7 @@ export class Projectile extends Role {
   /**
    * Construct a Projectile role
    *
-   * @param cfg
+   * @param cfg                     Configuration options for this projectile
    * @param cfg.damage              How much damage should the projectile do?
    *                                (default 1)
    * @param cfg.range               How far can the projectile travel before we

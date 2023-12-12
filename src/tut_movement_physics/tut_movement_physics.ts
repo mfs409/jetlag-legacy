@@ -36,14 +36,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * build the first "level" of a game.  Remember that opening scenes, cut scenes,
- * level choosers, the store, etc., are all "levels".  You might want to use
- * different functions to group different functionalities, with multiple
- * "levels" in each function.
+ * Build the levels of the game.
  *
  * @param level Which level should be displayed
  */
-function game(_level: number) {
+function builder(_level: number) {
   // Draw a grid on the screen, to help us think about the positions of actors
   GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
@@ -80,4 +77,4 @@ function game(_level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);

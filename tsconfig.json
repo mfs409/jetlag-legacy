@@ -37,10 +37,10 @@
     "src/tut_package_mobile/*",
     "src/tut_platformer_game/*",
     "src/tut_simulation_conway/*",
+    "src/tut_stage_transitions/*",
     "src/tut_storage/*",
     "src/tut_text_hud/*",
     "src/tut_timers/*",
-    "src/tut_types_of_stages/*",
     "src/viewer/*",
   ],
   "typedocOptions": {

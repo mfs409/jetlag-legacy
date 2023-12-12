@@ -34,14 +34,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * build the first "level" of a game.  Remember that opening scenes, cut scenes,
- * level choosers, the store, etc., are all "levels".  You might want to use
- * different functions to group different functionalities, with multiple
- * "levels" in each function.
+ * Build the levels of the game.
  *
  * @param level Which level should be displayed
  */
-function game(level: number) {
+function builder(level: number) {
   // NB: 21 levels, and then there's our "builder level" as 22
   // see https://en.wikipedia.org/wiki/Conway's_Game_of_Life
   let blank = [" "];
@@ -123,7 +120,7 @@ function game(level: number) {
   Actor.Make({
     rigidBody: new BoxBody({ cx: 42, cy: 42.5, width: 10, height: 4 }, stage.hud),
     appearance: new TextSprite({ center: true, face: "Arial", size: 36, color: "#000000" }, () => "Level: " + level),
-    gestures: { tap: () => { stage.switchTo(game, next_level); return true; } }
+    gestures: { tap: () => { stage.switchTo(builder, next_level); return true; } }
   });
 
   Actor.Make({
@@ -223,4 +220,4 @@ function game(level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);

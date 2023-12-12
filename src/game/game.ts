@@ -35,16 +35,15 @@ class Config implements JetLagGameConfig {
 
 
 /**
- * This function draws the first scene that shows when the game starts. In our
- * case, it's a very simple "game", consisting of an interactive world that
- * cannot be won or lost.  After your game starts becoming more polished, you
- * will probably want to use several functions like this one as a way to
- * organize the parts of your game (levels, chooser, welcome screen, store,
- * etc).
+ * This function draws the first scene that shows when the game starts.  In this
+ * code, it's an interactive world that cannot be won or lost.  After your game
+ * starts becoming more polished, you will probably want to use several
+ * functions like this one as a way to organize the parts of your game (levels,
+ * chooser, welcome screen, store, etc).
  *
  * @param level Which level of the game should be displayed
  */
-function game(_level: number) {
+function builder(_level: number) {
   // Draw a grid on the screen, to help us think about the positions of actors.
   // Remember that when `hitBoxes` is true, clicking the screen will show
   // coordinates in the developer console.
@@ -85,4 +84,4 @@ function game(_level: number) {
 
 // call the function that starts running the game in the `game-player` div tag
 // of `index.html`
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);

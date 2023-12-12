@@ -50,14 +50,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * build the first "level" of a game.  Remember that opening scenes, cut scenes,
- * level choosers, the store, etc., are all "levels".  You might want to use
- * different functions to group different functionalities, with multiple
- * "levels" in each function.
+ * Build the levels of the game.
  *
  * @param level Which level should be displayed
  */
-function game(_level: number) {
+function builder(_level: number) {
   // Draw a word that is 32x9 meters, with downward gravity
   stage.world.camera.setBounds(0, 0, 32, 9);
   stage.world.setGravity(0, 10);
@@ -229,8 +226,8 @@ function game(_level: number) {
     role: new Enemy()
   });
 
-  stage.score.onLose = { level: 1, builder: game };
-  stage.score.onWin = { level: 1, builder: game };
+  stage.score.onLose = { level: 1, builder: builder };
+  stage.score.onWin = { level: 1, builder: builder };
 
   stage.score.winSceneBuilder = (overlay: Scene, _screenshot?: ImageSprite) => {
     Actor.Make({
@@ -272,7 +269,7 @@ function game(_level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);
 
 /**
  * Draw a box on the scene

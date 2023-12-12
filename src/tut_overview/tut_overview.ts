@@ -34,11 +34,11 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * Build the levels of the tutorial
+ * Build the levels of the game.
  *
  * @param level Which level should be displayed
  */
-function game(level: number) {
+function builder(level: number) {
     level = 1;
     // A "clocked" game: turn and shoot
     if (level == 1) {
@@ -87,8 +87,8 @@ function game(level: number) {
             });
         }));
 
-        stage.score.onWin = { level: level, builder: game }
-        stage.score.onLose = { level: level, builder: game }
+        stage.score.onWin = { level: level, builder: builder }
+        stage.score.onLose = { level: level, builder: builder }
         stage.score.setVictoryEnemyCount(10);
     }
     // A "side scroller" game
@@ -164,12 +164,12 @@ function game(level: number) {
         });
 
         // Set up the score
-        stage.score.onWin = { level: level, builder: game }
-        stage.score.onLose = { level: level, builder: game }
+        stage.score.onWin = { level: level, builder: builder }
+        stage.score.onLose = { level: level, builder: builder }
         stage.score.setLoseCountdownRemaining(10);
         stage.score.setVictoryDestination(1);
     }
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), game);
+initializeAndLaunch("game-player", new Config(), builder);

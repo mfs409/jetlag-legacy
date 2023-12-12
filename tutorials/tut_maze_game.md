@@ -2,8 +2,6 @@
 
 ## Outline
 
-- 
-
 ## Level 1
 
 ```iframe
@@ -74,7 +72,7 @@
 }
 ```
 
-## All the code, not shuffled around yet:
+## All the code, not shuffled around yet
 
 ```typescript
 import { initializeAndLaunch } from "../jetlag/Stage";

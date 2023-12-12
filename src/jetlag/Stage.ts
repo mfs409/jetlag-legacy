@@ -69,7 +69,6 @@ export class Stage {
   /** A library of images */
   readonly imageLibrary: ImageLibraryService;
   /** Background music that doesn't stop when the level changes */
-  // TODO: Test this!
   public gameMusic: MusicComponent | undefined;
   /** Persistent storage + volatile storage for a game session and a level */
   readonly storage: StorageService;
@@ -189,6 +188,7 @@ export class Stage {
   public switchTo(builder: (index: number, stage: Stage) => void, index: number) {
     // reset music
     this.levelMusic?.stop();
+    this.levelMusic = undefined;
 
     // reset score and storage
     this.score.reset();
