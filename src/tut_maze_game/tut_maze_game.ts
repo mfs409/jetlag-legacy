@@ -1,19 +1,19 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameConfig } from "../jetlag/Config";
+import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
-import { ExplicitMovement, Path, PathMovement } from "../jetlag/Components/Movement";
+import { StandardMovement, Path, PathMovement } from "../jetlag/Components/Movement";
 import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Scene } from "../jetlag/Entities/Scene";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 
 /**
- * TutMazeGameConfig stores configuration information for the Maze Game
- * tutorial.
+ * Screen dimensions and other game configuration, such as the names of all
+ * the assets (images and sounds) used by this game.
  */
-class TutMazeGameConfig implements GameConfig {
+class Config implements JetLagGameConfig {
     // We want a landscape game.  The reference layout is 1600x900 pixels, with
     // each 100 pixels representing a meter
     pixelMeterRatio = 100;
@@ -36,17 +36,14 @@ class TutMazeGameConfig implements GameConfig {
     musicNames = [];
     soundNames = [];
     imageNames = ["sprites.json"];
-
-    // The name of the function that builds the initial screen of the game
-    gameBuilder = tut_maze_game;
 }
 
 /**
- * tut_maze_game builds the different levels of our "maze game" tutorial
+ * build the different levels of our "maze game" tutorial
  *
  * @param level level of the tutorial should be built?
  */
-function tut_maze_game(level: number) {
+function game(level: number) {
     // Level 1 is the final game, without hitboxes, suitable for the start of
     // the tutorial
     if (level == 1) {
@@ -94,18 +91,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -186,8 +183,8 @@ function tut_maze_game(level: number) {
             });
         };
 
-        stage.score.onLose = { level: level, builder: tut_maze_game };
-        stage.score.onWin = { level: level, builder: tut_maze_game };
+        stage.score.onLose = { level: level, builder: game };
+        stage.score.onWin = { level: level, builder: game };
     }
 
     // Don't forget: before diving into the code, present the configuration
@@ -200,18 +197,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
     }
     // Level 3 adds a destination and a background color
     else if (level == 3) {
@@ -222,18 +219,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         // Create a destination
         let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
@@ -245,8 +242,8 @@ function tut_maze_game(level: number) {
         stage.score.setVictoryDestination(1);
 
         // Win/Lose transitions
-        stage.score.onLose = { level: level, builder: tut_maze_game };
-        stage.score.onWin = { level: level, builder: tut_maze_game };
+        stage.score.onLose = { level: level, builder: game };
+        stage.score.onWin = { level: level, builder: game };
     }
     // Level 4 adds a wall and a goodie, plus borders
     else if (level == 4) {
@@ -279,18 +276,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         Actor.Make({
             rigidBody: new BoxBody({ cx: 4.5, cy: 4.5, width: 1, height: 1 }, stage.world),
@@ -313,8 +310,8 @@ function tut_maze_game(level: number) {
         });
         stage.score.setVictoryDestination(1);
 
-        stage.score.onLose = { level: level, builder: tut_maze_game };
-        stage.score.onWin = { level: level, builder: tut_maze_game };
+        stage.score.onLose = { level: level, builder: game };
+        stage.score.onWin = { level: level, builder: game };
     }
     // Level 5 adds a fancy way to make walls and goodies
     else if (level == 5) {
@@ -360,18 +357,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -402,8 +399,8 @@ function tut_maze_game(level: number) {
         });
         stage.score.setVictoryDestination(1);
 
-        stage.score.onLose = { level: level, builder: tut_maze_game };
-        stage.score.onWin = { level: level, builder: tut_maze_game };
+        stage.score.onLose = { level: level, builder: game };
+        stage.score.onWin = { level: level, builder: game };
     }
     // Level 6 "Activates" the destination and adds some helpful text
     else if (level == 6) {
@@ -449,18 +446,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -497,8 +494,8 @@ function tut_maze_game(level: number) {
             rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
-        stage.score.onLose = { level: level, builder: tut_maze_game };
-        stage.score.onWin = { level: level, builder: tut_maze_game };
+        stage.score.onLose = { level: level, builder: game };
+        stage.score.onWin = { level: level, builder: game };
     }
     // Level 7 finishes by adding an enemy and win/lose builders (but leaves on
     // the hitboxes)
@@ -545,18 +542,18 @@ function tut_maze_game(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
             role: new Hero(),
-            movement: new ExplicitMovement(),
+            movement: new StandardMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ExplicitMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ExplicitMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -637,10 +634,10 @@ function tut_maze_game(level: number) {
             });
         };
 
-        stage.score.onLose = { level: level, builder: tut_maze_game };
-        stage.score.onWin = { level: level, builder: tut_maze_game };
+        stage.score.onLose = { level: level, builder: game };
+        stage.score.onWin = { level: level, builder: game };
     }
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new TutMazeGameConfig());
+initializeAndLaunch("game-player", new Config(), game);

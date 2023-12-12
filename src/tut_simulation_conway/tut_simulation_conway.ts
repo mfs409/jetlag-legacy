@@ -1,5 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameConfig } from "../jetlag/Config";
+import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, TextSprite } from "../jetlag/Components/Appearance";
 import { BoxBody } from "../jetlag/Components/RigidBody";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -8,10 +8,10 @@ import { TimedEvent } from "../jetlag/Systems/Timer";
 import { GridSystem } from "../jetlag/Systems/Grid";
 
 /**
- * GameConfig stores things like screen dimensions and other game configuration,
- * as well as the names of all the assets (images and sounds) used by this game.
+ * Screen dimensions and other game configuration, such as the names of all
+ * the assets (images and sounds) used by this game.
  */
-export class TutConwayConfig implements GameConfig {
+class Config implements JetLagGameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 20;
@@ -31,9 +31,6 @@ export class TutConwayConfig implements GameConfig {
   musicNames = [];
   soundNames = [];
   imageNames = [];
-
-  // The name of the function that builds the initial screen of the game
-  gameBuilder = tut_conway;
 }
 
 /**
@@ -44,7 +41,7 @@ export class TutConwayConfig implements GameConfig {
  *
  * @param level Which level should be displayed
  */
-export function tut_conway(level: number) {
+function game(level: number) {
   // NB: 21 levels, and then there's our "builder level" as 22
   // see https://en.wikipedia.org/wiki/Conway's_Game_of_Life
   let blank = [" "];
@@ -126,7 +123,7 @@ export function tut_conway(level: number) {
   Actor.Make({
     rigidBody: new BoxBody({ cx: 42, cy: 42.5, width: 10, height: 4 }, stage.hud),
     appearance: new TextSprite({ center: true, face: "Arial", size: 36, color: "#000000" }, () => "Level: " + level),
-    gestures: { tap: () => { stage.switchTo(tut_conway, next_level); return true; } }
+    gestures: { tap: () => { stage.switchTo(game, next_level); return true; } }
   });
 
   Actor.Make({
@@ -185,12 +182,10 @@ export function tut_conway(level: number) {
 
   let opt = options[level - 1];
   if (opt) {
-    console.log(opt);
     let w = opt[0].length;
     let h = opt.length;
     let sx = Math.floor((COLS - w) / 2);
     let sy = Math.floor((ROWS - h) / 2);
-    console.log(w, h, sx, sy)
     for (let y = 0; y < h; ++y) {
       for (let x = 0; x < w; ++x) {
         if (opt[y].charAt(x) === 'x')
@@ -228,4 +223,4 @@ export function tut_conway(level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new TutConwayConfig());
+initializeAndLaunch("game-player", new Config(), game);

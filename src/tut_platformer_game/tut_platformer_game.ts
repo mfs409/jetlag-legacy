@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { AnimationSequence, AnimationState, GameConfig, Sides } from "../jetlag/Config";
+import { AnimationSequence, AnimationState, JetLagGameConfig, Sides } from "../jetlag/Config";
 import { AnimatedSprite, AppearanceComponent, FilledBox, FilledCircle, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { ExplicitMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { StandardMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { Destination, Enemy, Goodie, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -17,10 +17,10 @@ import { Scene } from "../jetlag/Entities/Scene";
 // TODO: Get rid of the projectile helper?
 
 /**
- * GameConfig stores things like screen dimensions and other game configuration,
- * as well as the names of all the assets (images and sounds) used by this game.
+ * Screen dimensions and other game configuration, such as the names of all
+ * the assets (images and sounds) used by this game.
  */
-export class TutPlatformConfig implements GameConfig {
+class Config implements JetLagGameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;
@@ -47,9 +47,6 @@ export class TutPlatformConfig implements GameConfig {
     // Sprite sheet with the coins (and other stuff that we don't use)
     "sprites.json",
   ];
-
-  // The name of the function that builds the initial screen of the game
-  gameBuilder = tut_platform;
 }
 
 /**
@@ -60,7 +57,7 @@ export class TutPlatformConfig implements GameConfig {
  *
  * @param level Which level should be displayed
  */
-export function tut_platform(_level: number) {
+function game(_level: number) {
   // Draw a word that is 32x9 meters, with downward gravity
   stage.world.camera.setBounds(0, 0, 32, 9);
   stage.world.setGravity(0, 10);
@@ -122,7 +119,7 @@ export function tut_platform(_level: number) {
   let h = Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
     rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
-    movement: new ExplicitMovement(),
+    movement: new StandardMovement(),
     role: new Hero()
   });
   (h.appearance as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
@@ -130,10 +127,10 @@ export function tut_platform(_level: number) {
   // world during gameplay
   stage.world.camera.setCameraFocus(h, 6, 0);
 
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(0));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ExplicitMovement).updateXVelocity(-2.5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ExplicitMovement).updateXVelocity(2.5));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-2.5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(2.5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => (h.role as Hero).jump(0, -10));
 
   Actor.Make({
@@ -232,8 +229,8 @@ export function tut_platform(_level: number) {
     role: new Enemy()
   });
 
-  stage.score.onLose = { level: 1, builder: tut_platform };
-  stage.score.onWin = { level: 1, builder: tut_platform };
+  stage.score.onLose = { level: 1, builder: game };
+  stage.score.onWin = { level: 1, builder: game };
 
   stage.score.winSceneBuilder = (overlay: Scene, _screenshot?: ImageSprite) => {
     Actor.Make({
@@ -275,7 +272,7 @@ export function tut_platform(_level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new TutPlatformConfig());
+initializeAndLaunch("game-player", new Config(), game);
 
 /**
  * Draw a box on the scene
@@ -354,7 +351,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
  * @param cfg.disappearOnCollide        Should projectiles disappear when they
  *                                      collide with each other?
  */
-export function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: number, bodyMaker: () => RigidBodyComponent, appearanceMaker: () => AppearanceComponent, strength: number, multiplier?: number, immuneToCollisions: boolean, gravityAffectsProjectiles?: boolean, fixedVectorVelocity?: number, rotateVectorToss?: boolean, soundEffects?: SoundEffectComponent, randomImageSources?: string[], range: number, disappearOnCollide: boolean }) {
+function populateProjectilePool(pool: ActorPoolSystem, cfg: { size: number, bodyMaker: () => RigidBodyComponent, appearanceMaker: () => AppearanceComponent, strength: number, multiplier?: number, immuneToCollisions: boolean, gravityAffectsProjectiles?: boolean, fixedVectorVelocity?: number, rotateVectorToss?: boolean, soundEffects?: SoundEffectComponent, randomImageSources?: string[], range: number, disappearOnCollide: boolean }) {
   // set up the pool of projectiles
   for (let i = 0; i < cfg.size; ++i) {
     let appearance = cfg.appearanceMaker();

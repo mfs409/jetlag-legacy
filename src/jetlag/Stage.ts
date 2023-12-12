@@ -4,7 +4,7 @@ import { GestureService } from "./Services/Gesture";
 import { AudioLibraryService } from "./Services/AudioLibrary";
 import { MusicComponent } from "./Components/Music";
 import { ScoreSystem } from "./Systems/Score";
-import { GameConfig } from "./Config";
+import { JetLagGameConfig } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
 import { RendererService } from "./Services/Renderer";
@@ -218,8 +218,9 @@ export class Stage {
    *
    * @param config  The game-wide configuration object
    * @param domId   The Id of the DOM element where the game exists
+   * @param builder A function for building the first visible level of the game
    */
-  constructor(readonly config: GameConfig, domId: string) {
+  constructor(readonly config: JetLagGameConfig, domId: string, builder: (level: number) => void) {
     this.console = new ConsoleService(config);
 
     this.pixelMeterRatio = config.pixelMeterRatio;
@@ -259,7 +260,7 @@ export class Stage {
     // Load the images asynchronously, then start rendering
     this.imageLibrary.loadAssets(() => {
       this.gestures = new GestureService(domId, this);
-      this.switchTo(this.config.gameBuilder, level!);
+      this.switchTo(builder, level);
       this.renderer.startRenderLoop();
     });
 
@@ -315,11 +316,12 @@ export class Stage {
 /**
  * Start a game
  *
- * @param domId  The name of the DIV into which the game should be placed
- * @param config The game configuration object
+ * @param domId   The name of the DIV into which the game should be placed
+ * @param config  The game configuration object
+ * @param builder A function for building the first visible level of the game
  */
-export function initializeAndLaunch(domId: string, config: GameConfig) {
-  stage = new Stage(config, domId);
+export function initializeAndLaunch(domId: string, config: JetLagGameConfig, builder: (level: number) => void) {
+  stage = new Stage(config, domId, builder);
 }
 
 /** A global reference to the Stage, suitable for use throughout JetLag */

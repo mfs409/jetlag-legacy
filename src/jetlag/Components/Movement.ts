@@ -519,7 +519,7 @@ export class ProjectileMovement {
    * @param cfg.rotateVectorToss    Should projectiles be rotated in the
    *                                direction they are tossed?
    */
-  constructor(cfg: { multiplier?: number, fixedVectorVelocity?: number, rotateVectorToss?: boolean }) {
+  constructor(cfg: { multiplier?: number, fixedVectorVelocity?: number, rotateVectorToss?: boolean } = {}) {
     this.multiplier = cfg.multiplier ?? 1;
     this.fixedVectorVelocity = cfg.fixedVectorVelocity;
     this.rotateVectorToss = cfg.rotateVectorToss;
@@ -605,10 +605,11 @@ export class GravityMovement {
 }
 
 /**
- * A rule for moving based on explicit input from the programmer, timers, or
- * on-screen controls 
+ * The standard movement component doesn't do anything by default, but provides
+ * ways of moving the actor, so that code attached to input events (keyboard,
+ * mouse, gesture) can make the actor move in appropriate ways.
  */
-export class ExplicitMovement {
+export class StandardMovement {
   /** The Actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
     this._rigidBody = body;
@@ -626,7 +627,7 @@ export class ExplicitMovement {
   private rotationByDirection: boolean;
 
   /**
-   * Construct a rule for moving based on explicit input
+   * Construct a StandardMovement component
    *
    * @param gravityAffectsIt  Does gravity affect this actor?
    * @param rotateByDirection Should the actor rotate based on its direction of
@@ -759,4 +760,4 @@ export class InertMovement {
 }
 
 /** MovementComponent is the type of any movement rules that an Actor can have */
-export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | ChaseFixed | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | ExplicitMovement | InertMovement;
+export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | ChaseFixed | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | StandardMovement | InertMovement;

@@ -1,6 +1,6 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameConfig } from "../jetlag/Config";
-import { TiltMovement } from "../jetlag/Components/Movement";
+import { JetLagGameConfig } from "../jetlag/Config";
+import { StandardMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -10,82 +10,79 @@ import { GridSystem } from "../jetlag/Systems/Grid";
 import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
 
 /**
- * A single place for storing screen dimensions and other game configuration, as
- * well as the names of all the assets (images and sounds) used by this game.
+ * Screen dimensions and other game configuration, such as the names of all
+ * the assets (images and sounds) used by this game.
  */
-export class TutGettingStartedConfig implements GameConfig {
-    // It's very unlikely that you'll want to change these next four values.
-    // Hover over them to see what they mean.
-    pixelMeterRatio = 100;
-    screenDimensions = { width: 1600, height: 900 };
-    adaptToScreenSize = true;
+class Config implements JetLagGameConfig {
+  // If your game is in landscape mode, it's very unlikely that you'll want to
+  // change these next values. Hover over them to see what they mean.  If your
+  // game is in portrait mode, you probably will want to swap the width and
+  // height.
+  pixelMeterRatio = 100;
+  screenDimensions = { width: 1600, height: 900 };
+  adaptToScreenSize = true;
 
-    // When you deploy your game, you'll want to change all of these
-    canVibrate = true;
-    forceAccelerometerOff = true;
-    storageKey = "--no-key--";
-    hitBoxes = true;
+  canVibrate = true;            // Turn off except for some mobile games
+  forceAccelerometerOff = true; // Turn on except for some mobile games
+  storageKey = "--no-key--";    // This needs to be globally unique to your game
+  hitBoxes = true;              // Turn off before deploying!
 
-    // Here's where we name all the images/sounds/background music files.  You'll
-    // probably want to delete these files from the assets folder, remove them
-    // from these lists, and add your own.
-    resourcePrefix = "./assets/";
-    musicNames = [];
-    soundNames = [];
-    imageNames = [];
-
-    // The name of the function that builds the initial screen of the game
-    gameBuilder = tut_getting_started;
+  resourcePrefix = "./assets/"; // All sounds and images go in this subfolder
+  musicNames = [];              // Audio files that you want to loop
+  soundNames = [];              // Short audio files that you don't want to loop
+  imageNames = [];              // All image files and sprite sheet json files
 }
 
 
 /**
- * buildSplashScreen is used to draw the scene that we see when the game starts.
- * In our case, it's just a menu.  The splash screen is mostly just branding: it
- * usually just has a big logo and then buttons for going to the level chooser,
- * the store, and the help scenes.  On a phone, it should also have a button for
- * quitting the app.
+ * This function draws the first scene that shows when the game starts. In our
+ * case, it's a very simple "game", consisting of an interactive world that
+ * cannot be won or lost.  After your game starts becoming more polished, you
+ * will probably want to use several functions like this one as a way to
+ * organize the parts of your game (levels, chooser, welcome screen, store,
+ * etc).
  *
- * There is usually only one splash screen, but JetLag allows for many, so there
- * is an index parameter.  In this code, we just ignore the index.
- *
- * @param level Which splash screen should be displayed
+ * @param level Which level of the game should be displayed
  */
-export function tut_getting_started(_level: number) {
-    // Draw a grid on the screen, to help us think about the positions of actors
-    GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
+function game(_level: number) {
+  // Draw a grid on the screen, to help us think about the positions of actors.
+  // Remember that when `hitBoxes` is true, clicking the screen will show
+  // coordinates in the developer console.
+  GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
-    stage.tilt.tiltMax.Set(10, 10);
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
+  // Make a "hero" who moves via keyboard control and appears as a circle
+  let hero = Actor.Make({
+    appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
+    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
+    role: new Hero(),
+    movement: new StandardMovement(),
+  })
 
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-    stage.tilt.tiltVelocityOverride = false;
+  // Make an obstacle that is a rectangle
+  Actor.Make({
+    rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
+    appearance: new FilledBox({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
+    role: new Obstacle(),
+  })
 
-    Actor.Make({
-        rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
-        appearance: new FilledBox({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-        role: new Obstacle(),
-    })
+  // Make an obstacle that is a polygon
+  Actor.Make({
+    rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -1, 0] }, stage.world),
+    appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -1, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
+    role: new Obstacle(),
+  })
 
-    Actor.Make({
-        rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
-        appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-        role: new Hero(),
-        movement: new TiltMovement(),
-    })
-
-    Actor.Make({
-        rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -.5, 0] }, stage.world),
-        appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-        role: new Obstacle(),
-    })
+  // Pressing a key will change the hero's velocity
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).updateYVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).updateYVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).updateXVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).updateXVelocity(0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).updateYVelocity(-5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).updateYVelocity(5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).updateXVelocity(-5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).updateXVelocity(5));
 }
 
-// call the function that kicks off the game
-initializeAndLaunch("game-player", new TutGettingStartedConfig());
+// call the function that starts running the game in the `game-player` div tag
+// of `index.html`
+initializeAndLaunch("game-player", new Config(), game);

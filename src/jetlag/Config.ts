@@ -164,10 +164,10 @@ export interface PhysicsCfg {
 }
 
 /**
- * GameConfig stores game-specific configuration values.  The programmer makes one
- * of these to tell JetLag how to run their game.
+ * JetLagGameConfig stores game-specific configuration values.  The programmer
+ * makes one of these to tell JetLag how to run their game.
  */
-export interface GameConfig {
+export interface JetLagGameConfig {
   /** How many pixels are equivalent to a meter in the game? */
   readonly pixelMeterRatio: number;
   /** The default game screen width, in pixels */
@@ -190,6 +190,4 @@ export interface GameConfig {
   readonly resourcePrefix: string;
   /** Should we force the accelerometer to be off (e.g., some laptops)?  */
   readonly forceAccelerometerOff: boolean;
-  /** The code that starts drawing levels of the game */
-  readonly gameBuilder: (level: number) => void;
 }

@@ -1,4 +1,4 @@
-import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ExplicitMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, StandardMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
@@ -586,7 +586,7 @@ export function buildLevelScreen(level: number) {
       rigidBody: new CircleBody(cfg, stage.world, { friction: 0.6 }),
       // The hero will be controlled explicitly via special touches, so give it
       // "explicit" movement.
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -747,7 +747,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -812,7 +812,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 2, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -885,7 +885,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -939,7 +939,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -1205,7 +1205,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       // Give the hero enough strength to beat the enemies
       role: new Hero({ strength: 5 }),
     });
@@ -1249,7 +1249,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
     addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
@@ -1309,7 +1309,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
     addJoystickControl(
@@ -1384,7 +1384,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -1496,7 +1496,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -1594,7 +1594,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -1643,7 +1643,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -1689,7 +1689,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement({ rotateByDirection: true }),
+      movement: new StandardMovement({ rotateByDirection: true }),
       role: new Hero(),
     });
 
@@ -1727,7 +1727,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement({ rotateByDirection: true }),
+      movement: new StandardMovement({ rotateByDirection: true }),
       role: new Hero(),
     });
 
@@ -2038,11 +2038,11 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement({ gravityAffectsIt: true }),
+      movement: new StandardMovement({ gravityAffectsIt: true }),
       role: new Hero(),
     });
     // Give the hero a fixed velocity
-    (h.movement as ExplicitMovement).addVelocity(10, 0);
+    (h.movement as StandardMovement).addVelocity(10, 0);
 
     cfg = { cx: 124, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
@@ -2097,7 +2097,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero({ allowMultiJump: true }),
     });
     // You might be wondering why we can't provide the velocity as part of the
@@ -2105,7 +2105,7 @@ export function buildLevelScreen(level: number) {
     // gets attached to the rigid body, but the movement isn't connected to the
     // rigid body until the preceding line *finishes*, so the best we can do is
     // add the velocity after we make the movement.
-    (h.movement as ExplicitMovement).addVelocity(5, 0);
+    (h.movement as StandardMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h, 6, 0);
     stage.backgroundColor = "#17b4ff";
@@ -2161,7 +2161,7 @@ export function buildLevelScreen(level: number) {
       // Then, here, we make an *AnimatedSprite*, which uses that configuration.
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
     stage.world.camera.setCameraFocus(h);
@@ -2189,10 +2189,10 @@ export function buildLevelScreen(level: number) {
     // draw some buttons for moving the hero.  These are "toggle" buttons: they
     // run some code when they are pressed, and other code when they are
     // released.
-    addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ExplicitMovement).updateXVelocity(-5), () => (h.movement as ExplicitMovement).updateXVelocity(0));
-    addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ExplicitMovement).updateXVelocity(5), () => (h.movement as ExplicitMovement).updateXVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(-5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as StandardMovement).updateXVelocity(-5), () => (h.movement as StandardMovement).updateXVelocity(0));
+    addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as StandardMovement).updateXVelocity(5), () => (h.movement as StandardMovement).updateXVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(5), () => (h.movement as StandardMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(-5), () => (h.movement as StandardMovement).updateYVelocity(0));
     // One thing you'll notice about these buttons is that unexpected things
     // happen if you slide your finger off of them.  Be sure to try to do things
     // like that when testing your code.  Maybe you'll decide you like the
@@ -2223,10 +2223,10 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
-    (h.movement as ExplicitMovement).addVelocity(5, 0);
+    (h.movement as StandardMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h);
 
@@ -2246,8 +2246,8 @@ export function buildLevelScreen(level: number) {
     });
 
     // draw the up/down controls that cover the whole screen
-    addToggleButton(stage.hud, { cx: 8, cy: 2.25, width: 16, height: 4.5, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(-5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 6.75, width: 16, height: 4.5, img: "" }, () => (h.movement as ExplicitMovement).updateYVelocity(5), () => (h.movement as ExplicitMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 2.25, width: 16, height: 4.5, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(-5), () => (h.movement as StandardMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 6.75, width: 16, height: 4.5, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(5), () => (h.movement as StandardMovement).updateYVelocity(0));
 
     welcomeMessage("Press screen borders\nto move up and down");
     winMessage("Great Job");
@@ -2273,10 +2273,10 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 5 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
-    (h.movement as ExplicitMovement).addVelocity(5, 0);
+    (h.movement as StandardMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h);
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
@@ -2319,7 +2319,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
     stage.world.camera.setCameraFocus(h);
@@ -2341,10 +2341,10 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
-    (h.movement as ExplicitMovement).addVelocity(5, 0);
+    (h.movement as StandardMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h);
     cfg = { cx: 159, cy: .5, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -2755,19 +2755,19 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
     addToggleButton(stage.hud,
       { cx: 1, cy: 4.5, width: 2, height: 9, img: "" },
-      () => (h.movement as ExplicitMovement).updateXVelocity(-5),
-      () => (h.movement as ExplicitMovement).updateXVelocity(0)
+      () => (h.movement as StandardMovement).updateXVelocity(-5),
+      () => (h.movement as StandardMovement).updateXVelocity(0)
     );
     addToggleButton(stage.hud,
       { cx: 15, cy: 4.5, width: 2, height: 9, img: "" },
-      () => (h.movement as ExplicitMovement).updateXVelocity(5),
-      () => (h.movement as ExplicitMovement).updateXVelocity(0)
+      () => (h.movement as StandardMovement).updateXVelocity(5),
+      () => (h.movement as StandardMovement).updateXVelocity(0)
     );
 
     // Set up our projectiles.  One thing we add here is a sound when they
@@ -2964,7 +2964,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -3284,10 +3284,10 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 5 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
-    (h.movement as ExplicitMovement).addVelocity(2, 0);
+    (h.movement as StandardMovement).addVelocity(2, 0);
 
     // stage.world.camera.setCameraFocus(h);
 
@@ -3371,7 +3371,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero({
         // provide some code to run when the hero's strength changes
         onStrengthChange: (actor: Actor) => {
@@ -3693,31 +3693,31 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { elasticity: 1, friction: 0.1 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
-    (h.movement as ExplicitMovement).addVelocity(0, 10);
+    (h.movement as StandardMovement).addVelocity(0, 10);
 
     // make an obstacle and then connect it to some controls
     let boxCfg = { cx: 2, cy: 8.75, width: 1, height: 0.5, fillColor: "#FF0000" };
     let o = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 100, elasticity: 1, friction: 0.1 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Obstacle(),
     });
 
     addToggleButton(
       stage.hud,
       { cx: 4, cy: 4.5, width: 8, height: 9, img: "" },
-      () => (o.movement as ExplicitMovement).updateXVelocity(-5),
-      () => (o.movement as ExplicitMovement).updateXVelocity(0)
+      () => (o.movement as StandardMovement).updateXVelocity(-5),
+      () => (o.movement as StandardMovement).updateXVelocity(0)
     );
     addToggleButton(
       stage.hud,
       { cx: 12, cy: 4.5, width: 8, height: 9, img: "" },
-      () => (o.movement as ExplicitMovement).updateXVelocity(5),
-      () => (o.movement as ExplicitMovement).updateXVelocity(0)
+      () => (o.movement as StandardMovement).updateXVelocity(5),
+      () => (o.movement as StandardMovement).updateXVelocity(0)
     );
   }
 
@@ -3928,7 +3928,7 @@ export function buildLevelScreen(level: number) {
     let callback_obstacle = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 1 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Obstacle({ disableHeroCollision: true }),
     });
 
@@ -4576,7 +4576,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 2, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
@@ -4616,12 +4616,12 @@ export function buildLevelScreen(level: number) {
 
     // draw some buttons for moving the hero
     addToggleButton(stage.hud, { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as ExplicitMovement).updateXVelocity(-5),
-      () => (h.movement as ExplicitMovement).updateXVelocity(0)
+      () => (h.movement as StandardMovement).updateXVelocity(-5),
+      () => (h.movement as StandardMovement).updateXVelocity(0)
     );
     addToggleButton(stage.hud, { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as ExplicitMovement).updateXVelocity(5),
-      () => (h.movement as ExplicitMovement).updateXVelocity(0)
+      () => (h.movement as StandardMovement).updateXVelocity(5),
+      () => (h.movement as StandardMovement).updateXVelocity(0)
     );
   }
 
@@ -4868,11 +4868,11 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
     // give the hero a fixed velocity
-    (h.movement as ExplicitMovement).addVelocity(4, 0);
+    (h.movement as StandardMovement).addVelocity(4, 0);
 
     // center the camera a little ahead of the hero
     stage.world.camera.setCameraFocus(h, 5, 0);
@@ -4886,8 +4886,8 @@ export function buildLevelScreen(level: number) {
     // "up" speed matches the hero velocity
     addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => (h.movement as ExplicitMovement).updateVelocity(15, 0),
-      () => (h.movement as ExplicitMovement).updateVelocity(4, 0)
+      () => (h.movement as StandardMovement).updateVelocity(15, 0),
+      () => (h.movement as StandardMovement).updateVelocity(4, 0)
     );
   }
 
@@ -4914,7 +4914,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -4969,7 +4969,7 @@ export function buildLevelScreen(level: number) {
       appearance: new FilledBox(platform_cfg),
       rigidBody: new BoxBody(platform_cfg, stage.world, { collisionsEnabled: true, singleRigidSide: Sides.TOP }),
       // Set a callback, then re-enable the platform's collision effect.
-      role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as ExplicitMovement).updateYVelocity(-5) }),
+      role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as StandardMovement).updateYVelocity(-5) }),
     });
   }
 
@@ -5003,7 +5003,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 1, friction: 0.5 }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
 
@@ -5089,7 +5089,7 @@ export function buildLevelScreen(level: number) {
     let d = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { dynamic: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Destination(),
     });
     // When we attach a rigidBody and destination role to an actor, the
@@ -5100,8 +5100,8 @@ export function buildLevelScreen(level: number) {
     // make the movement with an absolute velocity and with gravity defy turned
     // on.  Now it's a dynamic body, but gravity doesn't affect it.  It can
     // move, it can collide with obstacles, but it won't fall downward.
-    (d.movement as ExplicitMovement).setAbsoluteVelocity(-2, 0);
-    (d.movement as ExplicitMovement).setGravityDefy();
+    (d.movement as StandardMovement).setAbsoluteVelocity(-2, 0);
+    (d.movement as StandardMovement).setGravityDefy();
     stage.score.setVictoryDestination(1);
   }
 
@@ -5308,7 +5308,7 @@ export function buildLevelScreen(level: number) {
       // Note that for the weld joint to work, you probably want the obstacle to
       // have a dynamic body.
       rigidBody: new CircleBody(cfg, stage.world, { dynamic: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Obstacle(),
     });
 
@@ -5469,7 +5469,7 @@ export function buildLevelScreen(level: number) {
       let h = Actor.Make({
         appearance: new ImageSprite(boxCfg),
         rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, elasticity: 1, friction: 5 }),
-        movement: new ExplicitMovement(),
+        movement: new StandardMovement(),
         role: new Hero(),
       });
       heroes.push(h);
@@ -5489,7 +5489,7 @@ export function buildLevelScreen(level: number) {
     addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
       for (let h of heroes) {
         // The bounce is a bit chaotic in the x dimension, but always upward.
-        (h.movement as ExplicitMovement).setAbsoluteVelocity(5 - getRandom(10), -3);
+        (h.movement as StandardMovement).setAbsoluteVelocity(5 - getRandom(10), -3);
       }
       return true;
     });
@@ -5556,17 +5556,17 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 0.1, friction: 0, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     });
-    (h.movement as ExplicitMovement).setAbsoluteVelocity(5, 0);
+    (h.movement as StandardMovement).setAbsoluteVelocity(5, 0);
     stage.world.camera.setCameraFocus(h);
 
     // touching the screen makes the hero go upwards
     addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => (h.movement as ExplicitMovement).updateYVelocity(-5),
-      () => (h.movement as ExplicitMovement).updateYVelocity(0)
+      () => (h.movement as StandardMovement).updateYVelocity(-5),
+      () => (h.movement as StandardMovement).updateYVelocity(0)
     );
 
     // set up our background, with a few layers
@@ -5701,7 +5701,7 @@ export function buildLevelScreen(level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 2, friction: 0.5, disableRotation: true }),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
       role: new Hero(),
     })
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
@@ -5737,13 +5737,13 @@ export function buildLevelScreen(level: number) {
     // draw some buttons for moving the hero
     addToggleButton(stage.hud,
       { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as ExplicitMovement).updateXVelocity(-5),
-      () => (h.movement as ExplicitMovement).updateXVelocity(0)
+      () => (h.movement as StandardMovement).updateXVelocity(-5),
+      () => (h.movement as StandardMovement).updateXVelocity(0)
     );
     addToggleButton(stage.hud,
       { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as ExplicitMovement).updateXVelocity(5),
-      () => (h.movement as ExplicitMovement).updateXVelocity(0)
+      () => (h.movement as StandardMovement).updateXVelocity(5),
+      () => (h.movement as StandardMovement).updateXVelocity(0)
     );
   }
 
@@ -5772,7 +5772,7 @@ export function buildLevelScreen(level: number) {
       appearance: new ImageSprite(heroCfg),
       rigidBody: new CircleBody(heroCfg, stage.world, { friction: 0.6 }),
       role: new Hero(),
-      movement: new ExplicitMovement(),
+      movement: new StandardMovement(),
     });
 
     // Create walls for the maze
@@ -6273,7 +6273,7 @@ function addJoystickControl(scene: Scene, cfgOpts: any, cfg: { actor: Actor, sca
   let moving = false;
   function doMove(hudCoords: { x: number; y: number }) {
     moving = true;
-    (cfg.actor.movement as ExplicitMovement).setAbsoluteVelocity(
+    (cfg.actor.movement as StandardMovement).setAbsoluteVelocity(
       (cfg.scale ?? 1) * (hudCoords.x - cfgOpts.cx),
       (cfg.scale ?? 1) * (hudCoords.y - cfgOpts.cy));
     return true;
@@ -6282,7 +6282,7 @@ function addJoystickControl(scene: Scene, cfgOpts: any, cfg: { actor: Actor, sca
     if (!moving) return true;
     moving = false;
     if (!!cfg.stopOnUp) {
-      (cfg.actor.movement as ExplicitMovement).setAbsoluteVelocity(0, 0);
+      (cfg.actor.movement as StandardMovement).setAbsoluteVelocity(0, 0);
       cfg.actor.rigidBody?.clearRotation();
     }
     return true;
@@ -6399,8 +6399,8 @@ function addDirectionalTossButton(overlay: Scene, projectiles: ActorPoolSystem, 
 function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: number, dampening: number) {
   // TODO:  I think that dampening should only get set once per actor, but right
   //        now that's not true
-  (actor.movement as ExplicitMovement).setDamping(dampening);
-  return () => (actor.movement as ExplicitMovement).updateVelocity(xRate, yRate);
+  (actor.movement as StandardMovement).setDamping(dampening);
+  return () => (actor.movement as StandardMovement).updateVelocity(xRate, yRate);
 }
 
 /**
@@ -6539,7 +6539,7 @@ function setTouchAndGo(e: Actor, x: number, y: number) {
     // if it was hovering, its body type won't be Dynamic
     if (body.GetType() != b2BodyType.b2_dynamicBody)
       body.SetType(b2BodyType.b2_dynamicBody);
-    (e.movement as ExplicitMovement).setAbsoluteVelocity(x, y);
+    (e.movement as StandardMovement).setAbsoluteVelocity(x, y);
     // turn off isTouchAndGo, so we can't double-touch
     e.gestures!.tap = undefined;
     return true;
@@ -6559,7 +6559,7 @@ function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostDuration
     let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
     let x = v.x + boostAmountX;
     let y = v.y + boostAmountY;
-    (h.movement as ExplicitMovement).updateVelocity(x, y);
+    (h.movement as StandardMovement).updateVelocity(x, y);
     // now set a timer to un-boost the speed
     if (boostDuration != undefined) {
       stage.world.timer.addEvent(
@@ -6567,7 +6567,7 @@ function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostDuration
           let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
           let x = v.x - boostAmountX;
           let y = v.y - boostAmountY;
-          (h.movement as ExplicitMovement).updateVelocity(x, y);
+          (h.movement as StandardMovement).updateVelocity(x, y);
         })
       );
     }

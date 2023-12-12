@@ -1,9 +1,10 @@
-import { b2Vec2, b2Transform, b2BodyType } from "@box2d/core";
+import { b2Vec2, b2Transform, b2BodyType, b2DistanceJointDef } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 import { DIRECTION, StateEvent } from "./StateManager";
 import { AnimatedSprite, ImageSprite } from "./Appearance";
 import { ProjectileMovement } from "./Movement";
+import { TimedEvent } from "../Systems/Timer";
 
 /**
  * These are the different reasons why two entities might pass through each
@@ -892,6 +893,49 @@ export class Projectile extends Role {
     // Play a sound?  Animate the tossing actor?
     b.sounds?.toss?.play();
     actor.state.changeState(b, StateEvent.TOSS_Y);
+  }
+
+  /**
+   * Perform a "punch" using projectiles
+   *
+   * @param dx        The X distance between the actor's center and the punch
+   *                  hitbox center
+   * @param dy        The Y distance between the actor's center and the punch 
+   *                  hitbox center
+   * @param actor     The actor performing the punch
+   * @param duration  How long should the punch last (in seconds)?
+   */
+  public punch(dx: number, dy: number, actor: Actor, duration: number) {
+    const b = this.actor;
+    if (!b) return;
+    if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
+    b.enabled = true;
+    // place it where we want it to be
+    let axy = actor.rigidBody.getCenter();
+    b.rigidBody.setCenter(axy.x + dx, axy.y + dy);
+    // Weld it to the actor
+    // set up a joint so the entity can't move too far
+    let mDistJointDef = new b2DistanceJointDef();
+    mDistJointDef.bodyA = b.rigidBody.body;
+    mDistJointDef.bodyB = actor.rigidBody.body;
+    mDistJointDef.localAnchorA.Set(0, 0);
+    mDistJointDef.localAnchorB.Set(0, 0);
+    mDistJointDef.collideConnected = false;
+    mDistJointDef.damping = 0.1;
+    mDistJointDef.stiffness = 2;
+    mDistJointDef.length = Math.sqrt(dx * dx + dy * dy)
+
+    let joint = b.rigidBody.body.GetWorld().CreateJoint(mDistJointDef);
+
+    b.sounds?.toss?.play();
+    actor.state.changeState(b, StateEvent.TOSS_Y);
+    stage.world.timer.addEvent(new TimedEvent(duration, false, () => {
+      b.enabled = false;
+      b.rigidBody.body.GetWorld().DestroyJoint(joint);
+      actor.state.changeState(b, StateEvent.TOSS_N);
+      b.rigidBody.setVelocity(new b2Vec2(0, 0));
+      if (this.reclaimer) this.reclaimer(b);
+    }));
   }
 }
 

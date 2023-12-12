@@ -1,16 +1,30 @@
 # A Tour of JetLag
 
-Description goes here?
+In this tutorial, we will discuss the key ideas in JetLag.  We'll use two simple
+games to illustrate how these ideas work.  At the end of this tutorial, you will
+have modified your code from the first tutorial, first to be one game, then
+another.  In doing so, you will have learned about the physics simulator,
+graphics engine, camera, actors, and events.
 
 ## Software Foundations
 
-JetLag is built on top of Pixi.js (for graphics) and Box2D (for physics
-simulation).  Pixi.js and Box2D are general-purpose libraries... they can be
-used to make games, but also for many other purposes.  The main goal of JetLag
-is to provide a clean and easy way to develop games, by providing a
-game-specific interface to Pixi.js and Box2D.  JetLag tries to give you common
-building blocks for making games that are easy to use, and that still let you
-reach down into the full power of Pixi.js and Box2D when you need to.
+There is very little software that doesn't rely on other software.  When someone
+writes code and shares it, with the expectation that other people will use that
+code (but not modify it!), we call their code a "library".
+
+JetLag relies on two important libraries.  The first is Box2D.  Box2D is an
+industrial-strength physics simulator.  A programmer can use Box2D to create a
+"world", put shapes into that world, and then see how those shapes move and
+collide.  The second important library is Pixi.js.  Pixi.js is a library for
+drawing 2D images.  Note that Box2D doesn't know anything about drawing, and
+Pixi.js doesn't know anything about physics.
+
+Pixi.js and Box2D are general-purpose libraries... they can be used to make
+games, but also for many other purposes.  The main goal of JetLag is to provide
+a clean and easy way to develop games, by providing a game-specific interface to
+Pixi.js and Box2D.  JetLag tries to give you common building blocks for making
+games that are easy to use, and that still let you reach down into the full
+power of Pixi.js and Box2D when you need to.
 
 The following picture gives a sense for how everything fits together:
 
@@ -25,24 +39,218 @@ Finally, at the bottom, Pixi.js and Box2D interact with a web browser, which
 displays the game, receives input, etc.
 
 One way in which JetLag is different than many libraries is that we expect each
-game to end up customizing it at some point.  When you write a game with JetLag,
-you copy the JetLag code into your folder, right next to the code you write.
-That way, when things start to get complicated, and you need to use more of the
-power of Box2D and Pixi.js, you can make changes to JetLag that make those
-features visible.  One important aspect of this design is that your code can
-evolve over time, gradually using more and more of Box2D and Pixi.js.  This
+game to end up customizing JetLag at some point.  When you write a game with
+JetLag, you copy the JetLag code into your folder, right next to the code you
+write. That way, when things start to get complicated, and you need to use more
+of the power of Box2D and Pixi.js, you can make changes to JetLag that make
+those features visible.  One important aspect of this design is that your code
+can evolve over time, gradually using more and more of Box2D and Pixi.js.  This
 design will help you to avoid the problem illustrated in the next picture:
 
 ![Avoiding the Complexity Cliff](tut_overview/cliff.png)
 
-Before we start the tour, there is one more important topic to discuss.  If
+Before we look at some code, there is one more important topic to discuss.  If
 you're looking at that first picture and thinking "I don't want my game to run
 in a web browser", JetLag is still a good tool for you.  In a later tutorial,
 we'll show you how to use tools like [Capacitor](https://capacitorjs.com/) and
 [Electron](https://www.electronjs.org/) to run your game as a mobile or desktop
 app.
 
-## A Game is Like an Interactive Play
+## Understanding the Default Game
+
+Let's start by trying to understand the default game that comes with JetLag.  When you cloned the last tutorial and ran the game, you should have seen something like this:
+
+[TODO: Need screenshot]
+
+Our goal right now is to understand why.  There are two important files.  The first is `src/game/game.html`.  It is the file that defines the structure of the web page that you're seeing in your browser.  If you open it in VSCode, you should see something like this:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <style>
+    html,
+    body {
+      background-color: #000;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <title>JetLag Game</title>
+</head>
+
+<body>
+  <div style="text-align:center">
+    <div id="game-player"></div>
+  </div>
+  <script src="./game.js"></script>
+</body>
+
+</html>
+```
+
+The `head` section describes the general appearance of the web page.  It has
+some `meta` tags that explain how mobile web browsers should scale the page so
+it looks good on a small screen.  It has a `style` tag, which makes sure that
+the page fills the screen.  Finally, it has a `title`, which is what appears as
+your game name in the browser tab or browser title bar.  The first thing you
+should do whenever you start a new game is update the title.
+
+The `body` only has two parts.  The first is the pair of `div` tags, which
+define a `game-player`.  Right now, `game-player` doesn't mean anything.  When
+we get to the `game.ts` file, we'll see why it matters.  The other thing is a
+`script` tag.  This tells the web browser that the code to run will be called
+`game.js`.  You probably don't want to change anything in the `body` section of
+this file.
+
+Now let's move on to the second file.  It is called `sra/game/game.ts`.  First
+of all, notice that it is not `game.js`.  That's because it *only* has the code
+that you write, not all of the JetLag stuff (and Pixi.js stuff, and Box2D
+stuff).  When you type `npm start`, then `game.ts` gets combined with all those
+other things to produce the `game.js` file that the web page expects.
+
+There are four important parts of `game.ts`.  The first is a set of `import` statements that appear at the top of the file.  These indicate which parts of JetLag your game needs.  For now, you can just leave them as-is.  Later, you'll learn how to get VSCode to automatically update the imports as you start using new features of JetLag.  That part of the file should look like this:
+
+```typescript
+import { initializeAndLaunch } from "../jetlag/Stage";
+import { GameConfig } from "../jetlag/Config";
+import { TiltMovement } from "../jetlag/Components/Movement";
+import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
+import { Hero, Obstacle } from "../jetlag/Components/Role";
+import { Actor } from "../jetlag/Entities/Actor";
+import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { stage } from "../jetlag/Stage";
+import { GridSystem } from "../jetlag/Systems/Grid";
+import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
+```
+
+The second part of the file is where we configure our game.  You'll notice that
+some parts of this code are green.  Any text that comes after `//` or between
+`/*` and `*/` is called a "comment".  Comments are not real code.  They are
+notes that a programmer can put into the code to explain what it does, how it
+works, etc.  In this part of the code, you'll see a lot of comments to help
+explain what each line means.
+
+```typescript
+/**
+ * A single place for storing screen dimensions and other game configuration, as
+ * well as the names of all the assets (images and sounds) used by this game.
+ */
+class Config implements GameConfig {
+  // If your game is in landscape mode, it's very unlikely that you'll want to
+  // change these next values. Hover over them to see what they mean.  If your
+  // game is in portrait mode, you probably will want to swap the width and
+  // height.
+  pixelMeterRatio = 100;
+  screenDimensions = { width: 1600, height: 900 };
+  adaptToScreenSize = true;
+
+  canVibrate = true;            // Turn off except for some mobile games
+  forceAccelerometerOff = true; // Turn on except for some mobile games
+  storageKey = "--no-key--";    // This needs to be globally unique to your game
+  hitBoxes = true;              // Turn off before deploying!
+
+  resourcePrefix = "./assets/"; // All sounds and images go in this subfolder
+  musicNames = [];              // Audio files that you want to loop
+  soundNames = [];              // Short audio files that you don't want to loop
+  imageNames = [];              // All image files and sprite sheet json files
+
+  // The name of the function that builds the initial screen of the game
+  gameBuilder = game;
+}
+```
+
+One important thing is that all of this code is defined as a `class` that `implements` something called `GameConfig`.  All that really means is that I've made sure that if you forget any of the required parts of the configuration, you will get an error.  You can try it out.  Put `//` in front of one of the lines (perhaps `hitboxes`) and watch what happens.  `Config` gets a red underline, and if you hover your mouse over it, you'll see an error message.
+
+[TODO: Need Screenshot]
+
+Most of the time, the only things you'll want to change in this part of the code are the asset names (`musicNames`, `soundNames`, and `imageNames`).  When you start using JetLag's storage features, you will also need to update the `storageKey`, but we won't worry about that for now.  And when you're ready to launch your game, you'll want to set `hitBoxes = false`, but we're not ready to do that yet!
+
+The third part of the file is where we put our actual game code.  In later
+tutorials, we'll learn how to split this apart, since a game's code can get
+quite long.  We'll look at this code in more detail in the next section of the
+tutorial.
+
+```typescript
+/**
+ * This function draws the first scene that shows when the game starts. In our
+ * case, it's a very simple "game", consisting of an interactive world that
+ * cannot be won or lost.  After your game starts becoming more polished, you
+ * will probably want to use several functions like this one as a way to
+ * organize the parts of your game (levels, chooser, welcome screen, store,
+ * etc).
+ *
+ * @param level Which level of the game should be displayed
+ */
+export function game(_level: number) {
+  // Draw a grid on the screen, to help us think about the positions of actors.
+  // Remember that when `hitBoxes` is true, clicking the screen will show
+  // coordinates in the developer console.
+  GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
+
+  // Make a "hero" who moves via tilt and appears as a circle
+  Actor.Make({
+    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
+    appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
+    role: new Hero(),
+    movement: new TiltMovement(),
+  })
+
+  // Configure tilt: arrow keys will simulate gravitational force, with a
+  // maximum of +- 10 in the X and Y dimensions.
+  stage.tilt.tiltMax.Set(10, 10);
+  // Pressing a key will induce a force, releasing will stop inducing that force
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
+
+  // Make an obstacle that is a rectangle
+  Actor.Make({
+    rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
+    appearance: new FilledBox({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
+    role: new Obstacle(),
+  })
+
+  // Make an obstacle that is a polygon
+  Actor.Make({
+    rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -1, 0] }, stage.world),
+    appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -1, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
+    role: new Obstacle(),
+  })
+}
+```
+
+The last part of the file is a call to `initializeAndLaunch`.  This is what
+leads to your game actually running.  You'll notice that we have the name of the
+`div` from the HTML file in here.  In essence, this says "find that div, make a
+game according to the rules in `Config`, and put that game into that div".
+
+```typescript
+// call the function that starts running the game in the `game-player` div tag
+// of `index.html`
+initializeAndLaunch("game-player", new Config());
+```
+
+One last note: you can change names like `Config` and `game`, but when you do,
+make sure you change them everywhere!
+
+## A Game is Like an Interactive Play [TODO: Pick up from here]
+
+At this point, we've looked at everything except the code that actually makes
+our game different from any other game.  Part of what makes JetLag approachable
+is the way it organizes code.  JetLag organizes everything around the metaphor
+of a theater production.
 
 It is helpful to think about a game in the same way you might think about
 filming the kind of play where the actors get input from the audience.  The
@@ -206,10 +414,16 @@ into the *world*.  This can be useful for informational text, user interface
 buttons, and other things that aren't part of the world, and that need to be
 visible all the time.
 
+## Making It Yours
+
+What are the files and paths that need to be changed right away?
+
+- Stuff in GameConfig.ts
+- Stuff in index.html
+
 ## Putting It All Together: Our First "Game"
 
 ![Our First Game](tut_overview/grid.png)
-
 
 In LibLOL, the coordinate system starts in the bottom left corner.  So (0, 0) is bottom left, and as we move up and to the right, the y and x values get larger, respectively.
 

@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { AnimationSequence, AnimationState, GameConfig } from "../jetlag/Config";
+import { AnimationSequence, AnimationState, JetLagGameConfig } from "../jetlag/Config";
 import { AnimatedSprite, FilledBox } from "../jetlag/Components/Appearance";
-import { ExplicitMovement } from "../jetlag/Components/Movement";
+import { StandardMovement } from "../jetlag/Components/Movement";
 import { BoxBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -9,10 +9,10 @@ import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 
 /**
- * A single place for storing screen dimensions and other game configuration, as
- * well as the names of all the assets (images and sounds) used by this game.
+ * Screen dimensions and other game configuration, such as the names of all
+ * the assets (images and sounds) used by this game.
  */
-export class EmptyGameConfig implements GameConfig {
+class Config implements JetLagGameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;
@@ -32,9 +32,6 @@ export class EmptyGameConfig implements GameConfig {
   musicNames = [];
   soundNames = [];
   imageNames = ["alien.json"];
-
-  // The name of the function that builds the initial screen of the game
-  gameBuilder = tut_animations;
 }
 
 /**
@@ -49,7 +46,7 @@ export class EmptyGameConfig implements GameConfig {
  *
  * @param level Which splash screen should be displayed
  */
-export function tut_animations(_level: number) {
+function game(_level: number) {
   // Draw four walls, covering the four borders of the world
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
@@ -123,22 +120,22 @@ export function tut_animations(_level: number) {
     rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
     role: new Hero(),
-    movement: new ExplicitMovement(),
+    movement: new StandardMovement(),
   });
 
   // Demonstrate skip-to
   //  (hero.appearance as AnimatedSprite).skipTo(1, 7000);
 
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as ExplicitMovement).updateYVelocity(0)));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ExplicitMovement).updateYVelocity(0)));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ExplicitMovement).updateXVelocity(0)));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ExplicitMovement).updateXVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
 
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as ExplicitMovement).updateYVelocity(-5)));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ExplicitMovement).updateYVelocity(5)));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ExplicitMovement).updateXVelocity(-5)));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ExplicitMovement).updateXVelocity(5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(-5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(-5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(5)));
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new EmptyGameConfig());
+initializeAndLaunch("game-player", new Config(), game);

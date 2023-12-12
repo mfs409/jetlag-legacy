@@ -55,3 +55,5 @@ JetLag is supposed to be a library that its users will hack for their own
 purposes.  Consequently, we prefer that programmers preserve the structure we
 have in the repository, where both `jetlag` and `game` are sub-folders of the
 `src` folder.
+
+TODO: Be sure to update this README!

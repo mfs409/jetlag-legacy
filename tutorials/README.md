@@ -24,10 +24,14 @@ To make a new tutorial, please follow these steps:
 
 ## Tutorial Table of Contents
 
-### Getting Started [Do This Last]
+### Getting Started [TODO: Prep the github master branch, then Handle TODOs!]
 
-This tutorial is not about what JetLag is or how JetLag works.  It is just about
-how to get JetLag running on your computer.
+In this tutorial, we will discuss how to get started using JetLag.  This
+tutorial doesn't involve much programming.  It only focuses on getting your
+computer set up to start writing games.  When you finish this tutorial, you will
+have a copy of the JetLag code that you are able to run.  You will be able to
+use this as the starting point for learning about games, and also as the
+starting point for making your own game.
 
 ### An Overview of JetLag
 
@@ -109,10 +113,10 @@ This tutorial introduces ideas related to joints connecting rigid bodies.
 
 ### Miscellaneous Starter Games
 
-This tutorial shows several different interesting behaviors that are possible in
-JetLag.  Sometimes a unique game can arise just because of an interesting
-behavior that a developer stumbles upon by accident.  This tutorial should cover
-any outstanding ideas that are illustrated in a level of the demo game.
+This tutorial shows several different behaviors that are possible in JetLag.
+Sometimes a unique game can arise just because of an interesting behavior that a
+developer stumbles upon by accident.  This tutorial should cover any outstanding
+ideas that are illustrated in a level of what used to be the "demo" game.
 
 ### Packaging for Mobile
 
@@ -123,3 +127,5 @@ discusses games with vertical (portrait) orientation.
 
 This tutorial shows how to use Electron to package a game for desktop play
 (e.g., Steam).
+
+### TODO: Don't forget to update tutorials.html

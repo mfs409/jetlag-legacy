@@ -1,4 +1,4 @@
-import { GameConfig } from "../Config";
+import { JetLagGameConfig } from "../Config";
 
 /**
  * ConsoleService provides a clean and generic tool for printing debug messages.
@@ -8,7 +8,7 @@ import { GameConfig } from "../Config";
  */
 export class ConsoleService {
   /** Create an output console based on the game config object */
-  constructor(private cfg: GameConfig) { }
+  constructor(private cfg: JetLagGameConfig) { }
 
   /** Display a message to the console if we're not in debug mode */
   log(msg: string) { if (this.cfg.hitBoxes) console.log(msg); }

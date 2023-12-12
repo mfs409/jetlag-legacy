@@ -1,7 +1,5 @@
-// TODO: Populate this with instructions on how to get started making a tutorial
-
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { GameConfig } from "../jetlag/Config";
+import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
 import { TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
@@ -12,10 +10,10 @@ import { stage } from "../jetlag/Stage";
 import { GridSystem } from "../jetlag/Systems/Grid";
 
 /**
- * GameConfig stores things like screen dimensions and other game configuration,
- * as well as the names of all the assets (images and sounds) used by this game.
+ * Screen dimensions and other game configuration, such as the names of all
+ * the assets (images and sounds) used by this game.
  */
-export class EmptyGameConfig implements GameConfig {
+class Config implements JetLagGameConfig {
   // It's very unlikely that you'll want to change these next four values.
   // Hover over them to see what they mean.
   pixelMeterRatio = 100;
@@ -35,9 +33,6 @@ export class EmptyGameConfig implements GameConfig {
   musicNames = [];
   soundNames = [];
   imageNames = [];
-
-  // The name of the function that builds the initial screen of the game
-  gameBuilder = build_game;
 }
 
 /**
@@ -48,7 +43,7 @@ export class EmptyGameConfig implements GameConfig {
  *
  * @param level Which level should be displayed
  */
-export function build_game(_level: number) {
+function game(_level: number) {
   // Draw a grid on the screen, to help us think about the positions of actors
   GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
@@ -85,4 +80,4 @@ export function build_game(_level: number) {
 }
 
 // call the function that kicks off the game
-initializeAndLaunch("game-player", new EmptyGameConfig());
+initializeAndLaunch("game-player", new Config(), game);
