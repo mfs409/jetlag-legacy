@@ -13,9 +13,11 @@ console.log(`npm run <command>: Runs a command from package.json
     start-dev       Build a development version of the game specified by TARGET,
                     and start serving it
     build-game      Build a production version of the game specified by TARGET
+    start-tut       Build a development version of the tutorial specified by 
+                    TARGET, and start serving it
 
   Commands for Building and Serving Tutorials and Slides:
-    build-tuts      Build the tutorials
+    build-tuts      Build all the tutorials
     start-tuts      Start serving the tutorials
     build-slides    Build the slides
     start-slides    Start serving the slides
@@ -29,8 +31,8 @@ console.log(`npm run <command>: Runs a command from package.json
     check           Run TypeScript's type checker on all code in the repository
 
   Commands for Cleaning Up
-    clean-demo      Clean up after running start-demo
-    clean-dev       Clean up after running start-dev
+    clean-game      Clean up after running start-game
+    clean-tut       Clean up after running start-tut
     clean-game      Clean up after running build-game
     clean-tuts      Clean up after running build-tuts
     clean-slides    Clean up after running build-slides
