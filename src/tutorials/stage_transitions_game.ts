@@ -70,11 +70,12 @@ export function gameBuilder(level: number) {
   winMessage("Great Job");
   loseMessage("Try Again");
 
-  // Make a pause button:
+  // Make a pause button.  We'll pause differently for the last scene, so it's
+  // not here...
   Actor.Make({
     appearance: new ImageSprite({ img: "pause.png", width: 1, height: 1 }),
     rigidBody: new BoxBody({ cx: .5, cy: 1.5, width: 1, height: 1 }, stage.hud),
-    gestures: { tap: () => { pauseGame(level); return true; } }
+    gestures: { tap: () => { if (level != 9) pauseGame(level); return true; } }
   });
 
   // Put the level number in the top left corner
@@ -343,7 +344,7 @@ export function gameBuilder(level: number) {
   // For our last level, we'll throw in a few more enemies.  Note how we can
   // alter their paths by adding a waypoint
   else if (level == 9) {
-    Actor.Make({
+    let h = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -406,6 +407,13 @@ export function gameBuilder(level: number) {
     });
 
     welcomeMessage("Don't give up!");
+
+    // Make a special pause scene for this level
+    Actor.Make({
+      appearance: new ImageSprite({ img: "pause.png", width: 1, height: 1 }),
+      rigidBody: new BoxBody({ cx: .5, cy: 1.5, width: 1, height: 1 }, stage.hud),
+      gestures: { tap: () => { specialPauseGame(9, h); return true; } }
+    });
   }
 }
 
@@ -471,6 +479,89 @@ function pauseGame(level: number) {
 
     // It's not a bad idea to have a mute button...
     drawMuteButton({ scene: overlay, cx: 15.5, cy: 1.5, width: 1, height: 1 });
+  }, true);
+}
+
+
+/**
+ * Create an overlay (blocking all game progress) consisting of a text box over
+ * a snapshot of the in-progress game.  Clearing the overlay will resume the
+ * current level.  This is different from pauseGame in a few ways (see below).
+ *
+ * @param level The current level
+ */
+function specialPauseGame(level: number, h: Actor) {
+  // Immediately install the overlay, to pause the game
+  stage.requestOverlay((overlay: Scene, screenshot: ImageSprite | undefined) => {
+    // Draw the screenshot
+    Actor.Make({ appearance: screenshot!, rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay), });
+
+    // It's always good to have a way to go back to the chooser:
+    Actor.Make({
+      appearance: new ImageSprite({ img: "back_arrow.png", width: 1, height: 1 }),
+      rigidBody: new BoxBody({ cx: 15.5, cy: .5, width: 1, height: 1 }, overlay),
+      gestures: { tap: () => { stage.clearOverlay(); stage.switchTo(chooserBuilder, Math.ceil(level / 4)); return true; } }
+    });
+
+    // Pressing anywhere on the text box will make the overlay go away
+    Actor.Make({
+      appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, overlay),
+      gestures: { tap: () => { stage.clearOverlay(); return true; } },
+    });
+    Actor.Make({
+      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+    });
+
+    // It's not a bad idea to have a mute button...
+    drawMuteButton({ scene: overlay, cx: 15.5, cy: 1.5, width: 1, height: 1 });
+
+    // A "cheat" button for winning right away
+    Actor.Make({
+      appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 8, cy: 5.5, radius: .5 }, overlay),
+      gestures: { tap: () => { stage.clearOverlay(); stage.score.winLevel(); return true; } },
+    });
+
+    // A "cheat" button that makes you lose right away
+    Actor.Make({
+      appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
+      rigidBody: new CircleBody({ cx: 8, cy: 6.5, radius: .5 }, overlay),
+      gestures: { tap: () => { stage.clearOverlay(); stage.score.loseLevel(); return true; } },
+    });
+
+    // A mystery button.  It opens *another* pause scene, by hiding this one and
+    // installing a new one.
+    //
+    // One very cool thing is that you can change the *world* from within the
+    // pause scene.  In this case, we'll give the hero strength, so it can
+    // withstand collisions with enemies.
+    Actor.Make({
+      appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 8, cy: 7.5, radius: .5 }, overlay),
+      gestures: {
+        tap: () => {
+          // clear the pause scene, draw another one
+          stage.clearOverlay();
+          stage.requestOverlay((overlay: Scene) => {
+            // This one just has one button that boosts the hero's strength and returns to the game
+            Actor.Make({
+              appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
+              rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .5 }, overlay),
+              gestures: {
+                tap: () => {
+                  (h.role as Hero).strength = 10;
+                  stage.clearOverlay();
+                  return true;
+                }
+              }
+            });
+          }, false);
+          return true;
+        }
+      }
+    });
   }, true);
 }
 

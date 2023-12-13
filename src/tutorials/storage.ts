@@ -41,39 +41,100 @@ class Config implements JetLagGameConfig {
  * @param level Which level should be displayed
  */
 function builder(_level: number) {
-  // Draw a grid on the screen, to help us think about the positions of actors
-  GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
-  stage.tilt!.tiltMax.Set(10, 10);
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
 
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  stage.tilt!.tiltVelocityOverride = false;
+  // This level fleshes out some more poke-to-move stuff. Now we'll say
+  // that once a hero starts moving, the player must re-poke the hero
+  // before it can be given a new position. Also, the hero will keep
+  // moving after the screen is released. We will also show the Fact
+  // interface.
+  else if (level == 77) {
+    drawBoundingBox(0, 0, 16, 9, .1);
+    welcomeMessage("Poke the hero, then  where you want it to go.");
+    winMessage("Great Job");
+    loseMessage("Try Again");
 
-  Actor.Make({
-    rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
-    appearance: new FilledBox({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    role: new Obstacle(),
-  })
+    let w = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
+    let animations = new Map();
+    // TODO:  AnimatedSprite::getAnimationState is rather lackluster right now,
+    //        leading to a lot of redundancy in these situations.  Consider
+    //        something better?
+    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
+    animations.set(AnimationState.IDLE_W, w);
+    animations.set(AnimationState.IDLE_NW, w);
+    animations.set(AnimationState.IDLE_SW, w);
+    animations.set(AnimationState.WALK_W, w);
+    animations.set(AnimationState.WALK_SW, w);
+    animations.set(AnimationState.WALK_NW, w);
 
-  Actor.Make({
-    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
-    appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    role: new Hero(),
-    movement: new TiltMovement(),
-  })
+    let h_cfg = {
+      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, animations,
+    };
+    let h = Actor.Make({
+      appearance: new AnimatedSprite(h_cfg),
+      rigidBody: new CircleBody(h_cfg, stage.world, { density: 1, friction: 0.5 }),
+      movement: new StandardMovement(),
+      role: new Hero(),
+    });
 
-  Actor.Make({
-    rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -.5, 0] }, stage.world),
-    appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    role: new Obstacle(),
-  })
+    h.gestures = { tap: () => { stage.storage.setLevel("selected_entity", h); return true; } };
+    // Be sure to change to "false" and see what happens
+    createPokeToRunZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, true);
+
+    let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination(),
+    });
+
+    stage.score.setVictoryDestination(1);
+
+    // We've actually done a few things with "facts" already, but now it's time
+    // to discuss them in more detail.
+    //
+    // JetLag has three kinds of "facts"... level, session, and persistent.  A
+    // level fact resets to "undefined" every time you restart the level (by
+    // dying, going back to the menu, etc).  A session fact resets to
+    // "undefined" every time you refresh the page or close and re-open the
+    // browser.  Persistent facts never get reset after you set them, unless you
+    // set them to undefined.
+    //
+    // To test it out, we have three facts (all are just numbers).  You can
+    // press the buttons to increment the numbers.  Then exit the level or
+    // refresh the page, and watch what happens.
+    makeText(stage.hud,
+      { cx: 1.25, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
+      () => "Level: " + (stage.storage.getLevel("level test") ?? -1));
+    makeText(stage.hud,
+      { cx: 1.25, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
+      () => "Session: " + (stage.storage.getSession("session test") ?? -1));
+    makeText(stage.hud,
+      { cx: 1.25, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
+      () => "Game: " + (stage.storage.getPersistent("game test") ?? "-1"));
+
+    addTapControl(stage.hud,
+      { cx: .5, cy: 0.65, width: 0.5, height: 0.5, img: "red_ball.png" },
+      () => {
+        stage.storage.setLevel("level test", "" + (1 + parseInt(stage.storage.getLevel("level test") ?? -1)));
+        return true;
+      }
+    );
+    addTapControl(stage.hud,
+      { cx: .5, cy: 1.15, width: 0.5, height: 0.5, img: "blue_ball.png" },
+      () => {
+        stage.storage.setSession("session test", "" + (1 + parseInt(stage.storage.getSession("session test") ?? -1)));
+        return true;
+      }
+    );
+    addTapControl(stage.hud,
+      { cx: .5, cy: 1.65, width: 0.5, height: 0.5, img: "green_ball.png" },
+      () => {
+        stage.storage.setPersistent("game test", "" + (1 + parseInt(stage.storage.getPersistent("game test") ?? "-1")));
+        return true;
+      }
+    );
+  }
 }
 
 // call the function that kicks off the game

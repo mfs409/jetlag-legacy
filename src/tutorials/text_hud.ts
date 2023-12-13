@@ -41,39 +41,58 @@ class Config implements JetLagGameConfig {
  * @param level Which level should be displayed
  */
 function builder(_level: number) {
-  // Draw a grid on the screen, to help us think about the positions of actors
-  GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
-  stage.tilt!.tiltMax.Set(10, 10);
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
 
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  stage.tilt!.tiltVelocityOverride = false;
+      // We can make goodies "count" for more than one point... they can even count
+    // for negative points.
+    else if (level == 22) {
+    // start with a hero who is controlled via Joystick
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
+    let h = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      movement: new StandardMovement(),
+      role: new Hero(),
+    });
 
-  Actor.Make({
-    rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 1 }, stage.world),
-    appearance: new FilledBox({ width: 1, height: 1, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    role: new Obstacle(),
-  })
+    addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
 
-  Actor.Make({
-    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
-    appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    role: new Hero(),
-    movement: new TiltMovement(),
-  })
+    // Set up a destination that requires 7 type-1 goodies
+    cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 7; } }),
+    });
 
-  Actor.Make({
-    rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -.5, 0] }, stage.world),
-    appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -.5, 0], fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    role: new Obstacle(),
-  })
+    stage.score.setVictoryDestination(1);
+
+    // This goodie **reduces** your score
+    cfg = { cx: 9, cy: 1, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, -2); return true; } }),
+    });
+
+    // This goodie **increases** your score
+    cfg = { cx: 9, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Goodie({ onCollect: () => { stage.score.addToGoodieCount(0, 9); return true; } }),
+    });
+
+    // print a goodie count to show how the count goes up and down
+    makeText(stage.hud,
+      { cx: 7, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 18, z: 2 },
+      () => "Your score is: " + stage.score.getGoodieCount(0));
+
+    welcomeMessage("Collect 'the right' blue balls to activate destination");
+    winMessage("Great Job");
+  }
+
 }
 
 // call the function that kicks off the game

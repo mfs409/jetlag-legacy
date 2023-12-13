@@ -319,6 +319,252 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
     rigidBody: new BoxBody(cfg, stage.world, physicsCfg),
     role: new Obstacle({ jumpReEnableSides: [] }),
   });
+
+    // this level introduces the idea of invincibility. Collecting the goodie
+    // makes the hero invincible for a little while...
+    else if (level == 21) {
+    // start with a hero who is controlled via Joystick
+    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
+    let h = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      movement: new StandardMovement(),
+      role: new Hero(),
+    });
+    addJoystickControl(
+      stage.hud,
+      { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
+      { actor: h, scale: 5 }
+    );
+
+    // draw a few enemies, and make them rotate
+    for (let i = 0; i < 5; ++i) {
+      cfg = { cx: i + 4, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
+      Actor.Make({
+        appearance: new ImageSprite(cfg),
+        rigidBody: new CircleBody(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
+        role: new Enemy(),
+      });
+    }
+
+    // this goodie makes the hero invincible
+    cfg = { cx: 15, cy: 8, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world, { rotationSpeed: .25 }),
+      movement: new PathMovement(new Path().to(15, 8).to(10, 3).to(15, 8), 5, true),
+      role: new Goodie({
+        onCollect: (_g: Actor, h: Actor) => {
+          // Note that we *add* 15 seconds, instead of just setting it to 15, in
+          // case there was already some invincibility
+          (h.role as Hero).invincibleRemaining = ((h.role as Hero).invincibleRemaining + 15);
+          return true;
+        }
+      }),
+    });
+
+    // We'll require 5 enemies to be defeated before the destination works
+    cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination({ onAttemptArrival: () => { return stage.score.getEnemiesDefeated() >= 5; } }),
+    });
+    stage.score.setVictoryDestination(1);
+
+    // display a goodie count for type-1 goodies.  This shows that the count
+    // doesn't increase, since we provided an 'onCollect' that didn't increase
+    // the count.
+    makeText(stage.hud,
+      { cx: 0.1, cy: .5, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
+      () => stage.score.getGoodieCount(0) + " Goodies");
+
+    // Show how much invincibility is remaining
+    makeText(stage.hud,
+      { cx: 0.1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 16, z: 2 },
+      () => (h.role as Hero).invincibleRemaining.toFixed(0) + " Invincibility");
+
+    // put a frames-per-second display on the screen.
+    makeText(stage.hud,
+      { cx: 0.1, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#C8C864", size: 16, z: 2 },
+      () => stage.renderer.getFPS().toFixed(0) + " fps");
+
+    welcomeMessage("The blue ball will make you invincible for 15 seconds");
+    winMessage("Great Job");
+    loseMessage("Try Again");
+  }
+
+  // This level introduces a new concept: scrolling in the X dimension. We have
+  // a constant force in the  Y direction, and now we say that tilt can produce
+  // forces in X but not in Y. Thus we can tilt to move the hero left/right.
+  // Note, too, that the hero will fall to the floor, since there is a constant
+  // downward force, but there is not any mechanism to apply a Y force to make
+  // it move back up.
+  if (level == 31) {
+    // make a long level but not a tall level, and provide a constant downward force:
+    stage.world.camera.setBounds(0, 0, 3 * 16, 9);
+    stage.world.setGravity(0, 10);
+    // turn on tilt, but only in the X dimension
+    enableTilt(10, 0);
+
+    drawBoundingBox(0, 0, 3 * 16, 9, .1, { density: 1, friction: 1 });
+
+    // Add a hero and destination
+    let cfg = { cx: 0.25, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    let h = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      movement: new TiltMovement(),
+      role: new Hero(),
+    });
+
+    cfg = { cx: 47, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination(),
+    });
+
+    stage.score.setVictoryDestination(1);
+
+    // This is very important: we need the camera to follow the hero, or it will
+    // go off screen.
+    stage.world.camera.setCameraFocus(h);
+
+    // When you test this level, it's going to be hard to see that the ball is
+    // actually moving.  If you have the "Developer Console" open, you can tap
+    // the screen to see how the "world touch" coordinates are changing
+
+    welcomeMessage("Side scroller with tilt");
+    winMessage("Great Job");
+    loseMessage("Try Again");
+  }
+
+  // In the previous level, it was hard to see that the hero was moving.  We can
+  // make a background layer to remedy this situation. Notice that the
+  // background uses transparency to show the blue color for part of the screen
+  else if (level == 32) {
+    // Start with a repeat of the previous level
+    stage.world.camera.setBounds(0, 0, 128, 9);
+    stage.world.setGravity(0, 10);
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
+    let cfg = { cx: 0.25, cy: 7.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    let h = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      movement: new TiltMovement(),
+      role: new Hero(),
+    });
+
+    cfg = { cx: 127, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination(),
+    });
+
+    stage.score.setVictoryDestination(1);
+    stage.world.camera.setCameraFocus(h);
+
+    // Paint the background blue
+    stage.backgroundColor = "#17b4ff";
+
+    // put in a picture that auto-tiles, and that moves with velocity "0"
+    // relative to the movement of the hero (on whom the camera focuses).  This
+    // will simply tile the background.  Note that background layers don't work
+    // nicely with zoom.
+    //
+    // Note that background "layers" are all drawn *before* anything that is
+    // drawn with a z index... so the background will be behind the hero
+    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+
+    // make an obstacle that hovers in a fixed place. Note that hovering and
+    // zoom do not work together nicely.
+    cfg = { cx: 8, cy: 1, radius: 0.5, width: 1, height: 1, img: "blue_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      movement: new HoverMovement(8, 1),
+      role: new Obstacle(),
+    });
+
+    // Add some text on the HUD to show how far the hero has traveled
+    makeText(stage.hud,
+      { cx: 0.1, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 16, z: 2 },
+      () => Math.floor(h.rigidBody?.getCenter().x ?? 0) + " m");
+
+    // Add some text about the previous best score.  Notice that it's not on the
+    // HUD, so we only see it when the hero is at the beginning of the level
+    makeText(stage.world,
+      { cx: 0.1, cy: 8, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 12, z: 0 },
+      () => "best: " + (stage.storage.getPersistent("HighScore32") ?? "0") + "M"),
+
+      welcomeMessage("Side Scroller with basic repeating background");
+    // when this level ends, we save the best game.score. Once the score is
+    // saved, it is saved permanently on the phone. Note that we could run a
+    // callback on losing the level, too
+    winMessage("Great Job", () => {
+      // Get the hero distance at the end of the level... it's our score
+      let new_score = Math.ceil(h.rigidBody?.getCenter().x ?? 0);
+      // We read the previous best score, which we saved as "HighScore32".
+      // Remember that "Persistent" facts never go away, even when we quit the
+      // game
+      let oldBest = parseInt(stage.storage.getPersistent("HighScore32") ?? "0");
+      if (oldBest < new_score)
+        // If our new score is higher, then save it
+        stage.storage.setPersistent("HighScore32", new_score + "");
+    });
+    loseMessage("Try Again");
+  }
+
+  // Now let's look at how to add multiple background layers.  Also, let's add
+  // jumping
+  else if (level == 33) {
+    // Start like in the previous level
+    stage.world.camera.setBounds(0, 0, 128, 9);
+    stage.world.setGravity(0, 10);
+    enableTilt(10, 0);
+    drawBoundingBox(0, 0, 128, 9, .1, { density: 1, friction: 1 });
+    let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    let h = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      movement: new TiltMovement(),
+      role: new Hero({ numJumpsAllowed: 2 }),
+      sounds: new SoundEffectComponent({ jump: "flap_flap.ogg" }),
+    });
+
+    cfg = { cx: 127, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination(),
+    });
+
+    stage.score.setVictoryDestination(1);
+    stage.world.camera.setCameraFocus(h);
+
+    // this says that touching makes the hero jump.  -10 is the force of the
+    // jump in the y dimension (up is negative)
+    h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
+
+    // set up our background again, but add a few more layers
+    stage.backgroundColor = "#17b4ff";
+
+    // this layer has a scroll factor of 0... it won't move
+    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
+    // this layer moves at half the speed of the hero
+    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    // this layer has a negative value... it moves faster than the hero
+    stage.background.addLayer({ cx: 8, cy: 1, }, { imageMaker: () => new ImageSprite({ width: 16, height: 2.8, img: "front.png" }), speed: -0.5 });
+
+    welcomeMessage("Press the hero to make it jump");
+    winMessage("Great Job");
+    loseMessage("Try Again");
+  }
+
 }
 
 /**

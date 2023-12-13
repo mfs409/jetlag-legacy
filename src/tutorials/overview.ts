@@ -169,6 +169,83 @@ function builder(level: number) {
         stage.score.setLoseCountdownRemaining(10);
         stage.score.setVictoryDestination(1);
     }
+
+    // This shows that it is possible to make a level that is larger than a
+    // screen.
+    //
+    // This level also introduces the "heads up display" (the "HUD").  We can put
+    // information on the HUD, and we can also draw actors on the hud who we can
+    // touch in order to achieve new behaviors.  In this case, we'll put zoom-in
+    // and zoom-out buttons on the HUD.
+    else if (level == 11) {
+        // make the level really big, and set up tilt
+        stage.world.camera.setBounds(0, 0, 64, 36);
+        drawBoundingBox(0, 0, 64, 36, .1, { density: 1, elasticity: .3, friction: .4 });
+        enableTilt(10, 10);
+
+        // put the hero and destination far apart
+        let cfg = { cx: 1, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
+        let h = Actor.Make({
+            appearance: new ImageSprite(cfg),
+            rigidBody: new CircleBody(cfg, stage.world, { friction: 0.6 }),
+            movement: new TiltMovement(),
+            role: new Hero(),
+        });
+
+        cfg = { cx: 63, cy: 35, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+        Actor.Make({
+            appearance: new ImageSprite(cfg),
+            rigidBody: new CircleBody(cfg, stage.world),
+            role: new Destination(),
+        });
+
+        stage.score.setVictoryDestination(1);
+
+        // By default, the camera is centered on the point 8, 4.5f.  We can instead
+        // have the camera stay centered on the hero, so that we can keep seeing the
+        // hero as it moves around the world.  Note that this is the most
+        // rudimentary way to follow the hero's movement, and it's not going to look
+        // good when the hero is close to the level's boundaries.
+        stage.world.camera.setCameraFocus(h);
+
+        // add zoom buttons. We are using blank images, which means that the buttons
+        // will be invisible... that's nice, because we can make the buttons big
+        // (covering the left and right halves of the screen).  When debug rendering
+        // is turned on, we'll be able to see an outline of the two rectangles. You
+        // could also use images, but if you did, you'd probably want to use some
+        // transparency so that they don't cover up the gameplay.
+        addTapControl(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, () => {
+            if (stage.world.camera.getScale() > 50) stage.world.camera.setScale(stage.world.camera.getScale() - 10);
+            return true;
+        });
+        addTapControl(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, () => {
+            if (stage.world.camera.getScale() < 200) stage.world.camera.setScale(stage.world.camera.getScale() + 20);
+            return true;
+        });
+        // Did you notice "game.hud" instead of "game.world"?  If you looked at the
+        // bottom of this file, you'd find a spot where we write the level umber to
+        // the top right corner of the HUD.
+
+        // As the hero moves around, it's going to be hard to see that it's really
+        // moving.  Draw some "noise" in the background.  Note that we're changing
+        // the Z index.
+        //
+        // This code uses "for loops".  The outer loop will run 4 times (0, 16, 32,
+        // 48).  Each time, the inner loop will run 4 times (0, 9, 18, 27), drawing
+        // a total of 16 images.
+        for (let x = 0; x < 64; x += 16) {
+            for (let y = 0; y < 36; y += 9) {
+                // This is kind of neat: a picture is just an actor without a role or rigidBody
+                Actor.Make({
+                    appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
+                    rigidBody: new BoxBody({ cx: x + 8, cy: y + 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
+                });
+            }
+        }
+
+        welcomeMessage("Press left to zoom out\nright to zoom in");
+        winMessage("Great Job");
+    }
 }
 
 // call the function that kicks off the game
