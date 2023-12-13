@@ -1,80 +1,13 @@
 * Tutorial Table of Contents
 
-** Getting Started (Almost ready; Need to deploy v3 to github main first)
-*** Overview
-
-In this tutorial, we will discuss how to get started using JetLag.  This
-tutorial doesn't involve much programming.  It only focuses on getting your
-computer set up to start writing games.  When you finish this tutorial, you
-will have a copy of the JetLag code that you are able to run.  You will be
-able to use this as the starting point for learning about games, and also as
-the starting point for making your own game.
-
-*** Required Software
-
-- Terminal
-- Git
-- Node.js and NPM
-- Web Browser
-- Editor
-
-? How do you know that everything is good?  `node --version`, `npm
---version`, `git --version`, `code --version`
-
-*** Helpful Configuration
-
-- VSCode: `"editor.formatOnSave": true,`
-- VSCode: `"[typescript]": { "editor.defaultFormatter": "vscode.typescript-language-features" },`
-
-- Git: merge strategy
-- Git: user name
-
-- GitHub: You need an account, and you need to set up your ssh keys
-
-*** Fork the repo
-
-*** Clone the repo
-
-*** Mention https://www.cse.lehigh.edu/~spear/tutorials/viewer.html#cse216_git/tut.md
-
-*** Running for the first time
-
-- Do things like type ls to see that the files are there
-- You need to `npm install`, but only the first time
-- You need to do `npm start`
-- There's the "localhost" thing, which you can click to see your game
-
-*** Opening the code in VSCode
-
-- Talk about how we open folders, not files
-- Talk about the bar on the side
-- Discuss the folders and main files
-  - `assets` - This is where you should put any images, sounds, or other
-    files that support your game.
-  - `node_modules` - You can ignore this.  It's where `npm` put the things it
-    needs in order for your game to work.
-  - `scripts` - You can ignore this.  It's just has some code for helping
-    `npm to know how to run your code`
-  - `src` - This has two subfolders.  `src/jetlag` is where the JetLag code
-    can be found.  `src/game` is where your game code should go.
-  - `.gitignore` - This file tells `git` that some folders and files, such as
-    `node_modules`, shouldn't get backed up to GitHub.
-  - `package-lock.json` - This file is created by `npm`.  You can ignore it.
-  - `README.md` - A file describing the repository.  For now, it describes
-    the JetLag repository, but you may eventually change it.
-  - `package.json` - This file is used by `npm`.  You probably won't need to work
-    with this until your game gets very advanced.
-  - `tsconfig.json` - Another configuration file that you can ignore for a long
-    time.
-- Remind that all that matters for now is just src/game
-
-** An Overview of JetLag (Still the Getting Started code; ready)
-*** Overview
+** Done
+*** An Overview of JetLag (Still the Getting Started code; ready)
+**** Overview
 In this tutorial, we will discuss the key ideas in JetLag.  We'll make small
 changes to the game from the first tutorial, and watch how those changes
 change the behavior of the game.  In doing so, we will learn about the
 physics simulator, graphics engine, actors, and events.
-*** The idea of libraries
+**** The idea of libraries
 - Other people's code that you don't change, you just use
 - We have two big ones we rely on: Box2D and Pixi.js
 - JetLag is NOT a library
@@ -84,7 +17,7 @@ physics simulator, graphics engine, actors, and events.
 - JetLag not a library because we want it to be easy, but we don't want you
   falling off a cliff of difficulty, so when it stops being easy, you change
   it so things stay easy.
-*** The default game
+**** The default game
 - Look at the HTML file.  HEAD is general appearance of the web page.  META
   is about mobile browsers.  STYLE makes sure the page fills the screen.
   TITLE... you can change that.  It's the title bar/tab.  Now on to BODY.
@@ -102,7 +35,7 @@ physics simulator, graphics engine, actors, and events.
   - Third is the code that tells how your game behaves.  We'll do that later.
   - Fourth is the thing that sets it all up.  Connects the HTML to the config
     (and hence to the code).
-*** Thinking about a Theater Production
+**** Thinking about a Theater Production
 - Actors moving around on a stage
   - Yeah, that's a simplification, but for now it works.
 - So then each level is like an act, or at least a scene.  What is code?  It
@@ -116,7 +49,7 @@ physics simulator, graphics engine, actors, and events.
   - When an amount of time elapses, we can run some code
   - User input (gestures and keyboard and mouse) can cause code to run.
 - "code to run" == "script" or "callback".
-*** Now Actors
+**** Now Actors
 - Look at our game code.
 - First, notice that F12 does great stuff.  Turn off hitboxes.  That changes
   things.  Turn off the grid too.  Hmm...
@@ -153,13 +86,107 @@ physics simulator, graphics engine, actors, and events.
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
 
-** Thinking about the Camera and Gravity (tut_overview; ready need the code on paper)
-*** Overview
+
+
+*** A Maze Game (ready; Need the code on paper)
+**** Overview
+This tutorial builds a game where the player must navigate a maze.  It is the
+first time we use "assets", and it also lets us start to think about how to
+write efficient and maintainable code, by using a declarative approach for
+defining the maze.
+**** Sprites
+- We're cheating, using a spritesheet
+- Otherwise, it would be green_ball, blue_ball, mustard_ball, red_ball.
+- The code is pretty straightforward, walking through the steps of making the
+  game
+- The big thing is using the array.  Be sure to talk about that.
+- Other big thing is the winscene and losescene.  These really go all-in on
+  callbacks.
+
+
+*** Types of Stages (ready)
+**** Overview
+This tutorial discusses techniques for organizing code, especially with regard
+to handling the parts of the game that don't have gameplay, like menus.
+**** Status
+It's pretty much good, just need to figure out the order in which to discuss things.
+
+
+** Started
+*** Getting Started (Almost ready; Need to deploy v3 to github main first)
+**** Overview
+
+In this tutorial, we will discuss how to get started using JetLag.  This
+tutorial doesn't involve much programming.  It only focuses on getting your
+computer set up to start writing games.  When you finish this tutorial, you
+will have a copy of the JetLag code that you are able to run.  You will be
+able to use this as the starting point for learning about games, and also as
+the starting point for making your own game.
+
+**** Required Software
+
+- Terminal
+- Git
+- Node.js and NPM
+- Web Browser
+- Editor
+
+? How do you know that everything is good?  `node --version`, `npm
+--version`, `git --version`, `code --version`
+
+**** Helpful Configuration
+
+- VSCode: `"editor.formatOnSave": true,`
+- VSCode: `"[typescript]": { "editor.defaultFormatter": "vscode.typescript-language-features" },`
+
+- Git: merge strategy
+- Git: user name
+
+- GitHub: You need an account, and you need to set up your ssh keys
+
+**** Fork the repo
+**** Clone the repo
+**** Mention https://www.cse.lehigh.edu/~spear/tutorials/viewer.html#cse216_git/tut.md
+**** Running for the first time
+
+- Do things like type ls to see that the files are there
+- You need to `npm install`, but only the first time
+- You need to do `npm start`
+- There's the "localhost" thing, which you can click to see your game
+
+**** Opening the code in VSCode
+
+- Talk about how we open folders, not files
+- Talk about the bar on the side
+- Discuss the folders and main files
+  - `assets` - This is where you should put any images, sounds, or other
+    files that support your game.
+  - `node_modules` - You can ignore this.  It's where `npm` put the things it
+    needs in order for your game to work.
+  - `scripts` - You can ignore this.  It's just has some code for helping
+    `npm to know how to run your code`
+  - `src` - This has two subfolders.  `src/jetlag` is where the JetLag code
+    can be found.  `src/game` is where your game code should go.
+  - `.gitignore` - This file tells `git` that some folders and files, such as
+    `node_modules`, shouldn't get backed up to GitHub.
+  - `package-lock.json` - This file is created by `npm`.  You can ignore it.
+  - `README.md` - A file describing the repository.  For now, it describes
+    the JetLag repository, but you may eventually change it.
+  - `package.json` - This file is used by `npm`.  You probably won't need to work
+    with this until your game gets very advanced.
+  - `tsconfig.json` - Another configuration file that you can ignore for a long
+    time.
+- Remind that all that matters for now is just src/game
+
+
+
+*** Thinking about the Camera and Gravity (tut_overview; ready need the code on paper)
+**** Overview
 In this tutorial, we will explore ideas related to the camera and the physics
 simulator.  This will let us think about how we can use Box2D and Pixi.js to
 make games that seem like they are happening "in front of us" or where we're
 watching from above.
-*** An overhead game
+**** An overhead game
 - The default is no physical forces
 - In this game, we won't have any movement in the x/y, but we will rotate
 - New things
@@ -171,7 +198,7 @@ watching from above.
   - New role: enemies
   - PathMovement, ProjectileMovement
 - Talk about default strength for heroes and enemies
-*** A Side Scroller
+**** A Side Scroller
 - Camera follows the hero
 - Gravity
 - Border Obstacles
@@ -181,26 +208,14 @@ watching from above.
 - Time limit
 - Putting stuff on the HUD
 
-** A Maze Game (ready; Need the code on paper)
-*** Overview
-This tutorial builds a game where the player must navigate a maze.  It is the
-first time we use "assets", and it also lets us start to think about how to
-write efficient and maintainable code, by using a declarative approach for
-defining the maze.
-*** Sprites
-- We're cheating, using a spritesheet
-- Otherwise, it would be green_ball, blue_ball, mustard_ball, red_ball.
-- The code is pretty straightforward, walking through the steps of making the
-  game
-- The big thing is using the array.  Be sure to talk about that.
-- Other big thing is the winscene and losescene.  These really go all-in on
-  callbacks.
 
-** Text and the HUD (TODO)
-*** Overview
+** Not Started
+
+*** Text and the HUD (TODO)
+**** Overview
 This tutorial discusses how to make text in JetLag.  It especially encourages
 thinking about "when things run".
-*** TODO: What Goes In Here
+**** TODO: What Goes In Here
 - Centering versus specifying top-right
 - Font size, shape
 - Do we want to add stroke?
@@ -208,11 +223,12 @@ thinking about "when things run".
 - Strings versus producers
 - How to get your own fonts into the game
 
-** Assets, Audio, and Animations (TODO)
-*** Overview
+
+*** Assets, Audio, and Animations (TODO)
+**** Overview
 This tutorial focuses on the key asset types in JetLag: images, sounds, and
 sprite sheets.  It briefly discusses texture packing.
-*** TODO: What goes in here?
+**** TODO: What goes in here?
 - About color codes for those filledsprites (include transparency)
 - The two ways of making animations
 - All the different animation states
@@ -221,22 +237,26 @@ sprite sheets.  It briefly discusses texture packing.
 - No spaces in names!
 - Changing images/animations without making new components
 - Z index!
-** Introduction to Simulation: Conway's Game of Life (ready;)
-*** Overview
+
+
+*** Introduction to Simulation: Conway's Game of Life (ready;)
+**** Overview
 This tutorial discusses Conway's Game of Life, as a prelude to the idea that a
 game might need to create its own internal simulation (e.g., farming).
-*** Plan
+**** Plan
 - Discuss the rules of Conway
 - Introduce the array, and extra
 - A state machine for the UI
 - A function on the fly
 - It should just run itself (the game and the video)
-** Movement Styles and Physics Bodies (TODO)
-*** Overview
+
+
+*** Movement Styles and Physics Bodies (TODO)
+**** Overview
 This tutorial focuses on the `Movement` field in the constructor for `Actors`.
 It also discusses important issues related to rigid body types, physics
 properties, gravity, shapes, and tilt.
-*** What goes in here
+**** What goes in here
 - Sprite size / shape need not match rigidbody
 - Dynamic, Kinematic, Static (collisions and forces)
 - Friction, Density, Elasticity
@@ -245,10 +265,11 @@ properties, gravity, shapes, and tilt.
   BasicChase, ChaseFixed, Inert, Gravity
 - Not yet: Draggable, Flick, Hover, HoverFlick
 
-** Collision Events (TODO)
-*** Overview
+
+*** Collision Events (TODO)
+**** Overview
 This tutorial discusses collision events, and how they are handled in JetLag.
-*** What Goes In here?
+**** What Goes In here?
 - Prereq: dynamic body
 - Most things are when the collision starts
   - Automatic things: the code for when a hero and enemy collide.  But even
@@ -262,88 +283,106 @@ This tutorial discusses collision events, and how they are handled in JetLag.
 - addEndContactHandler (world method) is at the end of a collision
 - Disabling collisions: onesided, passthrough
 
-** Storage (TODO)
-*** Overview
+
+*** Storage (TODO)
+**** Overview
 This tutorial discusses the different categories of storage in JetLag, and their
 idiosyncrasies.  It also discusses the `extra` field, present in all actors.
-*** What goes in here
+**** What goes in here
 - Level is really just a convenience instead of capturing
 - Session is really useful
 - Persistent needs a key, and it's harder.  You probably want to JSON it.
 
-** An Overhead Fighting/Farming Game (Half done)
-*** Overview
+
+*** An Overhead Fighting/Farming Game (Half done)
+**** Overview
 This tutorial builds a game where characters move around in an overhead-view
 world, fighting, and farming.  It also introduces the projectile type.
-*** What goes in here
+**** What goes in here
 - This is especially about session storage and the way we make mini-state
   machines all the time.  Also a bit about how to represent state as arrays.
 - Be sure to talk about free asset packs, and how I made these assets
 - Changing size, faking it with projectiles
-** A Platformer Game (TODO)
-*** Overview
+
+
+*** A Platformer Game (TODO)
+**** Overview
 This tutorial builds a platformer-style game.  It introduces the idea of
 invincibility, and the different ways a hero can defeat an enemy.
-*** Missing Stuff
+**** Missing Stuff
 - We need all the defeat stuff: crawl, jump, projectile, and the plain old
   strength stuff
 - Immune to invincible, alwaysdoesdamage
 - Talk about how enemies don't work for "bosses", and what to do about it
   (use Extra on an Obstacle?)
 - Then discuss unusual uses of enemies, like at the bottom of a pit.
-** Gestures and Projectiles (TODO)
-*** Overview
+
+
+*** Gestures (TODO)
+**** Overview
 This tutorial focuses on gesture input.  It reinforces ideas about the heads-up
-display, and uses projectiles as a way to explain how different gesture
-receivers might be placed on the HUD.
-*** What goes in here?
+display.
+**** What goes in here?
 - Flick
 - Talk about panning and dragging being one and the same
 - Tapping
 - New mouseover feature
 - What else?
-** Endless Runner (TODO)
-*** Overview
+
+*** Projectiles (TODO)
+**** Overview
+This tutorial focuses on projectiles
+**** What goes in here?
+
+*** Endless Runner (TODO)
+**** Overview
 This tutorial is a gateway into thinking about procedurally-generated content.
 It builds an endless runner game.  Realizing that "random" is not always good,
 it suggests a simple strategy for avoiding repetitive gameplay.
-*** What goes in here
-** Timers (TODO)
-*** Overview
+**** What goes in here
+
+
+*** Timers (TODO)
+**** Overview
 This tutorial builds a survival-style game.  It uses the game to discuss some of
 the more nuanced issues related to timers.
-*** What goes in here?
+**** What goes in here?
 - Not sure... one-time timers?  
 - How to vary a timer's rate via a state machine?
-** Types of Stages (ready)
-*** Overview
-This tutorial discusses techniques for organizing code, especially with regard
-to handling the parts of the game that don't have gameplay, like menus.
-*** Status
-It's pretty much good, just need to figure out the order in which to discuss things.
-** Joints (TODO)
-*** Overview
+
+
+*** Joints (TODO)
+**** Overview
 This tutorial introduces ideas related to joints connecting rigid bodies.
-*** What goes in here?
+**** What goes in here?
 - Talk about the way we do sticky obstacles via distance joints
 - Talk about some revolutejoint stuff
 - Then say "you can get to the body, so do it yourself"
-** Miscellaneous Starter Games (TODO)
-*** Overview
+
+
+*** Miscellaneous Starter Games (TODO)
+**** Overview
 This tutorial shows several different behaviors that are possible in JetLag.
 Sometimes a unique game can arise just because of an interesting behavior that a
 developer stumbles upon by accident.  This tutorial should cover any outstanding
 ideas that are illustrated in a level of what used to be the "demo" game.
-*** What goes in here
+**** What goes in here
 - Include an arkanoid?
 - Include an "AI" in a free kick or air hockey game?
-** Packaging for Mobile (TODO)
-*** Overview
+
+
+*** Packaging for Mobile (TODO)
+**** Overview
 This tutorial shows how to use Capacitor to package a game for mobile.  It also
 discusses games with vertical (portrait) orientation.
-** Packaging for Desktop (TODO)
-*** Overview
+
+
+*** Packaging for Desktop (TODO)
+**** Overview
 This tutorial shows how to use Electron to package a game for desktop play
 (e.g., Steam).
 
-** TODO: Don't forget to update tutorials.html
+
+*** TODO: Don't forget to update tutorials.html
+
+*** TODO: Don't forget to update the scripts
