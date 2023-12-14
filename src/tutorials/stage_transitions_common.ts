@@ -19,7 +19,7 @@ export function drawMuteButton(cfg: { cx: number, cy: number, width: number, hei
   let getVolume = () => (stage.storage.getPersistent("volume") ?? "1") === "1";
   let mute = Actor.Make({
     appearance: new ImageSprite({ width: cfg.width, height: cfg.height, img: "audio_off.png" }),
-    rigidBody: new BoxBody({ cx: cfg.cx, cy: cfg.cy, width: cfg.width, height: cfg.height }, cfg.scene),
+    rigidBody: new BoxBody({ cx: cfg.cx, cy: cfg.cy, width: cfg.width, height: cfg.height }, { scene: cfg.scene }),
   });
   // If the game is not muted, switch the image
   if (getVolume())

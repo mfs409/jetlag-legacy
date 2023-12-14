@@ -15,11 +15,10 @@ import { KeyCodes } from "../jetlag/Services/Keyboard";
  */
 class Config implements JetLagGameConfig {
     // We want a landscape game.  The reference layout is 1600x900 pixels, with
-    // each 100 pixels representing a meter
+    // 100 pixels representing a meter
     pixelMeterRatio = 100;
     screenDimensions = { width: 1600, height: 900 };
-    // Resize to fill the screen
-    adaptToScreenSize = true;
+    adaptToScreenSize = true; // Resize to fill the screen
 
     // This game does not use vibration or accelerometer
     canVibrate = false;
@@ -29,9 +28,7 @@ class Config implements JetLagGameConfig {
     // For now, we're in debug mode, so print console messages and show hitboxes
     hitBoxes = true;
 
-    // Here's where we name all the images/sounds/background music files.  You'll
-    // probably want to delete these files from the assets folder, remove them
-    // from these lists, and add your own.
+    // Asset configuration
     resourcePrefix = "./assets/";
     musicNames = [];
     soundNames = [];
@@ -89,7 +86,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -109,7 +106,7 @@ function builder(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
                         appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
@@ -117,7 +114,7 @@ function builder(level: number) {
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
                         role: new Goodie(),
                     });
                 }
@@ -125,10 +122,9 @@ function builder(level: number) {
         }
 
         // Create a destination that requires 6 goodies before it works
-        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
-            appearance: new ImageSprite(destCfg),
-            rigidBody: new CircleBody(destCfg, stage.world),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+            rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
             role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
@@ -154,7 +150,11 @@ function builder(level: number) {
                 appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
                 rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
                 gestures: {
-                    tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
+                    tap: () => {
+                        stage.clearOverlay();
+                        stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level);
+                        return true;
+                    }
                 }
             });
             Actor.Make({
@@ -183,8 +183,8 @@ function builder(level: number) {
             });
         };
 
-        stage.score.onLose = { level: level, builder: builder };
-        stage.score.onWin = { level: level, builder: builder };
+        stage.score.onLose = { level, builder };
+        stage.score.onWin = { level, builder };
     }
 
     // Don't forget: before diving into the code, present the configuration
@@ -195,7 +195,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -217,7 +217,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -233,17 +233,16 @@ function builder(level: number) {
         stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         // Create a destination
-        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
-            appearance: new ImageSprite(destCfg),
-            rigidBody: new CircleBody(destCfg, stage.world),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+            rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
             role: new Destination(),
         });
         stage.score.setVictoryDestination(1);
 
         // Win/Lose transitions
-        stage.score.onLose = { level: level, builder: builder };
-        stage.score.onWin = { level: level, builder: builder };
+        stage.score.onLose = { level, builder };
+        stage.score.onWin = { level, builder };
     }
     // Level 4 adds a wall and a goodie, plus borders
     else if (level == 4) {
@@ -274,7 +273,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -290,28 +289,27 @@ function builder(level: number) {
         stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
 
         Actor.Make({
-            rigidBody: new BoxBody({ cx: 4.5, cy: 4.5, width: 1, height: 1 }, stage.world),
+            rigidBody: new BoxBody({ cx: 4.5, cy: 4.5, width: 1, height: 1 }),
             appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
             role: new Obstacle(),
         });
 
         Actor.Make({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-            rigidBody: new CircleBody({ cx: 6.5, cy: 6.5, radius: 0.25 }, stage.world),
+            rigidBody: new CircleBody({ cx: 6.5, cy: 6.5, radius: 0.25 }),
             role: new Goodie(),
         });
 
         // Create a destination
-        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
-            appearance: new ImageSprite(destCfg),
-            rigidBody: new CircleBody(destCfg, stage.world),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+            rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
             role: new Destination(),
         });
         stage.score.setVictoryDestination(1);
 
-        stage.score.onLose = { level: level, builder: builder };
-        stage.score.onWin = { level: level, builder: builder };
+        stage.score.onLose = { level, builder };
+        stage.score.onWin = { level, builder };
     }
     // Level 5 adds a fancy way to make walls and goodies
     else if (level == 5) {
@@ -355,7 +353,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -375,7 +373,7 @@ function builder(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
                         appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
@@ -383,7 +381,7 @@ function builder(level: number) {
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
                         role: new Goodie(),
                     });
                 }
@@ -391,16 +389,15 @@ function builder(level: number) {
         }
 
         // Create a destination
-        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
-            appearance: new ImageSprite(destCfg),
-            rigidBody: new CircleBody(destCfg, stage.world),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+            rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
             role: new Destination(),
         });
         stage.score.setVictoryDestination(1);
 
-        stage.score.onLose = { level: level, builder: builder };
-        stage.score.onWin = { level: level, builder: builder };
+        stage.score.onLose = { level, builder };
+        stage.score.onWin = { level, builder };
     }
     // Level 6 "Activates" the destination and adds some helpful text
     else if (level == 6) {
@@ -444,7 +441,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -464,7 +461,7 @@ function builder(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
                         appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
@@ -472,7 +469,7 @@ function builder(level: number) {
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
                         role: new Goodie(),
                     });
                 }
@@ -480,10 +477,9 @@ function builder(level: number) {
         }
 
         // Create a destination that requires 6 goodies before it works
-        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
-            appearance: new ImageSprite(destCfg),
-            rigidBody: new CircleBody(destCfg, stage.world),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+            rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
             role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
@@ -494,8 +490,8 @@ function builder(level: number) {
             rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
         });
 
-        stage.score.onLose = { level: level, builder: builder };
-        stage.score.onWin = { level: level, builder: builder };
+        stage.score.onLose = { level, builder };
+        stage.score.onWin = { level, builder };
     }
     // Level 7 finishes by adding an enemy and win/lose builders (but leaves on
     // the hitboxes)
@@ -540,7 +536,7 @@ function builder(level: number) {
         // Create a hero whose movement we can control "explicitly"
         let h = Actor.Make({
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
-            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }, stage.world),
+            rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
             movement: new StandardMovement(),
         });
@@ -560,7 +556,7 @@ function builder(level: number) {
             for (let col = 0; col < mazeLayout[row].length; col++) {
                 if (mazeLayout[row][col] === "#") {
                     Actor.Make({
-                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }, stage.world),
+                        rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
                         appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
                         role: new Obstacle(),
                     });
@@ -568,7 +564,7 @@ function builder(level: number) {
                 else if (mazeLayout[row][col] === "G") {
                     Actor.Make({
                         appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
-                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }, stage.world),
+                        rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
                         role: new Goodie(),
                     });
                 }
@@ -576,10 +572,9 @@ function builder(level: number) {
         }
 
         // Create a destination that requires 6 goodies before it works
-        let destCfg = { cx: 14.5, cy: 8.5, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
         Actor.Make({
-            appearance: new ImageSprite(destCfg),
-            rigidBody: new CircleBody(destCfg, stage.world),
+            appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+            rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
             role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
         });
         stage.score.setVictoryDestination(1);
@@ -634,8 +629,8 @@ function builder(level: number) {
             });
         };
 
-        stage.score.onLose = { level: level, builder: builder };
-        stage.score.onWin = { level: level, builder: builder };
+        stage.score.onLose = { level, builder };
+        stage.score.onWin = { level, builder };
     }
 }
 

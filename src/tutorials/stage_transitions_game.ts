@@ -74,7 +74,7 @@ export function gameBuilder(level: number) {
   // not here...
   Actor.Make({
     appearance: new ImageSprite({ img: "pause.png", width: 1, height: 1 }),
-    rigidBody: new BoxBody({ cx: .5, cy: 1.5, width: 1, height: 1 }, stage.hud),
+    rigidBody: new BoxBody({ cx: .5, cy: 1.5, width: 1, height: 1 }, { scene: stage.hud }),
     gestures: { tap: () => { if (level != 9) pauseGame(level); return true; } }
   });
 
@@ -411,7 +411,7 @@ export function gameBuilder(level: number) {
     // Make a special pause scene for this level
     Actor.Make({
       appearance: new ImageSprite({ img: "pause.png", width: 1, height: 1 }),
-      rigidBody: new BoxBody({ cx: .5, cy: 1.5, width: 1, height: 1 }, stage.hud),
+      rigidBody: new BoxBody({ cx: .5, cy: 1.5, width: 1, height: 1 }, { scene: stage.hud }),
       gestures: { tap: () => { specialPauseGame(9, h); return true; } }
     });
   }
@@ -430,7 +430,7 @@ function welcomeMessage(message: string) {
     // Pressing anywhere on the black background will make the overlay go away
     Actor.Make({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
           stage.clearOverlay();
@@ -440,7 +440,7 @@ function welcomeMessage(message: string) {
     });
     // The text goes in the middle
     Actor.Make({
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
     });
   }, false);
@@ -457,24 +457,24 @@ function pauseGame(level: number) {
   // Immediately install the overlay, to pause the game
   stage.requestOverlay((overlay: Scene, screenshot: ImageSprite | undefined) => {
     // Draw the screenshot
-    Actor.Make({ appearance: screenshot!, rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay), });
+    Actor.Make({ appearance: screenshot!, rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }), });
 
     // It's always good to have a way to go back to the chooser:
     Actor.Make({
       appearance: new ImageSprite({ img: "back_arrow.png", width: 1, height: 1 }),
-      rigidBody: new BoxBody({ cx: 15.5, cy: .5, width: 1, height: 1 }, overlay),
+      rigidBody: new BoxBody({ cx: 15.5, cy: .5, width: 1, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); stage.switchTo(chooserBuilder, Math.ceil(level / 4)); return true; } }
     });
 
     // Pressing anywhere on the text box will make the overlay go away
     Actor.Make({
       appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); return true; } },
     });
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
 
     // It's not a bad idea to have a mute button...
@@ -494,24 +494,24 @@ function specialPauseGame(level: number, h: Actor) {
   // Immediately install the overlay, to pause the game
   stage.requestOverlay((overlay: Scene, screenshot: ImageSprite | undefined) => {
     // Draw the screenshot
-    Actor.Make({ appearance: screenshot!, rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay), });
+    Actor.Make({ appearance: screenshot!, rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }), });
 
     // It's always good to have a way to go back to the chooser:
     Actor.Make({
       appearance: new ImageSprite({ img: "back_arrow.png", width: 1, height: 1 }),
-      rigidBody: new BoxBody({ cx: 15.5, cy: .5, width: 1, height: 1 }, overlay),
+      rigidBody: new BoxBody({ cx: 15.5, cy: .5, width: 1, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); stage.switchTo(chooserBuilder, Math.ceil(level / 4)); return true; } }
     });
 
     // Pressing anywhere on the text box will make the overlay go away
     Actor.Make({
       appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); return true; } },
     });
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
 
     // It's not a bad idea to have a mute button...
@@ -520,14 +520,14 @@ function specialPauseGame(level: number, h: Actor) {
     // A "cheat" button for winning right away
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
-      rigidBody: new CircleBody({ cx: 8, cy: 5.5, radius: .5 }, overlay),
+      rigidBody: new CircleBody({ cx: 8, cy: 5.5, radius: .5 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); stage.score.winLevel(); return true; } },
     });
 
     // A "cheat" button that makes you lose right away
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
-      rigidBody: new CircleBody({ cx: 8, cy: 6.5, radius: .5 }, overlay),
+      rigidBody: new CircleBody({ cx: 8, cy: 6.5, radius: .5 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); stage.score.loseLevel(); return true; } },
     });
 
@@ -539,7 +539,7 @@ function specialPauseGame(level: number, h: Actor) {
     // withstand collisions with enemies.
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
-      rigidBody: new CircleBody({ cx: 8, cy: 7.5, radius: .5 }, overlay),
+      rigidBody: new CircleBody({ cx: 8, cy: 7.5, radius: .5 }, { scene: overlay }),
       gestures: {
         tap: () => {
           // clear the pause scene, draw another one
@@ -548,7 +548,7 @@ function specialPauseGame(level: number, h: Actor) {
             // This one just has one button that boosts the hero's strength and returns to the game
             Actor.Make({
               appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
-              rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .5 }, overlay),
+              rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .5 }, { scene: overlay }),
               gestures: {
                 tap: () => {
                   (h.role as Hero).strength = 10;
@@ -575,7 +575,7 @@ function winMessage(message: string) {
   stage.score.winSceneBuilder = (overlay: Scene) => {
     Actor.Make({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
           stage.clearOverlay();
@@ -586,7 +586,7 @@ function winMessage(message: string) {
     });
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
   };
 }
@@ -601,7 +601,7 @@ function loseMessage(message: string) {
   stage.score.loseSceneBuilder = (overlay: Scene) => {
     Actor.Make({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
           stage.clearOverlay();
@@ -612,7 +612,7 @@ function loseMessage(message: string) {
     });
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     })
   };
 }

@@ -25,7 +25,7 @@ export function chooserBuilder(level: number) {
   // Draw a brown box at the top of the screen, put some text in it
   Actor.Make({
     appearance: new FilledBox({ width: 16, height: 2.3, fillColor: "#523216" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 1.15, width: 16, height: 2.3 }, stage.world, { collisionsEnabled: false }),
+    rigidBody: new BoxBody({ cx: 8, cy: 1.15, width: 16, height: 2.3 }, { collisionsEnabled: false }),
   });
   Actor.Make({
     appearance: new TextSprite({ center: true, face: "Arial", size: 120, color: "#FFFFFF" }, "Choose a Level"),

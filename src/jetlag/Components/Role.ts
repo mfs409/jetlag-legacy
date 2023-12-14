@@ -637,18 +637,22 @@ export class Obstacle extends Role {
    *                                  with a hero
    * @param cfg.enemyCollision        Code to run when this obstacle collides
    *                                  with an enemy
+   * @param cfg.projectileCollision   Code to run when this obstacle collides
+   *                                  with a projectile
    * @param cfg.disableHeroCollision  Should the hero bounce off of this
    *                                  obstacle?
    * @param cfg.jumpReEnableSides     Which sides "count" for letting a jumping
    *                                  hero jump again?
    */
-  constructor(cfg: { heroCollision?: (thisActor: Actor, collideActor: Actor) => void, enemyCollision?: (thisActor: Actor, collideActor: Actor) => void, disableHeroCollision?: boolean, jumpReEnableSides?: DIRECTION[] } = {}) {
+  constructor(cfg: { heroCollision?: (thisActor: Actor, collideActor: Actor) => void, enemyCollision?: (thisActor: Actor, collideActor: Actor) => void, projectileCollision?: (thisActor: Actor, collideActor: Actor) => boolean, disableHeroCollision?: boolean, jumpReEnableSides?: DIRECTION[] } = {}) {
     super();
 
     this.collisionRules.properties.push(CollisionExemptions.OBSTACLE);
 
     this.heroCollision = cfg.heroCollision;
     this.enemyCollision = cfg.enemyCollision;
+    this.projectileCollision = cfg.projectileCollision;
+
     if (cfg.disableHeroCollision) this.collisionRules.ignores.push(CollisionExemptions.HERO);
     // Switch from default jump-reenable sides (all) to just the specified ones
     if (cfg.jumpReEnableSides) {
@@ -672,7 +676,7 @@ export class Obstacle extends Role {
   heroCollision?: (thisActor: Actor, collideActor: Actor) => void;
 
   /** This is for when a projectile collides with an obstacle */
-  onProjectileCollision?: (thisActor: Actor, collideActor: Actor) => boolean;
+  projectileCollision?: (thisActor: Actor, collideActor: Actor) => boolean;
 
   /** This is for when an enemy collides with an obstacle */
   enemyCollision?: (thisActor: Actor, collideActor: Actor) => void;
@@ -799,9 +803,9 @@ export class Projectile extends Role {
     // call it
     if (other.role instanceof Obstacle) {
       let o = other.role;
-      if (o.onProjectileCollision) {
+      if (o.projectileCollision) {
         // Only disappear if it returns true
-        if (o.onProjectileCollision(other, this._actor!)) {
+        if (o.projectileCollision(other, this._actor!)) {
           this._actor!.remove();
           if (this.reclaimer) this.reclaimer(this._actor!);
         }

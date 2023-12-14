@@ -338,11 +338,11 @@ export class CircleBody extends RigidBodyBase {
    * @param circleCfg.cy                  Y coordinate of the center of the
    *                                      circle
    * @param circleCfg.radius              Radius of the circle
-   * @param scene                         The scene (world or hud) where this
-   *                                      circle should be created
    * @param physicsCfg                    A set of configuration options that
    *                                      can be applied while creating the
    *                                      circle
+   * @param physicsCfg.scene              The scene where this body should be
+   *                                      made
    * @param physicsCfg.density            The density of the body
    * @param physicsCfg.elasticity         The elasticity of the body
    * @param physicsCfg.friction           The friction of the body
@@ -364,7 +364,8 @@ export class CircleBody extends RigidBodyBase {
    *
    * @returns A rigid body with a Circle shape
    */
-  constructor(circleCfg: { cx: number, cy: number, radius: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+  constructor(circleCfg: { cx: number, cy: number, radius: number }, physicsCfg: PhysicsCfg = {}) {
+    let scene = physicsCfg.scene ?? stage.world;
     super(scene);
     let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: circleCfg.cx, y: circleCfg.cy } });
     this.body = body;
@@ -428,17 +429,14 @@ export class BoxBody extends RigidBodyBase {
    *
    * @param boxCfg                        The basic shape configuration for the
    *                                      box
-   * @param boxCfg.cx                     X coordinate of the center of the
-   *                                      box
-   * @param boxCfg.cy                     Y coordinate of the center of the
-   *                                      box
+   * @param boxCfg.cx                     X coordinate of the center of the box
+   * @param boxCfg.cy                     Y coordinate of the center of the box
    * @param boxCfg.width                  Width of the box
    * @param boxCfg.height                 Height of the box
-   * @param scene                         The scene (world or hud) where this
-   *                                      box should be created
    * @param physicsCfg                    A set of configuration options that
-   *                                      can be applied while creating the
-   *                                      box
+   *                                      can be applied while creating the box
+   * @param physicsCfg.scene              The scene where this body should be
+   *                                      made
    * @param physicsCfg.density            The density of the body
    * @param physicsCfg.elasticity         The elasticity of the body
    * @param physicsCfg.friction           The friction of the body
@@ -460,7 +458,8 @@ export class BoxBody extends RigidBodyBase {
    *
    * @returns A rigid body with a Box shape
    */
-  constructor(boxCfg: { cx: number, cy: number, width: number, height: number }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+  constructor(boxCfg: { cx: number, cy: number, width: number, height: number }, physicsCfg: PhysicsCfg = {}) {
+    let scene = physicsCfg.scene ?? stage.world;
     super(scene);
     let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: boxCfg.cx, y: boxCfg.cy } });
     this.body = body;
@@ -532,11 +531,11 @@ export class PolygonBody extends RigidBodyBase {
    * @param polygonCfg.vertices           Vertices of the polygon, as a stream
    *                                      of alternating x and y values that are
    *                                      offsets relative to (cx, cy)
-   * @param scene                         The scene (world or hud) where this
-   *                                      polygon should be created
    * @param physicsCfg                    A set of configuration options that
    *                                      can be applied while creating the
    *                                      polygon
+   * @param physicsCfg.scene              The scene where this body should be
+   *                                      made
    * @param physicsCfg.density            The density of the body
    * @param physicsCfg.elasticity         The elasticity of the body
    * @param physicsCfg.friction           The friction of the body
@@ -558,7 +557,8 @@ export class PolygonBody extends RigidBodyBase {
    *
    * @returns A rigid body with a Polygon shape
    */
-  constructor(polygonCfg: { cx: number, cy: number, vertices: number[] }, scene: Scene = stage.world, physicsCfg: PhysicsCfg = {}) {
+  constructor(polygonCfg: { cx: number, cy: number, vertices: number[] }, physicsCfg: PhysicsCfg = {}) {
+    let scene = physicsCfg.scene ?? stage.world;
     super(scene);
     let body = scene.physics!.world.CreateBody({ type: b2BodyType.b2_staticBody, position: { x: polygonCfg.cx, y: polygonCfg.cy } });
     // Compute the radius of the circumscribing circle

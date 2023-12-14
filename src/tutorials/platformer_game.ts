@@ -292,7 +292,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
     rigidBody: new BoxBody(cfg, stage.world, physicsCfg),
     role: new Obstacle(),
   });
-  (floor.role as Obstacle).onProjectileCollision = () => false;
+  (floor.role as Obstacle).projectileCollision = () => false;
 
 
   // The top only differs by translating the Y from the bottom

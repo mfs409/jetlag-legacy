@@ -1,13 +1,5 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
-import { TiltMovement } from "../jetlag/Components/Movement";
-import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
-import { Hero, Obstacle } from "../jetlag/Components/Role";
-import { Actor } from "../jetlag/Entities/Actor";
-import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { stage } from "../jetlag/Stage";
-import { GridSystem } from "../jetlag/Systems/Grid";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all

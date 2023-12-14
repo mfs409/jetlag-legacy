@@ -60,28 +60,43 @@ export class TextSprite {
   color: string;
   /** Font size */
   size: number;
+  /** Stroke width */
+  strokeWidth?: number;
+  /** Stroke color */
+  strokeColor?: string;
 
   /**
    * Build some text that can be rendered
    *
-   * @param opts        The configuration options for this TextSprite
-   * @param opts.center Should the text be centered at the rigid body's (cx,cy)
-   *                    (true) or is the rigid body's (cx,cy) top-left (false)
-   * @param opts.face   Font to use
-   * @param opts.color  Color for the text (should be an RGB string code, like
-   *                    #aa4433)
-   * @param opts.size   Font size
-   * @param opts.z      An optional z index in the range [-2,2]
-   * @param producer    A function that creates the text to display, or a String
+   * @param opts              The configuration options for this TextSprite
+   * @param opts.center       Should the text be centered at the rigid body's
+   *                          (cx,cy) (true) or is the rigid body's (cx,cy)
+   *                          top-left (false)?
+   * @param opts.face         Name of the font to use
+   * @param opts.color        Color for the text (should be an RGB string code,
+   *                          like #aa4433)
+   * @param opts.size         Font size
+   * @param opts.z            An optional z index in the range [-2,2]
+   * @param opts.strokeWidth  The width of the text outline (optional)
+   * @param opts.strokeColor  The color of the text outline (optional)
+   * @param producer          A function that creates the text to display, or a
+   *                          String
    */
-  constructor(opts: { center: boolean, face: string, color: string, size: number, z?: number }, public producer: string | (() => string)) {
+  constructor(opts: { center: boolean, face: string, color: string, size: number, z?: number, strokeWidth?: number, strokeColor?: string }, public producer: string | (() => string)) {
     this.center = opts.center;
     this.face = opts.face;
     this.color = opts.color;
     this.size = opts.size;
     this.z = coerceZ(opts.z);
+    this.strokeWidth = opts.strokeWidth;
+    this.strokeColor = opts.strokeColor;
     let sample_text = (typeof this.producer == "string") ? this.producer : this.producer();
-    this.text = Text.makeText(sample_text, { fontFamily: this.face, fontSize: this.size, fill: this.color });
+    let cfg: any = { fontFamily: this.face, fontSize: this.size, fill: this.color };
+    if (opts.strokeColor)
+      cfg.stroke = opts.strokeColor;
+    if (opts.strokeWidth)
+      cfg.strokeThickness = opts.strokeWidth;
+    this.text = Text.makeText(sample_text, cfg);
     this.width = this.text.text.width;
     this.height = this.text.text.height;
   }

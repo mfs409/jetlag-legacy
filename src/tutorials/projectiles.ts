@@ -333,12 +333,12 @@ function builder(_level: number) {
     // removing it).  That being the case, we can set a "callback" to run custom
     // code when the projectile and obstacle collide, and then just have the
     // custom code do nothing.
-    (leftBucket.role as Obstacle).onProjectileCollision = () => false;
+    (leftBucket.role as Obstacle).projectileCollision = () => false;
 
     // we can make a CollisionCallback object, and connect it to several obstacles
     let c = () => false;
-    (rightBucket.role as Obstacle).onProjectileCollision = c;
-    (bottomBucket.role as Obstacle).onProjectileCollision = c;
+    (rightBucket.role as Obstacle).projectileCollision = c;
+    (bottomBucket.role as Obstacle).projectileCollision = c;
 
     // put a hint on the screen after 15 seconds to show where to click to ensure that
     // projectiles hit the enemy
@@ -350,7 +350,7 @@ function builder(_level: number) {
         role: new Obstacle(),
       });
       // Make sure that when projectiles hit the obstacle, nothing happens
-      (hint.role as Obstacle).onProjectileCollision = () => false
+      (hint.role as Obstacle).projectileCollision = () => false
     }));
 
     welcomeMessage("Press anywhere to throw a projectile");

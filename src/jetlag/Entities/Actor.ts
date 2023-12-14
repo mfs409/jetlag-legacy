@@ -50,7 +50,7 @@ export class Actor {
    *                and `sounds`
    * @param config.rigidBody See {@link RigidBodyComponent}
    */
-  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void }) {
+  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
     return new Actor(config);
   }
 
@@ -61,7 +61,7 @@ export class Actor {
    *                `appearance`, and optional `movement`, `role`, `gestures`,
    *                and `sounds`
    */
-  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void }) {
+  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
     this.scene = config.rigidBody.scene;
 
     this.appearance = config.appearance;
@@ -82,6 +82,7 @@ export class Actor {
 
     this.sounds = config.sounds ?? new SoundEffectComponent({});
     this.onDisappear = config.onDisappear;
+    this.extra = config.extra;
   }
 
   /**

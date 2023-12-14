@@ -1,3 +1,4 @@
+import { Scene } from "./Entities/Scene";
 import { Sprite } from "./Services/ImageLibrary";
 import { stage } from "./Stage";
 
@@ -139,6 +140,8 @@ export const enum Sides { TOP, RIGHT, BOTTOM, LEFT }
  * -->
  */
 export interface PhysicsCfg {
+  /** The scene where this body should be made (defaults to stage.world) */
+  scene?: Scene;
   /** The density of the body */
   density?: number;
   /** The elasticity of the body */
