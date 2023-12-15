@@ -1,7 +1,7 @@
 * Tutorial Table of Contents
 
-** Done (7)
-*** Getting Started (getting_started; ready; need to verify after deplying v3 to github)
+** Done (10)
+*** Getting Started (getting_started.ts; ready; need to verify after deplying v3 to github)
 **** Overview
 In this tutorial, we will discuss how to get started using JetLag.  This
 tutorial doesn't involve much programming.  It only focuses on getting your
@@ -57,7 +57,7 @@ the starting point for making your own game.
     time.
 - Remind that all that matters for now is just src/game
 
-*** An Overview of JetLag (getting_started; ready)
+*** An Overview of JetLag (getting_started.ts; ready)
 **** Overview
 In this tutorial, we will discuss the key ideas in JetLag.  We'll make small
 changes to the game from the first tutorial, and watch how those changes
@@ -142,7 +142,7 @@ physics simulator, graphics engine, actors, and events.
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
 
-*** Thinking about the Camera and Gravity (overview; ready)
+*** Thinking about the Camera and Gravity (overview.ts; ready)
 **** Overview
 In this tutorial, we will explore ideas related to the camera and the physics
 simulator.  This will let us think about how we can use Box2D and Pixi.js to
@@ -178,7 +178,7 @@ watching from above.
 - Vertical parallax
 - Actual jumping
 
-*** A Maze Game (maze_game; ready)
+*** A Maze Game (maze_game.ts; ready)
 **** Overview
 This tutorial builds a game where the player must navigate a maze.  It is the
 first time we use "assets", and it also lets us start to think about how to
@@ -193,14 +193,14 @@ defining the maze.
 - Other big thing is the winscene and losescene.  These really go all-in on
   callbacks.
 
-*** Types of Stages (stage_transitions; ready)
+*** Types of Stages (stage_transitions.ts; ready)
 **** Overview
 This tutorial discusses techniques for organizing code, especially with regard
 to handling the parts of the game that don't have gameplay, like menus.
 **** Status
 It's pretty much good, just need to figure out the order in which to discuss things.
 
-*** Introduction to Simulation: Conway's Game of Life (simulation_conway; ready)
+*** Introduction to Simulation: Conway's Game of Life (simulation_conway.ts; ready)
 **** Overview
 This tutorial discusses Conway's Game of Life, as a prelude to the idea that a
 game might need to create its own internal simulation (e.g., farming).
@@ -211,7 +211,7 @@ game might need to create its own internal simulation (e.g., farming).
 - A function on the fly
 - It should just run itself (the game and the video)
 
-*** Text and the HUD (text_hud; ready)
+*** Text and the HUD (text_hud.ts; ready)
 **** Overview
 This tutorial discusses how to make text in JetLag.  It especially encourages
 thinking about "when things run".
@@ -223,7 +223,7 @@ thinking about "when things run".
 - Strings versus producers
 - How to get your own fonts into the game
 
-*** An Overhead Fighting/Farming Game (overhead_fight_farm_game; ready)
+*** An Overhead Fighting/Farming Game (overhead_fight_farm_game.ts; ready)
 **** Overview
 This tutorial builds a game where characters move around in an overhead-view
 world, fighting, and farming.  It also introduces the projectile type.
@@ -233,9 +233,47 @@ world, fighting, and farming.  It also introduces the projectile type.
 - Be sure to talk about free asset packs, and how I made these assets
 - Changing size of sprite, faking things with projectiles
 
+*** Movement Styles and Physics Bodies (movement_physics.ts; ready)
+**** Overview
+This tutorial focuses on the `Movement` field in the constructor for `Actors`.
+It also discusses important issues related to rigid body types, physics
+properties, gravity, shapes, and tilt.
+**** What goes in here
+- Dynamic, Kinematic, Static (collisions and forces)
+- Sprite size / shape need not match rigidbody
+- Friction, Density, Elasticity
+- Tilt / impulse / accelerometer
+- Movements: StandardMovement, PathMovement, TiltMovement, Projectile,
+  BasicChase, Inert, Gravity
+
+*** Roles (roles.ts; ready)
+**** Overview
+This tutorial discusses the "automatic" collision behaviors that come from
+the roles that JetLag supports
+**** What goes in here?
+- Let's just announce right up front that we won't talk about the projectile
+  role
+- Passive role also skipped.  All it does is turn off collisions and ensure
+  passives pass through each other
+- Each role has certain things it passes through.  Some turn off collisions
+  globally and/or with themselves.
+- That leaves Hero, Enemy, Destination, Goodie, Obstacle, and Sensor?
+-- Goodie: Defaults to no collisions, just has a hero collision callback
+   "onCollect"
+-- Hero: Default to dynamic; strength; invincibility via duration;
+   mustSurvive; onStrengthChange; allowMultiJump; numJumpsAllowed.  Can jump
+   and crawl.  JumpReenable stuff
+-- Enemy: Have damage, have onDefeated, have onDefeatHero.  defeatByCrawl,
+   and defeatByJump.  immuneToInvincibility and instantDefeat.
+   disableHeroCollision.  Can always manually defeat, too.
+-- Destination: Have a capacity, and have a test to run before accepting
+-- Obstacle: has hero, projectile, and enemy collisions.  jumpreenablesides.
+   disableHeroCollision to let hero pass through, but not others
+-- Sensor: just has a hero collision
+
 ** Started (0)
 
-** Not Started (15)
+** Not Started (13)
 *** Assets, Audio, and Animations (TODO)
 **** Overview
 This tutorial focuses on the key asset types in JetLag: images, sounds, and
@@ -249,21 +287,6 @@ sprite sheets.  It briefly discusses texture packing.
 - No spaces in names!
 - Changing images/animations without making new components
 - Z index!
-
-
-*** Movement Styles and Physics Bodies (TODO)
-**** Overview
-This tutorial focuses on the `Movement` field in the constructor for `Actors`.
-It also discusses important issues related to rigid body types, physics
-properties, gravity, shapes, and tilt.
-**** What goes in here
-- Sprite size / shape need not match rigidbody
-- Dynamic, Kinematic, Static (collisions and forces)
-- Friction, Density, Elasticity
-- Tilt / impulse / accelerometer
-- Movements: StandardMovement, PathMovement, TiltMovement, Projectile,
-  BasicChase, ChaseFixed, Inert, Gravity
-- Not yet: Draggable, Flick, Hover, HoverFlick
 
 
 *** Collision Events (TODO)
@@ -317,11 +340,14 @@ display.
 - Tapping
 - New mouseover feature
 - What else?
+- Not yet: Draggable, Flick, Hover, HoverFlick
+
 
 *** Projectiles (TODO)
 **** Overview
 This tutorial focuses on projectiles
 **** What goes in here?
+
 
 *** Endless Runner (TODO)
 **** Overview
@@ -349,7 +375,7 @@ This tutorial introduces ideas related to joints connecting rigid bodies.
 - Then say "you can get to the body, so do it yourself"
 
 
-*** Miscellaneous Starter Games (TODO)
+*** SVG (TODO)
 **** Overview
 This tutorial shows several different behaviors that are possible in JetLag.
 Sometimes a unique game can arise just because of an interesting behavior that a
@@ -370,6 +396,7 @@ discusses games with vertical (portrait) orientation.
 **** Overview
 This tutorial shows how to use Electron to package a game for desktop play
 (e.g., Steam).
+
 
 *** Score (TODO)
 This isn't even made yet!
@@ -436,8 +463,7 @@ This isn't even made yet!
   }
 
 
-*** Roles (TODO)
-This isn't made yet!
 *** TODO: Don't forget to update tutorials.html
+
 
 *** TODO: Don't forget to update the scripts
