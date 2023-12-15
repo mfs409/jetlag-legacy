@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { AnimationSequence, AnimationState, JetLagGameConfig } from "../jetlag/Config";
 import { AnimatedSprite, FilledBox, FilledCircle, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { Path, PathMovement, ProjectileMovement, StandardMovement } from "../jetlag/Components/Movement";
+import { Path, PathMovement, ProjectileMovement, ManualMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
 import { Enemy, Goodie, Hero, Obstacle, Projectile, Sensor } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -139,18 +139,18 @@ function builder(level: number) {
       rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true }),
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
       role: new Hero(),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
     });
 
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as ManualMovement).updateYVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ManualMovement).updateYVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ManualMovement).updateXVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ManualMovement).updateXVelocity(0)));
 
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(-5)));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(5)));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(-5)));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as ManualMovement).updateYVelocity(-5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ManualMovement).updateYVelocity(5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ManualMovement).updateXVelocity(-5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ManualMovement).updateXVelocity(5)));
 
     // set up a pool of projectiles to act as "water"
     let projectiles = new ActorPoolSystem();
@@ -307,18 +307,18 @@ function builder(level: number) {
       rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true }),
       appearance: new AnimatedSprite({ width: 4, height: 4, animations, remap }),
       role: new Hero(),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
     });
 
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as ManualMovement).updateYVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ManualMovement).updateYVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ManualMovement).updateXVelocity(0)));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ManualMovement).updateXVelocity(0)));
 
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(-5)));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(5)));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(-5)));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as ManualMovement).updateYVelocity(-5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ManualMovement).updateYVelocity(5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ManualMovement).updateXVelocity(-5)));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ManualMovement).updateXVelocity(5)));
 
     // set up a pool with one projectile, which we will use to simulate punching
     //

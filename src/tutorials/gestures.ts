@@ -42,6 +42,11 @@ class Config implements JetLagGameConfig {
  */
 function builder(_level: number) {
 
+  // Be sure to cover these movements
+  // Draggable
+  // FlickMovement
+  // HoverFlick
+
 
   // Draw a joystick on the HUD, and have the joystick control the hero.  This
   // will appear as a grey circle in the bottom left corner of the screen.
@@ -58,10 +63,10 @@ function builder(_level: number) {
     { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" },
     { actor: h, scale: 5, stopOnUp: true });
 
-    // this level demonstrates that we can drag actors (in this case,
-    // obstacles), and that we can make rotated obstacles. The latter could be
-    // useful for having angled walls in a maze
-    else if (level == 23) {
+  // this level demonstrates that we can drag actors (in this case,
+  // obstacles), and that we can make rotated obstacles. The latter could be
+  // useful for having angled walls in a maze
+  if (level == 23) {
     // start with a hero who is controlled via tilt, and a destination
     drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     enableTilt(10, 10);
@@ -129,7 +134,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -332,7 +337,7 @@ function builder(_level: number) {
       // Then, here, we make an *AnimatedSprite*, which uses that configuration.
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
     stage.world.camera.setCameraFocus(h);
@@ -360,10 +365,10 @@ function builder(_level: number) {
     // draw some buttons for moving the hero.  These are "toggle" buttons: they
     // run some code when they are pressed, and other code when they are
     // released.
-    addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as StandardMovement).updateXVelocity(-5), () => (h.movement as StandardMovement).updateXVelocity(0));
-    addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as StandardMovement).updateXVelocity(5), () => (h.movement as StandardMovement).updateXVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(5), () => (h.movement as StandardMovement).updateYVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(-5), () => (h.movement as StandardMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ManualMovement).updateXVelocity(-5), () => (h.movement as ManualMovement).updateXVelocity(0));
+    addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ManualMovement).updateXVelocity(5), () => (h.movement as ManualMovement).updateXVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as ManualMovement).updateYVelocity(5), () => (h.movement as ManualMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as ManualMovement).updateYVelocity(-5), () => (h.movement as ManualMovement).updateYVelocity(0));
     // One thing you'll notice about these buttons is that unexpected things
     // happen if you slide your finger off of them.  Be sure to try to do things
     // like that when testing your code.  Maybe you'll decide you like the
@@ -396,7 +401,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
     stage.world.camera.setCameraFocus(h);
@@ -524,11 +529,11 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
     // give the hero a fixed velocity
-    (h.movement as StandardMovement).addVelocity(4, 0);
+    (h.movement as ManualMovement).addVelocity(4, 0);
 
     // center the camera a little ahead of the hero
     stage.world.camera.setCameraFocus(h, 5, 0);
@@ -542,8 +547,8 @@ function builder(_level: number) {
     // "up" speed matches the hero velocity
     addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => (h.movement as StandardMovement).updateVelocity(15, 0),
-      () => (h.movement as StandardMovement).updateVelocity(4, 0)
+      () => (h.movement as ManualMovement).updateVelocity(15, 0),
+      () => (h.movement as ManualMovement).updateVelocity(4, 0)
     );
   }
 
@@ -577,7 +582,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 1, friction: 0.5 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -704,7 +709,7 @@ function builder(_level: number) {
       let h = Actor.Make({
         appearance: new ImageSprite(boxCfg),
         rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, elasticity: 1, friction: 5 }),
-        movement: new StandardMovement(),
+        movement: new ManualMovement(),
         role: new Hero(),
       });
       heroes.push(h);
@@ -724,7 +729,7 @@ function builder(_level: number) {
     addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
       for (let h of heroes) {
         // The bounce is a bit chaotic in the x dimension, but always upward.
-        (h.movement as StandardMovement).setAbsoluteVelocity(5 - getRandom(10), -3);
+        (h.movement as ManualMovement).setAbsoluteVelocity(5 - getRandom(10), -3);
       }
       return true;
     });

@@ -164,6 +164,8 @@ export interface PhysicsCfg {
   rotationSpeed?: number;
   /** Should the body be forced to be dynamic? */
   dynamic?: boolean;
+  /** Should the body be forced to be kinematic? */
+  kinematic?: boolean;
 }
 
 /**

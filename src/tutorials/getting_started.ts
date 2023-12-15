@@ -1,6 +1,6 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
-import { StandardMovement } from "../jetlag/Components/Movement";
+import { ManualMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -47,9 +47,9 @@ function builder(_level: number) {
   // Make a "hero" who moves via keyboard control and appears as a circle
   let hero = Actor.Make({
     appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
-    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }, stage.world),
+    rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .5 }),
     role: new Hero(),
-    movement: new StandardMovement(),
+    movement: new ManualMovement(),
   })
 
   // Make an obstacle that is a rectangle
@@ -67,14 +67,14 @@ function builder(_level: number) {
   })
 
   // Pressing a key will change the hero's velocity
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).updateYVelocity(0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).updateYVelocity(0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).updateXVelocity(0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).updateXVelocity(0));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).updateYVelocity(-5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).updateYVelocity(5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).updateXVelocity(-5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).updateXVelocity(5));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (hero.movement as ManualMovement).updateYVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (hero.movement as ManualMovement).updateYVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (hero.movement as ManualMovement).updateXVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as ManualMovement).updateXVelocity(0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as ManualMovement).updateYVelocity(-5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as ManualMovement).updateYVelocity(5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as ManualMovement).updateXVelocity(-5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as ManualMovement).updateXVelocity(5));
 }
 
 // call the function that starts running the game in the `game-player` div tag

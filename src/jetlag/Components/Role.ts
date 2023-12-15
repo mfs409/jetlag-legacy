@@ -406,10 +406,6 @@ export class Hero extends Role {
     })
   }
 
-  /** Code to run immediately before rendering a Hero's Actor */
-  prerender() {
-  }
-
   /**
    * Code to run when a Hero collides with another Actor
    *
@@ -519,9 +515,6 @@ export class Hero extends Role {
     if (fixtures != null)
       sensor = sensor && fixtures.IsSensor();
 
-    // reset rotation of hero if this obstacle is not a sensor
-    // if (this.currentRotation != 0 && !sensor) this.increaseRotation(-this.currentRotation);
-
     // if there is code attached to the obstacle for modifying the hero's
     // behavior, run it
     if (obstacle.heroCollision) obstacle.heroCollision(o, this._actor!);
@@ -601,21 +594,6 @@ export class Hero extends Role {
     transform.SetPositionAngle(body.GetPosition(), body.GetAngle() - rotate);
     body.SetTransform(transform);
     this._actor!.state.changeState(this._actor!, StateEvent.CRAWL_N);
-  }
-
-  /**
-   * Change the rotation of the hero
-   *
-   * @param delta How much to add to the current rotation
-   */
-  public increaseRotation(delta: number) {
-    let body = this._actor!.rigidBody.body;
-    if (!body) return;
-    let rot = body.GetAngle() + delta;
-    body.SetAngularVelocity(0);
-    let transform = new b2Transform();
-    transform.SetPositionAngle(body.GetPosition(), rot);
-    body.SetTransform(transform);
   }
 }
 

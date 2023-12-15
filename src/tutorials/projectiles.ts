@@ -42,11 +42,70 @@ class Config implements JetLagGameConfig {
  */
 function builder(_level: number) {
 
+  if (level == 99) {
+    // Do we even need a limit on projectiles?  Probably.  Make a demo?
 
-    // The next few levels demonstrate support for throwing projectiles. In this
-    // level, we throw projectiles by touching the hero, and the projectile always
-    // goes in the same direction
-    else if (level == 42) {
+    // set up our projectiles.  There are only 20... throw them carefully
+    let projectiles = new ActorPoolSystem();
+    populateProjectilePool(projectiles, {
+      size: 3, strength: 2,
+      bodyMaker: () => new CircleBody({ radius: 0.25, cx: -100, cy: -100 }),
+      disappearOnCollide: true,
+      range: 40,
+      immuneToCollisions: true,
+      appearanceMaker: () => new ImageSprite({ img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 }),
+      randomImageSources: ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"]
+    });
+    projectiles.setLimit(20);
+
+    // make an obstacle that causes the hero to throw Projectiles when touched
+    //
+    // It might seem silly to use an obstacle instead of something on the HUD,
+    // but it's good to realize that all these different behaviors are really
+    // the same.
+    cfg = { cx: 15, cy: 2, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
+    let o = Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, { collisionsEnabled: false }),
+      role: new Obstacle(),
+    });
+    o.gestures = {
+      tap: () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .125, .75, 0, 15); return true; }
+    };
+
+    // show how many shots are left
+    makeText(stage.hud,
+      { cx: 0.5, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 12, z: 2 },
+      () => projectiles.getRemaining() + " projectiles left");
+
+    // draw a bunch of enemies to defeat
+    cfg = { cx: 4, cy: 5, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
+      role: new Enemy(),
+    });
+
+    for (let i = 1; i < 20; i += 5) {
+      cfg = { cx: 1 + i / 2, cy: 7, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
+      Actor.Make({
+        appearance: new ImageSprite(cfg),
+        rigidBody: new CircleBody(cfg),
+        role: new Enemy(),
+      });
+    }
+
+    stage.score.setVictoryEnemyCount(5);
+
+    // This level makes an interesting point... what do you do if you run out of
+    // projectiles?  How can we say "start over"?  There are a few ways that
+    // would work... what can you come up with?
+  }
+
+  // The next few levels demonstrate support for throwing projectiles. In this
+  // level, we throw projectiles by touching the hero, and the projectile always
+  // goes in the same direction
+  else if (level == 42) {
     enableTilt(10, 10);
     // Just for fun, we'll have an auto-scrolling background, to make it look
     // like we're moving all the time

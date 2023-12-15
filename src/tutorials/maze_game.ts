@@ -4,7 +4,7 @@ import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appeara
 import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
-import { StandardMovement, Path, PathMovement } from "../jetlag/Components/Movement";
+import { ManualMovement, Path, PathMovement } from "../jetlag/Components/Movement";
 import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Scene } from "../jetlag/Entities/Scene";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
@@ -88,18 +88,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -132,7 +132,7 @@ function builder(level: number) {
         // Put a message on the screen to help the player along
         Actor.Make({
             appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
-            rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+            rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, { scene: stage.hud }),
         });
 
         // Add an enemy
@@ -148,7 +148,7 @@ function builder(level: number) {
         stage.score.winSceneBuilder = (overlay: Scene) => {
             Actor.Make({
                 appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
                 gestures: {
                     tap: () => {
                         stage.clearOverlay();
@@ -159,7 +159,7 @@ function builder(level: number) {
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
             });
         };
 
@@ -168,7 +168,7 @@ function builder(level: number) {
         stage.score.loseSceneBuilder = (overlay: Scene) => {
             Actor.Make({
                 appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
                 gestures: {
                     tap: () => {
                         stage.clearOverlay();
@@ -179,7 +179,7 @@ function builder(level: number) {
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
             });
         };
 
@@ -197,18 +197,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
     }
     // Level 3 adds a destination and a background color
     else if (level == 3) {
@@ -219,18 +219,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
         // Create a destination
         Actor.Make({
@@ -275,18 +275,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
         Actor.Make({
             rigidBody: new BoxBody({ cx: 4.5, cy: 4.5, width: 1, height: 1 }),
@@ -355,18 +355,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -443,18 +443,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -487,7 +487,7 @@ function builder(level: number) {
         // Put a message on the screen to help the player along
         Actor.Make({
             appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
-            rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+            rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, { scene: stage.hud }),
         });
 
         stage.score.onLose = { level, builder };
@@ -538,18 +538,18 @@ function builder(level: number) {
             appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
             rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up the keyboard for controlling the hero
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as StandardMovement).updateYVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as StandardMovement).updateYVelocity(5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-5));
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(5));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (h.movement as ManualMovement).updateYVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (h.movement as ManualMovement).updateYVelocity(5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
         // Create walls and goodies from the `mazeLayout`
         for (let row = 0; row < mazeLayout.length; row++) {
@@ -582,7 +582,7 @@ function builder(level: number) {
         // Put a message on the screen to help the player along
         Actor.Make({
             appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
-            rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, stage.hud),
+            rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, { scene: stage.hud }),
         });
 
         // Add an enemy
@@ -598,14 +598,14 @@ function builder(level: number) {
         stage.score.winSceneBuilder = (overlay: Scene) => {
             Actor.Make({
                 appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
                 gestures: {
                     tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
                 }
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
             });
         };
 
@@ -614,7 +614,7 @@ function builder(level: number) {
         stage.score.loseSceneBuilder = (overlay: Scene) => {
             Actor.Make({
                 appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, overlay),
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
                 gestures: {
                     tap: () => {
                         stage.clearOverlay();
@@ -625,7 +625,7 @@ function builder(level: number) {
             });
             Actor.Make({
                 appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
-                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, overlay)
+                rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
             });
         };
 

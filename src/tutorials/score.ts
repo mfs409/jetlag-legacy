@@ -42,11 +42,25 @@ class Config implements JetLagGameConfig {
  */
 function builder(_level: number) {
 
+  // draw a goodie counter in light blue (60, 70, 255) with a 12-point font
+  makeText(stage.hud,
+    { cx: 1, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#3C46FF", size: 12, z: 2 },
+    () => stage.score.getGoodieCount(0) + " Goodies");
 
-    // Tilt can be used to directly set an Actor's velocity, instead of applying
-    // forces to the Actor.  This technique doesn't always work well, but it's a
-    // nice option to have, so let's try it out.
-    else if (level == 6) {
+  welcomeMessage("Every actor can move...");
+  winMessage("Great Job");
+
+  // Make the stopwatch start counting, by giving it an initial value of 0
+  // Then draw the stopwatch value onto the HUD
+  stage.score.setStopwatch(0);
+  makeText(stage.hud,
+    { cx: 0.1, cy: 0.1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
+    (stage.score.getStopwatch() ?? 0).toFixed(0) + " seconds");
+
+  // Tilt can be used to directly set an Actor's velocity, instead of applying
+  // forces to the Actor.  This technique doesn't always work well, but it's a
+  // nice option to have, so let's try it out.
+  if (level == 6) {
     // To turn on "tilt as velocity", all we need to do is pass in an extra
     // "true" to "enableTilt"
     enableTilt(10, 10, true);
@@ -309,7 +323,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -372,7 +386,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -487,7 +501,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -536,7 +550,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement({ rotateByDirection: true }),
+      movement: new ManualMovement({ rotateByDirection: true }),
       role: new Hero(),
     });
 
@@ -574,7 +588,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement({ rotateByDirection: true }),
+      movement: new ManualMovement({ rotateByDirection: true }),
       role: new Hero(),
     });
 
@@ -627,10 +641,10 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
-    (h.movement as StandardMovement).addVelocity(5, 0);
+    (h.movement as ManualMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h);
 
@@ -650,8 +664,8 @@ function builder(_level: number) {
     });
 
     // draw the up/down controls that cover the whole screen
-    addToggleButton(stage.hud, { cx: 8, cy: 2.25, width: 16, height: 4.5, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(-5), () => (h.movement as StandardMovement).updateYVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 6.75, width: 16, height: 4.5, img: "" }, () => (h.movement as StandardMovement).updateYVelocity(5), () => (h.movement as StandardMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 2.25, width: 16, height: 4.5, img: "" }, () => (h.movement as ManualMovement).updateYVelocity(-5), () => (h.movement as ManualMovement).updateYVelocity(0));
+    addToggleButton(stage.hud, { cx: 8, cy: 6.75, width: 16, height: 4.5, img: "" }, () => (h.movement as ManualMovement).updateYVelocity(5), () => (h.movement as ManualMovement).updateYVelocity(0));
 
     welcomeMessage("Press screen borders\nto move up and down");
     winMessage("Great Job");
@@ -1001,7 +1015,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -1043,7 +1057,7 @@ function builder(_level: number) {
     let d = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { dynamic: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Destination(),
     });
     // When we attach a rigidBody and destination role to an actor, the
@@ -1054,8 +1068,8 @@ function builder(_level: number) {
     // make the movement with an absolute velocity and with gravity defy turned
     // on.  Now it's a dynamic body, but gravity doesn't affect it.  It can
     // move, it can collide with obstacles, but it won't fall downward.
-    (d.movement as StandardMovement).setAbsoluteVelocity(-2, 0);
-    (d.movement as StandardMovement).setGravityDefy();
+    (d.movement as ManualMovement).setAbsoluteVelocity(-2, 0);
+    (d.movement as ManualMovement).setGravityDefy();
     stage.score.setVictoryDestination(1);
   }
 
@@ -1118,31 +1132,31 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { elasticity: 1, friction: 0.1 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
-    (h.movement as StandardMovement).addVelocity(0, 10);
+    (h.movement as ManualMovement).addVelocity(0, 10);
 
     // make an obstacle and then connect it to some controls
     let boxCfg = { cx: 2, cy: 8.75, width: 1, height: 0.5, fillColor: "#FF0000" };
     let o = Actor.Make({
       appearance: new FilledBox(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 100, elasticity: 1, friction: 0.1 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Obstacle(),
     });
 
     addToggleButton(
       stage.hud,
       { cx: 4, cy: 4.5, width: 8, height: 9, img: "" },
-      () => (o.movement as StandardMovement).updateXVelocity(-5),
-      () => (o.movement as StandardMovement).updateXVelocity(0)
+      () => (o.movement as ManualMovement).updateXVelocity(-5),
+      () => (o.movement as ManualMovement).updateXVelocity(0)
     );
     addToggleButton(
       stage.hud,
       { cx: 12, cy: 4.5, width: 8, height: 9, img: "" },
-      () => (o.movement as StandardMovement).updateXVelocity(5),
-      () => (o.movement as StandardMovement).updateXVelocity(0)
+      () => (o.movement as ManualMovement).updateXVelocity(5),
+      () => (o.movement as ManualMovement).updateXVelocity(0)
     );
   }
 

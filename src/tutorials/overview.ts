@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { AnimationSequence, AnimationState, JetLagGameConfig, Sides } from "../jetlag/Config";
 import { AnimatedSprite, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { StandardMovement, Path, PathMovement, ProjectileMovement, TiltMovement } from "../jetlag/Components/Movement";
+import { ManualMovement, Path, PathMovement, ProjectileMovement, TiltMovement } from "../jetlag/Components/Movement";
 import { Actor } from "../jetlag/Entities/Actor";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
 import { GridSystem } from "../jetlag/Systems/Grid";
@@ -50,7 +50,7 @@ function builder(level: number) {
             appearance: new FilledPolygon({ vertices: [0, -.5, .25, .5, -.25, .5], fillColor: "#0000ff", lineWidth: 3, lineColor: "#000044", z: 1 }),
             rigidBody: new PolygonBody({ cx: 8, cy: 4.5, vertices: [0, -.5, .25, .5, -.25, .5] }, { collisionsEnabled: false }),
             role: new Hero(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Set up arrow keys to control the hero
@@ -93,7 +93,7 @@ function builder(level: number) {
     }
     // A simple overhead movement game with a big world and a HUD
     else if (level == 2) {
-        // make the level really big, and set up tilt
+        // make the level really big
         stage.world.camera.setBounds(0, 0, 64, 36);
 
         // Draw four walls, covering the four borders of the world
@@ -118,7 +118,7 @@ function builder(level: number) {
             role: new Obstacle(),
         });
 
-        // Every level will use tilt to control the hero, with arrow keys simulating
+        // We will use tilt to control the hero, with arrow keys simulating
         // tilt on devices that lack an accelerometer
         stage.tilt.tiltMax.Set(10, 10);
         if (!stage.accelerometer.tiltSupported) {
@@ -246,23 +246,23 @@ function builder(level: number) {
             appearance: new FilledCircle({ radius: .75, fillColor: "#0000ff", lineWidth: 3, lineColor: "#000044" }),
             rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .75 }),
             role: new Hero(),
-            movement: new StandardMovement(),
-            gestures: { tap: () => { (h.movement as StandardMovement).updateYVelocity(-8); return true; } },
+            movement: new ManualMovement(),
+            gestures: { tap: () => { (h.movement as ManualMovement).updateYVelocity(-8); return true; } },
         });
         stage.world.camera.setCameraFocus(h);
 
         // Set up arrow keys to control the hero
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (h.movement as StandardMovement).updateXVelocity(-5); });
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (h.movement as StandardMovement).updateXVelocity(0); });
-        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (h.movement as StandardMovement).updateXVelocity(5); });
-        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (h.movement as StandardMovement).updateXVelocity(0); });
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (h.movement as ManualMovement).updateXVelocity(-5); });
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (h.movement as ManualMovement).updateXVelocity(0); });
+        stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (h.movement as ManualMovement).updateXVelocity(5); });
+        stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (h.movement as ManualMovement).updateXVelocity(0); });
 
         // Make a destination
         Actor.Make({
             appearance: new FilledCircle({ radius: .5, fillColor: "#00ff00", lineWidth: 3, lineColor: "#004400" }),
             rigidBody: new CircleBody({ cx: 31, cy: 6, radius: .5 }),
             role: new Destination(),
-            movement: new StandardMovement(),
+            movement: new ManualMovement(),
         });
 
         // Draw a box, and write a timer on it.  Both go on the HUD
@@ -346,7 +346,7 @@ function builder(level: number) {
                 appearance: new FilledBox({ z: -1, width: 2, height: 0.2, fillColor: "#FF0000" }),
                 rigidBody: new BoxBody({ cx, cy, width: 2, height: 0.2, }, { collisionsEnabled: true, singleRigidSide: Sides.TOP }),
                 // Set a callback, then re-enable the platform's collision effect.
-                role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as StandardMovement).updateYVelocity(-5) }),
+                role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as ManualMovement).updateYVelocity(-5) }),
             });
         }
 

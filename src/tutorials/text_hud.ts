@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
 import { ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { Path, PathMovement, StandardMovement } from "../jetlag/Components/Movement";
+import { Path, PathMovement, ManualMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
@@ -125,7 +125,7 @@ function builder(level: number) {
     let hero = Actor.Make({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
-      movement: new StandardMovement({ rotateByDirection: true }),
+      movement: new ManualMovement({ rotateByDirection: true }),
     });
 
     Actor.Make({
@@ -135,10 +135,10 @@ function builder(level: number) {
         () => `${hero.rigidBody.getCenter().x.toFixed(2)}, ${hero.rigidBody.getCenter().y.toFixed(2)}, ${hero.rigidBody.getRotation().toFixed(2)}`),
     });
 
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).addVelocity(-1, 0))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).addVelocity(1, 0))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).addVelocity(0, -1))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).addVelocity(0, 1))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as ManualMovement).addVelocity(-1, 0))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as ManualMovement).addVelocity(1, 0))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as ManualMovement).addVelocity(0, -1))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as ManualMovement).addVelocity(0, 1))
 
     // Oh no, adding this doesn't do what we want
     stage.world.camera.setCameraFocus(hero);
@@ -148,7 +148,7 @@ function builder(level: number) {
     let hero = Actor.Make({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
-      movement: new StandardMovement({ rotateByDirection: true }),
+      movement: new ManualMovement({ rotateByDirection: true }),
     });
 
     // such a small change... we will just put this actor on the heads-up
@@ -160,10 +160,10 @@ function builder(level: number) {
         () => `${hero.rigidBody.getCenter().x.toFixed(2)}, ${hero.rigidBody.getCenter().y.toFixed(2)}, ${hero.rigidBody.getRotation().toFixed(2)}`),
     });
 
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).addVelocity(-1, 0))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).addVelocity(1, 0))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).addVelocity(0, -1))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).addVelocity(0, 1))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as ManualMovement).addVelocity(-1, 0))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as ManualMovement).addVelocity(1, 0))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as ManualMovement).addVelocity(0, -1))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as ManualMovement).addVelocity(0, 1))
 
     // Notice that we did not put any bounds on the camera, so the visible world
     // is going to be "infinite".
@@ -179,7 +179,7 @@ function builder(level: number) {
     let hero = Actor.Make({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
-      movement: new StandardMovement({ rotateByDirection: true }),
+      movement: new ManualMovement({ rotateByDirection: true }),
     });
 
     Actor.Make({
@@ -215,10 +215,10 @@ function builder(level: number) {
         () => `${hero.rigidBody.getCenter().x.toFixed(2)}, ${hero.rigidBody.getCenter().y.toFixed(2)}, ${hero.rigidBody.getRotation().toFixed(2)}`),
     });
 
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as StandardMovement).addVelocity(-1, 0))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as StandardMovement).addVelocity(1, 0))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as StandardMovement).addVelocity(0, -1))
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as StandardMovement).addVelocity(0, 1))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (hero.movement as ManualMovement).addVelocity(-1, 0))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (hero.movement as ManualMovement).addVelocity(1, 0))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (hero.movement as ManualMovement).addVelocity(0, -1))
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (hero.movement as ManualMovement).addVelocity(0, 1))
 
     stage.world.camera.setCameraFocus(hero);
   }

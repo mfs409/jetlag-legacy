@@ -48,7 +48,7 @@ function builder(_level: number) {
   // before it can be given a new position. Also, the hero will keep
   // moving after the screen is released. We will also show the Fact
   // interface.
-  else if (level == 77) {
+  if (level == 77) {
     drawBoundingBox(0, 0, 16, 9, .1);
     welcomeMessage("Poke the hero, then  where you want it to go.");
     winMessage("Great Job");
@@ -73,7 +73,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 1, friction: 0.5 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 

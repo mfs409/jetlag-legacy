@@ -43,10 +43,10 @@ class Config implements JetLagGameConfig {
 function builder(_level: number) {
 
 
-    // Joints are a powerful concept.  We'll just do a little demonstration here
-    // for revolute joints, which let one rigid body revolve around another.  In
-    // this demo, we'll have limits to the joints, kind of like pinball flippers.
-    else if (level == 81) {
+  // Joints are a powerful concept.  We'll just do a little demonstration here
+  // for revolute joints, which let one rigid body revolve around another.  In
+  // this demo, we'll have limits to the joints, kind of like pinball flippers.
+  if (level == 81) {
     enableTilt(10, 10);
     welcomeMessage("The revolving obstacle will move the hero");
     winMessage("Great Job");
@@ -127,7 +127,7 @@ function builder(_level: number) {
       // Note that for the weld joint to work, you probably want the obstacle to
       // have a dynamic body.
       rigidBody: new CircleBody(cfg, stage.world, { dynamic: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Obstacle(),
     });
 

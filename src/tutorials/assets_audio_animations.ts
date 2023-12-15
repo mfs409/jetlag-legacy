@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { AnimationSequence, AnimationState, JetLagGameConfig } from "../jetlag/Config";
 import { AnimatedSprite, FilledBox } from "../jetlag/Components/Appearance";
-import { StandardMovement } from "../jetlag/Components/Movement";
+import { ManualMovement } from "../jetlag/Components/Movement";
 import { BoxBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -113,33 +113,33 @@ function builder(_level: number) {
     rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }, stage.world),
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
     role: new Hero(),
-    movement: new StandardMovement(),
+    movement: new ManualMovement(),
   });
 
   // Demonstrate skip-to
   //  (hero.appearance as AnimatedSprite).skipTo(1, 7000);
 
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(0)));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => ((hero.movement as ManualMovement).updateYVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ManualMovement).updateYVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ManualMovement).updateXVelocity(0)));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ManualMovement).updateXVelocity(0)));
 
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as StandardMovement).updateYVelocity(-5)));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as StandardMovement).updateYVelocity(5)));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as StandardMovement).updateXVelocity(-5)));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as StandardMovement).updateXVelocity(5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => ((hero.movement as ManualMovement).updateYVelocity(-5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => ((hero.movement as ManualMovement).updateYVelocity(5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => ((hero.movement as ManualMovement).updateXVelocity(-5)));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => ((hero.movement as ManualMovement).updateXVelocity(5)));
 
-    // Obstacles are an important kind of actor.  They can be as simple as walls
-    // (indeed, our bounding box is really four obstacles), or they can do more
-    // complex things.  In this level, we draw a few obstacles.  Also, all actors
-    // can be circles, boxes, or polygons.  We will play around with circle,
-    // polygon, and box shapes in this level.
-    //
-    // We will also use a control to move the hero, instead of tilt.
-    //
-    // This level also shows how the "welcomeMessage" code works, by building a
-    // whole "welcome message" from scratch
-    else if (level == 12) {
+  // Obstacles are an important kind of actor.  They can be as simple as walls
+  // (indeed, our bounding box is really four obstacles), or they can do more
+  // complex things.  In this level, we draw a few obstacles.  Also, all actors
+  // can be circles, boxes, or polygons.  We will play around with circle,
+  // polygon, and box shapes in this level.
+  //
+  // We will also use a control to move the hero, instead of tilt.
+  //
+  // This level also shows how the "welcomeMessage" code works, by building a
+  // whole "welcome message" from scratch
+  if (level == 12) {
     // Put a border around the level, and create a hero and destination
     drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -149,7 +149,7 @@ function builder(_level: number) {
       rigidBody: new CircleBody(cfg, stage.world, { friction: 0.6 }),
       // The hero will be controlled explicitly via special touches, so give it
       // "explicit" movement.
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -161,6 +161,17 @@ function builder(_level: number) {
     });
 
     stage.score.setVictoryDestination(1);
+
+    // Make ONE destination, but indicate that it can hold TWO heroes
+    // Let's also say that whenever a hero reaches the destination, a sound
+    // will play
+    cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, stage.world),
+      role: new Destination({ capacity: 2 }),
+      sounds: new SoundEffectComponent({ arrive: "high_pitch.ogg" }),
+    });
 
 
     // We will now create four obstacles.  Two will use a red rectangle as their picture,
@@ -261,7 +272,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -327,7 +338,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -647,10 +658,10 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new AnimatedSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 5 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
-    (h.movement as StandardMovement).addVelocity(2, 0);
+    (h.movement as ManualMovement).addVelocity(2, 0);
 
     // stage.world.camera.setCameraFocus(h);
 
@@ -734,7 +745,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero({
         // provide some code to run when the hero's strength changes
         onStrengthChange: (actor: Actor) => {

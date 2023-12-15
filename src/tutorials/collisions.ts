@@ -1,13 +1,17 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { JetLagGameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
-import { TiltMovement } from "../jetlag/Components/Movement";
+import { AnimationSequence, AnimationState, JetLagGameConfig, Sides } from "../jetlag/Config";
+import { AnimatedSprite, FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
+import { BasicChase, FlickMovement, ManualMovement, Path, PathMovement, TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
-import { Hero, Obstacle } from "../jetlag/Components/Role";
+import { Destination, Enemy, Goodie, Hero, Obstacle, Projectile, Sensor } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { GridSystem } from "../jetlag/Systems/Grid";
+import { SoundEffectComponent } from "../jetlag/Components/SoundEffect";
+import { Scene } from "../jetlag/Entities/Scene";
+import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
+import { AdvancedCollisionSystem } from "../jetlag/Systems/Collisions";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -43,181 +47,11 @@ class Config implements JetLagGameConfig {
 function builder(_level: number) {
 
 
-  // It's not likely that you'd want to have multiple heroes and multiple
-  // destinations, but it is possible.  In this level, there are two heroes and
-  // two destinations.  Each destination can only hold one hero, but it doesn't
-  // matter which hero goes to which destination.
-  if (level == 4) {
-    // Let's start with the easy stuff:
-    enableTilt(10, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 0.9 });
-    winMessage("Great Job");
-    // In the next line, notice how the pair of characters "\n" will cause a
-    // newline to appear in the text.
-    welcomeMessage("Each destination can hold one hero\n\nBoth heroes must reach a destination to win this level");
-
-    // Now let's draw two heroes who can both move by tilting, and who both
-    // have density and friction. Note that we lower the density, so they
-    // move faster than in the previous level
-    let hero_cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(hero_cfg),
-      rigidBody: new CircleBody(hero_cfg, stage.world, { density: 2, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    // As we make the second hero, notice that it doesn't matter what order we
-    // assign the role, movement, rigidBody, or appearance.
-    hero_cfg = { cx: 6, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(hero_cfg),
-      rigidBody: new CircleBody(hero_cfg, stage.world, { density: 2, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    // We will make two destinations.  By default, each can only hold ONE hero.
-    // One thing to notice here is that we made a new configuration object for
-    // the destinations, and we added a "z" to it.  The default "z" is 0.  Valid
-    // values are -2, -1, 0, 1, and 2.  We can use this to make sure that some
-    // things appear "on top of" others.  If you're curious, things with the
-    // same "z" will be drawn on top of each other based on the order in which
-    // their "appearances" were created.
-    let dest_cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png", z: 1 };
-    Actor.Make({
-      appearance: new ImageSprite(dest_cfg),
-      rigidBody: new CircleBody(dest_cfg, stage.world),
-      role: new Destination(),
-    });
-
-    dest_cfg = { cx: 15, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png", z: -1 };
-    Actor.Make({
-      appearance: new ImageSprite(dest_cfg),
-      rigidBody: new CircleBody(dest_cfg, stage.world),
-      role: new Destination(),
-    });
-
-    // Insist that two heroes reach destinations in order to complete the level
-    stage.score.setVictoryDestination(2);
-  }
-
-  // This level demonstrates that we can have many heroes that can reach the
-  // same destination.  It also has a sound effect when the hero reaches the
-  // destination.
-  else if (level == 5) {
-    // Configure things like in the previous level
-    enableTilt(10, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    welcomeMessage("All heroes must\nreach the destination");
-    winMessage("Great Job");
-
-    let cfg = { cx: 4, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    cfg = { cx: 6, cy: 7, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    // Make ONE destination, but indicate that it can hold TWO heroes
-    // Let's also say that whenever a hero reaches the destination, a sound
-    // will play
-    cfg = { cx: 15, cy: 1, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination({ capacity: 2 }),
-      sounds: new SoundEffectComponent({ arrive: "high_pitch.ogg" }),
-    });
-
-
-    // Notice that this line didn't change from level 4: we still need a
-    // total of 2 heroes reaching destinations
-    stage.score.setVictoryDestination(2);
-  }
 
   // This level introduces goodies. Goodies are something that we collect.  We
   // can make the collection of goodies lead to changes in the behavior of the
   // game.  In this example, the collection of goodies "enables" a destination.
-  else if (level == 14) {
-    // set up a hero, destination, bounding box, and joystick
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-
-    let cfg = { cx: 1, cy: 5, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 2, friction: 0.6 }),
-      movement: new StandardMovement(),
-      role: new Hero(),
-    });
-
-    cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      // There are four "types" of goodies in JetLag, meaning we have four
-      // different scores.  We'll say that the destination won't accept heroes
-      // until the score is at least 2,0,0,0.  We achieve this by adding a bit
-      // of code to the destination.  The code will run whenever a hero collides
-      // with the destination, and returns true only if we want to let the hero
-      // in.
-      role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) >= 2; } }),
-    });
-
-    stage.score.setVictoryDestination(1);
-    addJoystickControl(stage.hud, { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
-
-    // Add some stationary goodies.
-    //
-    // Note that the default is for goodies to not cause a change in the hero's
-    // movement at the time when a collision occurs... this is often called
-    // being a "sensor"
-    //
-    // Note that JetLag tracks four different scores for goodies.  By default,
-    // collecting a goodie increases the "first" score by 1.
-    cfg = { cx: 2, cy: 2, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Goodie(),
-    });
-
-    cfg = { cx: 6, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "blue_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Goodie(),
-    });
-
-    // let's put a display on the screen to see how many goodies we've
-    // collected. This shows why we want a callback for specifying the text to
-    // put on the screen
-    makeText(stage.hud,
-      { cx: 0.25, cy: .25, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 20, z: 2 },
-      () => stage.score.getGoodieCount(0) + "/2 Goodies");
-
-    welcomeMessage("You must collect two blue balls.\nThen the destination will work");
-
-    // Set up a win scene that also plays a sound.  This should look familiar.
-    // And, as you can imagine, we can do lose scenes too.
-    stage.score.winSceneBuilder = (overlay: Scene) => {
-      addTapControl(overlay,
-        { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
-        () => { stage.switchTo(builder, level + 1); return true; });
-      makeText(overlay,
-        { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 28, z: 0 },
-        () => "Great Job");
-      stage.musicLibrary.getSound("win_sound.ogg").play();
-    };
+  if (level == 14) {
   }
 
   // Sometimes, we don't want a destination, we just want to say that the player
@@ -230,7 +64,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
@@ -293,113 +127,6 @@ function builder(_level: number) {
     winMessage("Great Job");
   }
 
-  // This level shows how we can put sensors into the game.  Sensors notice when
-  // an actor collides with them, and they run some code as a result. In this
-  // specific case, we'll have the sensors modify the hero's velocity.
-  //
-  // This level also adds a stopwatch. Stopwatches don't have any effect on
-  // gameplay yet.
-  //
-  // This level also has a Pause scene.
-  else if (level == 17) {
-    // start with a hero who is controlled via tilt, and a destination
-    enableTilt(10, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    let cfg = { cx: 3, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    cfg = { cx: 15, cy: 8, radius: 0.4, width: 0.8, height: 0.8, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // Make the stopwatch start counting, by giving it an initial value of 0
-    // Then draw the stopwatch value onto the HUD
-    stage.score.setStopwatch(0);
-    makeText(stage.hud,
-      { cx: 0.1, cy: 0.1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 2 }, () =>
-      (stage.score.getStopwatch() ?? 0).toFixed(0) + " seconds");
-
-    // Put a button on the HUD to pause the game
-    addTapControl(stage.hud, { cx: 1, cy: 8, width: 0.4, height: 0.4, img: "pause.png" }, () => {
-      // When the button is pressed, draw an overlay scene
-      // TODO: Ensure this does can get a screenshot?
-      stage.requestOverlay((overlay: Scene) => {
-        // The scene should have a full-screen background.  Pressing it should
-        // resume the game.
-        addTapControl(
-          overlay,
-          { cx: 8, cy: 4.5, width: 16, height: 9, img: "noise.png" },
-          () => { stage.clearOverlay(); return true; }
-        );
-        // Put some text on the pause scene
-        makeText(overlay,
-          { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#000000", size: 32, z: 0 },
-          () => "Game Paused");
-        // Add a button for going back to the first level
-        addTapControl(
-          overlay,
-          { cx: 15.5, cy: .5, width: 0.4, height: 0.4, img: "back_arrow.png" },
-          () => {
-            stage.clearOverlay();
-            stage.switchTo(builder, 1);
-            return true;
-          }
-        );
-      }, true);
-      return true;
-    });
-
-    // Now draw three sensors, with different "pad" effects.  Note that the
-    // Z-index completely controls if the hero goes over or under two of these.
-    // For the third, an index of 0 (the default), coupled with it being drawn
-    // after the hero, means the hero still goes under it
-
-    // We can make a function right here in the code, and use it to produce the
-    // functions the pads will run.
-    function padMaker(factor: number) {
-      // register a callback to multiply the hero's speed by factor
-      return (_self: Actor, h: Actor) => {
-        h.rigidBody!.setVelocity(h.rigidBody!.getVelocity().Scale(factor));
-      };
-    }
-
-    // This pad effect multiplies by -1, causing a "bounce off" effect
-    cfg = { cx: 5, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Sensor({ heroCollision: padMaker(-10) }),
-    });
-
-    // This pad multiplies by five, causing a speedup
-    cfg = { cx: 7, cy: 3, radius: 0.4, width: 0.8, height: 0.8, img: "purple_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Sensor({ heroCollision: padMaker(5) }),
-    });
-
-    // A fraction causes a slowdown, and we'll make this one spin
-    cfg = { cx: 9, cy: 3, width: 0.8, height: 0.8, radius: 0.4, img: "purple_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { rotationSpeed: 2 }),
-      role: new Sensor({ heroCollision: padMaker(0.2) }),
-    });
-
-    welcomeMessage("Obstacles as zoom, strips, friction pads, " + "and repellers");
-    winMessage("Great Job");
-  }
 
   // This level shows that it is possible to give heroes and enemies different
   // strengths, so that a hero doesn't disappear after a single collision. It
@@ -496,7 +223,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       // Give the hero enough strength to beat the enemies
       role: new Hero({ strength: 5 }),
     });
@@ -540,7 +267,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
     addJoystickControl(stage.hud, { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" }, { actor: h, scale: 5 });
@@ -611,10 +338,10 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 5 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
-    (h.movement as StandardMovement).addVelocity(5, 0);
+    (h.movement as ManualMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h);
     stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
@@ -646,10 +373,10 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
-    (h.movement as StandardMovement).addVelocity(5, 0);
+    (h.movement as ManualMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h);
     cfg = { cx: 159, cy: .5, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
@@ -988,7 +715,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 2, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
@@ -1028,12 +755,12 @@ function builder(_level: number) {
 
     // draw some buttons for moving the hero
     addToggleButton(stage.hud, { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as StandardMovement).updateXVelocity(-5),
-      () => (h.movement as StandardMovement).updateXVelocity(0)
+      () => (h.movement as ManualMovement).updateXVelocity(-5),
+      () => (h.movement as ManualMovement).updateXVelocity(0)
     );
     addToggleButton(stage.hud, { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as StandardMovement).updateXVelocity(5),
-      () => (h.movement as StandardMovement).updateXVelocity(0)
+      () => (h.movement as ManualMovement).updateXVelocity(5),
+      () => (h.movement as ManualMovement).updateXVelocity(0)
     );
   }
 
@@ -1207,7 +934,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 2, friction: 0.5, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     })
     h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
@@ -1243,13 +970,13 @@ function builder(_level: number) {
     // draw some buttons for moving the hero
     addToggleButton(stage.hud,
       { cx: .5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as StandardMovement).updateXVelocity(-5),
-      () => (h.movement as StandardMovement).updateXVelocity(0)
+      () => (h.movement as ManualMovement).updateXVelocity(-5),
+      () => (h.movement as ManualMovement).updateXVelocity(0)
     );
     addToggleButton(stage.hud,
       { cx: 15.5, cy: 4.5, width: 1, height: 8, img: "" },
-      () => (h.movement as StandardMovement).updateXVelocity(5),
-      () => (h.movement as StandardMovement).updateXVelocity(0)
+      () => (h.movement as ManualMovement).updateXVelocity(5),
+      () => (h.movement as ManualMovement).updateXVelocity(0)
     );
   }
 

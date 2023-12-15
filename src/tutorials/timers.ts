@@ -43,11 +43,11 @@ class Config implements JetLagGameConfig {
 function builder(_level: number) {
 
 
-    // This level introduces timers.  Timers let us run code at some point in the
-    // future, or at a fixed interval.  In this case, we'll use the timer to make
-    // more enemies.  We can use this to simulate bad things that spread, like
-    // fire on a building.
-    else if (level == 47) {
+  // This level introduces timers.  Timers let us run code at some point in the
+  // future, or at a fixed interval.  In this case, we'll use the timer to make
+  // more enemies.  We can use this to simulate bad things that spread, like
+  // fire on a building.
+  if (level == 47) {
     // In this level, we can press the screen to move left and right
     drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
 
@@ -55,19 +55,19 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
 
     addToggleButton(stage.hud,
       { cx: 1, cy: 4.5, width: 2, height: 9, img: "" },
-      () => (h.movement as StandardMovement).updateXVelocity(-5),
-      () => (h.movement as StandardMovement).updateXVelocity(0)
+      () => (h.movement as ManualMovement).updateXVelocity(-5),
+      () => (h.movement as ManualMovement).updateXVelocity(0)
     );
     addToggleButton(stage.hud,
       { cx: 15, cy: 4.5, width: 2, height: 9, img: "" },
-      () => (h.movement as StandardMovement).updateXVelocity(5),
-      () => (h.movement as StandardMovement).updateXVelocity(0)
+      () => (h.movement as ManualMovement).updateXVelocity(5),
+      () => (h.movement as ManualMovement).updateXVelocity(0)
     );
 
     // Set up our projectiles.  One thing we add here is a sound when they

@@ -103,7 +103,7 @@ export class PathMovement {
     p.Scale(this.velocity);
     this.rigidBody!.breakDistJoints();
     this.rigidBody!.body.SetLinearVelocity(p);
-    if (this.waypointCallback) this.waypointCallback(this.nextIndex);
+    if (this.waypointCallback) this.waypointCallback(this.nextIndex - 1);
   }
 
   /** Begin running a path */
@@ -294,59 +294,35 @@ export class BasicChase {
     this.rigidBody?.body.SetLinearVelocity({ x, y });
   }
 
+  /** The actor to chase */
+  private target: Actor;
+  /** The speed at which to chase the actor */
+  private speed: number;
+  /** Should it chase in the X dimension */
+  private chaseInX: boolean;
+  /** Should it chase in the Y dimension */
+  private chaseInY: boolean;
+  /** A multiplier for the speed */
+  private multiplier: number = 2;
+
   /**
    * Specify that this actor is supposed to chase another actor
    *
-   * @param speed       The speed with which it chases the other actor
-   * @param target      The actor to chase
-   * @param chaseInX    Should the actor change its x velocity?
-   * @param chaseInY    Should the actor change its y velocity?
-   * @param multiplier  A scaling factor for changing how fast the actor chases
+   * @param cfg.speed       The speed with which it chases the other actor
+   * @param cfg.target      The actor to chase
+   * @param cfg.chaseInX    Optional: Should the actor change its x velocity?
+   * @param cfg.chaseInY    Optional: Should the actor change its y velocity?
+   * @param cfg.multiplier  Optional scaling factor for changing how fast the
+   *                        actor chases (default is 2) (useful when chaseInX or
+   *                        chaseInY is false)
    */
-  constructor(private speed: number, private target: Actor, private chaseInX: boolean, private chaseInY: boolean, private multiplier: number = 2) {
+  constructor(cfg: { speed: number, target: Actor, chaseInX?: boolean, chaseInY?: boolean, multiplier?: number }) {
+    this.speed = cfg.speed;
+    this.target = cfg.target;
+    this.chaseInX = cfg.chaseInX == undefined ? true : cfg.chaseInX;
+    this.chaseInY = cfg.chaseInY == undefined ? true : cfg.chaseInY;
+    this.multiplier = (cfg.multiplier == undefined) ? 2 : cfg.multiplier;
   }
-}
-
-/** A rule for moving by chasing, but with a fixed velocity */
-export class ChaseFixed {
-  /** The Actor to which this movement is attached */
-  public set rigidBody(body: RigidBodyComponent | undefined) {
-    this._rigidBody = body;
-    // This cannot be a static body
-    if (this.rigidBody?.body.GetType() == b2BodyType.b2_staticBody)
-      this.rigidBody.body.SetType(b2BodyType.b2_kinematicBody);
-  }
-  public get rigidBody() { return this._rigidBody; }
-  private _rigidBody?: RigidBodyComponent;
-
-  /** Do any last-minute adjustments related to the movement */
-  prerender(_elapsedMs: number, _camera: CameraSystem) {
-    // This code only works if we've got a body, the target has a body, and both
-    // are enabled
-    if (!this.rigidBody || !this.target.rigidBody) return;
-    if (!this.target.enabled) return;
-
-    // determine directions for X and Y
-    let xDir = this.target.rigidBody.getCenter().x > this.rigidBody.getCenter().x ? 1 : -1;
-    let yDir = this.target.rigidBody.getCenter().x > this.rigidBody.getCenter().x ? 1 : -1;
-
-    // Compute and apply velocity
-    let x = this.xMagnitude == undefined ? this.rigidBody.body.GetLinearVelocity().x : xDir * this.xMagnitude;
-    let y = this.yMagnitude == undefined ? this.rigidBody.body.GetLinearVelocity().y : yDir * this.yMagnitude;
-    this.rigidBody.body.SetLinearVelocity({ x, y });
-  }
-
-  /**
-   * Specify that this actor is supposed to chase another actor, but using fixed
-   * X/Y velocities
-   *
-   * @param target      The actor to chase
-   * @param xMagnitude  The magnitude in the x direction, overrides target's
-   *                    current x velocity
-   * @param yMagnitude  The magnitude in the y direction, overrides target's
-   *                    current y velocity
-   */
-  constructor(private target: Actor, private xMagnitude: number | undefined, private yMagnitude: number | undefined) { }
 }
 
 /** A rule for moving via flick */
@@ -605,11 +581,11 @@ export class GravityMovement {
 }
 
 /**
- * The standard movement component doesn't do anything by default, but provides
+ * The manual movement component doesn't do anything by default, but provides
  * ways of moving the actor, so that code attached to input events (keyboard,
  * mouse, gesture) can make the actor move in appropriate ways.
  */
-export class StandardMovement {
+export class ManualMovement {
   /** The Actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
     this._rigidBody = body;
@@ -627,7 +603,7 @@ export class StandardMovement {
   private rotationByDirection: boolean;
 
   /**
-   * Construct a StandardMovement component
+   * Construct a ManualMovement component
    *
    * @param gravityAffectsIt  Does gravity affect this actor?
    * @param rotateByDirection Should the actor rotate based on its direction of
@@ -686,6 +662,15 @@ export class StandardMovement {
   }
 
   /**
+   * Set the angular velocity, for making a body rotate
+   *
+   * @param rps The velocity, in radians per second
+   */
+  public updateAngularVelocity(rps: number) {
+    this.rigidBody?.body.SetAngularVelocity(rps);
+  }
+
+  /**
    * Set the absolute velocity of this actor
    *
    * @param x Velocity in X dimension
@@ -705,6 +690,21 @@ export class StandardMovement {
     let transform = new b2Transform();
     transform.SetPositionAngle(this.rigidBody.body.GetPosition(), angle);
     this.rigidBody.body.SetTransform(transform);
+  }
+
+  /**
+   * Change the rotation of the body
+   *
+   * @param delta How much to add to the current rotation
+   */
+  public increaseRotation(delta: number) {
+    if (!this.rigidBody) return;
+    let body = this.rigidBody.body;
+    let rot = body.GetAngle() + delta;
+    body.SetAngularVelocity(0);
+    let transform = new b2Transform();
+    transform.SetPositionAngle(body.GetPosition(), rot);
+    body.SetTransform(transform);
   }
 
   /**
@@ -760,4 +760,4 @@ export class InertMovement {
 }
 
 /** MovementComponent is the type of any movement rules that an Actor can have */
-export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | ChaseFixed | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | StandardMovement | InertMovement;
+export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | ManualMovement | InertMovement;

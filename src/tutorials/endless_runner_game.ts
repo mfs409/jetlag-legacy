@@ -1,13 +1,14 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
-import { JetLagGameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
-import { TiltMovement } from "../jetlag/Components/Movement";
+import { JetLagGameConfig, Sides } from "../jetlag/Config";
+import { FilledBox, FilledCircle, FilledPolygon, ImageSprite } from "../jetlag/Components/Appearance";
+import { ManualMovement, TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
-import { Hero, Obstacle } from "../jetlag/Components/Role";
+import { CollisionExemptions, Destination, Enemy, Goodie, Hero, Obstacle, Sensor } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { GridSystem } from "../jetlag/Systems/Grid";
+import { Scene } from "../jetlag/Entities/Scene";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -43,9 +44,9 @@ class Config implements JetLagGameConfig {
 function builder(_level: number) {
 
 
-      // In side-scrolling games, we can have the hero move at a fixed velocity,
-    // instead of controlling its velocity with tilt or a joystick.
-    else if (level == 34) {
+  // In side-scrolling games, we can have the hero move at a fixed velocity,
+  // instead of controlling its velocity with tilt or a joystick.
+  if (level == 34) {
     // default side-scroller setup.  Note that neither the hero nor the bounding box has
     // friction
     stage.world.camera.setBounds(0, 0, 128, 9);
@@ -56,11 +57,11 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0, disableRotation: true }),
-      movement: new StandardMovement({ gravityAffectsIt: true }),
+      movement: new ManualMovement({ gravityAffectsIt: true }),
       role: new Hero(),
     });
     // Give the hero a fixed velocity
-    (h.movement as StandardMovement).addVelocity(10, 0);
+    (h.movement as ManualMovement).addVelocity(10, 0);
 
     cfg = { cx: 124, cy: 8.25, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
     Actor.Make({
@@ -115,7 +116,7 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero({ allowMultiJump: true }),
     });
     // You might be wondering why we can't provide the velocity as part of the
@@ -123,7 +124,7 @@ function builder(_level: number) {
     // gets attached to the rigid body, but the movement isn't connected to the
     // rigid body until the preceding line *finishes*, so the best we can do is
     // add the velocity after we make the movement.
-    (h.movement as StandardMovement).addVelocity(5, 0);
+    (h.movement as ManualMovement).addVelocity(5, 0);
 
     stage.world.camera.setCameraFocus(h, 6, 0);
     stage.backgroundColor = "#17b4ff";
@@ -231,7 +232,7 @@ function builder(_level: number) {
     let callback_obstacle = Actor.Make({
       appearance: new ImageSprite(boxCfg),
       rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 1 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Obstacle({ disableHeroCollision: true }),
     });
 
@@ -356,7 +357,7 @@ function builder(_level: number) {
       appearance: new FilledBox(platform_cfg),
       rigidBody: new BoxBody(platform_cfg, stage.world, { collisionsEnabled: true, singleRigidSide: Sides.TOP }),
       // Set a callback, then re-enable the platform's collision effect.
-      role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as StandardMovement).updateYVelocity(-5) }),
+      role: new Obstacle({ heroCollision: (_thisActor: Actor, collideActor: Actor) => (collideActor.movement as ManualMovement).updateYVelocity(-5) }),
     });
   }
 
@@ -377,17 +378,17 @@ function builder(_level: number) {
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 0.1, friction: 0, disableRotation: true }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
-    (h.movement as StandardMovement).setAbsoluteVelocity(5, 0);
+    (h.movement as ManualMovement).setAbsoluteVelocity(5, 0);
     stage.world.camera.setCameraFocus(h);
 
     // touching the screen makes the hero go upwards
     addToggleButton(stage.hud,
       { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => (h.movement as StandardMovement).updateYVelocity(-5),
-      () => (h.movement as StandardMovement).updateYVelocity(0)
+      () => (h.movement as ManualMovement).updateYVelocity(-5),
+      () => (h.movement as ManualMovement).updateYVelocity(0)
     );
 
     // set up our background, with a few layers

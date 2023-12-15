@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { AnimationSequence, AnimationState, JetLagGameConfig, Sides } from "../jetlag/Config";
 import { AnimatedSprite, AppearanceComponent, FilledBox, FilledCircle, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { StandardMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { ManualMovement, Path, PathMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody, RigidBodyComponent } from "../jetlag/Components/RigidBody";
 import { Destination, Enemy, Goodie, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -116,7 +116,7 @@ function builder(_level: number) {
   let h = Actor.Make({
     appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
     rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, stage.world, { density: 1, disableRotation: true }),
-    movement: new StandardMovement(),
+    movement: new ManualMovement(),
     role: new Hero()
   });
   (h.appearance as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
@@ -124,10 +124,10 @@ function builder(_level: number) {
   // world during gameplay
   stage.world.camera.setCameraFocus(h, 6, 0);
 
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(0));
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(0));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as StandardMovement).updateXVelocity(-2.5));
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as StandardMovement).updateXVelocity(2.5));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-2.5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(2.5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => (h.role as Hero).jump(0, -10));
 
   Actor.Make({
@@ -320,16 +320,16 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
     role: new Obstacle({ jumpReEnableSides: [] }),
   });
 
-    // this level introduces the idea of invincibility. Collecting the goodie
-    // makes the hero invincible for a little while...
-    else if (level == 21) {
+  // this level introduces the idea of invincibility. Collecting the goodie
+  // makes the hero invincible for a little while...
+  if (level == 21) {
     // start with a hero who is controlled via Joystick
     drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
     let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new StandardMovement(),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
     addJoystickControl(

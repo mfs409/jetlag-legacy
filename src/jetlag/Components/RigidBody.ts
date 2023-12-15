@@ -174,15 +174,15 @@ abstract class RigidBodyBase {
    * Adjust the default physics settings (density, elasticity, friction) for
    * this entity
    *
-   * @param density    New density of the entity
-   * @param elasticity New elasticity of the entity
-   * @param friction   New friction of the entity
+   * @param cfg.density    New density of the entity
+   * @param cfg.elasticity New elasticity of the entity
+   * @param cfg.friction   New friction of the entity
    */
-  public setPhysics(density: number, elasticity: number, friction: number) {
+  public setPhysics(cfg: { density?: number, elasticity?: number, friction?: number }) {
     for (let f = this.body.GetFixtureList(); f; f = f.GetNext()) {
-      f.SetDensity(density);
-      f.SetRestitution(elasticity);
-      f.SetFriction(friction);
+      if (cfg.density) f.SetDensity(cfg.density);
+      if (cfg.elasticity) f.SetRestitution(cfg.elasticity);
+      if (cfg.friction) f.SetFriction(cfg.friction);
     }
     this.body.ResetMassData();
   }
@@ -268,11 +268,11 @@ abstract class RigidBodyBase {
   protected updatePhysics(physicsCfg: PhysicsCfg) {
     // Update density/elasticity/friction?
     if (physicsCfg.density !== undefined && physicsCfg.density != 0)
-      this.setPhysics(physicsCfg.density, this.body.GetFixtureList()?.GetRestitution() ?? 0, this.body.GetFixtureList()?.GetFriction() ?? 0)
+      this.setPhysics({ density: physicsCfg.density })
     if (physicsCfg.elasticity !== undefined)
-      this.setPhysics(this.body.GetFixtureList()?.GetDensity() ?? 1, physicsCfg.elasticity, this.body.GetFixtureList()?.GetFriction() ?? 0)
+      this.setPhysics({ elasticity: physicsCfg.elasticity })
     if (physicsCfg.friction !== undefined)
-      this.setPhysics(this.body.GetFixtureList()?.GetDensity() ?? 1, this.body.GetFixtureList()?.GetRestitution() ?? 0, physicsCfg.friction);
+      this.setPhysics({ friction: physicsCfg.friction });
 
     // Enable.disable collisions?
     if (physicsCfg.collisionsEnabled !== undefined)
@@ -305,6 +305,9 @@ abstract class RigidBodyBase {
 
     // Switch the body to dynamic?
     if (physicsCfg.dynamic) this.body.SetType(b2BodyType.b2_dynamicBody);
+
+    // Switch the body to kinematic?
+    if (physicsCfg.kinematic) this.body.SetType(b2BodyType.b2_kinematicBody);
   }
 
   /** Make the entity stop rotating */
@@ -361,6 +364,8 @@ export class CircleBody extends RigidBodyBase {
    *                                      rotations per second
    * @param physicsCfg.dynamic            Should the body be forced to be
    *                                      dynamic?
+   * @param physicsCfg.kinematic          Should the body be forced to be
+   *                                      kinematic?
    *
    * @returns A rigid body with a Circle shape
    */
@@ -377,7 +382,7 @@ export class CircleBody extends RigidBodyBase {
     let shape = new b2CircleShape();
     shape.m_radius = circleCfg.radius;
     this.body.CreateFixture({ shape });
-    this.setPhysics(1, 0, 0);
+    this.setPhysics({ density: 1, elasticity: 0, friction: 0 });
     this.updatePhysics(physicsCfg);
   }
 
@@ -409,7 +414,7 @@ export class CircleBody extends RigidBodyBase {
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
-    this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
+    this.setPhysics({ density: oldFix.GetDensity(), elasticity: oldFix.GetRestitution(), friction: oldFix.GetFriction() });
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix)
     this.body.SetTransform(transform);
@@ -455,7 +460,9 @@ export class BoxBody extends RigidBodyBase {
    *                                      rotations per second
    * @param physicsCfg.dynamic            Should the body be forced to be
    *                                      dynamic?
-   *
+   * @param physicsCfg.kinematic          Should the body be forced to be
+   *                                      kinematic?
+  *
    * @returns A rigid body with a Box shape
    */
   constructor(boxCfg: { cx: number, cy: number, width: number, height: number }, physicsCfg: PhysicsCfg = {}) {
@@ -470,7 +477,7 @@ export class BoxBody extends RigidBodyBase {
     let shape = new b2PolygonShape();
     shape.SetAsBox(this.w / 2, this.h / 2);
     this.body.CreateFixture({ shape });
-    this.setPhysics(1, 0, 0);
+    this.setPhysics({ density: 1, elasticity: 0, friction: 0 });
     this.updatePhysics(physicsCfg);
   }
 
@@ -502,7 +509,7 @@ export class BoxBody extends RigidBodyBase {
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
-    this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
+    this.setPhysics({ density: oldFix.GetDensity(), elasticity: oldFix.GetRestitution(), friction: oldFix.GetFriction() });
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix)
     this.body.SetTransform(transform);
@@ -554,6 +561,8 @@ export class PolygonBody extends RigidBodyBase {
    *                                      rotations per second
    * @param physicsCfg.dynamic            Should the body be forced to be
    *                                      dynamic?
+   * @param physicsCfg.kinematic          Should the body be forced to be
+   *                                      kinematic?
    *
    * @returns A rigid body with a Polygon shape
    */
@@ -583,7 +592,7 @@ export class PolygonBody extends RigidBodyBase {
     let shape = new b2PolygonShape();
     shape.Set(this.vertArray);
     this.body.CreateFixture({ shape });
-    this.setPhysics(1, 0, 0);
+    this.setPhysics({ density: 1, elasticity: 0, friction: 0 });
     this.updatePhysics(physicsCfg);
   }
 
@@ -632,7 +641,7 @@ export class PolygonBody extends RigidBodyBase {
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
-    this.setPhysics(oldFix.GetDensity(), oldFix.GetRestitution(), oldFix.GetFriction());
+    this.setPhysics({ density: oldFix.GetDensity(), elasticity: oldFix.GetRestitution(), friction: oldFix.GetFriction() });
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix);
     this.body.SetTransform(transform);

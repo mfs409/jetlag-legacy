@@ -1,6 +1,6 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
-import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, StandardMovement, ProjectileMovement } from "../jetlag/Components/Movement";
+import { BasicChase, ChaseFixed, Draggable, FlickMovement, GravityMovement, HoverFlick, HoverMovement, PathMovement, TiltMovement, Path, ManualMovement, ProjectileMovement } from "../jetlag/Components/Movement";
 import { stage } from "../jetlag/Stage";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
@@ -57,56 +57,14 @@ class Config implements JetLagGameConfig {
  *
  * @param level Which level should be displayed
  */
-function builder(level: number) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function builder(_level: number) {
     // Drawing terrain by hand can be tedious.  In this level, we demonstrate
     // JetLag's rudimentary support for SVG files.  If you use Inkscape, or
     // another SVG tool, to make a picture that consists of only one line, then
     // you can import it into your game as a set of obstacles. Drawing a picture
     // on top of the obstacle is probably a good idea, though we don't bother in
     // this level
-    else if (level == 89) {
+    if (level == 89) {
         // We'll use tilt and jump to control the hero in this level
         stage.world.camera.setBounds(0, 0, 32, 18);
         enableTilt(10, 10);
@@ -533,7 +491,7 @@ function addJoystickControl(scene: Scene, cfgOpts: any, cfg: { actor: Actor, sca
     let moving = false;
     function doMove(hudCoords: { x: number; y: number }) {
         moving = true;
-        (cfg.actor.movement as StandardMovement).setAbsoluteVelocity(
+        (cfg.actor.movement as ManualMovement).setAbsoluteVelocity(
             (cfg.scale ?? 1) * (hudCoords.x - cfgOpts.cx),
             (cfg.scale ?? 1) * (hudCoords.y - cfgOpts.cy));
         return true;
@@ -542,7 +500,7 @@ function addJoystickControl(scene: Scene, cfgOpts: any, cfg: { actor: Actor, sca
         if (!moving) return true;
         moving = false;
         if (!!cfg.stopOnUp) {
-            (cfg.actor.movement as StandardMovement).setAbsoluteVelocity(0, 0);
+            (cfg.actor.movement as ManualMovement).setAbsoluteVelocity(0, 0);
             cfg.actor.rigidBody?.clearRotation();
         }
         return true;
@@ -659,8 +617,8 @@ function addDirectionalTossButton(overlay: Scene, projectiles: ActorPoolSystem, 
 function makeXYDampenedMotionAction(actor: Actor, xRate: number, yRate: number, dampening: number) {
     // TODO:  I think that dampening should only get set once per actor, but right
     //        now that's not true
-    (actor.movement as StandardMovement).setDamping(dampening);
-    return () => (actor.movement as StandardMovement).updateVelocity(xRate, yRate);
+    (actor.movement as ManualMovement).setDamping(dampening);
+    return () => (actor.movement as ManualMovement).updateVelocity(xRate, yRate);
 }
 
 /**
@@ -727,44 +685,6 @@ function jumpAction(hero: Actor, x: number, y: number, msDelay: number) {
     };
 }
 
-/**
- * Indicate that this actor should shrink over time.  Note that using negative
- * values will lead to growing instead of shrinking.
- *
- * @param actor         The Actor who should shrink over time
- * @param shrinkX       The number of meters by which the X dimension should
- *                      shrink each second
- * @param shrinkY       The number of meters by which the Y dimension should
- *                      shrink each second
- * @param keepCentered  Should the actor's center point stay the same as it
- *                      shrinks, or should its top left corner stay in the same
- *                      position
- */
-function setShrinkOverTime(actor: Actor, shrinkX: number, shrinkY: number, keepCentered: boolean) {
-    let done = false;
-    let te = new TimedEvent(0.05, true, () => {
-        if (done) return;
-        // NB: we shrink 20 times per second
-        let x = 0, y = 0;
-        if (keepCentered) {
-            x = (actor.rigidBody?.getCenter().x ?? 0) + shrinkX / 20 / 2;
-            y = (actor.rigidBody?.getCenter().y ?? 0) + shrinkY / 20 / 2;
-        } else {
-            x = actor.rigidBody?.getCenter().x ?? 0;
-            y = actor.rigidBody?.getCenter().y ?? 0;
-        }
-        let w = actor.appearance.width - shrinkX / 20;
-        let h = actor.appearance.height - shrinkY / 20;
-        // if the area remains >0, resize it and schedule a timer to run again
-        if (w > 0.05 && h > 0.05) {
-            actor.resize(x, y, w, h);
-        } else {
-            actor.remove();
-            done = true;
-        }
-    });
-    stage.world.timer.addEvent(te);
-}
 
 /**
  * Indicate that if the player touches this enemy, the enemy will be removed
@@ -799,7 +719,7 @@ function setTouchAndGo(e: Actor, x: number, y: number) {
         // if it was hovering, its body type won't be Dynamic
         if (body.GetType() != b2BodyType.b2_dynamicBody)
             body.SetType(b2BodyType.b2_dynamicBody);
-        (e.movement as StandardMovement).setAbsoluteVelocity(x, y);
+        (e.movement as ManualMovement).setAbsoluteVelocity(x, y);
         // turn off isTouchAndGo, so we can't double-touch
         e.gestures!.tap = undefined;
         return true;
@@ -819,7 +739,7 @@ function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostDuration
         let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
         let x = v.x + boostAmountX;
         let y = v.y + boostAmountY;
-        (h.movement as StandardMovement).updateVelocity(x, y);
+        (h.movement as ManualMovement).updateVelocity(x, y);
         // now set a timer to un-boost the speed
         if (boostDuration != undefined) {
             stage.world.timer.addEvent(
@@ -827,7 +747,7 @@ function setSpeedBoost(boostAmountX: number, boostAmountY: number, boostDuration
                     let v = h.rigidBody?.body.GetLinearVelocity() ?? { x: 0, y: 0 };
                     let x = v.x - boostAmountX;
                     let y = v.y - boostAmountY;
-                    (h.movement as StandardMovement).updateVelocity(x, y);
+                    (h.movement as ManualMovement).updateVelocity(x, y);
                 })
             );
         }
