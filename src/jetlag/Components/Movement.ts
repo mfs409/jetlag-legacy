@@ -225,32 +225,8 @@ export class TiltMovement {
   }
 }
 
-/** A rule for moving based on dragging the actor */
-export class Draggable {
-  /** The Actor to which this movement is attached */
-  public set rigidBody(body: RigidBodyComponent | undefined) {
-    this._rigidBody = body;
-    // The body needs to be able to move
-    if (this.rigidBody)
-      this.rigidBody.body.SetType((this.kinematic) ? b2BodyType.b2_kinematicBody : b2BodyType.b2_dynamicBody);
-  }
-  public get rigidBody() { return this._rigidBody; }
-  private _rigidBody?: RigidBodyComponent;
-
-  /** Do any last-minute adjustments related to the movement */
-  prerender(_elapsedMs: number, _camera: CameraSystem) { }
-
-  /**
-   * Construct a policy for moving via drag
-   *
-   * @param kinematic True to use a kinematic body (not affected by forces),
-   *                  false for a dynamic body (affected by forces)
-   */
-  constructor(private kinematic: boolean) { }
-}
-
 /** A rule for moving by chasing some other actor */
-export class BasicChase {
+export class ChaseMovement {
   /** The Actor to which this movement is attached */
   public set rigidBody(body: RigidBodyComponent | undefined) {
     this._rigidBody = body;
@@ -325,40 +301,6 @@ export class BasicChase {
   }
 }
 
-/** A rule for moving via flick */
-export class FlickMovement {
-  /** The Actor to which this movement is attached */
-  public set rigidBody(body: RigidBodyComponent | undefined) {
-    this._rigidBody = body;
-    // This must be a dynamic body
-    if (this.rigidBody?.body.GetType() == b2BodyType.b2_staticBody)
-      this.rigidBody.body.SetType(b2BodyType.b2_dynamicBody);
-  }
-  public get rigidBody() { return this._rigidBody; }
-  private _rigidBody?: RigidBodyComponent;
-
-  /** Do any last-minute adjustments related to the movement */
-  prerender(_elapsedMs: number, _camera: CameraSystem) { }
-
-  /**
-   * Indicate that this actor can be flicked on the screen
-   *
-   * @param multiplier A value that is multiplied by the vector for the flick,
-   *                   to affect speed
-   */
-  constructor(public multiplier: number) { }
-
-  /**
-   * Set a new velocity for the actor
-   *
-   * @param x The new X velocity
-   * @param y The new Y velocity
-   */
-  updateVelocity(x: number, y: number) {
-    this.rigidBody?.body.SetLinearVelocity({ x, y });
-  }
-}
-
 /** A rule for hovering at a fixed camera position */
 export class HoverMovement {
   /** The Actor to which this movement is attached */
@@ -369,6 +311,7 @@ export class HoverMovement {
   /** Do any last-minute adjustments related to the movement */
   prerender(_elapsedMs: number, camera: CameraSystem) {
     if (!this.rigidBody) return;
+    if (!this.hover) return;
     let pmr = stage.pixelMeterRatio;
     this.hover.Set(this.hoverX * pmr, this.hoverY * pmr);
     let a = camera.screenToMeters(this.hover.x, this.hover.y);
@@ -395,63 +338,10 @@ export class HoverMovement {
   }
 
   /** A vector for computing hover placement */
-  private hover: b2Vec2;
-}
-
-/** A rule for hovering until a flick, then moving by flick */
-export class HoverFlick {
-  /** The Actor to which this movement is attached */
-  public set rigidBody(body: RigidBodyComponent | undefined) {
-    this._rigidBody = body;
-    // This must be a moveable body
-    if (this.rigidBody?.body.GetType() == b2BodyType.b2_staticBody)
-      this.rigidBody.body.SetType(b2BodyType.b2_dynamicBody);
-  }
-  public get rigidBody() { return this._rigidBody; }
-  private _rigidBody?: RigidBodyComponent;
-
-  /** Do any last-minute adjustments related to the movement */
-  prerender(_elapsedMs: number, camera: CameraSystem) {
-    if (!this.hover) return;
-    if (!this.rigidBody) return;
-
-    let pmr = stage.pixelMeterRatio;
-    this.hover.Set(this.hoverX * pmr, this.hoverY * pmr);
-    let a = camera.screenToMeters(this.hover.x, this.hover.y);
-    this.hover.Set(a.x, a.y);
-    let transform = this.rigidBody!.body.GetTransform().Clone();
-    transform.SetPositionAngle(this.hover, this.rigidBody!.body.GetAngle());
-    this.rigidBody!.body.SetTransform(transform);
-  }
-
-  /**
-   * Indicate that this actor should hover at a specific location on the screen,
-   * rather than being placed at some point on the level itself. Note that the
-   * coordinates to this command are the center position of the hovering actor.
-   * Also, be careful about using hover with zoom... hover is relative to screen
-   * coordinates (pixels), not world coordinates, so it's going to look funny to
-   * use this with zoom
-   *
-   * @param hoverX      the X coordinate (in pixels) where the actor should
-   *                    appear
-   * @param hoverY      the Y coordinate (in pixels) where the actor should
-   *                    appear
-   * @param multiplier  A value that is multiplied by the vector for the flick,
-   *                    to affect speed
-   */
-  constructor(private hoverX: number, private hoverY: number, public multiplier: number) {
-    let pmr = stage.pixelMeterRatio;
-    this.hover = new b2Vec2(this.hoverX * pmr, this.hoverY * pmr);
-  }
-
-  /** A vector for computing hover placement */
   private hover?: b2Vec2;
 
-  /** Set a new velocity for the actor, and stop hovering */
-  updateVelocity(x: number, y: number) {
-    this.hover = undefined;
-    this.rigidBody?.body.SetLinearVelocity({ x, y });
-  }
+  /** Stop hovering */
+  public stopHover() { this.hover = undefined }
 }
 
 /** A rule for how projectiles move */
@@ -760,4 +650,4 @@ export class InertMovement {
 }
 
 /** MovementComponent is the type of any movement rules that an Actor can have */
-export type MovementComponent = PathMovement | TiltMovement | Draggable | BasicChase | FlickMovement | HoverMovement | HoverFlick | ProjectileMovement | GravityMovement | ManualMovement | InertMovement;
+export type MovementComponent = PathMovement | TiltMovement | ChaseMovement | HoverMovement | ProjectileMovement | GravityMovement | ManualMovement | InertMovement;

@@ -1,38 +1,29 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
-import { TiltMovement } from "../jetlag/Components/Movement";
-import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
-import { Hero, Obstacle } from "../jetlag/Components/Role";
+import { GravityMovement, HoverMovement, ManualMovement, Path, PathMovement } from "../jetlag/Components/Movement";
+import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
+import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
-import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
-import { GridSystem } from "../jetlag/Systems/Grid";
+import { FilledBox, ImageSprite } from "../jetlag/Components/Appearance";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
  * the assets (images and sounds) used by this game.
  */
 class Config implements JetLagGameConfig {
-  // It's very unlikely that you'll want to change these next four values.
-  // Hover over them to see what they mean.
   pixelMeterRatio = 100;
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
-
-  // When you deploy your game, you'll want to change all of these
   canVibrate = true;
   forceAccelerometerOff = true;
   storageKey = "--no-key--";
   hitBoxes = true;
-
-  // Here's where we name all the images/sounds/background music files.  Make
-  // sure names don't have spaces or other funny characters, and make sure you
-  // put the corresponding files in the folder identified by `resourcePrefix`.
   resourcePrefix = "./assets/";
   musicNames = [];
   soundNames = [];
-  imageNames = [];
+  imageNames = ["sprites.json", "noise.png"];
 }
 
 /**
@@ -40,702 +31,620 @@ class Config implements JetLagGameConfig {
  *
  * @param level Which level should be displayed
  */
-function builder(_level: number) {
+function builder(level: number) {
+  // There will be winning and losing in these tutorials, and we'll always want
+  // to restart
+  stage.score.onLose = { level, builder };
+  stage.score.onWin = { level, builder };
 
-  // Be sure to cover these movements
-  // Draggable
-  // FlickMovement
-  // HoverFlick
-
-
-  // Draw a joystick on the HUD, and have the joystick control the hero.  This
-  // will appear as a grey circle in the bottom left corner of the screen.
-  //
-  // This "helper" code is pretty complicated, and even the arguments to it
-  // might not make sense.  `game.hud` means that we want it on the HUD, not
-  // in the place where gameplay happens.  The second argument is image/body
-  // configuration for a rectangle that understands mouse/touch.  The third
-  // part is how we say which actor the joystick controls.  The scale is
-  // something that gets multiplied by the joystick value (you can use
-  // fractions, negatives, etc).  Lastly, we'll say that when the player
-  // releases the joystick, the actor should stop moving.
-  addJoystickControl(stage.hud,
-    { cx: 1, cy: 8, width: 1.5, height: 1.5, img: "grey_ball.png" },
-    { actor: h, scale: 5, stopOnUp: true });
-
-  // this level demonstrates that we can drag actors (in this case,
-  // obstacles), and that we can make rotated obstacles. The latter could be
-  // useful for having angled walls in a maze
-  if (level == 23) {
-    // start with a hero who is controlled via tilt, and a destination
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    enableTilt(10, 10);
-    let cfg = { cx: 0.25, cy: 5.25, radius: 0.4, width: 0.8, height: 0.8, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // Create a "drag zone": a region on the HUD that accepts finger drag gestures
-    createDragZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
-
-    // draw two obstacles that we can drag
-    let boxCfg = { cx: 15, cy: 2, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { elasticity: 1 }),
-      movement: new Draggable(true),
-      role: new Obstacle(),
-    });
-
-    boxCfg = { cx: 14, cy: 1, width: 0.75, height: 0.75, img: "purple_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { elasticity: 1 }),
-      movement: new Draggable(true),
-      role: new Obstacle(),
-    });
-
-    // draw an obstacle that is oblong (due to its width and height) and that is rotated.
-    // Note that this should be a box, or it will not have the right underlying shape.
-    boxCfg = { cx: 3, cy: 3, width: 0.75, height: 0.15, img: "purple_ball.png" };
-    let o = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      // This one is draggable, but we pass in "false", so when the hero hits into
-      // it, it will be affected.
-      movement: new Draggable(false),
-      role: new Obstacle(),
-    });
-    o.rigidBody.setRotation(Math.PI / 4);
-
-    welcomeMessage("More obstacle tricks, including one that can be dragged");
-    winMessage("Great Job");
-  }
-
-  // This level shows how we can use "poking" to move obstacles. In this case,
-  // pressing an obstacle selects it, and pressing the screen moves the obstacle
-  // to that location. Double-tapping an obstacle removes it.
-  else if (level == 24) {
-    // start with a hero who is controlled via Joystick, and a destination
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    let cfg = { cx: .75, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new ManualMovement(),
-      role: new Hero(),
-    });
-
-    cfg = { cx: 15, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // draw a picture on the -1 plane, so it is a background behind the hero and
-    // destination
-    Actor.Make({
-      appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, stage.world, { collisionsEnabled: false }),
-    });
-
-    // make a few obstacles that we can poke
-    let boxCfg = { cx: 14, cy: 1, width: 0.25, height: 2, img: "purple_ball.png" };
-    let vertical_obstacle = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { elasticity: 100 }),
-      role: new Obstacle(),
-    });
-
-    // JetLag doesn't understand "double tap", so we implement it ourselves by
-    // tracking each time a tap happens.
-    let lastTouch = 0;
-    // Track the actor most recently tapped
-    let lastTapActor: Actor | undefined = undefined;
-    // Now we can say what to do when the vertical obstacle is tapped:
-    vertical_obstacle.gestures = {
-      tap: () => {
-        // Get the time of the last tap to the screen
-        let x = stage.renderer.now;
-        // If it's been less than 300 milliseconds, and if this is the second
-        // consecutive tap to the vertical obstacle, remove it
-        if (x - lastTouch < 300 && lastTapActor == vertical_obstacle) {
-          vertical_obstacle.remove();
-          return true;
-        }
-        // Otherwise, remember the time of the tap, and that it was to the
-        // vertical obstacle
-        lastTouch = x;
-        lastTapActor = vertical_obstacle;
-        // The poke-to-place zone is going to look for "selected_entity", so
-        // make sure it is vertical_obstacle.
-        stage.storage.setLevel("selected_entity", vertical_obstacle);
-        return true;
-      }
-    };
-    createPokeToPlaceZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
-
-    boxCfg = { cx: 14, cy: 2, width: 2, height: 0.25, img: "purple_ball.png" };
-    let horizontal_obstacle = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { elasticity: 100 }),
-      role: new Obstacle(),
-    });
-    // We can write the code more succinctly the second time around...
-    horizontal_obstacle.gestures = {
-      tap: () => {
-        let x = stage.renderer.now;
-        if (x - lastTouch < 300 && lastTapActor == horizontal_obstacle) {
-          horizontal_obstacle.remove();
-          return true;
-        }
-        lastTouch = x;
-        lastTapActor = horizontal_obstacle;
-        stage.storage.setLevel("selected_entity", horizontal_obstacle);
-        return true;
-      }
-    };
-
-    // Note that we need to make the joystick *after* the pokeToPlaceZone,
-    // or else our interaction with the zone will prevent the joystick from
-    // working
-    addJoystickControl(
-      stage.hud,
-      { cx: 1, cy: 7.5, width: 1.5, height: 1.5, img: "grey_ball.png" },
-      { actor: h, scale: 5 }
-    );
-
-    welcomeMessage("Touch an obstacle to select it, then touch the " + "screen to move it\n (double-touch to remove)");
-    winMessage("Great Job");
-  }
-
-  // This level shows that we can draw on the screen to create obstacles.
-  else if (level == 29) {
-    // Set up a hero and destination, and turn on tilt
-    let cfg = { cx: 8, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "leg_star_1.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
-    enableTilt(10, 10);
-    cfg = { cx: 8, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // Here's a function that draws a purple ball at x,y
-    let make = (hudCoords: { x: number, y: number }): boolean => {
-      // Always convert the hud coordinates to world coordinates
-      let pixels = overlayToWorldCoords(stage.hud, hudCoords.x, hudCoords.y);
-      cfg = { cx: pixels.x, cy: pixels.y, radius: .25, width: .5, height: .5, img: "purple_ball.png" };
-      let o = Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: new CircleBody(cfg, stage.world, { elasticity: 2 }),
-        role: new Obstacle(),
-      });
-      // Let's make it disappear quietly after 10 seconds...
-      stage.world.timer.addEvent(new TimedEvent(10, false, () => o.remove()));
-      return true;
-    };
-    // "Pan" means "drag", more or less.  It has three parts: the initial
-    // down-press, the drag, and the release.  Let's say that whenever anyone
-    // drags anywhere on the screen, we'll call "make"
-    addPanCallbackControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, make, make, make);
-    welcomeMessage("Draw on the screen\nto make obstacles appear");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-  }
-
-  // This level shows that we can "flick" things to move them. Notice that we do
-  // not enable tilt. Instead, we specified that there is a default gravity in
-  // the Y dimension pushing everything down. This is much like gravity on
-  // earth. The only way to move things, then, is by flicking them.
-  else if (level == 30) {
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-
-    // This is new: we'll create a level with a constant force downward in the Y
-    // dimension
+  // side scroller, fixed speed, jump by touching anywhere
+  if (level == 1) {
+    // In this level, we're going to cover the screen with a button.  Tapping
+    // the button will make the hero jump
+    boundingBox();
     stage.world.setGravity(0, 10);
 
-    // draw a destination
-    let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // create a hero that can be flicked
-    cfg = { cx: 1, cy: 1, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
-      movement: new FlickMovement(1),
-      role: new Hero(),
-    });
-
-    // A "flick zone" will receive swipe gestures and apply them directly to the
-    // actor whose movement is "FlickMovement" and whose position is the start
-    // point of the swipe.
-    createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
-
-    // create an obstacle that can be flicked
-    cfg = { cx: 6, cy: 6, width: 0.8, height: 0.8, radius: 0.4, img: "purple_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
-      movement: new FlickMovement(0.5),
-      role: new Obstacle(),
-    });
-
-    welcomeMessage("Flick the hero to the destination");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-  }
-
-  // This level shows that we can make a hero move based on how we touch the
-  // screen.  It also shows that we can use a set of images to animate the
-  // appearance of an actor, instead of just using a single image.
-  else if (level == 36) {
-    stage.world.camera.setBounds(0, 0, 48, 9);
-    drawBoundingBox(0, 0, 48, 9, .1, { density: 1, friction: 1 });
-    // We do two new things here.  First, we provide animations in the hero's
-    // configuration
-    let animations = new Map();
-    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
-    animations.set(AnimationState.IDLE_W, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_1.png", "flip_leg_star_1.png"] }));
-
-    let h_cfg = {
-      cx: .4, cy: .4, width: 0.8, height: 0.8, radius: 0.4, animations,
-    };
-    let h = Actor.Make({
-      // Then, here, we make an *AnimatedSprite*, which uses that configuration.
-      appearance: new AnimatedSprite(h_cfg),
-      rigidBody: new CircleBody(h_cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
+    // A hero who can jump and who is moving
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
       movement: new ManualMovement(),
       role: new Hero(),
     });
-    stage.world.camera.setCameraFocus(h);
+    (hero.movement as ManualMovement).setAbsoluteVelocity(5, 0);
 
-    let cfg = { cx: 47, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
+    // A destination to reach
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+      rigidBody: new CircleBody({ cx: 11, cy: 6, radius: 0.4 }),
       role: new Destination(),
     });
 
-    stage.score.setVictoryDestination(1);
-    stage.backgroundColor = "#17b4ff";
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
-
-    // let's draw an enemy, just in case anyone wants to try to go to the bottom
-    // right corner
-    cfg = { cx: .5, cy: 8.5, radius: 0.5, width: 1, height: 1, img: "red_ball.png" };
+    // If you don't make it, you'll lose
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
+      appearance: new FilledBox({ width: .1, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 15.95, cy: 4.5, width: .1, height: 9 }),
       role: new Enemy(),
     });
+
+    Actor.Make({
+      appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
+      gestures: { tap: () => { (hero.role as Hero).jump(0, -7.5); return true; } }
+    });
+    return;
+  }
+
+  // We have a problem though... what if the world is bigger?  Does it really
+  // make sense to cover the whole screen with the button?
+  if (level == 2) {
+    // In this level, we're going to cover the screen with a button.  Tapping
+    // the button will make the hero jump
+    boundingBox2();
+    stage.world.setGravity(0, 10);
+    stage.world.camera.setBounds(0, 0, 32, 9);
+
+    // A background image, to help see that the hero is moving
+    Actor.Make({
+      appearance: new ImageSprite({ z: -2, width: 32, height: 9, img: "noise.png" }),
+      rigidBody: new BoxBody({ cx: 16, cy: 4.5, width: .1, height: .1 }),
+    });
+
+    // A hero who can jump and who is moving
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+    });
+    (hero.movement as ManualMovement).setAbsoluteVelocity(5, 0);
+    stage.world.camera.setCameraFocus(hero);
+
+    // A destination to reach
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+      rigidBody: new CircleBody({ cx: 27, cy: 6, radius: 0.4 }),
+      role: new Destination(),
+    });
+
+    // If you don't make it, you'll lose
+    Actor.Make({
+      appearance: new FilledBox({ width: .1, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 31.95, cy: 4.5, width: .1, height: 9 }),
+      role: new Enemy(),
+    });
+
+    // A button for jumping
+    Actor.Make({
+      appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }), // put it on the HUD
+      gestures: { tap: () => { (hero.role as Hero).jump(0, -7.5); return true; } }
+    });
+  }
+
+  // So far, we've only really looked at the tap gesture.  Now let's look at
+  // panning.
+  //
+  // Panning has three parts: what to do when the pan begins, what to do while
+  // it continues, and what to do when it ends.  We'll demonstrate it with a
+  // joystick.
+  else if (level == 3) {
+    boundingBox();
+
+    // A hero with ManualMovement, so that the joystick can control it
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+    });
+
+    // A destination to reach
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
+      rigidBody: new CircleBody({ cx: 11, cy: 6, radius: 0.4 }),
+      role: new Destination(),
+    });
+
+    // Let's put a joystick in the bottom left.  We'll define the code for
+    // moving the hero first:
+    let jcx = 1, jcy = 8; // center of joystick
+    let scale = 2;
+    // here's code for moving the hero, based on how hard we're pushing the
+    // joystick and where the touch is relative to the joystick center
+    function doMove(hudCoords: { x: number; y: number }) {
+      (hero.movement as ManualMovement).setAbsoluteVelocity(scale * (hudCoords.x - jcx), scale * (hudCoords.y - jcy));
+      return true;
+    }
+    // And here's code for stopping the hero:
+    function doStop() {
+      (hero.movement as ManualMovement).setAbsoluteVelocity(0, 0);
+      hero.rigidBody.clearRotation(); // be sure to try without this
+      return true;
+    }
+
+    // Make a joystick
+    Actor.Make({
+      appearance: new ImageSprite({ width: 2, height: 2, img: "grey_ball.png" }),
+      rigidBody: new CircleBody({ cx: jcx, cy: jcy, radius: 1 }, { scene: stage.hud }),
+      gestures: { panStart: doMove, panMove: doMove, panStop: doStop },
+    });
+
+    // Notice that if you glide your finger off the joystick, the panStop event
+    // won't happen.  That is a problem that can be fixed, but we're not going
+    // to worry about it for now.
+  }
+
+  // We've seen a gesture on the HUD change the behavior of an actor in the
+  // world.  An important concept is that we can translate HUD coordinates to
+  // screen coordinates.  Let's try it out:
+  else if (level == 4) {
+    // In this level, we're going to cover the screen with a button.  Tapping
+    // the button will make the hero jump
+    boundingBox2();
+    stage.world.setGravity(0, 10);
+    stage.world.camera.setBounds(0, 0, 32, 9);
+
+    // A background image, to help see that the hero is moving
+    Actor.Make({
+      appearance: new ImageSprite({ z: -2, width: 32, height: 9, img: "noise.png" }),
+      rigidBody: new BoxBody({ cx: 16, cy: 4.5, width: .1, height: .1 }),
+    });
+
+    // A hero who is moving
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+    });
+    (hero.movement as ManualMovement).setAbsoluteVelocity(5, 0);
+    stage.world.camera.setCameraFocus(hero);
+
+    // A button for dropping things
+    Actor.Make({
+      appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 2.25, width: 16, height: 4.5 }, { scene: stage.hud }), // put it on the HUD
+      gestures: {
+        tap: (hudMeters: { x: number, y: number }) => {
+          // We need to translate the coordinates from the HUD to the world.  We
+          // do that by turning them into screen coordinates, then turning them
+          // back.
+          let screenPixels = stage.hud.camera.metersToScreen(hudMeters.x, hudMeters.y);
+          let worldMeters = stage.world.camera.screenToMeters(screenPixels.x, screenPixels.y);
+          Actor.Make({
+            appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
+            rigidBody: new CircleBody({ cx: worldMeters.x, cy: worldMeters.y, radius: .25 }),
+            movement: new GravityMovement(),
+            role: new Goodie(),
+          });
+          return true;
+        }
+      }
+    });
+  }
+
+  // Now that we understand how to translate coordinates, let's try to use it to
+  // implement some dragging of actors using pan events.
+  else if (level == 5) {
+    boundingBox();
+    stage.world.setGravity(0, 10);
+
+    // draw two obstacles that we can drag, and one that we can't.  The whole
+    // key to deciding who is draggable and who isn't will be whether we give
+    // them "extra" information.
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 15, cy: 2, radius: 0.375 }, { dynamic: true }),
+      movement: new ManualMovement(),
+      role: new Obstacle(),
+      extra: { drag: true }
+    });
+
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 14, cy: 1, radius: 0.375 }, { elasticity: 1 }),
+      movement: new ManualMovement(),
+      role: new Obstacle(),
+      extra: { drag: true }
+    });
+
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 13, cy: 1, radius: 0.375 }, { elasticity: 1 }),
+      movement: new ManualMovement(),
+      role: new Obstacle(),
+    });
+
+    // We need a way to keep track of the actor currently being dragged.  We'll
+    // use this local variable (but we *could* use "level" storage)
+    let foundActor: Actor | undefined;
+    // pan start updates foundActor if there is an actor where the touch began
+    let panStart = (hudCoords: { x: number; y: number }) => {
+      // Turn HUD coordinates to world coordinates
+      let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
+      let world_coords = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+      // Ask the physics world for all actors at that position, and stop when we find one who is draggable:
+      for (let actor of stage.world.physics!.actorsAt(world_coords)) {
+        if (actor.extra.drag) {
+          foundActor = actor;
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // pan move changes the actor's position
+    let panMove = (hudCoords: { x: number; y: number }) => {
+      // If we have an Actor, move it using the translated coordinates
+      if (!foundActor) return false;
+      let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
+      let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+      foundActor.rigidBody?.setCenter(meters.x, meters.y);
+      return true;
+    };
+
+    // pan stop clears foundActor to stop letting this actor be dragged
+    let panStop = () => {
+      if (!foundActor) return false;
+      // This turns gravity back on, if appropriate
+      foundActor.rigidBody.body.SetAwake(true);
+      foundActor = undefined;
+      return true;
+    };
+
+    // Now we can cover the HUD with a button that handles the pan gestures
+    Actor.Make({
+      appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
+      gestures: { panStart, panMove, panStop },
+    });
+
+    // Fun fact: more than 1M downloads came from a game that noticed that you
+    // could use panMove as a way to "scribble" on the screen to make a track
+    // for a car.
+  }
+
+  // This level shows that we can use "flick" or "swipe" gestures to move actors
+  else if (level == 6) {
+    boundingBox();
+    stage.world.setGravity(0, 10);
+
+    // create a few Actors that can be flicked, and one who cannot
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 1, cy: 1, radius: 0.4 }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+      extra: { flickSpeed: 1 }
+    });
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 6, cy: 6, radius: 0.4 }, { dynamic: true }),
+      movement: new ManualMovement(),
+      role: new Obstacle(),
+      extra: { flickSpeed: 0.5 }
+    });
+    Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 6, cy: 5, radius: 0.4 }, { dynamic: true }),
+      movement: new ManualMovement(),
+      role: new Obstacle(),
+    });
+
+    // A swipe gesture consists of starting coordinates and ending coordinates,
+    // as well as the amount of time the swipe took
+    let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
+      // Convert starting coordinates from hud to world
+      let screenCoord1 = stage.hud.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
+      let worldCoord1 = stage.world.camera.screenToMeters(screenCoord1.x, screenCoord1.y);
+      // Is there a flickable actor there?
+      let foundActor: Actor | undefined = undefined;
+      for (let actor of stage.world.physics!.actorsAt(worldCoord1)) {
+        if (actor.extra.flickSpeed != undefined) {
+          foundActor = actor;
+          break;
+        }
+      }
+      if (!foundActor) return false;
+
+      // Figure out the velocity to apply, then apply it
+      let v = new b2Vec2(hudCoord2.x, hudCoord2.y)
+      v = v.Subtract(hudCoord1);
+      v.Normalize();
+      v.Scale(foundActor.extra.flickSpeed * 2000 / time);
+      (foundActor.movement as ManualMovement).updateVelocity(v.x, v.y);
+      return true;
+    };
+
+    // Make the area on the HUD that receives swipe gestures
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
+      gestures: { swipe }
+    });
+  }
+
+  // In the previous levels, any single kind of gesture only happened in one
+  // place.  What if we want a kind of gestures to be handled on the HUD and in
+  // the world?
+  if (level == 7) {
+    boundingBox();
+
+    // Track the actor most recently tapped
+    let lastTapActor: Actor | undefined = undefined;
+
+    // make an actor who can "teleport".  Tapping it will "activate" it.
+    // Double-tapping will remove it
+    const teleport_actor = Actor.Make({
+      appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 14, cy: 1, radius: .5 }),
+      gestures: {
+        tap: () => {
+          let x = stage.renderer.now; // Time of this tap
+          // If it's been less than 300 milliseconds since the last tap, remove
+          // it
+          if (x - teleport_actor.extra.last_tap < 300 && lastTapActor == teleport_actor) {
+            lastTapActor = undefined;
+            teleport_actor.remove();
+            return true;
+          }
+          // Otherwise, remember the time of the tap, and that it is activated
+          teleport_actor.extra.last_tap = x;
+          lastTapActor = teleport_actor;
+          return true;
+        }
+      },
+      extra: {
+        last_tap: 0,
+        poke_responder: (meters: { x: number, y: number }) => { teleport_actor.rigidBody.setCenter(meters.x, meters.y); }
+      }
+    });
+
+
+
+    // Make the tappable region on the hud
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
+      gestures: {
+        tap: (hudCoords: { x: number; y: number }) => {
+          if (!lastTapActor) return false;
+          let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
+          let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+          // "teleport" the actor:
+          lastTapActor.extra.poke_responder(meters);
+          // don't interact again without re-activating
+          lastTapActor = undefined;
+          return true;
+        }
+      }
+    });
+
+    // This effectively puts the tappable region "under" the world, so that
+    // pokes can find an actor before trying to move an actor.
+    stage.gestures.gestureHudFirst = false;
+
+
+    // make an actor who can move along a path.
+    const path_actor = Actor.Make({
+      appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 14, cy: 2, radius: .5 }),
+      movement: new PathMovement(new Path().to(14, 1), 0, false),
+      gestures: {
+        tap: () => { lastTapActor = path_actor; return true; }
+      },
+      extra: {
+        poke_responder: (meters: { x: number, y: number }) => {
+          let r = new Path().to(path_actor.rigidBody.getCenter().x, path_actor.rigidBody.getCenter().y).to(meters.x, meters.y);
+          path_actor.rigidBody.body.SetLinearVelocity({ x: 0, y: 0 });
+          path_actor.rigidBody.body.SetAngularVelocity(0);
+          (path_actor.movement as PathMovement).resetPath(r, 5, false);
+        }
+      }
+    });
+
+    // This actor will move in a direction, but won't stop
+    const walk_actor = Actor.Make({
+      appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
+      rigidBody: new CircleBody({ cx: 14, cy: 3, radius: .5 }),
+      movement: new ManualMovement(),
+      gestures: {
+        tap: () => { lastTapActor = walk_actor; return true; }
+      },
+      extra: {
+        poke_responder: (meters: { x: number, y: number }) => {
+          let speed = 2;
+          // This might be a nice time to brush up on your trigonometry :)
+          let dx = meters.x - walk_actor.rigidBody.getCenter().x;
+          let dy = meters.y - walk_actor.rigidBody.getCenter().y;
+          let hy = Math.sqrt(dx * dx + dy * dy) / speed;
+          let v = new b2Vec2(dx / hy, dy / hy);
+          walk_actor.rigidBody.body.SetAngularVelocity(0);
+          walk_actor.rigidBody.body.SetLinearVelocity(v);
+        }
+      }
+    });
+  }
+
+  // This level shows that we can set a button's action to happen repeatedly for
+  // as long as it is being depressed, by making use of the touch-down and
+  // touch-up gestures.
+  else if (level == 8) {
+    boundingBox();
+
+    let h = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: .4, cy: .4, radius: 0.4 }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+    });
+    // If we just gave it a velocity once, it would slow down...
+    (h.movement as ManualMovement).setDamping(5);
+
+    // There is some complexity to how this works, because each button needs to
+    // know if it is active.  We could do that via "extra" on each button, but
+    // instead we'll use the idea of "capturing" the `active` variable in each
+    // call to this function.
+    function addToggleButton(actor: Actor, whileDownAction: () => void, onUpAction: (coords: { x: number; y: number }) => void) {
+      let active = false; // will be captured by lambdas below
+      let touchDown = () => { active = true; return true; };
+      let touchUp = (hudCoords: { x: number; y: number }) => {
+        if (!active) return false;
+        active = false;
+        onUpAction(hudCoords);
+        return true;
+      };
+      // Put the control and events in the appropriate lists
+      stage.world.repeatEvents.push(() => { if (active && whileDownAction) whileDownAction(); });
+      actor.gestures.touchDown = touchDown;
+      actor.gestures.touchUp = touchUp;
+    }
 
     // draw some buttons for moving the hero.  These are "toggle" buttons: they
     // run some code when they are pressed, and other code when they are
     // released.
-    addToggleButton(stage.hud, { cx: 1, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ManualMovement).updateXVelocity(-5), () => (h.movement as ManualMovement).updateXVelocity(0));
-    addToggleButton(stage.hud, { cx: 15, cy: 4.5, width: 2, height: 5, img: "" }, () => (h.movement as ManualMovement).updateXVelocity(5), () => (h.movement as ManualMovement).updateXVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 8, width: 12, height: 2, img: "" }, () => (h.movement as ManualMovement).updateYVelocity(5), () => (h.movement as ManualMovement).updateYVelocity(0));
-    addToggleButton(stage.hud, { cx: 8, cy: 1, width: 12, height: 2, img: "" }, () => (h.movement as ManualMovement).updateYVelocity(-5), () => (h.movement as ManualMovement).updateYVelocity(0));
+    let l = Actor.Make({
+      appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 1, cy: 4.5, width: 2, height: 5 }, { scene: stage.hud }),
+    });
+    addToggleButton(l, () => (h.movement as ManualMovement).updateXVelocity(-5), () => { });
+    let r = Actor.Make({
+      appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 15, cy: 4.5, width: 2, height: 5 }, { scene: stage.hud }),
+    });
+    addToggleButton(r, () => (h.movement as ManualMovement).updateXVelocity(5), () => { });
+    let d = Actor.Make({
+      appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 8, width: 12, height: 2 }, { scene: stage.hud }),
+    });
+    addToggleButton(d, () => (h.movement as ManualMovement).updateYVelocity(5), () => { });
+    let u = Actor.Make({
+      appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 1, width: 12, height: 2 }, { scene: stage.hud }),
+    });
+    addToggleButton(u, () => (h.movement as ManualMovement).updateYVelocity(-5), () => { });
     // One thing you'll notice about these buttons is that unexpected things
     // happen if you slide your finger off of them.  Be sure to try to do things
     // like that when testing your code.  Maybe you'll decide you like the
     // unexpected behavior.  Maybe you'll decide that you need to make changes
     // to JetLag to fix the problem :)
 
-    welcomeMessage("Press screen borders to move the hero");
-    winMessage("Great Job");
-    loseMessage("Try Again");
   }
 
-  // We can make a hero start moving only when it is pressed. This can even let
-  // the hero hover until it is pressed. We could also use this to have a game
-  // where the player puts obstacles in place, then starts the hero moving.
-  else if (level == 39) {
+  // There is a "pseudo-movement" called Hover.  It makes an actor stay at the
+  // same part of the HUD, while behaving like it is in the world.
+  else if (level == 9) {
     stage.world.setGravity(0, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1 });
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
-    let cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
+    boundingBox();
 
     // make a hero who doesn't start moving until it is touched
-    let boxCfg = { cx: 0, cy: 8.25, width: 0.75, height: 0.75, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new ManualMovement(),
+    let hover_walk = Actor.Make({
+      appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.5, cy: 8.25, radius: 0.375 }, { density: 1, friction: 0, disableRotation: true }),
+      movement: new HoverMovement(0.5, 8.25),
       role: new Hero(),
     });
-    stage.world.camera.setCameraFocus(h);
-
-    setTouchAndGo(h, 5, 0);
-
-    welcomeMessage("Press the hero to start moving");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-  }
-
-  // We can make a hero hover, and then have it stop hovering when it is flicked
-  // or moved. This demonstrates the effect via flick. It also shows that an
-  // enemy (or obstacle/goodie/destination) can fall due to gravity.
-  else if (level == 66) {
-    stage.world.setGravity(0, 10);
-    welcomeMessage("Flick the hero into the destination");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-
-    let boxCfg = { cx: 1, cy: 7, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      movement: new HoverFlick(1, 7, 0.7),
-      role: new Hero(),
-    });
-    createFlickZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" });
-
-    // place an enemy, let it fall
-    let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      movement: new GravityMovement(),
-      role: new Enemy(),
-    });
-
-    // A destination.  You might need to flick the hero *while it's in the air*
-    // to reach the destination
-    cfg = { cx: 4, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-  }
-
-  // In level 24, we poked an actor, then poked the screen, and the actor
-  // teleported.  Here, we'll say that when we poke the screen, the actor starts
-  // moving toward that point.
-  else if (level == 69) {
-    drawBoundingBox(0, 0, 16, 9, .1);
-    welcomeMessage("Poke the hero, then  where you want it to go.");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-
-    // Let's set up a hero
-    let animations = new Map();
-    let r = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] });
-    animations.set(AnimationState.IDLE_E, r);
-    let l = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
-    animations.set(AnimationState.IDLE_W, l);
-    animations.set(AnimationState.IDLE_NW, l);
-    animations.set(AnimationState.IDLE_SW, l);
-    animations.set(AnimationState.WALK_W, l);
-    animations.set(AnimationState.WALK_SW, l);
-    animations.set(AnimationState.WALK_NW, l);
-    let h_cfg = {
-      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, animations
-    };
-    let h = Actor.Make({
-      appearance: new AnimatedSprite(h_cfg),
-      rigidBody: new CircleBody(h_cfg, stage.world),
-      movement: new PathMovement(new Path().to(.25, 5.25).to(.25, 5.25), 1, false),
-      role: new Hero(),
-    });
-
-    // Like in poke-to-place, we need to "select" the entity with an initial tap
-    h.gestures = { tap: () => { stage.storage.setLevel("selected_entity", h); return true; } };
-    // The "false" means that we don't have to poke hero, poke location, poke
-    // hero, poke location, ... Instead, we can poke hero, poke location, poke
-    // location, ...
-    //
-    // Be sure to move left/right/up/down, to see if the animations are working
-    createPokeToMoveZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, false);
-
-    let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // sometimes a control needs to have a large touchable area, but a small
-    // image. One way to do it is to make an invisible control, then put a
-    // picture on top of it. If you need that, see level 25 for a way to draw
-    // pictures on the HUD.
-  }
-
-  // We can have a control that increases the hero's speed while pressed,
-  // and decreases it upon release
-  else if (level == 74) {
-    stage.world.setGravity(0, 10);
-    welcomeMessage("Press anywhere to speed up");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-    drawBoundingBox(0, 0, 64, 9, .1, { density: 1 });
-
-    let cfg = { cx: 63, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    let boxCfg = { cx: 2, cy: 4, width: 0.75, height: 1.5, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, friction: 0, disableRotation: true }),
-      movement: new ManualMovement(),
-      role: new Hero(),
-    });
-    // give the hero a fixed velocity
-    (h.movement as ManualMovement).addVelocity(4, 0);
-
-    // center the camera a little ahead of the hero
-    stage.world.camera.setCameraFocus(h, 5, 0);
-    stage.world.camera.setBounds(0, 0, 64, 9);
-
-    // set up the background
-    stage.backgroundColor = "#17b4ff";
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
-
-    // draw a turbo boost button that covers the whole screen... make sure its
-    // "up" speed matches the hero velocity
-    addToggleButton(stage.hud,
-      { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => (h.movement as ManualMovement).updateVelocity(15, 0),
-      () => (h.movement as ManualMovement).updateVelocity(4, 0)
-    );
-  }
-
-  // This level fleshes out some more poke-to-move stuff. Now we'll say
-  // that once a hero starts moving, the player must re-poke the hero
-  // before it can be given a new position. Also, the hero will keep
-  // moving after the screen is released. We will also show the Fact
-  // interface.
-  else if (level == 77) {
-    drawBoundingBox(0, 0, 16, 9, .1);
-    welcomeMessage("Poke the hero, then  where you want it to go.");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-
-    let w = AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["flip_leg_star_8.png", "flip_leg_star_8.png"] });
-    let animations = new Map();
-    // TODO:  AnimatedSprite::getAnimationState is rather lackluster right now,
-    //        leading to a lot of redundancy in these situations.  Consider
-    //        something better?
-    animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 200, repeat: true, images: ["leg_star_1.png", "leg_star_1.png"] }));
-    animations.set(AnimationState.IDLE_W, w);
-    animations.set(AnimationState.IDLE_NW, w);
-    animations.set(AnimationState.IDLE_SW, w);
-    animations.set(AnimationState.WALK_W, w);
-    animations.set(AnimationState.WALK_SW, w);
-    animations.set(AnimationState.WALK_NW, w);
-
-    let h_cfg = {
-      cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, animations,
-    };
-    let h = Actor.Make({
-      appearance: new AnimatedSprite(h_cfg),
-      rigidBody: new CircleBody(h_cfg, stage.world, { density: 1, friction: 0.5 }),
-      movement: new ManualMovement(),
-      role: new Hero(),
-    });
-
-    h.gestures = { tap: () => { stage.storage.setLevel("selected_entity", h); return true; } };
-    // Be sure to change to "false" and see what happens
-    createPokeToRunZone(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, 5, true);
-
-    let cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // We've actually done a few things with "facts" already, but now it's time
-    // to discuss them in more detail.
-    //
-    // JetLag has three kinds of "facts"... level, session, and persistent.  A
-    // level fact resets to "undefined" every time you restart the level (by
-    // dying, going back to the menu, etc).  A session fact resets to
-    // "undefined" every time you refresh the page or close and re-open the
-    // browser.  Persistent facts never get reset after you set them, unless you
-    // set them to undefined.
-    //
-    // To test it out, we have three facts (all are just numbers).  You can
-    // press the buttons to increment the numbers.  Then exit the level or
-    // refresh the page, and watch what happens.
-    makeText(stage.hud,
-      { cx: 1.25, cy: 0.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
-      () => "Level: " + (stage.storage.getLevel("level test") ?? -1));
-    makeText(stage.hud,
-      { cx: 1.25, cy: 1, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
-      () => "Session: " + (stage.storage.getSession("session test") ?? -1));
-    makeText(stage.hud,
-      { cx: 1.25, cy: 1.5, center: false, width: .1, height: .1, face: "Arial", color: "#000000", size: 24, z: 2 },
-      () => "Game: " + (stage.storage.getPersistent("game test") ?? "-1"));
-
-    addTapControl(stage.hud,
-      { cx: .5, cy: 0.65, width: 0.5, height: 0.5, img: "red_ball.png" },
-      () => {
-        stage.storage.setLevel("level test", "" + (1 + parseInt(stage.storage.getLevel("level test") ?? -1)));
-        return true;
-      }
-    );
-    addTapControl(stage.hud,
-      { cx: .5, cy: 1.15, width: 0.5, height: 0.5, img: "blue_ball.png" },
-      () => {
-        stage.storage.setSession("session test", "" + (1 + parseInt(stage.storage.getSession("session test") ?? -1)));
-        return true;
-      }
-    );
-    addTapControl(stage.hud,
-      { cx: .5, cy: 1.65, width: 0.5, height: 0.5, img: "green_ball.png" },
-      () => {
-        stage.storage.setPersistent("game test", "" + (1 + parseInt(stage.storage.getPersistent("game test") ?? "-1")));
-        return true;
-      }
-    );
-  }
-
-  // Demonstrate one-time callback controls
-  else if (level == 82) {
-    // start by setting everything up just like in level 1
-    enableTilt(10, 10);
-    let cfg = { cx: 2, cy: 3, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-    winMessage("Great Job");
-    drawBoundingBox(0, 0, 16, 9, .1);
-    welcomeMessage("Reach the destination\nto win this level");
-
-    // add a pause button
-    let hasPaused = false;
-    let pause_button = addTapControl(stage.hud,
-      { cx: 0.3, cy: 0.3, width: 0.5, height: 0.5, img: "pause.png" },
-      () => {
-        if (hasPaused) return false;
-        hasPaused = true;
-        stage.requestOverlay((overlay: Scene) => {
-          addTapControl(overlay,
-            { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000" },
-            () => { stage.clearOverlay(); return true; }
-          );
-          makeText(overlay,
-            { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 20, z: 0 },
-            () => "you can only pause once...");
-        }, false);
-        // When the pause button draws the pause screen, it also disables the
-        // pause button, so there can be no more pausing...
-        pause_button.enabled = false;
-        return true;
-      }
-    );
-  }
-
-  // It is possible for a button to control many Actors at once!
-  else if (level == 86) {
-    stage.world.setGravity(0, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { elasticity: 1, friction: 0.1 });
-    welcomeMessage("Keep pressing until a hero makes it to the destination");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-
-    // We're going to make a bunch of heroes, and save them in the "heroes"
-    // array
-    let heroes: Actor[] = [];
-    for (let i = 0; i < 16; ++i) {
-      let boxCfg = { cx: i + 0.2, cy: 8, width: 0.25, height: 0.25, img: "green_ball.png" };
-      let h = Actor.Make({
-        appearance: new ImageSprite(boxCfg),
-        rigidBody: new BoxBody(boxCfg, stage.world, { density: 1, elasticity: 1, friction: 5 }),
-        movement: new ManualMovement(),
-        role: new Hero(),
-      });
-      heroes.push(h);
+    // The `HoverMovement` isn't a full-fledged movement component, so if you
+    // want to make its actor move, you'll need to work with the body directly.
+    hover_walk.gestures.tap = () => {
+      (hover_walk.movement as HoverMovement).stopHover();
+      hover_walk.rigidBody.body.SetLinearVelocity({ x: 5, y: 0 });
+      hover_walk.gestures.tap = undefined;
+      return true;
     }
 
-    // Here's a destination.  We need one hero to reach it
-    let cfg = { cx: 7.5, cy: 0.25, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
+    // Make a hero who is hovering, but who we will eventually flick
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
+      appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 1, cy: 7, radius: .5 }),
+      movement: new HoverMovement(1, 7),
+      role: new Hero(),
+      extra: { flickSpeed: .5 }
     });
 
-    stage.score.setVictoryDestination(1);
-
-    // Tapping this button will make all the heroes bounce a bit
-    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, () => {
-      for (let h of heroes) {
-        // The bounce is a bit chaotic in the x dimension, but always upward.
-        (h.movement as ManualMovement).setAbsoluteVelocity(5 - getRandom(10), -3);
+    // Set up a "swipe" zone on the HUD, for swiping that hero
+    let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
+      // Convert starting coordinates from hud to world
+      let screenCoord1 = stage.hud.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
+      let worldCoord1 = stage.world.camera.screenToMeters(screenCoord1.x, screenCoord1.y);
+      // Is there a flickable actor there?
+      let foundActor: Actor | undefined = undefined;
+      for (let actor of stage.world.physics!.actorsAt(worldCoord1)) {
+        if (actor.extra.flickSpeed != undefined) {
+          foundActor = actor;
+          break;
+        }
       }
+      if (!foundActor) return false;
+
+      // Figure out the velocity to apply, then apply it
+      let v = new b2Vec2(hudCoord2.x, hudCoord2.y)
+      v = v.Subtract(hudCoord1);
+      v.Normalize();
+      v.Scale(foundActor.extra.flickSpeed * 2000 / time);
+      // Don't forget to turn off hovering!
+      (foundActor.movement as HoverMovement).stopHover();
+      foundActor.rigidBody.body.SetLinearVelocity(v);
       return true;
+    };
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9, }, { scene: stage.hud }),
+      gestures: { swipe },
     });
   }
-
 }
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
+
+/** Draw a bounding box that surrounds the default world viewport */
+function boundingBox() {
+  // Draw a box around the world
+  Actor.Make({
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+}
+
+/** Draw a bounding box that surrounds an extended world viewport */
+function boundingBox2() {
+  // Draw a box around the world
+  Actor.Make({
+    appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 16, cy: -.05, width: 32, height: .1 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 16, cy: 9.05, width: 32, height: .1 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 32.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+}

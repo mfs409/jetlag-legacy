@@ -1,38 +1,30 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
+import { FilledBox, ImageSprite } from "../jetlag/Components/Appearance";
 import { TiltMovement } from "../jetlag/Components/Movement";
-import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
+import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
-import { GridSystem } from "../jetlag/Systems/Grid";
+import { TimedEvent } from "../jetlag/Systems/Timer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
  * the assets (images and sounds) used by this game.
  */
 class Config implements JetLagGameConfig {
-  // It's very unlikely that you'll want to change these next four values.
-  // Hover over them to see what they mean.
   pixelMeterRatio = 100;
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
-
-  // When you deploy your game, you'll want to change all of these
   canVibrate = true;
   forceAccelerometerOff = true;
   storageKey = "--no-key--";
   hitBoxes = true;
-
-  // Here's where we name all the images/sounds/background music files.  Make
-  // sure names don't have spaces or other funny characters, and make sure you
-  // put the corresponding files in the folder identified by `resourcePrefix`.
   resourcePrefix = "./assets/";
   musicNames = [];
   soundNames = [];
-  imageNames = [];
+  imageNames = ["sprites.json"];
 }
 
 /**
@@ -40,39 +32,24 @@ class Config implements JetLagGameConfig {
  *
  * @param level Which level should be displayed
  */
-function builder(_level: number) {
+function builder(level: number) {
+  // JetLag does not really do much to make Joints easy to use.  There are a few
+  // demonstrations below, but if you need to use joints, you will probably want
+  // to look at references like https://www.iforce2d.net/b2dtut/joints-overview,
+  // and then figure out how to translate that code from C++ to TypeScript.
 
-
-  // Joints are a powerful concept.  We'll just do a little demonstration here
-  // for revolute joints, which let one rigid body revolve around another.  In
-  // this demo, we'll have limits to the joints, kind of like pinball flippers.
-  if (level == 81) {
-    enableTilt(10, 10);
-    welcomeMessage("The revolving obstacle will move the hero");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
-
-    let cfg = { cx: 5, cy: 8, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    // Note: you must give density to the revolving part...
-    let boxCfg = { cx: 1.5, cy: 4, width: 5, height: 1, fillColor: "#FF0000" };
+  if (level == 1) {
+    // In this level, a joint relates the rectangle to the circle.  The circle
+    // is the pivot point, and the rectangle rotates around it
     let revolving = Actor.Make({
-      appearance: new FilledBox(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { density: 1 }),
+      appearance: new FilledBox({ width: 5, height: 1, fillColor: "#FF0000" }),
+      rigidBody: new BoxBody({ cx: 1.5, cy: 4, width: 5, height: 1, }),
       role: new Obstacle(),
     });
 
-    cfg = { cx: 7.5, cy: 4, width: 1, height: 1, radius: 0.5, img: "blue_ball.png" };
     let anchor = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 1 }),
+      appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
+      rigidBody: new CircleBody({ cx: 7.5, cy: 4, radius: 0.5 }),
       role: new Obstacle(),
     });
 
@@ -80,12 +57,6 @@ function builder(_level: number) {
     // Add some limits, then give some speed to make it move
     revolving.rigidBody!.setRevoluteJointLimits(1.7, -1.7);
     revolving.rigidBody!.setRevoluteJointMotor(0.5, Number.POSITIVE_INFINITY);
-    cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
 
     // Notice that we can change the motor at any time...
     stage.world.timer.addEvent(new TimedEvent(5, false, () => {
@@ -93,91 +64,116 @@ function builder(_level: number) {
       revolving.rigidBody!.setRevoluteJointMotor(-.5, Number.POSITIVE_INFINITY);
       revolving.rigidBody!.setRevoluteJointLimits(1.7, -.5);
     }));
-
-    stage.score.setVictoryDestination(1);
   }
 
-  // Here's another joint demo.  In this one, we weld an obstacle to the hero.
-  // This might be useful if your hero needs to pick things up and move them
-  // places.
-  else if (level == 83) {
+  else if (level == 2) {
+    // In this demo, we have a joint that welds one actor to another
     enableTilt(10, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
-    let cfg = { cx: 15, cy: 1, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
+    stage.world.setGravity(0, 10);
+    boundingBox();
+
+    // Set up a hero
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
-
-    // set up a hero and fuse an obstacle to it
-    cfg = { cx: 4, cy: 2, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 4, cy: 8.5, radius: 0.4 }, { disableRotation: true }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    cfg = { cx: 1, cy: 1, width: 1, height: 1, radius: 0.5, img: "blue_ball.png" };
-    let o = Actor.Make({
-      appearance: new ImageSprite(cfg),
+    // When the hero collides with this box, it will stick to the hero
+    Actor.Make({
+      appearance: new FilledBox({ width: .5, height: .5, fillColor: "#FF0000" }),
       // Note that for the weld joint to work, you probably want the obstacle to
       // have a dynamic body.
-      rigidBody: new CircleBody(cfg, stage.world, { dynamic: true }),
-      movement: new ManualMovement(),
-      role: new Obstacle(),
+      rigidBody: new BoxBody({ width: .5, height: .5, cx: 7, cy: 8.5 }, { dynamic: true }),
+      role: new Obstacle({
+        heroCollision: (o: Actor, h: Actor) => {
+          h.rigidBody!.setWeldJoint(o, -.25, 0, .4, 0, 0);
+        }
+      }),
     });
-
-    h.rigidBody!.setWeldJoint(o, 3, 0, 0, 0, 45);
   }
 
-  // We saw revolute joints earlier.  In this level, we'll make a joint without
-  // any limits.  We can use it to drive a wheel, which means we can have
-  // somewhat realistic physical propulsion.
-  else if (level == 87) {
+  else if (level == 3) {
+    // Revolute joints without limits can be the foundation for things like cars
     stage.world.setGravity(0, 10);
+
     // If the ground and wheels don't have friction, then this level won't work!
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, friction: 1 });
+    let sides = boundingBox();
+    sides.b.rigidBody.setPhysics({ friction: 1 });
 
     // We'll make the body of our car as a hero with just a red square
-    let boxCfg = { cx: 1, cy: 8, width: 2, height: 0.5, fillColor: "#FF0000" };
-    let truck = Actor.Make({
-      appearance: new FilledBox(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world, { density: 1 }),
+    let car = Actor.Make({
+      appearance: new FilledBox({ width: 2, height: 0.5, fillColor: "#FF0000" }),
+      rigidBody: new BoxBody({ cx: 1, cy: 8, width: 2, height: 0.5 }),
       role: new Hero(),
     });
 
-    let cfg = { cx: 0.75, cy: 8.5, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
+    // Connect a back wheel... heavy tires make for good traction
     let backWheel = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 3, friction: 1 }),
+      appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "blue_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.75, cy: 8.5, radius: 0.25 }, { density: 3, friction: 1 }),
       role: new Obstacle(),
     });
-    backWheel.rigidBody.setRevoluteJoint(truck, -1, 0.5, 0, 0);
+    backWheel.rigidBody.setRevoluteJoint(car, -1, 0.5, 0, 0);
     backWheel.rigidBody.setRevoluteJointMotor(10, 10);
 
-    cfg = { cx: 2.75, cy: 8.5, width: 0.5, height: 0.5, radius: 0.25, img: "blue_ball.png" };
+    // Connect a front wheel... it'll be all-wheel drive :)
     let frontWheel = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 3, friction: 1 }),
+      appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "blue_ball.png" }),
+      rigidBody: new CircleBody({ cx: 2.75, cy: 8.5, radius: 0.25 }, { density: 3, friction: 1 }),
       role: new Obstacle(),
     });
-    frontWheel.rigidBody.setRevoluteJoint(truck, 1, 0.5, 0, 0);
+    frontWheel.rigidBody.setRevoluteJoint(car, 1, 0.5, 0, 0);
     frontWheel.rigidBody.setRevoluteJointMotor(10, 10);
-
-    cfg = { cx: 15, cy: 8, width: 1, height: 1, radius: 0.5, img: "mustard_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      role: new Destination(),
-    });
-
-    stage.score.setVictoryDestination(1);
   }
 }
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
+
+/** Draw a bounding box that surrounds the default world viewport */
+function boundingBox() {
+  // Draw a box around the world
+  let l = Actor.Make({
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
+    role: new Obstacle(),
+  });
+  let r = Actor.Make({
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+    role: new Obstacle(),
+  });
+  let t = Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+  let b = Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+  return { l, r, t, b };
+}
+
+/**
+ * Enable Tilt, and set up arrow keys to simulate it
+ *
+ * @param xMax  The maximum X force
+ * @param yMax  The maximum Y force
+ */
+function enableTilt(xMax: number, yMax: number) {
+  stage.tilt.tiltMax.Set(xMax, yMax);
+  if (!stage.accelerometer.tiltSupported) {
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
+  }
+}

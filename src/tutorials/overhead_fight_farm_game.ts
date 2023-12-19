@@ -160,9 +160,10 @@ function builder(level: number) {
       rigidBody.body.SetGravityScale(1);
       rigidBody.setCollisionsEnabled(false);
       let reclaimer = (actor: Actor) => { projectiles.put(actor); actor.enabled = false; }
-      let role = new Projectile({ damage: 1, range: .5, disappearOnCollide: true, reclaimer });
+      let role = new Projectile({ damage: 1, disappearOnCollide: true, reclaimer });
       // Put in some code for eliminating the projectile quietly if it has
       // traveled too far
+      let range = .5;
       role.prerenderTasks.push((_elapsedMs: number, actor?: Actor) => {
         if (!actor) return;
         if (!actor.enabled) return;
@@ -170,7 +171,7 @@ function builder(level: number) {
         let body = actor.rigidBody.body;
         let dx = Math.abs(body.GetPosition().x - role.rangeFrom.x);
         let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
-        if ((dx * dx + dy * dy) > (role.range * role.range)) reclaimer(actor);
+        if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
       });
       let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role });
       projectiles.put(p);
@@ -329,7 +330,7 @@ function builder(level: number) {
     rigidBody.body.SetGravityScale(1);
     rigidBody.setCollisionsEnabled(false);
     let reclaimer = (actor: Actor) => { projectiles.put(actor); actor.enabled = false; }
-    let role = new Projectile({ damage: 1, range: 8, disappearOnCollide: false, reclaimer, });
+    let role = new Projectile({ damage: 1, disappearOnCollide: false, reclaimer, });
     projectiles.put(Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role }));
 
     // "Punch" in the direction the hero is facing

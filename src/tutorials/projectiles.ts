@@ -1,38 +1,32 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
-import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
-import { TiltMovement } from "../jetlag/Components/Movement";
-import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
-import { Hero, Obstacle } from "../jetlag/Components/Role";
+import { FilledBox, ImageSprite } from "../jetlag/Components/Appearance";
+import { GravityMovement, ManualMovement, ProjectileMovement, TiltMovement } from "../jetlag/Components/Movement";
+import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
+import { Enemy, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
-import { GridSystem } from "../jetlag/Systems/Grid";
+import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
+import { TimedEvent } from "../jetlag/Systems/Timer";
+import { b2Vec2 } from "@box2d/core";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
  * the assets (images and sounds) used by this game.
  */
 class Config implements JetLagGameConfig {
-  // It's very unlikely that you'll want to change these next four values.
-  // Hover over them to see what they mean.
   pixelMeterRatio = 100;
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
-
-  // When you deploy your game, you'll want to change all of these
   canVibrate = true;
   forceAccelerometerOff = true;
   storageKey = "--no-key--";
   hitBoxes = true;
-
-  // Here's where we name all the images/sounds/background music files.  Make
-  // sure names don't have spaces or other funny characters, and make sure you
-  // put the corresponding files in the folder identified by `resourcePrefix`.
   resourcePrefix = "./assets/";
   musicNames = [];
   soundNames = [];
-  imageNames = [];
+  imageNames = ["sprites.json"];
 }
 
 /**
@@ -40,243 +34,267 @@ class Config implements JetLagGameConfig {
  *
  * @param level Which level should be displayed
  */
-function builder(_level: number) {
+function builder(level: number) {
+  stage.score.onLose = { level, builder };
+  stage.score.onWin = { level, builder };
 
-  if (level == 99) {
-    // Do we even need a limit on projectiles?  Probably.  Make a demo?
-
-    // set up our projectiles.  There are only 20... throw them carefully
-    let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      size: 3, strength: 2,
-      bodyMaker: () => new CircleBody({ radius: 0.25, cx: -100, cy: -100 }),
-      disappearOnCollide: true,
-      range: 40,
-      immuneToCollisions: true,
-      appearanceMaker: () => new ImageSprite({ img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 }),
-      randomImageSources: ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"]
+  // Projectiles are something that we can "toss" on the screen.  They are
+  // unique among roles, because it really only makes sense to have a Projectile
+  // role along with Projectile movement.
+  if (level == 1) {
+    boundingBox();
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
+      movement: new ManualMovement(),
+      role: new Hero(),
     });
-    projectiles.setLimit(20);
-
-    // make an obstacle that causes the hero to throw Projectiles when touched
-    //
-    // It might seem silly to use an obstacle instead of something on the HUD,
-    // but it's good to realize that all these different behaviors are really
-    // the same.
-    cfg = { cx: 15, cy: 2, width: 1, height: 1, radius: 0.5, img: "purple_ball.png" };
-    let o = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, { collisionsEnabled: false }),
-      role: new Obstacle(),
-    });
-    o.gestures = {
-      tap: () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .125, .75, 0, 15); return true; }
-    };
-
-    // show how many shots are left
-    makeText(stage.hud,
-      { cx: 0.5, cy: 8.5, center: false, width: .1, height: .1, face: "Arial", color: "#FF00FF", size: 12, z: 2 },
-      () => projectiles.getRemaining() + " projectiles left");
-
-    // draw a bunch of enemies to defeat
-    cfg = { cx: 4, cy: 5, width: 0.5, height: 0.5, radius: 0.25, img: "red_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
-      role: new Enemy(),
-    });
-
-    for (let i = 1; i < 20; i += 5) {
-      cfg = { cx: 1 + i / 2, cy: 7, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-      Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: new CircleBody(cfg),
-        role: new Enemy(),
+    // Note that you could have different buttons, or different keys, for
+    // tossing projectiles in a few specific directions
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
+      let p = Actor.Make({
+        appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
+        rigidBody: new CircleBody({ cx: hero.rigidBody.getCenter().x + .2, cy: hero.rigidBody.getCenter().y, radius: .1 }),
+        movement: new ProjectileMovement(),
+        role: new Projectile()
       });
-    }
-
-    stage.score.setVictoryEnemyCount(5);
-
-    // This level makes an interesting point... what do you do if you run out of
-    // projectiles?  How can we say "start over"?  There are a few ways that
-    // would work... what can you come up with?
+      // We can use "tossFrom" to throw in a specific direction, starting at a
+      // point, such as the hero's center.
+      (p.role as Projectile).tossFrom(hero, .2, 0, 5, 0);
+    });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(-5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.world.setGravity(0, 10);
   }
 
-  // The next few levels demonstrate support for throwing projectiles. In this
-  // level, we throw projectiles by touching the hero, and the projectile always
-  // goes in the same direction
-  else if (level == 42) {
-    enableTilt(10, 10);
-    // Just for fun, we'll have an auto-scrolling background, to make it look
-    // like we're moving all the time
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+  // Making all of those projectiles is a bad idea... we'll end up with too
+  // many, and the game will slow down.  We can use a "pool" to hold just
+  // enough to make the game work:
+  else if (level == 2) {
+    boundingBox();
+    let projectiles = new ActorPoolSystem();
+    for (let i = 0; i < 10; ++i) {
+      // Where we put them doesn't matter, because the pool will disable them
+      let p = Actor.Make({
+        appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
+        rigidBody: new CircleBody({ cx: -10, cy: -10, radius: .1 }),
+        movement: new ProjectileMovement(),
+        role: new Projectile()
+      });
+      projectiles.put(p);
+    }
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+    });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
+      let p = projectiles.get();
+      if (p) (p.role as Projectile).tossFrom(hero, .2, 0, 5, 0);
+    });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(-5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.world.setGravity(0, 10);
+  }
 
-    // Make a hero and an enemy that slowly moves toward the hero
-    let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+  // We ran out of projectiles!  Let's get them back into the pool:
+  else if (level == 3) {
+    boundingBox();
+    let projectiles = new ActorPoolSystem();
+    for (let i = 0; i < 10; ++i) {
+      // Where we put them doesn't matter, because the pool will disable them
+      let p = Actor.Make({
+        appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
+        rigidBody: new CircleBody({ cx: -10, cy: -10, radius: .1 }),
+        movement: new ProjectileMovement(),
+        role: new Projectile({ reclaimer: (actor: Actor) => projectiles.put(actor) })
+      });
+      projectiles.put(p);
+    }
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
+      movement: new ManualMovement(),
+      role: new Hero(),
+    });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
+      let p = projectiles.get();
+      if (p) (p.role as Projectile).tossFrom(hero, .2, 0, 5, 0);
+    });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(-5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.world.setGravity(0, 10);
+
+    // While there are 10 projectiles, we re-use them over and over again.  This
+    // means there can never be more than 10 on the screen at a time.  If you
+    // also wanted to limit the total number of tosses, we can do that, too:
+    projectiles.setLimit(15);
+    // You could use projectiles.getRemaining() to keep track of the remaining
+    // number of shots.  And you could make power-ups that called setLimit() to
+    // increase it.
+  }
+
+  // Projectiles don't have to be circles.  Here, we make them long, skinny
+  // rectangles, so they look like laser beams
+  if (level == 4) {
+    boundingBox();
+
     let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6 }),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    // This enemy will slowly move toward the hero
-    cfg = { cx: 15, cy: 8, width: 0.8, height: 0.8, radius: 0.4, img: "red_ball.png" };
-    Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
-      movement: new ChaseFixed(h, 0.1, 0.1),
-      role: new Enemy(),
-    });
-
-    stage.score.setVictoryEnemyCount(1);
-
-    // configure a pool of projectiles. We say that there can be no more than 3
-    // projectiles in flight at any time.  Once a projectile hits a wall or
-    // enemy, it stops being "in flight", so we can throw another.
+    // set up a pool of projectiles with fixed velocity.  They will be rotated
+    // in the direction they travel.
     let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      size: 3, strength: 1, disappearOnCollide: true, range: 40, immuneToCollisions: true, bodyMaker: () => new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
-      appearanceMaker: () => new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 1 }),
-    });
+    // set up the pool of projectiles
+    for (let i = 0; i < 100; ++i) {
+      let appearance = new FilledBox({ width: 0.02, height: 1, fillColor: "#FF0000" });
+      let rigidBody = new BoxBody({ width: 0.02, height: .5, cx: -100, cy: -100 }, { collisionsEnabled: false });
+      // let's not let gravity affect these projectiles
+      rigidBody.setCollisionsEnabled(false);
+      let reclaimer = (actor: Actor) => { projectiles.put(actor); }
+      let role = new Projectile({ disappearOnCollide: true, reclaimer });
+      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement({ fixedVectorVelocity: 10, rotateVectorToss: true }), role });
+      projectiles.put(p);
+    }
 
-    // Touching the hero will throw a projectile
-    h.gestures = {
-      tap: () => {
-        // We need to say where to start the projectile, because we may want it
-        // to look like it's coming out of a certain part of the hero
-        // (especially if it's animated). .525 is the sum of the radii, so the
-        // projectile won't overlap the hero at all. The speed will be (10,0)
-        //
-        // TODO: There is a lot of copy/paste of code like this, which doesn't work:
-        //    (projectiles.get()?.movement as ProjectileMovement).throwFixed(projectiles, h, .525, 0, 10, 0);
-        // It should be:
-        (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .525, 0, 10, 0);
-        return true;
+    // Now let's cover the HUD with a button for shooting these "laser beams".
+    // This will have the same "toggle" feeling from the Gesture tutorial.  But
+    // we'll use gestures to figure out *where* to toss the projectile, and a
+    // timer to limit the rate at which they are tossed.
+    let v = new b2Vec2(0, 0);
+    let isHolding = false;
+    // On the initial touch, figure out where in the world it's happening
+    let touchDown = (hudCoords: { x: number; y: number }) => {
+      isHolding = true;
+      let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
+      let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+      v.x = world.x;
+      v.y = world.y;
+      return true;
+    };
+    // On a release of the touch, stop tossing
+    let touchUp = () => { isHolding = false; return true; };
+    // Move will be the same as touchDown
+    let panMove = touchDown;
+
+    // Set up a timer to run on every render
+    let mLastToss = 0;
+    stage.world.repeatEvents.push(() => {
+      if (isHolding) {
+        let now = new Date().getTime();
+        // Only throw once per 100 ms
+        if (mLastToss + 100 < now) {
+          mLastToss = now;
+          // We can use "tossAt" to throw toward a specific point
+          (projectiles.get()?.role as Projectile | undefined)?.tossAt(h.rigidBody?.getCenter().x ?? 0, h.rigidBody?.getCenter().y ?? 0, v.x, v.y, h, 0, 0);
+        }
       }
-    };
+    });
 
-    welcomeMessage("Press the hero to make it throw projectiles");
-    winMessage("Great Job");
-    loseMessage("Try Again");
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
+      gestures: { touchDown, touchUp, panMove }
+    });
+
+    // Warning!  If your projectiles seem to "not shoot", it might be because
+    // they are colliding with something.
   }
 
-  // This is another demo of how throwing projectiles works. In this level, we
-  // limit the distance that projectiles travel, and we can put a control on the
-  // HUD for throwing projectiles in two directions
-  else if (level == 43) {
-    // Set up a scrolling background for the level
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "front.png" }), speed: -5 / 1000, isHorizontal: false, isAuto: true });
-    enableTilt(1, 1, true);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    let cfg = { cx: 8, cy: 4.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 0.6, disableRotation: true }),
-      movement: new TiltMovement(),
+  // What happens if projectiles go "too far"?  We might want to put them back
+  // in the pool before they collide with something off-screen.  Also, when we
+  // toss a projectile, we could randomly pick its image.
+  //
+  // Also, we didn't really get into *why* one would want projectiles.  Let's
+  // use them to defeat enemies!
+  if (level == 5) {
+    boundingBox();
+    stage.world.setGravity(0, 10);
+
+    let hero = Actor.Make({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
+      movement: new ManualMovement(),
       role: new Hero(),
     });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(-5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
+    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+    stage.world.setGravity(0, 10);
 
-    // Win by defeating all enemies
-    stage.score.setVictoryEnemyCount();
-
-    // draw two enemies, on either side of the screen
-    let boxCfg = { cx: .25, cy: 4.5, width: 0.5, height: 9, img: "red_ball.png" };
-    let left_enemy = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      role: new Enemy(),
-    });
-    (left_enemy.role as Enemy).damage = 10;
-    boxCfg = { cx: 15.75, cy: 4.5, width: 0.5, height: 9, img: "red_ball.png" };
-    let right_enemy = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      role: new Enemy(),
-    });
-    (right_enemy.role as Enemy).damage = 10;
-
-    // set up a pool of projectiles, but now once the projectiles travel more
-    // than 9 meters, they disappear
+    // set up the pool of projectiles
     let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      size: 100, strength: 1, range: 9, immuneToCollisions: true, disappearOnCollide: true,
-      bodyMaker: () => new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
-      appearanceMaker: () => new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }),
-    });
-
-    // Add buttons for throwing to the left and right.  Each keeps throwing for
-    // as long as it is held, but only throws once every 100 milliseconds.
-    // Throwing to the left flies out of the top of the hero.  Throwing to the
-    // right flies out of the bottom.
-    addToggleButton(stage.hud, { cx: 4, cy: 4.5, width: 8, height: 9, img: "" }, makeRepeatToss(projectiles, h, 100, 0, -.5, -30, 0), undefined);
-    addToggleButton(stage.hud, { cx: 12, cy: 4.5, width: 8, height: 9, img: "" }, makeRepeatToss(projectiles, h, 100, 0, .5, 30, 0), undefined);
-
-    welcomeMessage("Press left and right to throw projectiles");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-  }
-
-  // this level shows how to change the amount of damage a projectile can do
-  else if (level == 44) {
-    enableTilt(10, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    let cfg = { cx: 0, cy: 0, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 1, friction: 0.6 }),
-      movement: new TiltMovement(),
-      role: new Hero(),
-    });
-
-    stage.score.setVictoryEnemyCount();
-
-    // draw a few enemies.  The damage of an enemy determines how many
-    // projectiles are needed to defeat it
-    for (let i = 1; i <= 6; i++) {
-      cfg = { cx: 2 * i, cy: 7 - i, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
-      let e = Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: new CircleBody(cfg, stage.world, { density: 1.0, elasticity: 0.3, friction: 0.6 }),
-        role: new Enemy(),
+    for (let i = 0; i < 3; ++i) {
+      let appearance = new ImageSprite({ img: "color_star_1.png", width: 0.5, height: 0.5, z: 0 });
+      let rigidBody = new CircleBody({ radius: 0.25, cx: -100, cy: -100 });
+      rigidBody.setCollisionsEnabled(false);
+      let reclaimer = (actor: Actor) => { projectiles.put(actor); }
+      let role = new Projectile({ damage: 2, disappearOnCollide: true, reclaimer });
+      // Put in some code for eliminating the projectile quietly if it has
+      // traveled too far
+      let range = 5;
+      role.prerenderTasks.push((_elapsedMs: number, actor?: Actor) => {
+        if (!actor) return;
+        if (!actor.enabled) return;
+        let role = actor.role as Projectile;
+        let body = actor.rigidBody.body;
+        let dx = Math.abs(body.GetPosition().x - role.rangeFrom.x);
+        let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
+        if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
       });
-      (e.role as Enemy).damage = 2 * i;
+      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role });
+      p.rigidBody.body.SetGravityScale(0);
+      projectiles.put(p);
     }
 
-    // set up our projectiles... note that now projectiles each do 2 units of
-    // damage.  Note that we make our projectiles immune to collisions.  This is
-    // important if we don't want them colliding with the hero.
-    let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      size: 3, strength: 2, immuneToCollisions: true, disappearOnCollide: true, range: 40,
-      bodyMaker: () => new BoxBody({ width: .1, height: .4, cx: -100, cy: -100 }, stage.world),
-      appearanceMaker: () => new ImageSprite({ width: 0.1, height: 0.4, img: "grey_ball.png", z: 0 })
+    let images = ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"];
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
+      let p = projectiles.get();
+      if (!p) return;
+      (p.appearance as ImageSprite).setImage(images[Math.trunc(Math.random() * 4)]);
+      (p.role as Projectile).tossFrom(hero, .2, 0, 5, 0);
+      p.rigidBody.body.SetAngularVelocity(4);
     });
 
-    // this button only throws one projectile per press...
-    addTapControl(stage.hud, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" },
-      () => { (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, 0, 0, 0, -10); return true; });
-
-    welcomeMessage("Defeat all enemies to win");
-    winMessage("Great Job");
-    loseMessage("Try Again");
+    // draw some enemies to defeat
+    for (let i = 0; i < 5; i++) {
+      Actor.Make({
+        appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
+        rigidBody: new CircleBody({ cx: 2 + 2 * i, cy: 8.5, radius: 0.5 }),
+        role: new Enemy({ damage: i + 1 }),
+      });
+    }
   }
 
-  // This level shows how to throw projectiles in a variety of directions, based
-  // on touch. The velocity of the projectile will depend on the distance
-  // between the hero and the touch point
-  else if (level == 45) {
+  // This level is reminiscent of games where you need to keep asteroids from
+  // hitting the ground. Note that now, the velocity of the projectile will
+  // depend on the distance between the hero and the touch point
+  else if (level == 6) {
     stage.world.setGravity(0, 3);
 
-    // Note: the height of the bounding box is set so that enemies can be drawn off screen
-    // and then fall downward
-    drawBoundingBox(0, -2, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
+    // We won't have a bounding box, just a floor:
+    Actor.Make({
+      appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
+      rigidBody: new BoxBody({ cx: 16, cy: 9.05, width: 32, height: .1 }),
+      role: new Obstacle(),
+    });
 
     let cfg = { cx: 8.5, cy: 0.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
     let h = Actor.Make({
       appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
+      rigidBody: new CircleBody(cfg),
       role: new Hero(),
     });
 
@@ -286,205 +304,187 @@ function builder(_level: number) {
     // hero we press, the faster the projectile goes, so we multiply the velocity by .8 to
     // slow it down a bit
     let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      disappearOnCollide: true,
-      size: 100, bodyMaker: () => new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, stage.world),
-      appearanceMaker: () => new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 }), strength: 2, multiplier: 0.8, range: 10, immuneToCollisions: true
+    for (let i = 0; i < 100; ++i) {
+      // Be sure to explore the relationship between setCollisionsEnabled and disappearOnCollide
+      let appearance = new ImageSprite({ width: 0.25, height: 0.25, img: "grey_ball.png", z: 0 });
+      let rigidBody = new CircleBody({ radius: 0.125, cx: -100, cy: -100 });
+      rigidBody.body.SetGravityScale(0); // immune to gravity
+      rigidBody.setCollisionsEnabled(true); // No bouncing on a collision
+      let reclaimer = (actor: Actor) => { projectiles.put(actor); }
+      let role = new Projectile({ damage: 2, disappearOnCollide: true, reclaimer });
+      // Put in some code for eliminating the projectile quietly if it has
+      // traveled too far
+      let range = 10;
+      role.prerenderTasks.push((_elapsedMs: number, actor?: Actor) => {
+        if (!actor) return;
+        if (!actor.enabled) return;
+        let role = actor.role as Projectile;
+        let body = actor.rigidBody.body;
+        let dx = Math.abs(body.GetPosition().x - role.rangeFrom.x);
+        let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
+        if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
+      });
+      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement({ multiplier: .8 }), role });
+      projectiles.put(p);
+    }
+
+    let v = new b2Vec2(0, 0);
+    let isHolding = false;
+    let touchDown = (hudCoords: { x: number; y: number }) => {
+      isHolding = true;
+      let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
+      let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+      v.x = world.x;
+      v.y = world.y;
+      return true;
+    };
+    let touchUp = () => { isHolding = false; return true; };
+    let panMove = touchDown;
+    Actor.Make({
+      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
+      gestures: { touchDown, touchUp, panMove },
     });
 
-    // Draw a button for throwing projectiles in many directions.  Again, note
-    // that if we hold the button, it keeps throwing
-    addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 50, 0, 0);
+    let mLastToss = 0;
+    stage.world.repeatEvents.push(() => {
+      if (isHolding) {
+        let now = new Date().getTime();
+        if (mLastToss + 50 < now) {
+          mLastToss = now;
+          let p = projectiles.get();
+          if (p) (p.role as Projectile).tossAt(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, v.x, v.y, h, 0, -.5);
+        }
+      }
+    });
 
     // We'll set up a timer, so that enemies keep falling from the sky
     stage.world.timer.addEvent(new TimedEvent(1, true, () => {
       // get a random number between 0.0 and 15.0
-      let x = getRandom(151) / 10;
-      cfg = { cx: x, cy: -1, width: 1, height: 1, radius: 0.5, img: "red_ball.png" };
+      let x = Math.trunc(Math.random() * 151) / 10;
       Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: new CircleBody(cfg, stage.world),
+        appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
+        rigidBody: new CircleBody({ cx: x, cy: -1, radius: 0.5 }),
         movement: new GravityMovement(),
         role: new Enemy(),
       });
     }));
 
-    welcomeMessage("Press anywhere to throw a ball");
-    winMessage("Great Job");
-    loseMessage("Try Again");
   }
 
-  // Continuing our exploration of projectiles, this level shows how projectiles
-  // can be affected by gravity.  It also shows that projectiles do not have to
-  // disappear when they collide with obstacles.
-  else if (level == 46) {
-    // In this level, there is no way to move the hero left and right, but it can jump
+  // We'll wrap up with a level where the hero can jump and toss projectiles.
+  // It needs to get projectiles into the basket to win.
+  else if (level == 7) {
     stage.world.setGravity(0, 10);
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-    let cfg = { cx: .4, cy: 0.4, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    boundingBox();
+
+    // Make a hero
     let h = Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world, { density: 5, friction: 1 }),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: .4, cy: 0.4, radius: 0.4 }),
       role: new Hero(),
+      gestures: { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
     });
 
-    h.gestures = { tap: () => { (h.role as Hero).jump(0, -10); return true; } }
-
-    // draw a bucket, as three rectangles
-    let boxCfg = { cx: 8.95, cy: 3.95, width: 0.1, height: 1, fillColor: "#FF0000" };
-    let leftBucket = Actor.Make({
-      appearance: new FilledBox(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      role: new Obstacle(),
+    // draw a bucket as three rectangles
+    //
+    // We want to make it so that when the ball hits the obstacle (the bucket),
+    // it doesn't disappear. The only time a projectile does not disappear when
+    // hitting an obstacle is when you provide custom code to run on a
+    // projectile/obstacle collision, and that code returns false. In that case,
+    // you are responsible for removing the projectile (or for not removing it).
+    // That being the case, we can provide code that just returns false, and
+    // that'll do the job.
+    Actor.Make({
+      appearance: new FilledBox({ width: 0.1, height: 1, fillColor: "#FF0000" }),
+      rigidBody: new BoxBody({ cx: 8.95, cy: 3.95, width: 0.1, height: 1 }),
+      role: new Obstacle({ projectileCollision: () => false }),
     });
-
-    boxCfg = { cx: 10.05, cy: 3.95, width: 0.1, height: 1, fillColor: "#FF0000" };
-    let rightBucket = Actor.Make({
-      appearance: new FilledBox(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      role: new Obstacle(),
+    Actor.Make({
+      appearance: new FilledBox({ width: 0.1, height: 1, fillColor: "#FF0000" }),
+      rigidBody: new BoxBody({ cx: 10.05, cy: 3.95, width: 0.1, height: 1 }),
+      role: new Obstacle({ projectileCollision: () => false }),
     });
-
-    boxCfg = { cx: 9.5, cy: 4.4, width: 1.2, height: 0.1, fillColor: "#FF0000" };
-    let bottomBucket = Actor.Make({
-      appearance: new FilledBox(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      role: new Obstacle(),
+    Actor.Make({
+      appearance: new FilledBox({ width: 1.2, height: 0.1, fillColor: "#FF0000" }),
+      rigidBody: new BoxBody({ cx: 9.5, cy: 4.4, width: 1.2, height: 0.1 }),
+      role: new Obstacle({ projectileCollision: () => false }),
     });
 
     // Place an enemy in the bucket, and require that it be defeated
-    cfg = { cx: 9.5, cy: 3.9, width: 0.8, height: 0.8, radius: 0.4, img: "red_ball.png" };
     Actor.Make({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, stage.world),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
+      rigidBody: new CircleBody({ cx: 9.5, cy: 3.9, radius: 0.4 }),
       movement: new GravityMovement(),
       role: new Enemy({ damage: 4 }),
     });
-
     stage.score.setVictoryEnemyCount();
 
-    // Set up a projectile pool with 5 projectiles
+    // Set up a projectile pool so we can toss balls at the basket
     let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      size: 5,
-      bodyMaker: () => new CircleBody({ radius: 0.25, cx: -100, cy: -100 }, stage.world),
-      appearanceMaker: () => new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 }),
-      strength: 1,
-      multiplier: 2,
-      disappearOnCollide: true,
-      range: 40,
-      gravityAffectsProjectiles: true,
-      immuneToCollisions: false,
-    });
+    for (let i = 0; i < 5; ++i) {
+      let appearance = new ImageSprite({ width: 0.5, height: 0.5, img: "grey_ball.png", z: 0 });
+      let rigidBody = new CircleBody({ radius: 0.25, cx: -100, cy: -100 });
+      rigidBody.body.SetGravityScale(1); // turn on gravity
+      rigidBody.setCollisionsEnabled(true); // Collisions count... this should bounce off the basket
+      let reclaimer = (actor: Actor) => { projectiles.put(actor); }
+      let role = new Projectile({ damage: 1, disappearOnCollide: true, reclaimer });
+      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement({ multiplier: 2 }), role });
+      projectiles.put(p);
+    }
 
     // cover "most" of the screen with a button for throwing projectiles.  This
     // ensures that we can still tap the hero to make it jump
-    addTapControl(stage.hud, { cx: 8.5, cy: 4.5, width: 15, height: 9, img: "" },
-      TossDirectionalAction(stage.hud, projectiles, h, 0, 0)
-    );
-
-
-    // We want to make it so that when the ball hits the obstacle (the
-    // backboard), it doesn't disappear. The only time a projectile does not
-    // disappear when hitting an obstacle is when you provide custom code to run
-    // on a projectile/obstacle collision, and that code returns false. In that
-    // case, you are responsible for removing the projectile (or for not
-    // removing it).  That being the case, we can set a "callback" to run custom
-    // code when the projectile and obstacle collide, and then just have the
-    // custom code do nothing.
-    (leftBucket.role as Obstacle).projectileCollision = () => false;
-
-    // we can make a CollisionCallback object, and connect it to several obstacles
-    let c = () => false;
-    (rightBucket.role as Obstacle).projectileCollision = c;
-    (bottomBucket.role as Obstacle).projectileCollision = c;
+    Actor.Make({
+      appearance: new FilledBox({ width: 15, height: 9, fillColor: "#00000000" }),
+      rigidBody: new BoxBody({ cx: 8.5, cy: 4.5, width: 15, height: 9 }, { scene: stage.hud }),
+      gestures: {
+        tap: (hudCoords: { x: number; y: number }) => {
+          let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
+          let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
+          let p = projectiles.get(); if (!p) return true;
+          (p.role as Projectile).tossAt(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, world.x, world.y, h, 0, 0);
+          return true;
+        }
+      }
+    });
 
     // put a hint on the screen after 15 seconds to show where to click to ensure that
     // projectiles hit the enemy
     stage.world.timer.addEvent(new TimedEvent(15, false, () => {
-      cfg = { cx: 2.75, cy: 2.4, width: 0.2, height: 0.2, radius: 0.1, img: "purple_ball.png" };
-      let hint = Actor.Make({
-        appearance: new ImageSprite(cfg),
-        rigidBody: new CircleBody(cfg, stage.world, { collisionsEnabled: false }),
-        role: new Obstacle(),
+      Actor.Make({
+        appearance: new ImageSprite({ width: 0.2, height: 0.2, img: "purple_ball.png" }),
+        rigidBody: new CircleBody({ cx: 2.75, cy: 2.4, radius: 0.1 }, { collisionsEnabled: false }),
+        role: new Obstacle({ projectileCollision: () => false }),
       });
-      // Make sure that when projectiles hit the obstacle, nothing happens
-      (hint.role as Obstacle).projectileCollision = () => false
     }));
-
-    welcomeMessage("Press anywhere to throw a projectile");
-    winMessage("Great Job");
-    loseMessage("Try Again");
-  }
-
-  // This level shows how to use countdown timers to win a level, and introduces
-  // a way to throw projectiles in an arbitrary direction but with fixed
-  // velocity.
-  else if (level == 65) {
-    stage.world.setGravity(0, 10);
-    welcomeMessage("Press anywhere to throw a ball");
-    winMessage("You Survived!");
-    loseMessage("Try Again");
-    drawBoundingBox(0, 0, 16, 9, .1, { density: 1, elasticity: 0.3, friction: 1 });
-
-    // draw a hero, and a button for throwing projectiles in many directions.
-    // Note that this is going to look like an "asteroids" game, with a hero
-    // covering the bottom of the screen, so that anything that falls to the
-    // bottom counts against the player
-    let boxCfg = { cx: 8, cy: 8.74, width: 15.9, height: 0.5, img: "green_ball.png" };
-    let h = Actor.Make({
-      appearance: new ImageSprite(boxCfg),
-      rigidBody: new BoxBody(boxCfg, stage.world),
-      role: new Hero(),
-    });
-
-
-    // set up our pool of projectiles, then set them to have a fixed
-    // velocity when using the vector throw mechanism
-    let projectiles = new ActorPoolSystem();
-    populateProjectilePool(projectiles, {
-      size: 100, strength: 1, range: 20, fixedVectorVelocity: 5,
-      bodyMaker: () => new CircleBody({ radius: 0.1, cx: -100, cy: -100 }, stage.world),
-      disappearOnCollide: true,
-      immuneToCollisions: true,
-      appearanceMaker: () => new ImageSprite({ width: 0.2, height: 0.2, img: "grey_ball.png" }),
-    });
-    addDirectionalTossButton(stage.hud, projectiles, { cx: 8, cy: 4.5, width: 16, height: 9, img: "" }, h, 100, 0, -0.5);
-
-    // we're going to win by "surviving" for 25 seconds... with no enemies, that
-    // shouldn't be too hard.  Let's put the timer on the HUD, so the player
-    // knows how much time remains.
-    stage.score.setWinCountdownRemaining(25);
-    makeText(stage.hud,
-      { cx: 2, cy: 2, center: false, width: .1, height: .1, face: "Arial", color: "#C0C0C0", size: 16, z: 2 },
-      () => "" + (stage.score.getWinCountdownRemaining() ?? 0).toFixed(2) + "s remaining");
-
-    // just to play it safe, let's say that we win on reaching a destination...
-    // this ensures that collecting goodies or defeating enemies won't
-    // accidentally cause us to win. Of course, with no destination, there's no
-    // way to win now, except waiting for the countdown timer
-    stage.score.setVictoryDestination(1);
-
-    // Let's put a button for pausing the game, so we can see that it pauses the
-    // timer.  Notice that we have to draw it *after* the throw button, or else
-    // the throw button will cover it.
-    addTapControl(stage.hud,
-      { cx: .5, cy: .5, width: .5, height: .5, img: "pause.png" },
-      () => {
-        stage.requestOverlay((overlay: Scene) => {
-          makeText(overlay,
-            { center: true, cx: 8, cy: 4.5, width: .1, height: .1, face: "Arial", color: "#FFFFFF", size: 32, z: 0 },
-            () => "Game Paused");
-          addTapControl(overlay,
-            { cx: 8, cy: 4.5, width: 16, height: 9, fillColor: "#000000", z: -1 },
-            () => { stage.clearOverlay(); return true; }
-          );
-        }, false);
-        return true;
-      }
-    );
   }
 }
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
+
+/** Draw a bounding box that surrounds the default world viewport */
+function boundingBox() {
+  // Draw a box around the world
+  Actor.Make({
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+  Actor.Make({
+    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
+    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
+    role: new Obstacle(),
+  });
+}

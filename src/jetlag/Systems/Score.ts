@@ -125,12 +125,18 @@ export class ScoreSystem {
 
     if (this.timerLoseStats.remaining != undefined) {
       this.timerLoseStats.remaining -= elapsedMs / 1000;
-      if (this.timerLoseStats.remaining < 0) this.loseLevel();
+      if (this.timerLoseStats.remaining < 0) {
+        this.timerLoseStats.remaining = undefined;
+        this.loseLevel();
+      }
     }
     if (this.surviveWinStats.remaining) {
       this.surviveWinStats.remaining -= elapsedMs / 1000;
       if (this.victoryType != VictoryType.SURVIVE) return;
-      if (this.surviveWinStats.remaining < 0) this.winLevel();
+      if (this.surviveWinStats.remaining < 0) {
+        this.surviveWinStats.remaining = undefined;
+        this.winLevel();
+      }
     }
   }
 
@@ -160,6 +166,9 @@ export class ScoreSystem {
 
   /** Return the number of enemies defeated */
   public getEnemiesDefeated() { return this.enemyWinStats.defeated; }
+
+  /** Return the number of enemies created */
+  public getEnemiesCreated() { return this.enemyWinStats.created; }
 
   /**
    * Indicate that the level should be won by some number of heroes reaching the
@@ -197,6 +206,16 @@ export class ScoreSystem {
   public setVictoryGoodies(v0: number, v1: number, v2: number, v3: number) {
     this.victoryType = VictoryType.GOODIE_COUNT;
     this.goodieWinStats.required = [v0, v1, v2, v3];
+  }
+
+  /**
+   * Indicate that the level is won by surviving for long enough
+   *
+   * @param duration  How long the hero must survive, in seconds
+   */
+  public setVictorySurvive(duration: number) {
+    this.victoryType = VictoryType.SURVIVE;
+    this.surviveWinStats.remaining = duration;
   }
 
   /**
@@ -270,6 +289,9 @@ export class ScoreSystem {
 
   /** Return the number of heroes that have been defeated so far */
   public getHeroesDefeated() { return this.heroLoseStats.defeated; }
+
+  /** Return the number of heroes that have been defeated so far */
+  public getHeroesCreated() { return this.heroLoseStats.created; }
 
   /** Return the number of heroes that have arrived at a destination so far */
   public getDestinationArrivals() { return this.destinationWinStats.arrived; }

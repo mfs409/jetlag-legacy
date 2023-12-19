@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { BasicChase, TiltMovement } from "../jetlag/Components/Movement";
+import { ChaseMovement, TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Destination, Enemy, Goodie, Hero, Obstacle, Sensor } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -385,7 +385,7 @@ function builder(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: 0.4 }, { dynamic: true }),
-      movement: new BasicChase({ target: h, speed: 1 }),
+      movement: new ChaseMovement({ target: h, speed: 1 }),
       role: new Enemy(),
       extra: { weak: true }
     });
@@ -393,7 +393,7 @@ function builder(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 2, radius: 0.4 }, { dynamic: true }),
-      movement: new BasicChase({ target: h, speed: 1 }),
+      movement: new ChaseMovement({ target: h, speed: 1 }),
       role: new Enemy(),
       extra: { weak: false }
     });
@@ -533,6 +533,10 @@ function builder(level: number) {
   else if (level == 15) {
     // Heroes can use jumping and crawling to defeat enemies.  This doesn't
     // involve the hero's strength
+    //
+    // You might use crawling to simulate crawling, ducking, rolling, spinning,
+    // etc.
+
     stage.world.setGravity(0, 10);
     let hero = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),

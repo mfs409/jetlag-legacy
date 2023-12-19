@@ -1,6 +1,6 @@
 * Tutorial Table of Contents
 
-** Done (10)
+** Done
 *** Getting Started (getting_started.ts; ready; need to verify after deplying v3 to github)
 **** Overview
 In this tutorial, we will discuss how to get started using JetLag.  This
@@ -270,30 +270,6 @@ the roles that JetLag supports
 -- Obstacle: has hero, projectile, and enemy collisions.  jumpreenablesides.
    disableHeroCollision to let hero pass through, but not others
 -- Sensor: just has a hero collision
-
-** Started (0)
-
-** Not Started (13)
-*** Assets, Audio, and Animations (TODO)
-**** Overview
-This tutorial focuses on the key asset types in JetLag: images, sounds, and
-sprite sheets.  It briefly discusses texture packing.
-**** TODO: What goes in here?
-- About color codes for those filledsprites (include transparency)
-- The two ways of making animations
-- All the different animation states
-- The remap concept (ugh) for overriding defaults
-- Sounds versus music
-- No spaces in names!
-- Changing images/animations without making new components
-- Z index!
-
-
-*** Collision Events (TODO)
-**** Overview
-This tutorial discusses collision events, and how they are handled in JetLag.
-**** What Goes In here?
-- Prereq: dynamic body
 - Most things are when the collision starts
   - Automatic things: the code for when a hero and enemy collide.  But even
     these are customizable
@@ -303,11 +279,8 @@ This tutorial discusses collision events, and how they are handled in JetLag.
     - Hero: OnStrengthChange, defaults for enemy, destination, goodie
     - Obstacle: heroCollision, enemyCollision, projectileCollision
     - Sensor: heroCollision
-- addEndContactHandler (world method) is at the end of a collision
-- Disabling collisions: onesided, passthrough
 
-
-*** Storage (TODO)
+*** Storage (storage.ts; ready)
 **** Overview
 This tutorial discusses the different categories of storage in JetLag, and their
 idiosyncrasies.  It also discusses the `extra` field, present in all actors.
@@ -316,21 +289,15 @@ idiosyncrasies.  It also discusses the `extra` field, present in all actors.
 - Session is really useful
 - Persistent needs a key, and it's harder.  You probably want to JSON it.
 
-
-*** A Platformer Game (TODO)
+*** Timers (timers; ready)
 **** Overview
-This tutorial builds a platformer-style game.  It introduces the idea of
-invincibility, and the different ways a hero can defeat an enemy.
-**** Missing Stuff
-- We need all the defeat stuff: crawl, jump, projectile, and the plain old
-  strength stuff
-- Immune to invincible, alwaysdoesdamage
-- Talk about how enemies don't work for "bosses", and what to do about it
-  (use Extra on an Obstacle?)
-- Then discuss unusual uses of enemies, like at the bottom of a pit.
+This tutorial builds a survival-style game.  It uses the game to discuss some of
+the more nuanced issues related to timers.
+**** What goes in here?
+- Not sure... one-time timers?  
+- How to vary a timer's rate via a state machine?
 
-
-*** Gestures (TODO)
+*** Gestures (gestures; ready)
 **** Overview
 This tutorial focuses on gesture input.  It reinforces ideas about the heads-up
 display.
@@ -341,64 +308,48 @@ display.
 - New mouseover feature
 - What else?
 - Not yet: Draggable, Flick, Hover, HoverFlick
+- A whole lot about hud and order of hud vs non-hud
+- Joystick
+- Drag Zone
+- Poke to Place
+- PanCallback
+- Flick
+- ToggleButton
+- TouchAndGo
+- PokeToMove
+- PokeToRun
+- OneTime?
+- MultiHero
 
+*** Collision Events (collisions; ready)
+**** Overview
+This tutorial discusses collision events, and how they are handled in JetLag.
+**** What Goes In here?
+- Not in it: Most things are when the collision starts
+  - Automatic things: the code for when a hero and enemy collide.  But even
+    these are customizable
+    - Goodie: "OnCollect"
+    - Destination: "OnAttemptArrival"
+    - Enemy: OnDefeatHero, OnDefeated
+    - Hero: OnStrengthChange, defaults for enemy, destination, goodie
+    - Obstacle: heroCollision, enemyCollision, projectileCollision
+    - Sensor: heroCollision
+- Disabling collisions: onesided, passthrough
+- addEndContactHandler (world method) is at the end of a collision
+- Sticky
 
-*** Projectiles (TODO)
+*** Projectiles and Pools (projectiles; ready)
 **** Overview
 This tutorial focuses on projectiles
 **** What goes in here?
-
-
-*** Endless Runner (TODO)
-**** Overview
-This tutorial is a gateway into thinking about procedurally-generated content.
-It builds an endless runner game.  Realizing that "random" is not always good,
-it suggests a simple strategy for avoiding repetitive gameplay.
-**** What goes in here
-
-
-*** Timers (TODO)
-**** Overview
-This tutorial builds a survival-style game.  It uses the game to discuss some of
-the more nuanced issues related to timers.
-**** What goes in here?
-- Not sure... one-time timers?  
-- How to vary a timer's rate via a state machine?
-
-
-*** Joints (TODO)
-**** Overview
-This tutorial introduces ideas related to joints connecting rigid bodies.
-**** What goes in here?
-- Talk about the way we do sticky obstacles via distance joints
-- Talk about some revolutejoint stuff
-- Then say "you can get to the body, so do it yourself"
-
-
-*** SVG (TODO)
-**** Overview
-This tutorial shows several different behaviors that are possible in JetLag.
-Sometimes a unique game can arise just because of an interesting behavior that a
-developer stumbles upon by accident.  This tutorial should cover any outstanding
-ideas that are illustrated in a level of what used to be the "demo" game.
-**** What goes in here
-- Include an arkanoid?
-- Include an "AI" in a free kick or air hockey game?
-
-
-*** Packaging for Mobile (TODO)
-**** Overview
-This tutorial shows how to use Capacitor to package a game for mobile.  It also
-discusses games with vertical (portrait) orientation.
-
-
-*** Packaging for Desktop (TODO)
-**** Overview
-This tutorial shows how to use Electron to package a game for desktop play
-(e.g., Steam).
-
-
-*** Score (TODO)
+- Projectile is special: it is a role but it has an associated movement
+- Projectile movement: throwx2+punch
+- Introduce the idea of pools
+-- To reclaim
+-- To limit things in flight
+- Then go into the various different projectile features
+- Mention punch but just say "do the farm game"
+*** Score (score; ready)
 This isn't even made yet!
   else if (level == 9) {
     // JetLag tracks a lot of information while your game is playing, through
@@ -461,9 +412,64 @@ This isn't even made yet!
     welcomeMessage("Collect 'the right' blue balls to activate destination");
     winMessage("Great Job");
   }
+*** Assets, Audio, and Animations (assets_audio_animation; ready)
+**** Overview
+This tutorial focuses on the key asset types in JetLag: images, sounds, and
+sprite sheets.  It briefly discusses texture packing.
+**** TODO: What goes in here?
+- About color codes for those filledsprites (include transparency)
+- The two ways of making animations
+- All the different animation states
+- The remap concept (ugh) for overriding defaults
+- Sounds versus music
+- No spaces in names!
+- Sounds:
+-- Disappear, toss, arrive, defeat, jump, collide
+- Changing images/animations without making new components
+- Z index!
 
+*** Joints (joints; ready)
+**** Overview
+This tutorial introduces ideas related to joints connecting rigid bodies.
+**** What goes in here?
+- Talk about the way we do sticky obstacles via distance joints
+- Talk about some revolutejoint stuff
+- Then say "you can get to the body, so do it yourself"
+
+*** A Platformer Game (platformer_game; ready)
+**** Overview
+This tutorial builds a platformer-style game.  It introduces the idea of
+invincibility, and the different ways a hero can defeat an enemy.
+**** Missing Stuff
+- We need all the defeat stuff: crawl, jump, projectile, and the plain old
+  strength stuff
+- Immune to invincible, alwaysdoesdamage
+- Talk about how enemies don't work for "bosses", and what to do about it
+  (use Extra on an Obstacle?)
+- Then discuss unusual uses of enemies, like at the bottom of a pit.
+
+*** Endless Runner (endless_runner; ready)
+**** Overview
+This tutorial is a gateway into thinking about procedurally-generated content.
+It builds an endless runner game.  Realizing that "random" is not always good,
+it suggests a simple strategy for avoiding repetitive gameplay.
+**** What goes in here
+
+*** SVG (svg; ready)
+**** Overview
+This tutorial just shows the svg factory
+
+** Not Started
+*** Packaging for Mobile (TODO)
+**** Overview
+This tutorial shows how to use Capacitor to package a game for mobile.  It also
+discusses games with vertical (portrait) orientation.
+
+*** Packaging for Desktop (TODO)
+**** Overview
+This tutorial shows how to use Electron to package a game for desktop play
+(e.g., Steam).
 
 *** TODO: Don't forget to update tutorials.html
-
 
 *** TODO: Don't forget to update the scripts

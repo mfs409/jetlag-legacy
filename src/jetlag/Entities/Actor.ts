@@ -24,7 +24,7 @@ export class Actor {
   readonly rigidBody: RigidBodyComponent;
 
   /** A set of functions describing how the Actor should respond to gestures. */
-  public gestures?: GestureHandlers;
+  public gestures: GestureHandlers;
   /** The rules for how this Actor should move */
   readonly movement: MovementComponent;
   /** The packet of information describing the audio aspects of this Actor */
@@ -77,12 +77,12 @@ export class Actor {
     this.role = config.role ?? new Passive();
     this.role.actor = this;
 
-    if (config.gestures)
-      this.gestures = config.gestures;
+    if (config.gestures) this.gestures = config.gestures;
+    else this.gestures = {};
 
     this.sounds = config.sounds ?? new SoundEffectComponent({});
     this.onDisappear = config.onDisappear;
-    this.extra = config.extra;
+    this.extra = config.extra ?? {};
   }
 
   /**

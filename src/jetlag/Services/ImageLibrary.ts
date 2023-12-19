@@ -110,14 +110,15 @@ export class ImageLibraryService {
 
   /**
    * Get an image that has been loaded by the renderer, or a blank image if the
-   * provided filename is invalid.
+   * provided filename is the empty string.
    *
    * @param imgName The name of the image to load
    */
   public getSprite(imgName: string) {
     let texture = this.textures.get(imgName);
     if (!texture) {
-      if (imgName !== "") stage.console.log("Unable to find graphics asset '" + imgName + "'");
+      if (imgName !== "")
+        throw "Unable to find graphics asset '" + imgName + "'";
       return new Sprite("", new PixiSprite());
     }
     // NB:  If we wanted to use Pixi to modify the texture, then we'd need to

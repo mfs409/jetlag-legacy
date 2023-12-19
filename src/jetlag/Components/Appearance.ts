@@ -21,10 +21,6 @@ function validateFilledConfig(cfg: FilledBox | FilledCircle | FilledPolygon, cfg
   // Validate: if there's a line color, there needs to be a line width
   else if (cfg.lineColor !== undefined && cfg.lineWidth === undefined)
     stage.console.log(`Error: ${cfgName} with lineColor must have lineWidth`);
-
-  // Validate: if there is no line width or line color, there needs to be a fill color
-  else if (cfg.lineWidth === undefined && cfg.fillColor === undefined)
-    stage.console.log(`Error: ${cfgName} must have lineWidth or fillColor`);
 }
 
 /** Coerce a z value into the range -2...2 */
@@ -696,7 +692,7 @@ export class FilledBox {
   /** Line color */
   lineColor?: string;
   /** Fill color */
-  fillColor?: string;
+  fillColor: string;
 
   /**
    * Build a FilledBox
@@ -705,12 +701,12 @@ export class FilledBox {
    *                        object
    * @param opts.width      Width of the box 
    * @param opts.height     Height of the box 
-   * @param opts.lineWidth  Width of the border
-   * @param opts.lineColor  Color for the border
+   * @param opts.lineWidth  Optional width of the border
+   * @param opts.lineColor  Optional color for the border
    * @param opts.fillColor  Color to fill the box
    * @param opts.z          An optional z index in the range [-2,2]
    */
-  public constructor(opts: { width: number, height: number, lineWidth?: number, lineColor?: string, fillColor?: string, z?: number }) {
+  public constructor(opts: { width: number, height: number, lineWidth?: number, lineColor?: string, fillColor: string, z?: number }) {
     this.width = opts.width;
     this.height = opts.height;
     this.z = coerceZ(opts.z);

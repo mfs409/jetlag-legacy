@@ -2,7 +2,7 @@ import { b2Vec2, b2Transform, b2BodyType, b2DistanceJointDef } from "@box2d/core
 import { Actor } from "../Entities/Actor";
 import { stage } from "../Stage";
 import { DIRECTION, StateEvent } from "./StateManager";
-import { AnimatedSprite, ImageSprite } from "./Appearance";
+import { AnimatedSprite } from "./Appearance";
 import { ProjectileMovement } from "./Movement";
 import { TimedEvent } from "../Systems/Timer";
 
@@ -719,13 +719,6 @@ export class Projectile extends Role {
   /** The actor associated with this Role */
   public get actor() { return this._actor; }
 
-  /**
-   * We have to ensure that projectiles don't continue traveling off screen
-   * forever. This field lets us cap the distance away from the hero that a
-   * projectile can travel before we make it disappear.
-   */
-  public range: number;
-
   /** This is the initial point from which the projectile was thrown */
   readonly rangeFrom = new b2Vec2(0, 0);
 
@@ -741,34 +734,24 @@ export class Projectile extends Role {
   /** Code to run when the projectile is reclaimed due to a collision */
   readonly reclaimer?: (actor: Actor) => void;
 
-  /** A set of image names to randomly assign to projectiles' appearance */
-  randomImageSources?: string[];
-
   /**
    * Construct a Projectile role
    *
    * @param cfg                     Configuration options for this projectile
    * @param cfg.damage              How much damage should the projectile do?
    *                                (default 1)
-   * @param cfg.range               How far can the projectile travel before we
-   *                                reclaim it (default 40 meters)
    * @param cfg.disappearOnCollide  Should the projectile disappear when it
    *                                collides with another projectile? (default
    *                                true)
    * @param cfg.reclaimer           Code to run when the projectile is reclaimed
    *                                due to a collision.
-   * @param cfg.randomImageSources  An array of image names to use for the
-   *                                appearance (assumes the appearance is an
-   *                                ImageSprite)
    */
-  constructor(cfg: { damage?: number, range?: number, disappearOnCollide?: boolean, reclaimer?: (actor: Actor) => void, randomImageSources?: string[] } = {}) {
+  constructor(cfg: { damage?: number, disappearOnCollide?: boolean, reclaimer?: (actor: Actor) => void } = {}) {
     super();
     this.collisionRules.properties.push(CollisionExemptions.PROJECTILE);
     this.damage = cfg.damage ?? 1;
-    this.range = cfg.range ?? 40;
-    this.disappearOnCollide = cfg.disappearOnCollide ?? true;
+    this.disappearOnCollide = cfg.disappearOnCollide != undefined ? cfg.disappearOnCollide : true;
     this.reclaimer = cfg.reclaimer;
-    this.randomImageSources = cfg.randomImageSources;
   }
 
   /**
@@ -833,10 +816,6 @@ export class Projectile extends Role {
     let b = this.actor;
     if (!b) return;
     if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
-    if (this.randomImageSources) {
-      let idx = Math.floor(Math.random() * this.randomImageSources!.length);
-      (b.appearance as ImageSprite).setImage(this.randomImageSources![idx]);
-    }
     b.enabled = true;
 
     // Compute the starting point, then toss it
@@ -867,10 +846,6 @@ export class Projectile extends Role {
     let b = this.actor;
     if (!b) return;
     if (b.appearance instanceof AnimatedSprite) b.appearance.restartCurrentAnimation();
-    if (this.randomImageSources) {
-      let idx = Math.floor(Math.random() * this.randomImageSources!.length);
-      (b.appearance as ImageSprite).setImage(this.randomImageSources![idx]);
-    }
     b.enabled = true;
 
     // Compute the starting point, then toss it

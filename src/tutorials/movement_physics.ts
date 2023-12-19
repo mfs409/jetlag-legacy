@@ -1,7 +1,7 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, FilledCircle, FilledPolygon, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { BasicChase, GravityMovement, ManualMovement, Path, PathMovement, TiltMovement } from "../jetlag/Components/Movement";
+import { ChaseMovement, GravityMovement, ManualMovement, Path, PathMovement, TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody, PolygonBody } from "../jetlag/Components/RigidBody";
 import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
@@ -709,7 +709,7 @@ function builder(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 1, radius: 0.25 }),
-      movement: new BasicChase({ speed: 1, target: h }),
+      movement: new ChaseMovement({ speed: 1, target: h }),
       role: new Enemy(),
     });
 
@@ -735,14 +735,14 @@ function builder(level: number) {
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 0, cy: 2.5, radius: 0.5 }),
-      movement: new BasicChase({ speed: 10, target: h, chaseInX: false }),
+      movement: new ChaseMovement({ speed: 10, target: h, chaseInX: false }),
       role: new Obstacle(),
     });
 
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 2.5, cy: 0, radius: 0.5, }),
-      movement: new BasicChase({ speed: 10, target: h, chaseInY: false }),
+      movement: new ChaseMovement({ speed: 10, target: h, chaseInY: false }),
       role: new Obstacle(),
     });
   }
@@ -771,7 +771,7 @@ function builder(level: number) {
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       role: new Obstacle(),
       rigidBody: new CircleBody({ cx: 15, cy: 2, radius: 0.4 }, { dynamic: true }),
-      movement: new BasicChase({ target: h, chaseInY: false, speed: 0.9 })
+      movement: new ChaseMovement({ target: h, chaseInY: false, speed: 0.9 })
     });
   }
 

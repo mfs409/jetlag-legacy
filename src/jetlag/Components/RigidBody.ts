@@ -21,7 +21,7 @@ abstract class RigidBodyBase {
   stickyDelay?: number;
   /** Which sides of the body are sticky, if any? */
   stickySides: Sides[] = [];
-  /** Entities with a matching nonzero Id don't collide with each other */
+  /** Entities with a matching Id don't collide with each other */
   passThroughId?: number;
   /** Are collisions only valid from one direction? */
   singleRigidSide?: Sides;
@@ -180,9 +180,9 @@ abstract class RigidBodyBase {
    */
   public setPhysics(cfg: { density?: number, elasticity?: number, friction?: number }) {
     for (let f = this.body.GetFixtureList(); f; f = f.GetNext()) {
-      if (cfg.density) f.SetDensity(cfg.density);
-      if (cfg.elasticity) f.SetRestitution(cfg.elasticity);
-      if (cfg.friction) f.SetFriction(cfg.friction);
+      if (cfg.density != undefined && cfg.density != 0) f.SetDensity(cfg.density);
+      if (cfg.elasticity != undefined) f.SetRestitution(cfg.elasticity);
+      if (cfg.friction != undefined) f.SetFriction(cfg.friction);
     }
     this.body.ResetMassData();
   }
@@ -358,8 +358,8 @@ export class CircleBody extends RigidBodyBase {
    *                                      before it can stick again
    * @param physicsCfg.singleRigidSide    Are collisions only valid from one
    *                                      direction?
-   * @param physicsCfg.passThroughId      Entities with a matching nonzero Id
-   *                                      don't collide with each other
+   * @param physicsCfg.passThroughId      Entities with a matching Id don't
+   *                                      collide with each other
    * @param physicsCfg.rotationSpeed      The speed at which to rotate, in
    *                                      rotations per second
    * @param physicsCfg.dynamic            Should the body be forced to be
@@ -454,8 +454,8 @@ export class BoxBody extends RigidBodyBase {
    *                                      before it can stick again
    * @param physicsCfg.singleRigidSide    Are collisions only valid from one
    *                                      direction?
-   * @param physicsCfg.passThroughId      Entities with a matching nonzero Id
-   *                                      don't collide with each other
+   * @param physicsCfg.passThroughId      Entities with a matching Id don't
+   *                                      collide with each other
    * @param physicsCfg.rotationSpeed      The speed at which to rotate, in
    *                                      rotations per second
    * @param physicsCfg.dynamic            Should the body be forced to be
@@ -555,8 +555,8 @@ export class PolygonBody extends RigidBodyBase {
    *                                      before it can stick again
    * @param physicsCfg.singleRigidSide    Are collisions only valid from one
    *                                      direction?
-   * @param physicsCfg.passThroughId      Entities with a matching nonzero Id
-   *                                      don't collide with each other
+   * @param physicsCfg.passThroughId      Entities with a matching Id don't
+   *                                      collide with each other
    * @param physicsCfg.rotationSpeed      The speed at which to rotate, in
    *                                      rotations per second
    * @param physicsCfg.dynamic            Should the body be forced to be
