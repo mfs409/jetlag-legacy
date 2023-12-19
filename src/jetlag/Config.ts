@@ -7,6 +7,8 @@ import { stage } from "./Stage";
  *
  * NB:  JetLag supports a broad set of possible states.  In many games, most of
  *      these won't be useful.
+ *
+ * TODO:  Consider adding a CLIMB state?
  */
 export const enum AnimationState {
   // Stationary
