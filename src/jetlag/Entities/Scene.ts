@@ -20,16 +20,16 @@ import { b2Vec2 } from "@box2d/core";
  */
 export class Scene {
   /** A camera, for making sure important actors are on screen */
-  public readonly camera: CameraSystem;
+  readonly camera: CameraSystem;
 
   /** A timer, for creating time-based events */
-  public readonly timer: TimerSystem = new TimerSystem();
+  readonly timer: TimerSystem = new TimerSystem();
 
   /** Events that get processed on the next render, then discarded */
-  public readonly oneTimeEvents: (() => void)[] = [];
+  readonly oneTimeEvents: (() => void)[] = [];
 
   /** Events that get processed on every render */
-  public readonly repeatEvents: (() => void)[] = [];
+  readonly repeatEvents: (() => void)[] = [];
 
   /** Run any pending events that should happen during a render */
   public runRendertimeEvents() {

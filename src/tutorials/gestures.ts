@@ -47,7 +47,7 @@ function builder(level: number) {
     stage.world.setGravity(0, 10);
 
     // A hero who can jump and who is moving
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
       movement: new ManualMovement(),
@@ -56,20 +56,20 @@ function builder(level: number) {
     (hero.movement as ManualMovement).setAbsoluteVelocity(5, 0);
 
     // A destination to reach
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 11, cy: 6, radius: 0.4 }),
       role: new Destination(),
     });
 
     // If you don't make it, you'll lose
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 15.95, cy: 4.5, width: .1, height: 9 }),
       role: new Enemy(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
       gestures: { tap: () => { (hero.role as Hero).jump(0, -7.5); return true; } }
@@ -88,13 +88,13 @@ function builder(level: number) {
     stage.world.camera.setBounds(0, 0, 32, 9);
 
     // A background image, to help see that the hero is moving
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ z: -2, width: 32, height: 9, img: "noise.png" }),
       rigidBody: new BoxBody({ cx: 16, cy: 4.5, width: .1, height: .1 }),
     });
 
     // A hero who can jump and who is moving
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
       movement: new ManualMovement(),
@@ -104,21 +104,21 @@ function builder(level: number) {
     stage.world.camera.setCameraFocus(hero);
 
     // A destination to reach
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 27, cy: 6, radius: 0.4 }),
       role: new Destination(),
     });
 
     // If you don't make it, you'll lose
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 31.95, cy: 4.5, width: .1, height: 9 }),
       role: new Enemy(),
     });
 
     // A button for jumping
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }), // put it on the HUD
       gestures: { tap: () => { (hero.role as Hero).jump(0, -7.5); return true; } }
@@ -136,7 +136,7 @@ function builder(level: number) {
     boundingBox();
 
     // A hero with ManualMovement, so that the joystick can control it
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
       movement: new ManualMovement(),
@@ -144,7 +144,7 @@ function builder(level: number) {
     });
 
     // A destination to reach
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 11, cy: 6, radius: 0.4 }),
       role: new Destination(),
@@ -168,7 +168,7 @@ function builder(level: number) {
     }
 
     // Make a joystick
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 2, height: 2, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ cx: jcx, cy: jcy, radius: 1 }, { scene: stage.hud }),
       gestures: { panStart: doMove, panMove: doMove, panStop: doStop },
@@ -191,13 +191,13 @@ function builder(level: number) {
     stage.world.camera.setBounds(0, 0, 32, 9);
 
     // A background image, to help see that the hero is moving
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ z: -2, width: 32, height: 9, img: "noise.png" }),
       rigidBody: new BoxBody({ cx: 16, cy: 4.5, width: .1, height: .1 }),
     });
 
     // A hero who is moving
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
       movement: new ManualMovement(),
@@ -207,7 +207,7 @@ function builder(level: number) {
     stage.world.camera.setCameraFocus(hero);
 
     // A button for dropping things
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 2.25, width: 16, height: 4.5 }, { scene: stage.hud }), // put it on the HUD
       gestures: {
@@ -217,7 +217,7 @@ function builder(level: number) {
           // back.
           let screenPixels = stage.hud.camera.metersToScreen(hudMeters.x, hudMeters.y);
           let worldMeters = stage.world.camera.screenToMeters(screenPixels.x, screenPixels.y);
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ cx: worldMeters.x, cy: worldMeters.y, radius: .25 }),
             movement: new GravityMovement(),
@@ -239,7 +239,7 @@ function builder(level: number) {
     // draw two obstacles that we can drag, and one that we can't.  The whole
     // key to deciding who is draggable and who isn't will be whether we give
     // them "extra" information.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 2, radius: 0.375 }, { dynamic: true }),
       movement: new ManualMovement(),
@@ -247,7 +247,7 @@ function builder(level: number) {
       extra: { drag: true }
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 14, cy: 1, radius: 0.375 }, { elasticity: 1 }),
       movement: new ManualMovement(),
@@ -255,7 +255,7 @@ function builder(level: number) {
       extra: { drag: true }
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 13, cy: 1, radius: 0.375 }, { elasticity: 1 }),
       movement: new ManualMovement(),
@@ -300,7 +300,7 @@ function builder(level: number) {
     };
 
     // Now we can cover the HUD with a button that handles the pan gestures
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
       gestures: { panStart, panMove, panStop },
@@ -319,21 +319,21 @@ function builder(level: number) {
     stage.world.setGravity(0, 10);
 
     // create a few Actors that can be flicked, and one who cannot
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: 0.4 }),
       movement: new ManualMovement(),
       role: new Hero(),
       extra: { flickSpeed: 1 }
     });
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 6, radius: 0.4 }, { dynamic: true }),
       movement: new ManualMovement(),
       role: new Obstacle(),
       extra: { flickSpeed: 0.5 }
     });
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 5, radius: 0.4 }, { dynamic: true }),
       movement: new ManualMovement(),
@@ -366,7 +366,7 @@ function builder(level: number) {
     };
 
     // Make the area on the HUD that receives swipe gestures
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
       gestures: { swipe }
@@ -384,7 +384,7 @@ function builder(level: number) {
 
     // make an actor who can "teleport".  Tapping it will "activate" it.
     // Double-tapping will remove it
-    const teleport_actor = Actor.Make({
+    const teleport_actor = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 14, cy: 1, radius: .5 }),
       gestures: {
@@ -412,7 +412,7 @@ function builder(level: number) {
 
 
     // Make the tappable region on the hud
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
       gestures: {
@@ -435,7 +435,7 @@ function builder(level: number) {
 
 
     // make an actor who can move along a path.
-    const path_actor = Actor.Make({
+    const path_actor = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 14, cy: 2, radius: .5 }),
       movement: new PathMovement(new Path().to(14, 1), 0, false),
@@ -453,7 +453,7 @@ function builder(level: number) {
     });
 
     // This actor will move in a direction, but won't stop
-    const walk_actor = Actor.Make({
+    const walk_actor = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 14, cy: 3, radius: .5 }),
       movement: new ManualMovement(),
@@ -481,7 +481,7 @@ function builder(level: number) {
     // touch-up gestures.
     boundingBox();
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .4, cy: .4, radius: 0.4 }),
       movement: new ManualMovement(),
@@ -512,22 +512,22 @@ function builder(level: number) {
     // draw some buttons for moving the hero.  These are "toggle" buttons: they
     // run some code when they are pressed, and other code when they are
     // released.
-    let l = Actor.Make({
+    let l = new Actor({
       appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 1, cy: 4.5, width: 2, height: 5 }, { scene: stage.hud }),
     });
     addToggleButton(l, () => (h.movement as ManualMovement).updateXVelocity(-5), () => { });
-    let r = Actor.Make({
+    let r = new Actor({
       appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 15, cy: 4.5, width: 2, height: 5 }, { scene: stage.hud }),
     });
     addToggleButton(r, () => (h.movement as ManualMovement).updateXVelocity(5), () => { });
-    let d = Actor.Make({
+    let d = new Actor({
       appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 8, width: 12, height: 2 }, { scene: stage.hud }),
     });
     addToggleButton(d, () => (h.movement as ManualMovement).updateYVelocity(5), () => { });
-    let u = Actor.Make({
+    let u = new Actor({
       appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 1, width: 12, height: 2 }, { scene: stage.hud }),
     });
@@ -547,7 +547,7 @@ function builder(level: number) {
     boundingBox();
 
     // make a hero who doesn't start moving until it is touched
-    let hover_walk = Actor.Make({
+    let hover_walk = new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.5, cy: 8.25, radius: 0.375 }, { density: 1, friction: 0, disableRotation: true }),
       movement: new HoverMovement(0.5, 8.25),
@@ -563,7 +563,7 @@ function builder(level: number) {
     }
 
     // Make a hero who is hovering, but who we will eventually flick
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 7, radius: .5 }),
       movement: new HoverMovement(1, 7),
@@ -596,7 +596,7 @@ function builder(level: number) {
       foundActor.rigidBody.body.SetLinearVelocity(v);
       return true;
     };
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9, }, { scene: stage.hud }),
       gestures: { swipe },

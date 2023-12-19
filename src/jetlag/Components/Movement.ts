@@ -379,7 +379,6 @@ export class ProjectileMovement {
   /**
    * Construct a movement policy that is appropriate for projectiles
    *
-   * @param cfg                     The requested configuration
    * @param cfg.multiplier          A multiplier on projectile speed
    * @param cfg.fixedVectorVelocity A fixed velocity for all projectiles
    * @param cfg.rotateVectorToss    Should projectiles be rotated in the

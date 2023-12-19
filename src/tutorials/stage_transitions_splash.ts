@@ -26,29 +26,29 @@ export function splashBuilder(_level: number) {
   stage.backgroundColor = "#FFFFFF";
 
   // Draw a brown box at the top of the screen, put some text in it
-  Actor.Make({
+  new Actor({
     appearance: new FilledBox({ width: 16, height: 3, fillColor: "#523216" }),
     rigidBody: new BoxBody({ cx: 8, cy: 1.5, width: 16, height: 3 }),
   });
-  Actor.Make({
+  new Actor({
     appearance: new TextSprite({ center: true, face: "Arial", size: 120, color: "#FFFFFF" }, "JetLag Demo"),
     rigidBody: new BoxBody({ cx: 8, cy: 1.25, width: .1, height: .1 }),
   });
-  Actor.Make({
+  new Actor({
     appearance: new TextSprite({ center: true, face: "Arial", size: 56, color: "#FFFFFF" }, "2D Games for Web and Mobile"),
     rigidBody: new BoxBody({ cx: 8, cy: 2.4, width: .1, height: .1 }),
   });
 
   // Draw some text.  Tapping its *rigidBody* will go to the first page of the
   // level chooser
-  Actor.Make({
+  new Actor({
     appearance: new TextSprite({ center: true, face: "Arial", size: 96, color: "#000000" }, "Play"),
     rigidBody: new BoxBody({ cx: 8, cy: 5.625, width: 2.5, height: 1.25 }),
     gestures: { tap: () => { stage.switchTo(chooserBuilder, 1); return true; } }
   });
 
   // Make some text for going to the help screen
-  Actor.Make({
+  new Actor({
     appearance: new TextSprite({ center: true, face: "Arial", size: 72, color: "#000000" }, "Help"),
     rigidBody: new BoxBody({ cx: 3.2, cy: 6.15, width: 1.8, height: 0.9 }),
     gestures: { tap: () => { stage.switchTo(helpBuilder, 1); return true; } }
@@ -56,7 +56,7 @@ export function splashBuilder(_level: number) {
 
   // Make a quit button.  This is probably not useful in browser games, only
   // mobile/desktop.
-  Actor.Make({
+  new Actor({
     appearance: new TextSprite({ center: true, face: "Arial", size: 72, color: "#000000" }, "Quit"),
     rigidBody: new BoxBody({ cx: 12.75, cy: 6.15, width: 1.8, height: 0.9 }),
     gestures: { tap: () => { stage.exit(); return true; } }

@@ -37,7 +37,7 @@ function builder(level: number) {
     // will go.  The easiest thing is to center the text on the anchor.  If
     // the text isn't also supposed to be interactive, it is sufficient to
     // make a tiny body for it:
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: .01 }),
       appearance: new TextSprite({ center: true, face: "Arial", size: 22, color: "#FF0000" }, "JetLag")
     });
@@ -45,7 +45,7 @@ function builder(level: number) {
     // Every TextSprite must have a face, size, and color.  We can add a fourth
     // pair of digits to the color to make it transparent.  There are optional
     // configuration fields for an outline, too.
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: 4, cy: 4, radius: .01 }),
       appearance: new TextSprite({ center: true, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 }, "JetLag")
     });
@@ -55,7 +55,7 @@ function builder(level: number) {
     // other.  The default is 0.  If two things have the same Z, the one we made
     // second is the one on top.  So let's put a green ball in Z -1, to see how
     // the transparency worked on that previous text:
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: 4, cy: 4, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, z: -1, img: "green_ball.png" })
     });
@@ -64,7 +64,7 @@ function builder(level: number) {
     // anything else.  The key thing is that the text's *body* is what is
     // interactive, not its appearance.  So in this case, let's make some text
     // that moves around:
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 1, cy: 1, width: .5, height: .5 }),
       appearance: new TextSprite({ center: true, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 }, "Tap Me"),
       movement: new PathMovement(new Path().to(1, 1).to(15, 1).to(15, 8).to(1, 8).to(1, 1), 4, true)
@@ -73,7 +73,7 @@ function builder(level: number) {
 
   else if (level == 2) {
     // Let's stop that movement, and look at what's happening with that text
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 1, cy: 1, width: .5, height: .5 }),
       appearance: new TextSprite({ center: true, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 }, "Tap Me"),
       gestures: { tap: () => { console.log("tap"); return true; } }
@@ -83,7 +83,7 @@ function builder(level: number) {
   else if (level == 3) {
     let tap_count = 0;
     // Let's stop that movement, and look at what's happening with that text
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 1, cy: 1, width: .5, height: .5 }),
       appearance: new TextSprite({ center: true, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 }, "Taps: " + tap_count),
       gestures: { tap: () => { console.log("tap"); tap_count += 1; return true; } }
@@ -93,7 +93,7 @@ function builder(level: number) {
   else if (level == 4) {
     // When did the previous code run?
     let tap_count = 0;
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 1, cy: 1, width: .5, height: .5 }),
       appearance: new TextSprite(
         { center: true, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 },
@@ -107,7 +107,7 @@ function builder(level: number) {
     // center?
 
     let tap_count = 0;
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 1, cy: 1, width: .5, height: .5 }),
       appearance: new TextSprite(
         { center: false, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 },
@@ -121,13 +121,13 @@ function builder(level: number) {
 
   else if (level == 6) {
     // We can put arbitrary code in the "producer" for the TextSprite:
-    let hero = Actor.Make({
+    let hero = new Actor({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       movement: new ManualMovement({ rotateByDirection: true }),
     });
 
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: .001 }),
       appearance: new TextSprite(
         { center: false, face: "Arial", size: 20, color: "#FF0000aa" },
@@ -144,7 +144,7 @@ function builder(level: number) {
   }
 
   else if (level == 7) {
-    let hero = Actor.Make({
+    let hero = new Actor({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       movement: new ManualMovement({ rotateByDirection: true }),
@@ -152,7 +152,7 @@ function builder(level: number) {
 
     // such a small change... we will just put this actor on the heads-up
     // display instead of in the world.
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: .001 }, { scene: stage.hud }),
       appearance: new TextSprite(
         { center: false, face: "Arial", size: 20, color: "#FF0000aa" },
@@ -175,20 +175,20 @@ function builder(level: number) {
     // such roles, but certainly we can have different kinds of appearance, and
     // they can even have movement.
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       movement: new ManualMovement({ rotateByDirection: true }),
     });
 
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .5 }, { scene: stage.hud }),
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       movement: new PathMovement(new Path().to(1, 1).to(15, 1).to(15, 8).to(1, 8).to(1, 1), 4, true)
     });
 
     // For reference, here's the "Arial" font that we had been using so far
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: .001 }, { scene: stage.hud }),
       appearance: new TextSprite(
         { center: false, face: "Arial", size: 20, color: "#FF0000aa" },
@@ -197,7 +197,7 @@ function builder(level: number) {
 
     // You can add fonts to your game by linking to them in your html file.  In
     // this case, I've added a link for the "Lato" font:
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: .5, cy: 1.5, radius: .001 }, { scene: stage.hud }),
       appearance: new TextSprite(
         { center: false, face: "Lato", size: 20, color: "#FF0000aa" },
@@ -207,7 +207,7 @@ function builder(level: number) {
     // You can also add fonts by *downloading* them into your assets folder, and
     // then linking them differently in your html file.  I did that for the
     // Roboto font
-    Actor.Make({
+    new Actor({
       rigidBody: new CircleBody({ cx: .5, cy: 1, radius: .001 }, { scene: stage.hud }),
       appearance: new TextSprite(
         { center: false, face: "Roboto", size: 20, color: "#FF0000aa" },

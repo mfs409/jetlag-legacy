@@ -116,12 +116,12 @@ function builder(level: number) {
 
     if (first_time) {
       stage.requestOverlay((overlay: Scene) => {
-        Actor.Make({
+        new Actor({
           appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
           rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
           gestures: { tap: () => { stage.clearOverlay(); return true; } }
         });
-        Actor.Make({
+        new Actor({
           appearance: new TextSprite({ center: true, face: "Arial", size: 32, color: "#FFFFFF" }, "Welcome!"),
           rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, { scene: overlay }),
         });
@@ -130,12 +130,12 @@ function builder(level: number) {
 
     else if (new_day) {
       stage.requestOverlay((overlay: Scene) => {
-        Actor.Make({
+        new Actor({
           appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
           rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
           gestures: { tap: () => { stage.clearOverlay(); return true; } }
         });
-        Actor.Make({
+        new Actor({
           appearance: new TextSprite({ center: true, face: "Arial", size: 32, color: "#FFFFFF" }, "Welcome Back!"),
           rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, { scene: overlay }),
         });
@@ -153,7 +153,7 @@ function builder(level: number) {
     }
     boundingBox();
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 8, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -165,7 +165,7 @@ function builder(level: number) {
     for (let cx = 0.5; cx < 16.5; cx += 2) {
       let animations = new Map();
       animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 75, repeat: true, images: ["coin0.png", "coin1.png", "coin2.png", "coin3.png", "coin4.png", "coin5.png", "coin6.png", "coin7.png"] }))
-      Actor.Make({
+      new Actor({
         appearance: new AnimatedSprite({ width: 0.4, height: 0.4, animations }),
         rigidBody: new CircleBody({ cx, cy: 5, radius: 0.2 }),
         role: new Goodie({ onCollect: () => { lstore.coins += 1; return true; } }),
@@ -175,7 +175,7 @@ function builder(level: number) {
     for (let cx = 1.5; cx < 16.5; cx += 2) {
       let animations = new Map();
       animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 75, repeat: true, images: ["coin0.png", "coin1.png", "coin2.png", "coin3.png", "coin4.png", "coin5.png", "coin6.png", "coin7.png"] }))
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite({ width: 0.4, height: 0.4, img: "red_ball.png" }),
         rigidBody: new CircleBody({ cx, cy: 5, radius: 0.2 }),
         role: new Enemy(),
@@ -183,7 +183,7 @@ function builder(level: number) {
     }
 
     // Make a destination
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 8, radius: 0.4 }),
       role: new Destination(),
@@ -192,21 +192,21 @@ function builder(level: number) {
 
 
     // Make the coin counter
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.4, height: 0.4, img: "coin0.png" }),
       rigidBody: new CircleBody({ cx: 0.5, cy: 0.5, radius: 0.2 }, { scene: stage.hud })
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 24, color: "#000000" }, () => "x " + (lstore.coins + sstore.coins)),
       rigidBody: new CircleBody({ cx: 0.8, cy: 0.35, radius: 0.01 }, { scene: stage.hud })
     });
 
     // Make the ruby counter
-    Actor.Make({
+    new Actor({
       appearance: new FilledPolygon({ fillColor: "#FF0000", vertices: [-.1, 0, 0, -.2, .1, 0, 0, .2] }),
       rigidBody: new CircleBody({ cx: 0.5, cy: 1, radius: 0.2 }, { scene: stage.hud })
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 24, color: "#000000" }, () => "x " + (pstore.rubies)),
       rigidBody: new CircleBody({ cx: 0.8, cy: 0.9, radius: 0.01 }, { scene: stage.hud })
     });
@@ -228,23 +228,23 @@ function builder(level: number) {
         pstore.rubies += rubies;
         persist(pstore, "persistent_info");
       }
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: { tap: () => { stage.clearOverlay(); stage.switchTo(builder, level); return true; } }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", size: 32, color: "#FFFFFF" }, "Good Job"),
         rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, { scene: overlay }),
       });
       if (rubies == 1) {
-        Actor.Make({
+        new Actor({
           appearance: new TextSprite({ center: true, face: "Arial", size: 32, color: "#FFFFFF" }, "You earned 1 ruby"),
           rigidBody: new CircleBody({ cx: 8, cy: 5.5, radius: .01 }, { scene: overlay }),
         });
       }
       if (rubies == 2) {
-        Actor.Make({
+        new Actor({
           appearance: new TextSprite({ center: true, face: "Arial", size: 32, color: "#FFFFFF" }, "You earned 2 rubies"),
           rigidBody: new CircleBody({ cx: 8, cy: 5.5, radius: .01 }, { scene: overlay }),
         });
@@ -253,12 +253,12 @@ function builder(level: number) {
 
     // When the player loses, just give a message and let them start over
     stage.score.loseSceneBuilder = (overlay) => {
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: { tap: () => { stage.clearOverlay(); stage.switchTo(builder, level); return true; } }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", size: 32, color: "#FFFFFF" }, "Try Again"),
         rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, { scene: overlay }),
       });

@@ -54,14 +54,14 @@ function builder(level: number) {
     //
     // NB:  Heroes are always dynamic, since they're involved in so many
     //      important collisions...
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Goodie(),
@@ -73,14 +73,14 @@ function builder(level: number) {
 
   else if (level == 2) {
     // Now let's provide code for making all the goodie counts change
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 10, cy: 3, radius: 0.4 }),
       role: new Goodie({
@@ -95,7 +95,7 @@ function builder(level: number) {
       }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Goodie({
@@ -126,14 +126,14 @@ function builder(level: number) {
     // Next, let's look at destinations
     // First, let's do the "default" behavior: the destination accepts a hero
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Destination(),
@@ -145,21 +145,21 @@ function builder(level: number) {
   else if (level == 4) {
     // We can let a destination hold more than one hero (and we can change the
     // victory condition)
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 5, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Destination({ capacity: 2 }),
@@ -170,27 +170,27 @@ function builder(level: number) {
 
   else if (level == 5) {
     // That also means we can have two destinations each hold one hero
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 5, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Destination(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 6, radius: 0.4 }),
       role: new Destination(),
@@ -200,7 +200,7 @@ function builder(level: number) {
   }
 
   else if (level == 6) {
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -208,19 +208,19 @@ function builder(level: number) {
       extra: {}
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 8, radius: 0.4 }),
       role: new Destination({ onAttemptArrival: (h: Actor) => stage.score.getGoodieCount(0) > 0 && h.extra.collected }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Goodie(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 5, radius: 0.4 }),
       role: new Goodie({ onCollect: (_g: Actor, h: Actor) => { h.extra.collected = true; return true; } }),
@@ -228,7 +228,7 @@ function builder(level: number) {
   }
 
   else if (level == 7) {
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -242,7 +242,7 @@ function builder(level: number) {
 
     // This pad effect multiplies by -1, causing a "bounce off" effect even
     // though collisions are not enabled
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ cx: 5, cy: 3, radius: 0.4 }),
       role: new Sensor({
@@ -251,7 +251,7 @@ function builder(level: number) {
     });
 
     // This pad multiplies by five, causing a speedup
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ cx: 7, cy: 3, radius: 0.4 }),
       role: new Sensor({
@@ -260,7 +260,7 @@ function builder(level: number) {
     });
 
     // A fraction causes a slowdown
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ cx: 9, cy: 3, radius: 0.4 }, { rotationSpeed: 2 }),
       role: new Sensor({
@@ -277,14 +277,14 @@ function builder(level: number) {
     // goodie, it automatically collects it.  JetLag has four built-in "goodie
     // counters".  When you collide with a goodie, the default is that the "0"
     // goodie counter increments by one.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Obstacle(),
@@ -294,14 +294,14 @@ function builder(level: number) {
   else if (level == 9) {
     // We can run code when an enemy collides with an obstacle.  We can also
     // disable collisions for heroes but not anything else
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.2, height: 2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 12, cy: 8, width: .2, height: 2 }),
       role: new Obstacle({
@@ -311,7 +311,7 @@ function builder(level: number) {
       }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: 0.4 }, { dynamic: true }),
       movement: new ChaseMovement({ target: h, speed: 1 }),
@@ -319,7 +319,7 @@ function builder(level: number) {
       extra: { weak: true }
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 2, radius: 0.4 }, { dynamic: true }),
       movement: new ChaseMovement({ target: h, speed: 1 }),
@@ -330,7 +330,7 @@ function builder(level: number) {
 
   else if (level == 10) {
     // We can run code when a hero collides with an obstacle, too
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -338,7 +338,7 @@ function builder(level: number) {
       extra: { regular: true }
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.2, height: 2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 12, cy: 8, width: .2, height: 2 }),
       role: new Obstacle({
@@ -359,7 +359,7 @@ function builder(level: number) {
 
     stage.world.setGravity(0, 10);
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -376,7 +376,7 @@ function builder(level: number) {
     });
 
     // But this one only works from the top
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 2, height: 2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 12, cy: 5, width: 2, height: 2 }),
       role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
@@ -386,7 +386,7 @@ function builder(level: number) {
   else if (level == 12) {
     // Let's do more with enemies now.  By default, heroes have "1" strength,
     // and enemies do "2" damage, so when they collide, the hero goes away
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.4, height: 0.4, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.2 }, { density: 2 }),
       movement: new TiltMovement(),
@@ -396,7 +396,7 @@ function builder(level: number) {
       }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
       role: new Enemy(),
@@ -404,7 +404,7 @@ function builder(level: number) {
 
     // This goodie changes the hero's strength, which, in turn, triggers the
     // hero's strength change callback
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 8, radius: 0.4 }),
       role: new Goodie({
@@ -420,7 +420,7 @@ function builder(level: number) {
     // We saw jumping in level 12.  Of course, we can also double-jump :)
     stage.world.setGravity(0, 10);
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -441,7 +441,7 @@ function builder(level: number) {
     // Since jumping is a nice way to do movement, we also have infinite jump
     stage.world.setGravity(0, 10);
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -467,20 +467,20 @@ function builder(level: number) {
     // etc.
 
     stage.world.setGravity(0, 10);
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new BoxBody({ cx: 2, cy: 3, width: 0.8, height: 0.8 }, { density: 2 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 8.6, radius: 0.4 }),
       role: new Enemy({ defeatByCrawl: true, }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 14, cy: 8.6, radius: 0.4 }),
       role: new Enemy({ defeatByJump: true }),
@@ -497,7 +497,7 @@ function builder(level: number) {
     // require certain heroes to stay alive.  Otherwise, as long as one hero is
     // still alive, the game goes on
     for (let i = 1; i < 4; ++i) {
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
         rigidBody: new BoxBody({ cx: 2 * i, cy: 3, width: 0.8, height: 0.8 }, { density: 2 }),
         movement: new TiltMovement(),
@@ -505,12 +505,12 @@ function builder(level: number) {
       });
     }
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 8.6, radius: 0.4 }),
       role: new Enemy({
         damage: 8, onDefeatHero: (e: Actor) => e.resize(12, 8.5, 1, 1), onDefeated: (e: Actor) =>
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ radius: .25, cx: e.rigidBody.getCenter().x, cy: 2 }),
             role: new Goodie()
@@ -527,7 +527,7 @@ function builder(level: number) {
     // defeat 3 enemies to win
     stage.score.setVictoryEnemyCount(3);
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }, { density: 2 }),
       movement: new TiltMovement(),
@@ -537,7 +537,7 @@ function builder(level: number) {
     // draw a few enemies, and make them rotate
     for (let i = 0; i < 5; ++i) {
       let cfg = { cx: i + 4, cy: 6, radius: 0.25, width: 0.5, height: 0.5, img: "red_ball.png" };
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite(cfg),
         rigidBody: new CircleBody(cfg, { density: 1.0, elasticity: 0.3, friction: 0.6, rotationSpeed: 1 }),
         role: new Enemy({ immuneToInvincibility: i == 4, instantDefeat: i == 2, disableHeroCollision: true }),
@@ -545,7 +545,7 @@ function builder(level: number) {
     }
 
     // this goodie adds 15 seconds of invincibility
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 8, radius: 0.25, }, { rotationSpeed: .25 }),
       role: new Goodie({
@@ -556,7 +556,7 @@ function builder(level: number) {
     });
 
     // Show how much invincibility is remaining
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", size: 16, color: "#3C64BF", center: false }, () => (hero.role as Hero).invincibleRemaining.toFixed(0) + " Invincibility"),
       rigidBody: new CircleBody({ radius: .01, cx: .01, cy: 1 }, { scene: stage.hud })
     })

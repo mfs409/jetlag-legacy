@@ -41,7 +41,7 @@ function builder(level: number) {
     GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 16, y: 9 });
 
     // Make a hero
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new FilledPolygon({ vertices: [0, -.5, .25, .5, -.25, .5], fillColor: "#0000ff", lineWidth: 3, lineColor: "#000044", z: 1 }),
       rigidBody: new PolygonBody({ cx: 8, cy: 4.5, vertices: [0, -.5, .25, .5, -.25, .5] }, { collisionsEnabled: false }),
       role: new Hero(),
@@ -65,7 +65,7 @@ function builder(level: number) {
       rigidBody.setCollisionsEnabled(true);
       let appearance = new FilledCircle({ radius: .125, fillColor: "#bbbbbb", z: 0 });
       let role = new Projectile({ damage: 1, disappearOnCollide: true });
-      Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role });
+      new Actor({ appearance, rigidBody, movement: new ProjectileMovement(), role });
       role.tossAt(x, y, x + scale * dx, y + scale * dy, h, 0, 0);
     });
 
@@ -74,7 +74,7 @@ function builder(level: number) {
       let angle = Math.random() * 2 * Math.PI;
       let hx = h.rigidBody.getCenter().x, hy = h.rigidBody.getCenter().y;
       let sx = 9 * Math.sin(angle) + hx, sy = 9 * Math.cos(angle) + hy;
-      Actor.Make({
+      new Actor({
         appearance: new FilledCircle({ radius: .5, fillColor: "#F01100" }),
         rigidBody: new CircleBody({ cx: sx, cy: sy, radius: .5 }),
         role: new Enemy({ damage: 1 }),
@@ -93,22 +93,22 @@ function builder(level: number) {
     stage.world.camera.setBounds(0, 0, 64, 36);
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 64, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 32, cy: -.05, width: 64, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 64, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 32, cy: 36.05, width: 64, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 36, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -.05, cy: 18, width: .1, height: 36 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 36, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 64.05, cy: 18, width: .1, height: 36 }),
       role: new Obstacle(),
@@ -128,14 +128,14 @@ function builder(level: number) {
       stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
     }
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 55, cy: 28, radius: 0.4 }),
       role: new Destination(),
@@ -159,7 +159,7 @@ function builder(level: number) {
     // transparency so that they don't cover up the gameplay.
 
     // Note: these go on the HUD
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 8, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 4, cy: 4.5, width: 8, height: 9 }, { scene: stage.hud }),
       gestures: {
@@ -169,7 +169,7 @@ function builder(level: number) {
         }
       }
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 8, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 12, cy: 4.5, width: 8, height: 9 }, { scene: stage.hud }),
       gestures: {
@@ -190,7 +190,7 @@ function builder(level: number) {
     for (let x = 0; x < 64; x += 16) {
       for (let y = 0; y < 36; y += 9) {
         // This is kind of neat: a picture is just an actor without a role or rigidBody
-        Actor.Make({
+        new Actor({
           appearance: new ImageSprite({ width: 16, height: 9, img: "noise.png", z: -1 }),
           rigidBody: new BoxBody({ cx: x + 8, cy: y + 4.5, width: 16, height: 9 }, { collisionsEnabled: false }),
         });
@@ -218,29 +218,29 @@ function builder(level: number) {
     GridSystem.makeGrid(stage.world, { x: 0, y: 0 }, { x: 32, y: 9 });
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16, cy: .05, width: 32, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16, cy: 8.95, width: 32, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: .05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 31.95, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
 
     // Make a hero, let the camera follow it
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new FilledCircle({ radius: .75, fillColor: "#0000ff", lineWidth: 3, lineColor: "#000044" }),
       rigidBody: new CircleBody({ cx: 3, cy: 3, radius: .75 }),
       role: new Hero(),
@@ -256,7 +256,7 @@ function builder(level: number) {
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (h.movement as ManualMovement).updateXVelocity(0); });
 
     // Make a destination
-    Actor.Make({
+    new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#00ff00", lineWidth: 3, lineColor: "#004400" }),
       rigidBody: new CircleBody({ cx: 31, cy: 6, radius: .5 }),
       role: new Destination(),
@@ -264,11 +264,11 @@ function builder(level: number) {
     });
 
     // Draw a box, and write a timer on it.  Both go on the HUD
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .75, height: .75, fillColor: "#eeeeee", lineWidth: 3, lineColor: "#000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: .75, width: .75, height: .75 }, { scene: stage.hud }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#444444", size: 48 }, () => (stage.score.getLoseCountdownRemaining() ?? 0).toFixed(0)),
       rigidBody: new BoxBody({ cx: 8, cy: .75, width: 1.8, height: 1 }, { scene: stage.hud }),
     });
@@ -299,7 +299,7 @@ function builder(level: number) {
     }
 
     // Make the floor
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 20, height: .1 }),
       role: new Obstacle(),
@@ -307,19 +307,19 @@ function builder(level: number) {
 
     // Make the sides as enemies, but put them a tad off screen, because
     // that's a bit more kind
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 36, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -1, cy: -9, width: .1, height: 36 }),
       role: new Enemy(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 36, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 17, cy: -9, width: .1, height: 36 }),
       role: new Enemy(),
     });
 
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 1, friction: 0.5, disableRotation: true }),
       movement: new TiltMovement(),
@@ -330,7 +330,7 @@ function builder(level: number) {
 
     stage.world.camera.setCameraFocus(h, 0, -2);
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: -26, radius: 0.5 }),
       role: new Destination(),
@@ -340,7 +340,7 @@ function builder(level: number) {
 
     // create a platform that we can jump through from below
     function platform(cx: number, cy: number) {
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ z: -1, width: 2, height: 0.2, fillColor: "#FF0000" }),
         rigidBody: new BoxBody({ cx, cy, width: 2, height: 0.2, }, { collisionsEnabled: true, singleRigidSide: Sides.TOP }),
         // Set a callback, then re-enable the platform's collision effect.
@@ -364,7 +364,7 @@ function builder(level: number) {
 
     let animations = new Map();
     animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 550, repeat: true, images: ["night_0.png", "night_1.png"] }))
-    stage.background.addLayer({ cx: 8, cy: 4.5 }, { imageMaker: () => new AnimatedSprite({ width: 16, height: 9, animations }), speed: 0, isHorizontal: false, isAuto: false });
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5 }, imageMaker: () => new AnimatedSprite({ width: 16, height: 9, animations }), speed: 0, isHorizontal: false, isAuto: false });
   }
 }
 

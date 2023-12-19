@@ -17,7 +17,7 @@ import { stage } from "../jetlag/Stage";
 export function drawMuteButton(cfg: { cx: number, cy: number, width: number, height: number, scene: Scene }) {
   // Draw a mute button
   let getVolume = () => (stage.storage.getPersistent("volume") ?? "1") === "1";
-  let mute = Actor.Make({
+  let mute = new Actor({
     appearance: new ImageSprite({ width: cfg.width, height: cfg.height, img: "audio_off.png" }),
     rigidBody: new BoxBody({ cx: cfg.cx, cy: cfg.cy, width: cfg.width, height: cfg.height }, { scene: cfg.scene }),
   });

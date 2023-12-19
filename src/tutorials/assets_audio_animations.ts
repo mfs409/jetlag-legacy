@@ -53,21 +53,21 @@ function builder(level: number) {
 
     // A circle.  It is filled red.  It has a green outline.  The body has a
     // bigger radius
-    Actor.Make({
+    new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#ff0000", lineWidth: 4, lineColor: "#00ff00" }),
       rigidBody: new CircleBody({ cx: 5, cy: 2, radius: 1 }),
     })
 
     // A rectangle.  It is filled blue.  It has no outline.  The body has a
     // smaller perimeter and different shape
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 3, cy: 4, width: 2, height: 2 }),
       appearance: new FilledBox({ width: 1, height: .5, fillColor: "#0000ff" }),
     })
 
     // A polygon.  The fourth color channel is "alpha", and 00 means
     // "transparent", even though it looks like it should be red.
-    Actor.Make({
+    new Actor({
       rigidBody: new PolygonBody({ cx: 10, cy: 5, vertices: [0, -.5, .5, 0, 0, .5, -1, 0] }),
       appearance: new FilledPolygon({ vertices: [0, -.5, .5, 0, 0, .5, -1, 0], fillColor: "#ff000000", lineWidth: 4, lineColor: "#00ff00" }),
     })
@@ -78,7 +78,7 @@ function builder(level: number) {
     // "noise.png" in the "assets" folder.  Up above, "assets" is the folder
     // name in the config object, and "noise.png" is listed as an image.  That
     // means we can use the image:
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 2, height: 2, img: "noise.png" }),
       rigidBody: new CircleBody({ cx: 5, cy: 2, radius: 1 }),
     });
@@ -94,7 +94,7 @@ function builder(level: number) {
     // Copying all your images into the "assets" folder and listing them all in
     // that array up above is tedious and error prone.  If you put in a bad
     // name, your developer console will give you an error.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 2, height: 2, img: "bird.png" }),
       rigidBody: new CircleBody({ cx: 5, cy: 2, radius: 1 }),
     });
@@ -107,7 +107,7 @@ function builder(level: number) {
     // can put the two files into your assets folder, and then just put the json
     // file into the array up above.  Then you can use the names of the files,
     // just like before.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 2, height: 2, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 5, cy: 2, radius: 1 }),
     });
@@ -122,20 +122,20 @@ function builder(level: number) {
     // on top of things that were made before them.  Let's try it out.
 
     // This actor will go "under" everything else in Z=0, since it was drawn first
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: 8, cy: 1 }),
       role: new Hero(),
       movement: new TiltMovement()
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "left_arrow.png" }),
       rigidBody: new BoxBody({ width: 1, height: 1, cx: 15, cy: 1 })
     });
 
     // But the actor will go *over* this, since its Z is -1
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "right_arrow.png", z: -1 }),
       rigidBody: new BoxBody({ width: 1, height: 1, cx: 1, cy: 1 })
     });
@@ -149,7 +149,7 @@ function builder(level: number) {
     stage.world.setGravity(0, 10);
     enableTilt(10, 0);
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
       movement: new TiltMovement(),
@@ -160,22 +160,22 @@ function builder(level: number) {
       (h.appearance as ImageSprite).setImage("color_star_" + s + ".png");
       return true;
     }
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 2.5, cy: 8.5, radius: .5 }),
       role: new Goodie({ onCollect }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 4.5, cy: 8.5, radius: .5 }),
       role: new Goodie({ onCollect }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 6.5, cy: 8.5, radius: .5 }),
       role: new Goodie({ onCollect }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 6.5, cy: 8.5, radius: .5 }),
       role: new Goodie({ onCollect }),
@@ -190,7 +190,7 @@ function builder(level: number) {
     enableTilt(10, 0);
     stage.world.setGravity(0, 10);
     stage.world.camera.setBounds(0, 0, 32, 9);
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 8, radius: .5 }),
       movement: new TiltMovement(),
@@ -200,10 +200,10 @@ function builder(level: number) {
     stage.backgroundColor = "#4050D0";
     // These get layered in the order they are made.  You probably want them to
     // be layered from speed 1 down to speed 0.
-    stage.background.addLayer({ cx: 8, cy: 4.5 }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 })
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5 }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 })
     // Speed 0 is "same as hero"; Speed 1 is "seems not to move".  In between
     // will seem like layers in the distance.
-    stage.background.addLayer({ cx: 8, cy: 4.5 }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 })
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5 }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 })
 
     // JetLag also supports foregrounds.  They work in the same way :)
   }
@@ -224,7 +224,7 @@ function builder(level: number) {
     animation_map.set(AnimationState.IDLE_E, coins);
 
     // Now we can use it:
-    Actor.Make({
+    new Actor({
       appearance: new AnimatedSprite({ width: .5, height: .5, animations: animation_map }),
       rigidBody: new CircleBody({ cx: 5, cy: 2, radius: .25 }),
     });
@@ -246,7 +246,7 @@ function builder(level: number) {
 
     // Now we can use it
     for (let i = 0; i < 16; ++i) {
-      let coin = Actor.Make({
+      let coin = new Actor({
         appearance: new AnimatedSprite({ width: .5, height: .5, animations: animation_map }),
         rigidBody: new CircleBody({ cx: i + .5, cy: 2, radius: .25 }),
       });
@@ -264,7 +264,7 @@ function builder(level: number) {
     // Note that I did not draw the Alien.  I used the "Universal Sprite Sheet
     // Creator" at
     // https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/.
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }),
       appearance: new AnimatedSprite({ width: 2, height: 2, animations }),
       role: new Hero(),
@@ -302,7 +302,7 @@ function builder(level: number) {
     animations.set(AnimationState.IDLE_S, new AnimationSequence(true).to("alien_thrust_d_0.png", 750).to("alien_thrust_d_1.png", 75));
     animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("alien_thrust_r_0.png", 750).to("alien_thrust_r_1.png", 75));
 
-    const hero = Actor.Make({
+    const hero = new Actor({
       rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }),
       appearance: new AnimatedSprite({ width: 2, height: 2, animations }),
       role: new Hero(),
@@ -364,7 +364,7 @@ function builder(level: number) {
     animations.set(AnimationState.IDLE_S, new AnimationSequence(true).to("alien_thrust_d_0.png", 750).to("alien_thrust_d_1.png", 75));
     animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("alien_thrust_r_0.png", 750).to("alien_thrust_r_1.png", 75));
 
-    const hero = Actor.Make({
+    const hero = new Actor({
       rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }),
       appearance: new AnimatedSprite({ width: 2, height: 2, animations }),
       role: new Hero(),
@@ -421,7 +421,7 @@ function builder(level: number) {
     remap.set(AnimationState.IDLE_NW, AnimationState.IDLE_W);
     remap.set(AnimationState.IDLE_SW, AnimationState.IDLE_W);
 
-    const hero = Actor.Make({
+    const hero = new Actor({
       rigidBody: new BoxBody({ cx: 3, cy: 4, width: 1, height: 2 }),
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
       role: new Hero(),
@@ -453,7 +453,7 @@ function builder(level: number) {
 
     stage.backgroundColor = "#17b4ff";
     // Layers can be a nice way to make backgrounds even when there isn't scrolling :)
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5, }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // The hero has one animation when it is not in the air, another when it is
     // Note that "jump_right" will also be used when jumping to the left, if
@@ -470,7 +470,7 @@ function builder(level: number) {
     remap.set(AnimationState.JUMP_W, AnimationState.JUMP_E);
 
     let h_cfg = { cx: 0.25, cy: 7, width: 0.8, height: 0.8, radius: 0.4, animations, remap };
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new AnimatedSprite(h_cfg),
       rigidBody: new CircleBody(h_cfg, { density: 5, friction: 0.6, disableRotation: true }),
       movement: new TiltMovement(),
@@ -485,14 +485,14 @@ function builder(level: number) {
 
     // We can make "disappear" animations by turning "repeat" to false when
     // putting an animation where an actor used to be:
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "star_burst_3.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 7.5, radius: 0.25 }),
       role: new Goodie(),
       onDisappear: (a: Actor) => {
         let animations = new Map();
         animations.set(AnimationState.IDLE_E, new AnimationSequence(false).to("star_burst_3.png", 200).to("star_burst_2.png", 200).to("star_burst_1.png", 200).to("star_burst_4.png", 200));
-        Actor.Make({
+        new Actor({
           appearance: new AnimatedSprite({ animations, width: .5, height: .5 }),
           rigidBody: new BoxBody({ cx: a.rigidBody.getCenter().x, cy: a.rigidBody.getCenter().y, width: .5, height: .5 }, { collisionsEnabled: false }),
         })
@@ -517,7 +517,7 @@ function builder(level: number) {
     drawMuteButton({ cx: 15.5, cy: 0.5, width: 1, height: 1, scene: stage.hud });
 
     // disappear and collide will both be attached to this obstacle
-    let o = Actor.Make({
+    let o = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 2.5, cy: 8.5, radius: .5 }),
       role: new Obstacle(),
@@ -527,7 +527,7 @@ function builder(level: number) {
 
     // The hero will have a jump sound, and its projectiles will make toss
     // sounds
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
       role: new Hero(),
@@ -535,7 +535,7 @@ function builder(level: number) {
       sounds: new SoundEffectComponent({ jump: "slow_down.ogg" }),
       gestures: {
         tap: () => {
-          let p = Actor.Make({
+          let p = new Actor({
             appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
             rigidBody: new CircleBody({ cx: h.rigidBody.getCenter().x + .2, cy: h.rigidBody.getCenter().y, radius: .1 }),
             movement: new ProjectileMovement(),
@@ -552,7 +552,7 @@ function builder(level: number) {
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => { (h.role as Hero).jump(0, -7.5) });
 
     // Defeat the enemy to get a defeat sound
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 4.5, cy: 8.5, radius: .5 }),
       role: new Enemy(),
@@ -560,7 +560,7 @@ function builder(level: number) {
     });
 
     // Reach the destination for an arrive sound
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: .5 }),
       role: new Destination(),
@@ -591,7 +591,7 @@ initializeAndLaunch("game-player", new Config(), builder);
 function drawMuteButton(cfg: { cx: number, cy: number, width: number, height: number, scene: Scene }) {
   // Draw a mute button
   let getVolume = () => (stage.storage.getPersistent("volume") ?? "1") === "1";
-  let mute = Actor.Make({
+  let mute = new Actor({
     appearance: new ImageSprite({ width: cfg.width, height: cfg.height, img: "audio_off.png" }),
     rigidBody: new BoxBody({ cx: cfg.cx, cy: cfg.cy, width: cfg.width, height: cfg.height }, { scene: cfg.scene }),
   });

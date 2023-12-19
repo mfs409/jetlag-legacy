@@ -43,7 +43,7 @@ function builder(level: number) {
     let animations = new Map();
     animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 75, repeat: true, images: ["alien_walk_r_0.png", "alien_walk_r_1.png", "alien_walk_r_2.png", "alien_walk_r_3.png", "alien_walk_r_4.png", "alien_walk_r_5.png", "alien_walk_r_6.png", "alien_walk_r_7.png", "alien_walk_r_8.png"] }));
     animations.set(AnimationState.JUMP_E, new AnimationSequence(true).to("alien_cast_r_0.png", 75).to("alien_cast_r_1.png", 75).to("alien_cast_r_2.png", 75).to("alien_cast_r_3.png", 75).to("alien_cast_r_4.png", 8000).to("alien_cast_r_5.png", 75).to("alien_cast_r_6.png", 75));
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new AnimatedSprite({ width: 2, height: 2, animations }),
       rigidBody: new PolygonBody({ cx: 0.5, cy: 5.9, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { disableRotation: true }),
       movement: new ManualMovement(),
@@ -61,7 +61,7 @@ function builder(level: number) {
     // you make it 0, you still can't jump while in the air, but you can jump as
     // soon as you land.
     let last = 0;
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: .1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ width: 16, height: 9, cx: 8, cy: 4.5 }, { scene: stage.hud }),
       gestures: {
@@ -75,26 +75,26 @@ function builder(level: number) {
     });
     // set up the background
     stage.backgroundColor = "#17b4ff";
-    stage.background.addLayer({ cx: 0, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    stage.background.addLayer({ anchor: { cx: 0, cy: 4.5, }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // Put a distance display on the HUD
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", size: 40, color: "#FFFFFF", strokeColor: "#000000", strokeWidth: 1 }, () => h.rigidBody.getCenter().x.toFixed(2) + " m"),
       rigidBody: new CircleBody({ cx: .1, cy: .1, radius: .05 }, { scene: stage.hud })
     })
 
     // Draw some floor
-    let floor0 = Actor.Make({
+    let floor0 = new Actor({
       appearance: new FilledBox({ width: 64, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -32, cy: 9.05, width: 64, height: .1 }),
       role: new Obstacle(),
     });
-    let floor1 = Actor.Make({
+    let floor1 = new Actor({
       appearance: new FilledBox({ width: 64, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 32, cy: 9.05, width: 64, height: .1 }),
       role: new Obstacle(),
     });
-    let floor2 = Actor.Make({
+    let floor2 = new Actor({
       appearance: new FilledBox({ width: 64, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 96, cy: 9.05, width: 64, height: .1 }),
       role: new Obstacle(),
@@ -102,7 +102,7 @@ function builder(level: number) {
 
     // This sensor will keep "building" the next part of the level as the hero
     // moves forward
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ width: .1, height: 9, cx: 63.95, cy: 4.5 }),
       role: new Sensor({
@@ -119,12 +119,12 @@ function builder(level: number) {
           // game.  We'll just draw a goodie and an enemy. You could also speed
           // up the hero (permanently or temporarily), if that would make the
           // game more fun.
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .75, height: .75, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ radius: .375, cx: s.rigidBody.getCenter().x + 64 + Math.random() * 64, cy: 8.5 * Math.random() }),
             role: new Goodie(),
           })
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .75, height: .75, img: "red_ball.png" }),
             rigidBody: new CircleBody({ radius: .375, cx: s.rigidBody.getCenter().x + 64 + Math.random() * 64, cy: 8.5 * Math.random() }),
             role: new Enemy(),

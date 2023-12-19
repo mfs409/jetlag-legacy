@@ -67,7 +67,7 @@ function builder(level: number) {
   boundingBox();
 
   // Make a portal to the other level
-  Actor.Make({
+  new Actor({
     appearance: new FilledCircle({ radius: .5, fillColor: "#000000" }),
     rigidBody: new CircleBody({ cx: 4, cy: 1, radius: .5 }),
     role: new Sensor({ heroCollision: () => stage.switchTo(builder, 3 - level) })
@@ -117,7 +117,7 @@ function builder(level: number) {
     remap.set(AnimationState.TOSS_IDLE_NE, AnimationState.TOSS_NE);
     remap.set(AnimationState.TOSS_IDLE_SE, AnimationState.TOSS_SE);
 
-    const hero = Actor.Make({
+    const hero = new Actor({
       rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true }),
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
       role: new Hero(),
@@ -155,7 +155,7 @@ function builder(level: number) {
         let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
         if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
       });
-      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role });
+      let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement(), role });
       projectiles.put(p);
     }
 
@@ -172,7 +172,7 @@ function builder(level: number) {
 
     // Here is a seed.  We make one each day
     if (!state.seed_collected) {
-      Actor.Make({
+      new Actor({
         rigidBody: new CircleBody({ cx: 15, cy: 8, radius: .1 }),
         appearance: new FilledCircle({ radius: .1, fillColor: "#00FF00" }),
         role: new Goodie({ onCollect: () => { state.seeds += 1; state.seed_collected = true; return true; } }),
@@ -180,13 +180,13 @@ function builder(level: number) {
     }
 
     // The bed takes us to "tomorrow"
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 12, cy: 2, width: 3, height: 1.75 }),
       appearance: new FilledBox({ width: 3, height: 1.75, fillColor: "#0000FF" }),
       role: new Obstacle({
         heroCollision: () => {
           stage.requestOverlay((overlay: Scene) => {
-            Actor.Make({
+            new Actor({
               rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
               appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
               gestures: {
@@ -199,7 +199,7 @@ function builder(level: number) {
                 }
               },
             });
-            Actor.Make({
+            new Actor({
               rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .01 }, { scene: overlay }),
               appearance: new TextSprite({ face: "Arial", size: 36, color: "#FFFFFF", center: true }, "Good Night..."),
             });
@@ -210,7 +210,7 @@ function builder(level: number) {
 
     // We can plant a seed on one of the four dirt patches
     for (let d = 0; d < 4; ++d) {
-      Actor.Make({
+      new Actor({
         rigidBody: new CircleBody({ cx: (7.5 + d), cy: 8.5, radius: .5 }),
         appearance: new FilledCircle({ radius: .5, fillColor: state.colors[state.dirt_states[d]] }),
         role: new Obstacle({
@@ -286,7 +286,7 @@ function builder(level: number) {
     remap.set(AnimationState.TOSS_IDLE_NE, AnimationState.TOSS_NE);
     remap.set(AnimationState.TOSS_IDLE_SE, AnimationState.TOSS_SE);
 
-    const hero = Actor.Make({
+    const hero = new Actor({
       rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true }),
       appearance: new AnimatedSprite({ width: 4, height: 4, animations, remap }),
       role: new Hero(),
@@ -313,7 +313,7 @@ function builder(level: number) {
     rigidBody.setCollisionsEnabled(false);
     let reclaimer = (actor: Actor) => { projectiles.put(actor); actor.enabled = false; }
     let role = new Projectile({ damage: 1, disappearOnCollide: false, reclaimer, });
-    projectiles.put(Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role }));
+    projectiles.put(new Actor({ appearance, rigidBody, movement: new ProjectileMovement(), role }));
 
     // "Punch" in the direction the hero is facing
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_TAB, () => {
@@ -347,7 +347,7 @@ function builder(level: number) {
     remap = new Map();
     remap.set(AnimationState.IDLE_E, AnimationState.WALK_E);
     // Enemy to defeat
-    Actor.Make({
+    new Actor({
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
       rigidBody: new PolygonBody({ cx: 14.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true }),
       movement: new PathMovement(new Path().to(14.5, 8.1).to(18.5, 8.1).to(14.5, 8.1), 2.5, true),
@@ -359,37 +359,37 @@ function builder(level: number) {
   }
 
   // Put the day on the hud
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .125, cy: .25, radius: .001 }, { scene: stage.hud }),
     appearance: new TextSprite({ face: "Arial", size: 36, color: "#000000", center: false }, () => "Day: " + state.day),
   });
 
   // Put the seed inventory on the hud
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .5, cy: .75, radius: .001 }, { scene: stage.hud }),
     appearance: new TextSprite({ face: "Arial", size: 36, color: "#000000", center: false }, () => "x " + state.seeds),
   });
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .25, cy: 1, radius: .1 }, { scene: stage.hud }),
     appearance: new FilledCircle({ radius: .1, fillColor: "#00FF00" }),
   });
 
   // Put the number of harvested plants on the hud
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .5, cy: 1.25, radius: .001 }, { scene: stage.hud }),
     appearance: new TextSprite({ face: "Arial", size: 36, color: "#000000", center: false }, () => "x " + state.plants),
   });
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .25, cy: 1.5, radius: .1 }, { scene: stage.hud }),
     appearance: new FilledCircle({ radius: .1, fillColor: "#FFFF00" }),
   });
 
   // Put the number of defeated lizards on the hud
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .5, cy: 1.75, radius: .001 }, { scene: stage.hud }),
     appearance: new TextSprite({ face: "Arial", size: 36, color: "#000000", center: false }, () => "x " + state.lizards),
   });
-  Actor.Make({
+  new Actor({
     rigidBody: new CircleBody({ cx: .25, cy: 1.875, radius: .1 }, { scene: stage.hud }),
     appearance: new ImageSprite({ width: .5, height: .5, img: "lizard_walk_r_0.png" }),
   });

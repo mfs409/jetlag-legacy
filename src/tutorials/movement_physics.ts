@@ -53,25 +53,25 @@ function builder(level: number) {
     enableTilt(10, 10);
 
     // The actor who can move
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(), // This makes it dynamic
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 4, cy: 4, radius: 0.4 }),
       role: new Obstacle(), // Defaults to static
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 4, radius: 0.4 }, { kinematic: true }),
       role: new Obstacle(), // The prior line overrides to kinematic
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 4, radius: 0.4 }, { dynamic: true }),
       role: new Obstacle(), // This one is overridden to be dynamic
@@ -85,19 +85,19 @@ function builder(level: number) {
     // Let's have a bounding box
     boundingBox();
 
-    let s = Actor.Make({
+    let s = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 4, cy: 4, radius: 0.4 }),
       role: new Obstacle(), // Defaults to static
     });
 
-    let k = Actor.Make({
+    let k = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 4, radius: 0.4 }, { kinematic: true }),
       role: new Obstacle(),
     });
 
-    let d = Actor.Make({
+    let d = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 4, radius: 0.4 }, { dynamic: true }),
       role: new Obstacle(),
@@ -112,12 +112,12 @@ function builder(level: number) {
 
     // To convince ourselves, let's repeat the experiment with two kinematics,
     // and again with two dynamics:
-    let k1 = Actor.Make({
+    let k1 = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 2, radius: 0.4 }, { kinematic: true }),
       role: new Obstacle(),
     });
-    let k2 = Actor.Make({
+    let k2 = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 2, radius: 0.4 }, { kinematic: true }),
       role: new Obstacle(),
@@ -125,12 +125,12 @@ function builder(level: number) {
     k1.rigidBody.body.SetLinearVelocity({ x: 1, y: 0 })
     k2.rigidBody.body.SetLinearVelocity({ x: -1, y: 0 })
 
-    let d1 = Actor.Make({
+    let d1 = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 6, radius: 0.4 }, { dynamic: true }),
       role: new Obstacle(),
     });
-    let d2 = Actor.Make({
+    let d2 = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 6, radius: 0.4 }, { dynamic: true }),
       role: new Obstacle(),
@@ -148,19 +148,19 @@ function builder(level: number) {
     // Note: you could have negative gravity, to make things float upward...
     stage.world.setGravity(0, 10);
 
-    let s = Actor.Make({
+    let s = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 4, cy: 4, radius: 0.4 }),
       role: new Obstacle(), // Defaults to static
     });
 
-    let k = Actor.Make({
+    let k = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 4, radius: 0.4 }, { kinematic: true }),
       role: new Obstacle(),
     });
 
-    let d = Actor.Make({
+    let d = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 4, radius: 0.4 }, { dynamic: true }),
       role: new Obstacle(),
@@ -184,14 +184,14 @@ function builder(level: number) {
     // configuration.  In this case, we'll make things rotate
 
     // Circles need a radius.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: 1, cy: 1 }, { rotationSpeed: 5 }),
       role: new Obstacle(),
     });
 
     // Boxes have a width and a height
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "blue_ball.png" }),
       rigidBody: new BoxBody({ width: 1, height: 2, cx: 3, cy: 2 }, { rotationSpeed: -.25 }),
       role: new Obstacle(),
@@ -204,7 +204,7 @@ function builder(level: number) {
     // crazy), but the polygon needs to be convex.  Points are described in
     // terms of their distance from the center.  So, for example, here's a
     // circular image with a hexagonal body.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 2, height: 2, img: "blue_ball.png" }),
       rigidBody: new PolygonBody(
         { cx: 6, cy: 6, vertices: [-1, 0, -.5, .866, .5, .866, 1, 0, .5, -.866, -.5, -.866] },
@@ -213,7 +213,7 @@ function builder(level: number) {
     });
 
     // The polygon's center (x,y) need not be its true center:
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 2, height: 2, img: "blue_ball.png" }),
       rigidBody: new PolygonBody(
         { cx: 13, cy: 6, vertices: [-1, 0, 0, 1, 1, 0] },
@@ -228,7 +228,7 @@ function builder(level: number) {
     // Let's also draw an obstacle that is oblong (due to its width and height)
     // and that is rotated. Note that this should be a box, or it will not have
     // the right underlying shape.
-    let o = Actor.Make({
+    let o = new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.15, img: "blue_ball.png" }),
       rigidBody: new BoxBody({ cx: 13, cy: 3, width: 0.75, height: 0.15, }),
       role: new Obstacle(),
@@ -236,7 +236,7 @@ function builder(level: number) {
     o.rigidBody.setRotation(Math.PI / 4);
 
     // This actor can move around and experience the other actors' shapes
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(), // This makes it dynamic
@@ -261,7 +261,7 @@ function builder(level: number) {
     // affect velocity directly, instead of inducing forces:
     stage.tilt.tiltVelocityOverride = true;
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }, { collisionsEnabled: false }),
       movement: new TiltMovement(),
@@ -274,14 +274,14 @@ function builder(level: number) {
     // Let's look at density, elasticity, and friction
     enableTilt(10, 10);
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }, { density: 5, friction: .3 }),
       movement: new TiltMovement(),
       role: new Obstacle(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new BoxBody({ cx: 4, cy: 3, width: .8, height: .8 }, { density: 5, friction: .3 }),
       movement: new TiltMovement(),
@@ -294,13 +294,13 @@ function builder(level: number) {
 
   else if (level == 7) {
     enableTilt(10, 10);
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }, { density: 5, friction: .3 }),
       movement: new TiltMovement(),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new BoxBody({ cx: 4, cy: 3, width: .8, height: .8 }, { density: 5, friction: .3 }),
       movement: new TiltMovement(),
@@ -331,7 +331,7 @@ function builder(level: number) {
     boundingBox();
 
     // A hero, for exploring the world
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 8, radius: 0.4, }),
       movement: new TiltMovement(),
@@ -339,7 +339,7 @@ function builder(level: number) {
     });
 
     // A circle.  Tap it to make it shrink a little bit
-    let shrinkCircle = Actor.Make({
+    let shrinkCircle = new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#FF0000" }),
       rigidBody: new CircleBody({ cx: 2, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { shrinkCircle.extra.radius *= .8; shrinkCircle.resize(2, 2, 2 * shrinkCircle.extra.radius, 2 * shrinkCircle.extra.radius); return true; } },
@@ -348,7 +348,7 @@ function builder(level: number) {
     });
 
     // A box.  Tap it to make it shrink a little bit
-    let shrinkBox = Actor.Make({
+    let shrinkBox = new Actor({
       appearance: new FilledBox({ width: 1, height: 2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 4, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { shrinkBox.extra.w *= .8; shrinkBox.extra.h *= .8; shrinkBox.resize(4, 2, shrinkBox.extra.w, shrinkBox.extra.h); return true; } },
@@ -357,7 +357,7 @@ function builder(level: number) {
     });
 
     // A circle.  Tap it to make it grow a little bit
-    let growCircle = Actor.Make({
+    let growCircle = new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#0000FF" }),
       rigidBody: new CircleBody({ cx: 2, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { growCircle.extra.radius *= 1.2; growCircle.resize(2, 5, 2 * growCircle.extra.radius, 2 * growCircle.extra.radius); return true; } },
@@ -366,7 +366,7 @@ function builder(level: number) {
     });
 
     // A box.  Tap it to make it grow a little bit
-    let growBox = Actor.Make({
+    let growBox = new Actor({
       appearance: new FilledBox({ width: 1, height: 2, fillColor: "#0000FF" }),
       rigidBody: new BoxBody({ cx: 4, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { growBox.extra.w *= 1.2; growBox.extra.h *= 1.2; growBox.resize(4, 5, growBox.extra.w, growBox.extra.h); return true; } },
@@ -375,7 +375,7 @@ function builder(level: number) {
     });
 
     // A circle with an image.  Tap it to make it shrink a little bit
-    let shrinkCircleImage = Actor.Make({
+    let shrinkCircleImage = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { shrinkCircleImage.extra.radius *= .8; shrinkCircleImage.resize(6, 2, 2 * shrinkCircleImage.extra.radius, 2 * shrinkCircleImage.extra.radius); return true; } },
@@ -384,7 +384,7 @@ function builder(level: number) {
     });
 
     // A box with an image.  Tap it to make it shrink a little bit
-    let shrinkBoxImage = Actor.Make({
+    let shrinkBoxImage = new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "red_ball.png" }),
       rigidBody: new BoxBody({ cx: 8, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { shrinkBoxImage.extra.w *= .8; shrinkBoxImage.extra.h *= .8; shrinkBoxImage.resize(8, 2, shrinkBoxImage.extra.w, shrinkBoxImage.extra.h); return true; } },
@@ -393,7 +393,7 @@ function builder(level: number) {
     });
 
     // A circle with an image.  Tap it to make it grow a little bit
-    let growCircleImage = Actor.Make({
+    let growCircleImage = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { growCircleImage.extra.radius *= 1.2; growCircleImage.resize(6, 5, 2 * growCircleImage.extra.radius, 2 * growCircleImage.extra.radius); return true; } },
@@ -402,7 +402,7 @@ function builder(level: number) {
     });
 
     // A box with an image.  Tap it to make it grow a little bit
-    let growBoxImage = Actor.Make({
+    let growBoxImage = new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "blue_ball.png" }),
       rigidBody: new BoxBody({ cx: 8, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { growBoxImage.extra.w *= 1.2; growBoxImage.extra.h *= 1.2; growBoxImage.resize(8, 5, growBoxImage.extra.w, growBoxImage.extra.h); return true; } },
@@ -411,7 +411,7 @@ function builder(level: number) {
     });
 
     // A circle with text.  Tap it to make it shrink a little bit
-    let shrinkCircleText = Actor.Make({
+    let shrinkCircleText = new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#FF0000" }, "hello"),
       rigidBody: new CircleBody({ cx: 10, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { shrinkCircleText.extra.radius *= .8; shrinkCircleText.resize(10, 2, 2 * shrinkCircleText.extra.radius, 10 * shrinkCircleText.extra.radius); return true; } },
@@ -420,7 +420,7 @@ function builder(level: number) {
     });
 
     // A box with text.  Tap it to make it shrink a little bit
-    let shrinkBoxText = Actor.Make({
+    let shrinkBoxText = new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#FF0000" }, "hello"),
       rigidBody: new BoxBody({ cx: 12, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { shrinkBoxText.extra.w *= .8; shrinkBoxText.extra.h *= .8; shrinkBoxText.resize(12, 2, shrinkBoxText.extra.w, shrinkBoxText.extra.h); return true; } },
@@ -429,7 +429,7 @@ function builder(level: number) {
     });
 
     // A circle with text.  Tap it to make it grow a little bit
-    let growCircleText = Actor.Make({
+    let growCircleText = new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#0000FF" }, "hello"),
       rigidBody: new CircleBody({ cx: 10, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { growCircleText.extra.radius *= 1.2; growCircleText.resize(10, 5, 2 * growCircleText.extra.radius, 2 * growCircleText.extra.radius); return true; } },
@@ -438,7 +438,7 @@ function builder(level: number) {
     });
 
     // A box with text.  Tap it to make it grow a little bit
-    let growBoxText = Actor.Make({
+    let growBoxText = new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#0000FF" }, "hello"),
       rigidBody: new BoxBody({ cx: 12, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
       gestures: { tap: () => { growBoxText.extra.w *= 1.2; growBoxText.extra.h *= 1.2; growBoxText.resize(12, 5, growBoxText.extra.w, growBoxText.extra.h); return true; } },
@@ -447,7 +447,7 @@ function builder(level: number) {
     });
 
     // A polygon.  Tap it to make it shrink a little bit
-    let shrinkPoly = Actor.Make({
+    let shrinkPoly = new Actor({
       appearance: new FilledPolygon({ vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#FF0000" }),
       rigidBody: new PolygonBody({ cx: 14, cy: 2, vertices: [-1, -1, 0, 1, -1, 1] }),
       gestures: { tap: () => { shrinkPoly.extra.w *= .8; shrinkPoly.extra.h *= .8; shrinkPoly.resize(14, 2, shrinkPoly.extra.w, shrinkPoly.extra.h); return true; } },
@@ -456,7 +456,7 @@ function builder(level: number) {
     });
 
     // A polygon.  Tap it to make it grow a little bit
-    let growPoly = Actor.Make({
+    let growPoly = new Actor({
       appearance: new FilledPolygon({ vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#0000FF" }),
       rigidBody: new PolygonBody({ cx: 14, cy: 5, vertices: [-1, -1, 0, 1, -1, 1] }),
       gestures: { tap: () => { growPoly.extra.w *= 1.2; growPoly.extra.h *= 1.2; growPoly.resize(14, 5, growPoly.extra.w, growPoly.extra.h); return true; } },
@@ -490,7 +490,7 @@ function builder(level: number) {
     stage.world.setGravity(0, 10);
 
     // Falling enemies
-    stage.world.timer.addEvent(new TimedEvent(1, true, () => Actor.Make({
+    stage.world.timer.addEvent(new TimedEvent(1, true, () => new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cy: -.5, cx: .5 + (Math.random() * 15) }),
       role: new Enemy(),
@@ -499,7 +499,7 @@ function builder(level: number) {
 
     // A hero moving via tilt.  Notice that the ball "rolls" on the ground, even
     // though there's no friction.  That's because of gravity.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 8.6, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -516,7 +516,7 @@ function builder(level: number) {
     // repeat.
 
     // Moving around in the world will make this more interesting!
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 8.6, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -525,7 +525,7 @@ function builder(level: number) {
     enableTilt(10, 10);
 
     // This actor moves to a position and stops
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: .5, cy: .5 }),
       role: new Obstacle(),
@@ -534,7 +534,7 @@ function builder(level: number) {
 
     // This actor loops, and is faster.  Also, actors on paths don't have to be
     // obstacles, they can have any role...
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: 1.5, cy: 1.5 }),
       role: new Enemy(),
@@ -545,7 +545,7 @@ function builder(level: number) {
     stage.score.onLose = { level, builder }
 
     // The last one was a bit odd.  This one has *three* points.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: 2.5, cy: 1.5 }),
       role: new Enemy(),
@@ -567,7 +567,7 @@ function builder(level: number) {
       if (up) lastY += 1; else lastY -= 1;
       up = !up;
     }
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: p.getPoint(0).x, cy: p.getPoint(0).y }),
       role: new Obstacle(),
@@ -577,7 +577,7 @@ function builder(level: number) {
     // If a point on the path is directly between two other points, you won't
     // notice it's there.  The velocity is all that matters
     let p2 = new Path().to(-.5, 5).to(8, 5).to(16.5, 5).to(-.5, 5);
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: p2.getPoint(0).x, cy: p2.getPoint(0).y }),
       role: new Obstacle(),
@@ -586,7 +586,7 @@ function builder(level: number) {
 
     // But once we've done that, we can re-use the path, letting the next actor
     // jump forward by a waypoint:
-    let a2 = Actor.Make({
+    let a2 = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: p2.getPoint(0).x, cy: p2.getPoint(0).y }),
       role: new Obstacle(),
@@ -599,7 +599,7 @@ function builder(level: number) {
     // We can make actors on paths dynamic.  This is usually a bad idea if
     // collisions are enabled (which is, of course, the default).  Try colliding
     // with this.  It will mess up the whole path system.
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: 2.5, cy: 1.5 }, { dynamic: true }),
       role: new Obstacle(),
@@ -609,13 +609,13 @@ function builder(level: number) {
     // Lastly, let's observe that we can run code whenever an actor reaches a
     // waypoint.  In this example, we'll only do something on the second
     // waypoint (waypoint #1):
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ radius: .5, cx: 2.5, cy: 7.5 }),
       role: new Obstacle(),
       movement: new PathMovement(new Path().to(-.5, 7.5).to(8, 8.5).to(16.5, 7.5).to(8, 8.5).to(-.5, 7.5), 5, true, (which: number) => {
         if (which == 1 || which == 3) {
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "grey_ball.png" }),
             rigidBody: new CircleBody({ radius: .25, cx: 1.5 - Math.random(), cy: 1.5 - Math.random() }, { dynamic: true }),
             role: new Goodie(),
@@ -635,7 +635,7 @@ function builder(level: number) {
     enableTilt(10, 10);
 
     // Make a hero who we control via tilt
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -643,7 +643,7 @@ function builder(level: number) {
     });
 
     // create an enemy who chases the hero
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 1, radius: 0.25 }),
       movement: new ChaseMovement({ speed: 1, target: h }),
@@ -661,7 +661,7 @@ function builder(level: number) {
     enableTilt(10, 10);
 
     // Make a hero who moves via tilt
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 5.25, cy: 5.25, radius: 0.4, }),
       movement: new TiltMovement(),
@@ -669,14 +669,14 @@ function builder(level: number) {
     });
 
     // These obstacles chase the hero, but only in one dimension
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 0, cy: 2.5, radius: 0.5 }),
       movement: new ChaseMovement({ speed: 10, target: h, chaseInX: false }),
       role: new Obstacle(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 2.5, cy: 0, radius: 0.5, }),
       movement: new ChaseMovement({ speed: 10, target: h, chaseInY: false }),
@@ -692,10 +692,10 @@ function builder(level: number) {
 
     // Just for fun, we'll have an auto-scrolling background, to make it look
     // like we're moving all the time
-    stage.background.addLayer({ cx: 8, cy: 4.5 }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5 }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: -5 / 1000, isAuto: true });
 
     // Make a hero and an enemy that slowly moves toward the hero
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       role: new Hero(),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }),
@@ -704,7 +704,7 @@ function builder(level: number) {
     });
 
     // This enemy will slowly move toward the hero
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       role: new Obstacle(),
       rigidBody: new CircleBody({ cx: 15, cy: 2, radius: 0.4 }, { dynamic: true }),
@@ -720,7 +720,7 @@ function builder(level: number) {
     boundingBox();
 
     // First, make the hero with ManualMovement as its movement component
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 4, cy: 8, radius: 0.25 }),
       movement: new ManualMovement(),
@@ -750,8 +750,8 @@ function builder(level: number) {
     boundingBox();
 
     stage.backgroundColor = "#17b4ff";
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
-    let hero = Actor.Make({
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5, }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4, }, { disableRotation: true }),
       movement: new ManualMovement(),
@@ -773,14 +773,14 @@ function builder(level: number) {
 
     // If we don't have the `disableRotation` option here, then if the hero just
     // barely nicks the corner of the platform, it will rotate as it falls!
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new BoxBody({ cx: 1, cy: 5.25, width: .8, height: .8 }, { disableRotation: false }),
       movement: new ManualMovement(),
       role: new Hero(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 2, height: .25, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ width: 2, height: .25, cx: 4, cy: 7 }),
       role: new Obstacle(),
@@ -803,7 +803,7 @@ function builder(level: number) {
     stage.world.setGravity(0, 0);
     boundingBox();
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 1.5, img: "green_ball.png" }),
       rigidBody: new BoxBody({ cx: 2, cy: 4, width: 0.75, height: 1.5, }),
       movement: new ManualMovement(),
@@ -822,7 +822,7 @@ function builder(level: number) {
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_S, () => ((hero.movement as ManualMovement).updateAngularVelocity(1)));
 
     stage.backgroundColor = "#17b4ff";
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5, }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
   }
 
   else if (level == 18) {
@@ -834,7 +834,7 @@ function builder(level: number) {
     // Destinations default to having collisions disabled.  We don't want this
     // to fly off screen, so we need to re-enable collisions, and we need to
     // make it dynamic.
-    let d = Actor.Make({
+    let d = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 4, radius: 0.5 }, { dynamic: true }),
       movement: new ManualMovement(),
@@ -855,7 +855,7 @@ function builder(level: number) {
 
     // make a hero who is always moving... note there is no friction,
     // anywhere, and the hero is elastic... it won't ever stop...
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 7, radius: 0.25 }, { elasticity: 1, friction: 0.1 }),
       movement: new ManualMovement(),
@@ -865,7 +865,7 @@ function builder(level: number) {
 
     // make an obstacle and then connect it to some controls
     let boxCfg = { cx: 8, cy: 8.75, width: 2, height: 0.5, fillColor: "#FF0000" };
-    let o = Actor.Make({
+    let o = new Actor({
       appearance: new FilledBox(boxCfg),
       rigidBody: new BoxBody(boxCfg, { density: 10, elasticity: 1, friction: 0.1 }),
       movement: new ManualMovement(),
@@ -875,7 +875,7 @@ function builder(level: number) {
     let colors = ["#FF0000", "#FFFF00", "#FF00FF", "#00FF00", "#00FFFF", "#0000FF"];
     for (let r = .25; r < 4.25; r += .5) {
       for (let c = .5; c < 16; c += 1) {
-        Actor.Make({
+        new Actor({
           appearance: new FilledBox({ width: 1, height: .5, fillColor: colors[Math.trunc(Math.random() * 6)] }),
           rigidBody: new BoxBody({ cx: c, cy: r, width: 1, height: .5 }, { density: 1 }),
           role: new Obstacle({ heroCollision: (thisActor: Actor) => thisActor.enabled = false })

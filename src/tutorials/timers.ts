@@ -50,7 +50,7 @@ function builder(level: number) {
 
     stage.world.timer.addEvent(new TimedEvent(5, false, () => {
       // Make a destination
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
         rigidBody: new CircleBody({ cx: 15, cy: 8, radius: 0.4 }),
         role: new Destination(),
@@ -58,7 +58,7 @@ function builder(level: number) {
       stage.score.setVictoryDestination(1);
     }))
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 8, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -90,7 +90,7 @@ function builder(level: number) {
     }
     boundingBox();
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 8, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -98,7 +98,7 @@ function builder(level: number) {
     });
 
     // make an enemy, put it into a vector of enemies
-    let e = Actor.Make({
+    let e = new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 14, cy: 7, radius: 0.25 }),
       movement: new TiltMovement(),
@@ -133,7 +133,7 @@ function builder(level: number) {
           e.extra.num -= 1;
 
           // reproduce the enemy
-          let e2 = Actor.Make({
+          let e2 = new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "red_ball.png" }),
             rigidBody: new CircleBody({ cx: e.rigidBody.getCenter().x + 0.01, cy: e.rigidBody.getCenter().y + 0.01, radius: .25 }),
             movement: new TiltMovement(),
@@ -156,13 +156,13 @@ function builder(level: number) {
     stage.score.setVictorySurvive(10);
 
     // Finally, if you get this goodie, you save 2 seconds
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 1, cy: 1, radius: 0.25 }),
       role: new Goodie({ onCollect: () => { stage.score.setWinCountdownRemaining(stage.score.getWinCountdownRemaining()! - 2); return true; } }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 22, color: "#000000" }, () => (stage.score.getWinCountdownRemaining()!.toFixed(2))),
       rigidBody: new CircleBody({ cx: 0.5, cy: 0.2, radius: 0.01 }, { scene: stage.hud })
     });
@@ -182,14 +182,14 @@ function builder(level: number) {
     boundingBox();
 
     // Make a destination
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: 8, radius: 0.4 }),
       role: new Destination(),
     });
     stage.score.setVictoryDestination(1);
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 8, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -203,7 +203,7 @@ function builder(level: number) {
     stage.score.onWin = { level, builder };
 
     stage.score.setLoseCountdownRemaining(5);
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 22, color: "#000000" }, () => (stage.score.getLoseCountdownRemaining()!.toFixed(2))),
       rigidBody: new CircleBody({ cx: 0.5, cy: 0.2, radius: 0.01 }, { scene: stage.hud })
     });
@@ -229,14 +229,14 @@ function builder(level: number) {
     boundingBox();
 
     // Make an invisible destination
-    let d = Actor.Make({
+    let d = new Actor({
       appearance: new FilledBox({ width: 0.8, height: 0.8, fillColor: "#00000000" }),
       rigidBody: new CircleBody({ cx: 0.5 + 15 * Math.random(), cy: 0.5 + 8 * Math.random(), radius: 0.4 }),
       role: new Destination(),
     });
     stage.score.setVictoryDestination(1);
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 8, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -258,11 +258,11 @@ function builder(level: number) {
     }));
 
     // Give some hints
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 22, color: "#000000" }, () => "go " + lr),
       rigidBody: new CircleBody({ cx: 0.5, cy: 0.2, radius: 0.01 }, { scene: stage.hud })
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 22, color: "#000000" }, () => "go " + ud),
       rigidBody: new CircleBody({ cx: 0.5, cy: 0.7, radius: 0.01 }, { scene: stage.hud })
     });
@@ -280,7 +280,7 @@ function builder(level: number) {
       let phase = Math.max(1, 10 - stage.score.getEnemiesDefeated()!);
       counter = (counter + 1) % phase;
       if (counter != 0) return;
-      let e = Actor.Make({
+      let e = new Actor({
         appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
         rigidBody: new CircleBody({ cx: .5 + 15 * Math.random(), cy: -5.5 + 5 * Math.random(), radius: .5 }),
         role: new Enemy(),
@@ -289,7 +289,7 @@ function builder(level: number) {
       })
     }));
 
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ face: "Arial", center: false, size: 22, color: "#000000" }, () => stage.score.getEnemiesDefeated() + ""),
       rigidBody: new CircleBody({ cx: 0.5, cy: 0.2, radius: 0.01 }, { scene: stage.hud })
     });

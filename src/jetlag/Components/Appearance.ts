@@ -64,7 +64,6 @@ export class TextSprite {
   /**
    * Build some text that can be rendered
    *
-   * @param opts              The configuration options for this TextSprite
    * @param opts.center       Should the text be centered at the rigid body's
    *                          (cx,cy) (true) or is the rigid body's (cx,cy)
    *                          top-left (false)?
@@ -177,7 +176,6 @@ export class ImageSprite {
   /**
    * Build an image that can be rendered
    *
-   * @param opts        Configuration information for this ImageConfig object
    * @param opts.width  The width of the image, in meters
    * @param opts.height The height of the image, in meters
    * @param opts.img    The name of the file to use as the image
@@ -302,7 +300,7 @@ export class AnimatedSprite implements IStateObserver {
    *
    * @param index   The 0-based index of the cell of the animation within the
    *                current AnimationSequence
-   * @param elapsed Act as if thisow many milliseconds within the new cell have
+   * @param elapsed Act as if this many milliseconds within the new cell have
    *                passed.
    */
   public skipTo(index: number, elapsed: number) {
@@ -315,8 +313,6 @@ export class AnimatedSprite implements IStateObserver {
   /**
    * Build an animation that can be rendered
    *
-   * @param opts            Configuration information for this AnimationConfig
-   *                        object
    * @param opts.width      The width of the animation
    * @param opts.height     The height of the animation
    * @param opts.animations A map with the valid animations.  Note that you must
@@ -697,8 +693,6 @@ export class FilledBox {
   /**
    * Build a FilledBox
    *
-   * @param opts            Configuration information for this FilledBoxConfig
-   *                        object
    * @param opts.width      Width of the box 
    * @param opts.height     Height of the box 
    * @param opts.lineWidth  Optional width of the border
@@ -770,8 +764,6 @@ export class FilledCircle {
   /**
    * Build a FilledCircle
    * 
-   * @param opts            Configuration information for this
-   *                        FilledCircleConfig object
    * @param opts.radius     Radius of the circle
    * @param opts.lineWidth  Width of the border
    * @param opts.lineColor  Color for the border
@@ -843,8 +835,6 @@ export class FilledPolygon {
   /**
    * Build a FilledPolygon
    *
-   * @param opts            Configuration information for this
-   *                        FilledPolygonConfig object
    * @param opts.vertices   An array of vertex points.  Even indices are x
    *                        values, odd indices are y values.  The points should
    *                        be relative to the center.

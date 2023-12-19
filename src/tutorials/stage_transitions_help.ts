@@ -26,67 +26,67 @@ export function helpBuilder(level: number) {
     stage.backgroundColor = "#19698e"; // Light blue background
 
     // put some information and pictures on the screen
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56, }, "The levels of this game demonstrate JetLag features"),
       rigidBody: new BoxBody({ cx: 8, cy: 1, width: .1, height: .1 }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 2.5, radius: 0.375 }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "You control the hero"),
       rigidBody: new BoxBody({ cx: 1.5, cy: 2.25, width: .1, height: .1, }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 3.5, radius: 0.375 }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Collect these goodies"),
       rigidBody: new BoxBody({ cx: 1.5, cy: 3.25, width: .1, height: .1 }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 4.5, radius: 0.375 }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Avoid or defeat enemies"),
       rigidBody: new BoxBody({ cx: 1.5, cy: 4.25, width: .1, height: .1 }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 5.5, radius: 0.375 }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "Reach the destination"),
       rigidBody: new BoxBody({ cx: 1.5, cy: 5.25, width: .1, height: .1 }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "purple_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 6.5, radius: 0.375 }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "These are obstacles"),
       rigidBody: new BoxBody({ cx: 1.5, cy: 6.25, width: .1, height: .1 }),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.75, height: 0.75, img: "grey_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 7.5, radius: 0.375 }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#000000", size: 24 }, "toss projectiles"),
       rigidBody: new BoxBody({ cx: 1.5, cy: 7.25, width: .1, height: .1 }),
     });
 
     // Tap anywhere to go to the next screen
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }), // the fourth "00" is the alpha channel, for invisibility
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
       gestures: { tap: () => { stage.switchTo(helpBuilder, 2); return true; } }
@@ -99,20 +99,20 @@ export function helpBuilder(level: number) {
     // different text
 
     stage.backgroundColor = "#19698e";
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56 }, "That's All"),
       rigidBody: new BoxBody({ cx: 8, cy: 1, width: .1, height: .1 }),
     });
     let big_text = `We hope you enjoy learning about game development!
 
 If you publish a game based on JetLag, please be sure to let us know.`;
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 32 }, big_text),
       rigidBody: new BoxBody({ cx: 8, cy: 5, width: .1, height: .1 }),
     });
 
     // Tap anywhere to go back to the splash screen
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
       gestures: { tap: () => { stage.switchTo(splashBuilder, 1); return true; } }

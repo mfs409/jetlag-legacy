@@ -107,7 +107,6 @@ export class Goodie extends Role {
   /**
    * Construct a Goodie role
    *
-   * @param cfg           A description of how to configure the Goodie.
    * @param cfg.onCollect Code to run when a hero collects the goodie.  If you
    *                      do not provide a value, the default is that score[0]
    *                      will increase by one.
@@ -153,8 +152,6 @@ export class Destination extends Role {
   /**
    * Construct a Destination role
    *
-   * @param cfg                   A description of how to configure the
-   *                              Destination.
    * @param cfg.capacity          The number of Heroes this Destination can hold
    *                              (default 1)
    * @param cfg.onAttemptArrival  A custom, optional check to decide if the
@@ -250,8 +247,6 @@ export class Enemy extends Role {
   /**
    * Construct an Enemy role
    *
-   * @param cfg                       A description of how to configure the
-   *                                  Enemy.
    * @param cfg.damage                The amount of damage the enemy does
    *                                  (default 2)
    * @param cfg.onDefeatHero          Code to run when defeating a hero
@@ -367,7 +362,6 @@ export class Hero extends Role {
   /** 
    * Construct a Hero role
    *
-   * @param cfg                   Configuration information for the hero
    * @param cfg.strength          The hero's strength (default 1)
    * @param cfg.allowMultiJump    True if the hero can jump infinitely often
    *                              when in mid-jump
@@ -610,7 +604,6 @@ export class Obstacle extends Role {
   /**
    * Construct an Obstacle role
    *
-   * @param cfg                       Configuration information for the obstacle
    * @param cfg.heroCollision         Code to run when this obstacle collides
    *                                  with a hero
    * @param cfg.enemyCollision        Code to run when this obstacle collides
@@ -695,7 +688,6 @@ export class Sensor extends Role {
    * Construct a Sensor by providing some code to run when a hero passes over
    * this sensor 
    *
-   * @param cfg               Configuration options for this sensor
    * @param cfg.heroCollision The code to run when the hero crosses the Sensor
    */
   constructor(cfg: { heroCollision?: (thisActor: Actor, collideActor: Actor) => void } = {}) {
@@ -737,7 +729,6 @@ export class Projectile extends Role {
   /**
    * Construct a Projectile role
    *
-   * @param cfg                     Configuration options for this projectile
    * @param cfg.damage              How much damage should the projectile do?
    *                                (default 1)
    * @param cfg.disappearOnCollide  Should the projectile disappear when it

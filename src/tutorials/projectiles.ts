@@ -44,7 +44,7 @@ function builder(level: number) {
     // unique among roles, because it really only makes sense to have a
     // Projectile role along with Projectile movement.
     boundingBox();
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
       movement: new ManualMovement(),
@@ -53,7 +53,7 @@ function builder(level: number) {
     // Note that you could have different buttons, or different keys, for
     // tossing projectiles in a few specific directions
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
-      let p = Actor.Make({
+      let p = new Actor({
         appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
         rigidBody: new CircleBody({ cx: hero.rigidBody.getCenter().x + .2, cy: hero.rigidBody.getCenter().y, radius: .1 }),
         movement: new ProjectileMovement(),
@@ -78,7 +78,7 @@ function builder(level: number) {
     let projectiles = new ActorPoolSystem();
     for (let i = 0; i < 10; ++i) {
       // Where we put them doesn't matter, because the pool will disable them
-      let p = Actor.Make({
+      let p = new Actor({
         appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
         rigidBody: new CircleBody({ cx: -10, cy: -10, radius: .1 }),
         movement: new ProjectileMovement(),
@@ -86,7 +86,7 @@ function builder(level: number) {
       });
       projectiles.put(p);
     }
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
       movement: new ManualMovement(),
@@ -109,7 +109,7 @@ function builder(level: number) {
     let projectiles = new ActorPoolSystem();
     for (let i = 0; i < 10; ++i) {
       // Where we put them doesn't matter, because the pool will disable them
-      let p = Actor.Make({
+      let p = new Actor({
         appearance: new ImageSprite({ width: .2, height: .2, img: "grey_ball.png" }),
         rigidBody: new CircleBody({ cx: -10, cy: -10, radius: .1 }),
         movement: new ProjectileMovement(),
@@ -117,7 +117,7 @@ function builder(level: number) {
       });
       projectiles.put(p);
     }
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
       movement: new ManualMovement(),
@@ -147,7 +147,7 @@ function builder(level: number) {
     // rectangles, so they look like laser beams
     boundingBox();
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: 0.4 }),
       movement: new TiltMovement(),
@@ -165,7 +165,7 @@ function builder(level: number) {
       rigidBody.setCollisionsEnabled(false);
       let reclaimer = (actor: Actor) => { projectiles.put(actor); }
       let role = new Projectile({ disappearOnCollide: true, reclaimer });
-      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement({ fixedVectorVelocity: 10, rotateVectorToss: true }), role });
+      let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement({ fixedVectorVelocity: 10, rotateVectorToss: true }), role });
       projectiles.put(p);
     }
 
@@ -203,7 +203,7 @@ function builder(level: number) {
       }
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
       gestures: { touchDown, touchUp, panMove }
@@ -223,7 +223,7 @@ function builder(level: number) {
     boundingBox();
     stage.world.setGravity(0, 10);
 
-    let hero = Actor.Make({
+    let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
       movement: new ManualMovement(),
@@ -255,7 +255,7 @@ function builder(level: number) {
         let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
         if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
       });
-      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role });
+      let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement(), role });
       p.rigidBody.body.SetGravityScale(0);
       projectiles.put(p);
     }
@@ -271,7 +271,7 @@ function builder(level: number) {
 
     // draw some enemies to defeat
     for (let i = 0; i < 5; i++) {
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
         rigidBody: new CircleBody({ cx: 2 + 2 * i, cy: 8.5, radius: 0.5 }),
         role: new Enemy({ damage: i + 1 }),
@@ -286,14 +286,14 @@ function builder(level: number) {
     stage.world.setGravity(0, 3);
 
     // We won't have a bounding box, just a floor:
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16, cy: 9.05, width: 32, height: .1 }),
       role: new Obstacle(),
     });
 
     let cfg = { cx: 8.5, cy: 0.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg),
       role: new Hero(),
@@ -325,7 +325,7 @@ function builder(level: number) {
         let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
         if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
       });
-      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement({ multiplier: .8 }), role });
+      let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement({ multiplier: .8 }), role });
       projectiles.put(p);
     }
 
@@ -341,7 +341,7 @@ function builder(level: number) {
     };
     let touchUp = () => { isHolding = false; return true; };
     let panMove = touchDown;
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
       gestures: { touchDown, touchUp, panMove },
@@ -363,7 +363,7 @@ function builder(level: number) {
     stage.world.timer.addEvent(new TimedEvent(1, true, () => {
       // get a random number between 0.0 and 15.0
       let x = Math.trunc(Math.random() * 151) / 10;
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
         rigidBody: new CircleBody({ cx: x, cy: -1, radius: 0.5 }),
         movement: new GravityMovement(),
@@ -380,7 +380,7 @@ function builder(level: number) {
     boundingBox();
 
     // Make a hero
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .4, cy: 0.4, radius: 0.4 }),
       role: new Hero(),
@@ -396,24 +396,24 @@ function builder(level: number) {
     // you are responsible for removing the projectile (or for not removing it).
     // That being the case, we can provide code that just returns false, and
     // that'll do the job.
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.1, height: 1, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 8.95, cy: 3.95, width: 0.1, height: 1 }),
       role: new Obstacle({ projectileCollision: () => false }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 0.1, height: 1, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 10.05, cy: 3.95, width: 0.1, height: 1 }),
       role: new Obstacle({ projectileCollision: () => false }),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 1.2, height: 0.1, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 9.5, cy: 4.4, width: 1.2, height: 0.1 }),
       role: new Obstacle({ projectileCollision: () => false }),
     });
 
     // Place an enemy in the bucket, and require that it be defeated
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 9.5, cy: 3.9, radius: 0.4 }),
       movement: new GravityMovement(),
@@ -430,13 +430,13 @@ function builder(level: number) {
       rigidBody.setCollisionsEnabled(true); // Collisions count... this should bounce off the basket
       let reclaimer = (actor: Actor) => { projectiles.put(actor); }
       let role = new Projectile({ damage: 1, disappearOnCollide: true, reclaimer });
-      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement({ multiplier: 2 }), role });
+      let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement({ multiplier: 2 }), role });
       projectiles.put(p);
     }
 
     // cover "most" of the screen with a button for throwing projectiles.  This
     // ensures that we can still tap the hero to make it jump
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 15, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8.5, cy: 4.5, width: 15, height: 9 }, { scene: stage.hud }),
       gestures: {
@@ -453,7 +453,7 @@ function builder(level: number) {
     // put a hint on the screen after 15 seconds to show where to click to ensure that
     // projectiles hit the enemy
     stage.world.timer.addEvent(new TimedEvent(15, false, () => {
-      Actor.Make({
+      new Actor({
         appearance: new ImageSprite({ width: 0.2, height: 0.2, img: "purple_ball.png" }),
         rigidBody: new CircleBody({ cx: 2.75, cy: 2.4, radius: 0.1 }, { collisionsEnabled: false }),
         role: new Obstacle({ projectileCollision: () => false }),

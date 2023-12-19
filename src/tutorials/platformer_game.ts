@@ -82,7 +82,7 @@ function builder(level: number) {
     remap.set(AnimationState.CRAWL_IDLE_W, AnimationState.CRAWL_W);
     remap.set(AnimationState.CRAWL_IDLE_E, AnimationState.CRAWL_E);
 
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
       rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true, passThroughId: 8 }),
       movement: new ManualMovement(),
@@ -101,7 +101,7 @@ function builder(level: number) {
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_C, () => (h.role as Hero).crawlOn(Math.PI / 2));
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_C, () => (h.role as Hero).crawlOff(Math.PI / 2));
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledCircle({ radius: 0.4, fillColor: "#ff7575" }),
       rigidBody: new CircleBody({ cx: 31, cy: 8.25, radius: 0.4, }),
       role: new Goodie({ onCollect: () => { (h.role as Hero).invincibleRemaining = 15; return true; } }),
@@ -111,8 +111,8 @@ function builder(level: number) {
 
     // set up the backgrounds
     stage.backgroundColor = "#17b4ff";
-    stage.background.addLayer({ cx: 8, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
-    stage.background.addLayer({ cx: 0, cy: 4.5, }, { imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5, }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "back.png" }), speed: 1 });
+    stage.background.addLayer({ anchor: { cx: 0, cy: 4.5, }, imageMaker: () => new ImageSprite({ width: 16, height: 9, img: "mid.png" }), speed: 0 });
 
     // set up a pool of projectiles, but now once the projectiles travel more
     // than 16 meters, they disappear
@@ -137,7 +137,7 @@ function builder(level: number) {
         let dy = Math.abs(body.GetPosition().y - role.rangeFrom.y);
         if ((dx * dx + dy * dy) > (range * range)) reclaimer(actor);
       });
-      let p = Actor.Make({ appearance, rigidBody, movement: new ProjectileMovement(), role });
+      let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement(), role });
       projectiles.put(p);
     }
 
@@ -149,19 +149,19 @@ function builder(level: number) {
         (projectiles.get()?.role as (Projectile | undefined))?.tossFrom(h, .5, .3, 5, 0)
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 2, height: .2, fillColor: "#444444" }),
       rigidBody: new BoxBody({ width: 2, height: .2, cx: 3, cy: 7.4 }),
       role: new Obstacle(),
     })
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 2, height: .2, fillColor: "#444444" }),
       rigidBody: new BoxBody({ width: 2, height: .2, cx: 7, cy: 5.4 }),
       role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
     })
 
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 4, height: .2, fillColor: "#444444" }),
       rigidBody: new BoxBody({ width: 4, height: .2, cx: 13, cy: 3.4 }),
       role: new Obstacle({ jumpReEnableSides: [DIRECTION.N] }),
@@ -171,7 +171,7 @@ function builder(level: number) {
     animations = new Map();
     animations.set(AnimationState.IDLE_E, new AnimationSequence(true).to("coin0.png", 100).to("coin1.png", 100).to("coin2.png", 100).to("coin3.png", 100).to("coin4.png", 100).to("coin5.png", 100).to("coin6.png", 100).to("coin7.png", 100))
     for (let cx of [11.5, 12.5, 13.5, 14.5]) {
-      Actor.Make({
+      new Actor({
         appearance: new AnimatedSprite({ width: .5, height: .5, animations }),
         rigidBody: new CircleBody({ radius: .25, cx, cy: 3.05 }),
         role: new Goodie(),
@@ -179,12 +179,12 @@ function builder(level: number) {
     }
 
     // HUD Coin Counter
-    Actor.Make({
+    new Actor({
       appearance: new AnimatedSprite({ width: .5, height: .5, animations }),
       rigidBody: new CircleBody({ radius: .15, cx: 14.5, cy: 0.5 }, { scene: stage.hud }),
       role: new Goodie(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", size: 36, color: "#ffffff" }, () => "x " + stage.score.getGoodieCount(0)),
       rigidBody: new CircleBody({ radius: .01, cx: 15, cy: 0.25 }, { scene: stage.hud }),
       role: new Goodie(),
@@ -208,7 +208,7 @@ function builder(level: number) {
     remap = new Map();
     remap.set(AnimationState.IDLE_E, AnimationState.WALK_E);
     // Enemy to defeat
-    Actor.Make({
+    new Actor({
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
       rigidBody: new PolygonBody({ cx: 14.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true }),
       movement: new PathMovement(new Path().to(14.5, 8.1).to(18.5, 8.1).to(14.5, 8.1), 2.5, true),
@@ -219,7 +219,7 @@ function builder(level: number) {
     stage.score.onWin = { level: 1, builder: builder };
 
     stage.score.winSceneBuilder = (overlay: Scene, _screenshot?: ImageSprite) => {
-      Actor.Make({
+      new Actor({
         appearance: _screenshot!,
         // appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
@@ -231,14 +231,14 @@ function builder(level: number) {
           }
         }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", size: 44, color: "#FFFFFF" }, "Great Job!"),
         rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .1 }, { scene: overlay }),
       });
     };
 
     stage.score.loseSceneBuilder = (overlay: Scene, screenshot?: ImageSprite) => {
-      Actor.Make({
+      new Actor({
         appearance: screenshot!,
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: {
@@ -249,7 +249,7 @@ function builder(level: number) {
           }
         }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", size: 44, color: "#FFFFFF" }, "Try Again"),
         rigidBody: new CircleBody({ cx: 8, cy: 4.5, radius: .1 }, { scene: overlay }),
       });
@@ -275,7 +275,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   // Bottom box:
   let width = Math.abs(x0 - x1);
   let cfg = { box: true, cx: x0 + width / 2, cy: y1 + thickness / 2, width: width + 2 * thickness, height: thickness, img: "" };
-  let floor = Actor.Make({
+  let floor = new Actor({
     appearance: new ImageSprite(cfg),
     rigidBody: new BoxBody(cfg),
     role: new Obstacle(),
@@ -285,7 +285,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
   // Right box:
   let height = Math.abs(y0 - y1);
   cfg = { box: true, cx: x1 + thickness / 2, cy: y0 + height / 2, height: height + 2 * thickness, width: thickness, img: "" };
-  Actor.Make({
+  new Actor({
     appearance: new ImageSprite(cfg),
     rigidBody: new BoxBody(cfg),
     role: new Obstacle({ jumpReEnableSides: [] }),
@@ -293,7 +293,7 @@ function drawBoundingBox(x0: number, y0: number, x1: number, y1: number, thickne
 
   // The left only differs by translating the X
   cfg.cx -= (thickness + Math.abs(x0 - x1));
-  Actor.Make({
+  new Actor({
     appearance: new ImageSprite(cfg),
     rigidBody: new BoxBody(cfg),
     role: new Obstacle({ jumpReEnableSides: [] }),

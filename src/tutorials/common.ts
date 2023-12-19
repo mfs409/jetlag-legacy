@@ -8,22 +8,22 @@ import { stage } from "../jetlag/Stage";
 /** Draw a bounding box that surrounds the default world viewport */
 export function boundingBox() {
   // Draw a box around the world
-  let t = Actor.Make({
+  let t = new Actor({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
     role: new Obstacle(),
   });
-  let b = Actor.Make({
+  let b = new Actor({
     appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
     role: new Obstacle(),
   });
-  let l = Actor.Make({
+  let l = new Actor({
     appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
   });
-  let r = Actor.Make({
+  let r = new Actor({
     appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
@@ -54,22 +54,22 @@ export function enableTilt(xMax: number, yMax: number) {
 /** Draw a bounding box that surrounds an extended (32m) world viewport */
 export function wideBoundingBox() {
   // Draw a box around the world
-  Actor.Make({
+  new Actor({
     appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: 16, cy: -.05, width: 32, height: .1 }),
     role: new Obstacle(),
   });
-  Actor.Make({
+  new Actor({
     appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: 16, cy: 9.05, width: 32, height: .1 }),
     role: new Obstacle(),
   });
-  Actor.Make({
+  new Actor({
     appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),
   });
-  Actor.Make({
+  new Actor({
     appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
     rigidBody: new BoxBody({ cx: 32.05, cy: 4.5, width: .1, height: 9 }),
     role: new Obstacle(),

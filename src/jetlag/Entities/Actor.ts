@@ -45,23 +45,16 @@ export class Actor {
   /**
    * Create an Actor
    *
-   * @param config  Actor configuration, consisting of `rigidBody`,
-   *                `appearance`, and optional `movement`, `role`, `gestures`,
-   *                and `sounds`
-   * @param config.rigidBody See {@link RigidBodyComponent}
+   * @param config.rigidBody    The actor's body
+   * @param config.appearance   The appearance of the actor
+   * @param config.movement     The movement rules for this actor
+   * @param config.role         The role for this actor
+   * @param config.gestures     Any gestures to attach to this actor
+   * @param config.sounds       The sounds for this actor
+   * @param config.onDisappear  Code to run when the actor disappears
+   * @param config.extra        An untyped object to store extra information
    */
-  static Make(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
-    return new Actor(config);
-  }
-
-  /**
-   * Construct an Actor
-   *
-   * @param config  Actor configuration, consisting of `rigidBody`,
-   *                `appearance`, and optional `movement`, `role`, `gestures`,
-   *                and `sounds`
-   */
-  private constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
+  public constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
     this.scene = config.rigidBody.scene;
 
     this.appearance = config.appearance;
@@ -122,10 +115,10 @@ export class Actor {
   /**
    * Change the size of an Actor, and/or change its position
    *
-   * @param x      The new X coordinate of its top left corner, in pixels
-   * @param y      The new Y coordinate of its top left corner, in pixels
-   * @param width  The new width of the Actor, in pixels
-   * @param height The new height of the Actor, in pixels
+   * @param x      The new X coordinate of its center
+   * @param y      The new Y coordinate of its center
+   * @param width  The new width of the Actor
+   * @param height The new height of the Actor
    */
   public resize(x: number, y: number, width: number, height: number) {
     // set new height and width of the Render context

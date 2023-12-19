@@ -60,7 +60,7 @@ class PointToActorCallback {
  */
 export class BasicCollisionSystem {
   /** The physics world in which all actors interact */
-  public readonly world = b2World.Create(new b2Vec2(0, 0));
+  readonly world = b2World.Create(new b2Vec2(0, 0));
 
   /** For querying the point that was touched */
   protected readonly pointQuerier = new PointToActorCallback();

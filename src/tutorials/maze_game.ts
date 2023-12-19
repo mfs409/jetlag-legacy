@@ -54,29 +54,29 @@ function builder(level: number) {
     stage.backgroundColor = "#b3cde0";
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
 
     // Create a hero whose movement we can control "explicitly"
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -97,14 +97,14 @@ function builder(level: number) {
     for (let row = 0; row < mazeLayout.length; row++) {
       for (let col = 0; col < mazeLayout[row].length; col++) {
         if (mazeLayout[row][col] === "#") {
-          Actor.Make({
+          new Actor({
             rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
             appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
             role: new Obstacle(),
           });
         }
         else if (mazeLayout[row][col] === "G") {
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
             role: new Goodie(),
@@ -114,7 +114,7 @@ function builder(level: number) {
     }
 
     // Create a destination that requires 6 goodies before it works
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
@@ -122,13 +122,13 @@ function builder(level: number) {
     stage.score.setVictoryDestination(1);
 
     // Put a message on the screen to help the player along
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
       rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, { scene: stage.hud }),
     });
 
     // Add an enemy
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: .8, height: .8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ radius: .4, cx: 8.5, cy: .5 }),
       role: new Enemy(),
@@ -138,7 +138,7 @@ function builder(level: number) {
     // When the level is won, put some white text on a black background.
     // Clicking restarts the level.
     stage.score.winSceneBuilder = (overlay: Scene) => {
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: {
@@ -149,7 +149,7 @@ function builder(level: number) {
           }
         }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
       });
@@ -158,7 +158,7 @@ function builder(level: number) {
     // When the level is lost, put some white text on a black background.
     // Clicking restarts the level.
     stage.score.loseSceneBuilder = (overlay: Scene) => {
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: {
@@ -169,7 +169,7 @@ function builder(level: number) {
           }
         }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
       });
@@ -186,7 +186,7 @@ function builder(level: number) {
     // Level 2 is where we get started, by just having a hero we can move
 
     // Create a hero whose movement we can control via gestures and keys
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -209,7 +209,7 @@ function builder(level: number) {
     stage.backgroundColor = "#b3cde0";
 
     // Create a hero whose movement we can control "explicitly"
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -227,7 +227,7 @@ function builder(level: number) {
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
     // Create a destination
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
       role: new Destination(),
@@ -244,29 +244,29 @@ function builder(level: number) {
     stage.backgroundColor = "#b3cde0";
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
 
     // Create a hero whose movement we can control "explicitly"
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -283,20 +283,20 @@ function builder(level: number) {
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (h.movement as ManualMovement).updateXVelocity(-5));
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (h.movement as ManualMovement).updateXVelocity(5));
 
-    Actor.Make({
+    new Actor({
       rigidBody: new BoxBody({ cx: 4.5, cy: 4.5, width: 1, height: 1 }),
       appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
       role: new Obstacle(),
     });
 
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 6.5, cy: 6.5, radius: 0.25 }),
       role: new Goodie(),
     });
 
     // Create a destination
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
       role: new Destination(),
@@ -326,29 +326,29 @@ function builder(level: number) {
     stage.backgroundColor = "#b3cde0";
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
 
     // Create a hero whose movement we can control "explicitly"
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -369,14 +369,14 @@ function builder(level: number) {
     for (let row = 0; row < mazeLayout.length; row++) {
       for (let col = 0; col < mazeLayout[row].length; col++) {
         if (mazeLayout[row][col] === "#") {
-          Actor.Make({
+          new Actor({
             rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
             appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
             role: new Obstacle(),
           });
         }
         else if (mazeLayout[row][col] === "G") {
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
             role: new Goodie(),
@@ -386,7 +386,7 @@ function builder(level: number) {
     }
 
     // Create a destination
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
       role: new Destination(),
@@ -416,29 +416,29 @@ function builder(level: number) {
     stage.backgroundColor = "#b3cde0";
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
 
     // Create a hero whose movement we can control "explicitly"
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -459,14 +459,14 @@ function builder(level: number) {
     for (let row = 0; row < mazeLayout.length; row++) {
       for (let col = 0; col < mazeLayout[row].length; col++) {
         if (mazeLayout[row][col] === "#") {
-          Actor.Make({
+          new Actor({
             rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
             appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
             role: new Obstacle(),
           });
         }
         else if (mazeLayout[row][col] === "G") {
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
             role: new Goodie(),
@@ -476,7 +476,7 @@ function builder(level: number) {
     }
 
     // Create a destination that requires 6 goodies before it works
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
@@ -484,7 +484,7 @@ function builder(level: number) {
     stage.score.setVictoryDestination(1);
 
     // Put a message on the screen to help the player along
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
       rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, { scene: stage.hud }),
     });
@@ -513,29 +513,29 @@ function builder(level: number) {
     stage.backgroundColor = "#b3cde0";
 
     // Draw four walls, covering the four borders of the world
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
       rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
       role: new Obstacle(),
     });
 
     // Create a hero whose movement we can control "explicitly"
-    let h = Actor.Make({
+    let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png", z: 1 }),
       rigidBody: new CircleBody({ cx: .5, cy: .5, radius: 0.4, }),
       role: new Hero(),
@@ -556,14 +556,14 @@ function builder(level: number) {
     for (let row = 0; row < mazeLayout.length; row++) {
       for (let col = 0; col < mazeLayout[row].length; col++) {
         if (mazeLayout[row][col] === "#") {
-          Actor.Make({
+          new Actor({
             rigidBody: new BoxBody({ cx: col + 0.5, cy: row + 0.5, width: 1, height: 1 }),
             appearance: new FilledBox({ width: 1, height: 1, fillColor: "#6497b1" }),
             role: new Obstacle(),
           });
         }
         else if (mazeLayout[row][col] === "G") {
-          Actor.Make({
+          new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ cx: col + 0.5, cy: row + 0.5, radius: 0.25 }),
             role: new Goodie(),
@@ -573,7 +573,7 @@ function builder(level: number) {
     }
 
     // Create a destination that requires 6 goodies before it works
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 14.5, cy: 8.5, radius: 0.4 }),
       role: new Destination({ onAttemptArrival: () => { return stage.score.getGoodieCount(0) == 6; } }),
@@ -581,13 +581,13 @@ function builder(level: number) {
     stage.score.setVictoryDestination(1);
 
     // Put a message on the screen to help the player along
-    Actor.Make({
+    new Actor({
       appearance: new TextSprite({ center: false, face: "Arial", color: "#005b96", size: 20, z: 2 }, () => "You need " + (6 - stage.score.getGoodieCount(0)) + " more Goodies"),
       rigidBody: new BoxBody({ cx: 13.6, cy: 0.05, width: .1, height: .1 }, { scene: stage.hud }),
     });
 
     // Add an enemy
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: .8, height: .8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ radius: .4, cx: 8.5, cy: .5 }),
       role: new Enemy(),
@@ -597,14 +597,14 @@ function builder(level: number) {
     // When the level is won, put some white text on a black background.
     // Clicking restarts the level.
     stage.score.winSceneBuilder = (overlay: Scene) => {
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: {
           tap: () => { stage.clearOverlay(); stage.switchTo(stage.score.onWin.builder, stage.score.onWin.level); return true; }
         }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "You Won!"),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
       });
@@ -613,7 +613,7 @@ function builder(level: number) {
     // When the level is lost, put some white text on a black background.
     // Clicking restarts the level.
     stage.score.loseSceneBuilder = (overlay: Scene) => {
-      Actor.Make({
+      new Actor({
         appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
         gestures: {
@@ -624,7 +624,7 @@ function builder(level: number) {
           }
         }
       });
-      Actor.Make({
+      new Actor({
         appearance: new TextSprite({ center: true, face: "Arial", color: " #FFFFFF", size: 28 }, "Try Again..."),
         rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay })
       });

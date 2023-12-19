@@ -176,15 +176,16 @@ export class ParallaxSystem {
   /**
    * Add a parallax layer to the current level
    *
-   * @param appearance    An AppearanceComponent, describing the appearance of
-   *                      the layer
-   * @param speed         Speed that the picture seems to move.
-   * @param isHorizontal  True for moving in X, false for moving in Y
-   * @param isAuto        Should the image scroll automatically, or in relation
-   *                      to the camera position?
+   * @param cfg.anchor        The position of one instance of the image.  All
+   *                          other instances will be tiled from this point.
+   * @param cfg.imageMaker    Code for making each ImageSprite or AnimatedSprite
+   * @param cfg.speed         Speed that the picture seems to move.
+   * @param cfg.isHorizontal  True for moving in X, false for moving in Y
+   * @param cfg.isAuto        Should the image scroll automatically, or in
+   *                          relation to the camera position?
    */
-  public addLayer(anchor: { cx: number, cy: number }, cfg: { imageMaker: () => (ImageSprite | AnimatedSprite), speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
-    this.layers.push(new ParallaxLayer(anchor, cfg.imageMaker, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
+  public addLayer(cfg: { anchor: { cx: number, cy: number }, imageMaker: () => (ImageSprite | AnimatedSprite), speed: number, isHorizontal?: boolean, isAuto?: boolean }) {
+    this.layers.push(new ParallaxLayer(cfg.anchor, cfg.imageMaker, cfg.speed, cfg.isHorizontal == undefined ? true : !!cfg.isHorizontal, !!cfg.isAuto));
   }
 
   /**

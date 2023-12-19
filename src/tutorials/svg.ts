@@ -43,7 +43,7 @@ function builder(level: number) {
     boundingBox();
 
     let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite(cfg),
       rigidBody: new CircleBody(cfg, { density: 5, friction: 0.6 }),
       movement: new TiltMovement(),
@@ -57,7 +57,7 @@ function builder(level: number) {
     // when we make the call to processFile.
     SvgSystem.processFile("shape.svg", 2, 2, 1.5, 1.5, (centerX: number, centerY: number, width: number, rotation: number) => {
       // Make an obstacle and rotate it
-      let a = Actor.Make({
+      let a = new Actor({
         appearance: new FilledBox({ width, height: 0.05, fillColor: "#FF0000" }),
         rigidBody: new BoxBody({ cx: centerX, cy: centerY, width, height: 0.05 }),
         role: new Obstacle(),

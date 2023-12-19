@@ -41,13 +41,13 @@ function builder(level: number) {
   if (level == 1) {
     // In this level, a joint relates the rectangle to the circle.  The circle
     // is the pivot point, and the rectangle rotates around it
-    let revolving = Actor.Make({
+    let revolving = new Actor({
       appearance: new FilledBox({ width: 5, height: 1, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 1.5, cy: 4, width: 5, height: 1, }),
       role: new Obstacle(),
     });
 
-    let anchor = Actor.Make({
+    let anchor = new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 7.5, cy: 4, radius: 0.5 }),
       role: new Obstacle(),
@@ -73,7 +73,7 @@ function builder(level: number) {
     boundingBox();
 
     // Set up a hero
-    Actor.Make({
+    new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 4, cy: 8.5, radius: 0.4 }, { disableRotation: true }),
       movement: new TiltMovement(),
@@ -81,7 +81,7 @@ function builder(level: number) {
     });
 
     // When the hero collides with this box, it will stick to the hero
-    Actor.Make({
+    new Actor({
       appearance: new FilledBox({ width: .5, height: .5, fillColor: "#FF0000" }),
       // Note that for the weld joint to work, you probably want the obstacle to
       // have a dynamic body.
@@ -103,14 +103,14 @@ function builder(level: number) {
     sides.b.rigidBody.setPhysics({ friction: 1 });
 
     // We'll make the body of our car as a hero with just a red square
-    let car = Actor.Make({
+    let car = new Actor({
       appearance: new FilledBox({ width: 2, height: 0.5, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 1, cy: 8, width: 2, height: 0.5 }),
       role: new Hero(),
     });
 
     // Connect a back wheel... heavy tires make for good traction
-    let backWheel = Actor.Make({
+    let backWheel = new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 0.75, cy: 8.5, radius: 0.25 }, { density: 3, friction: 1 }),
       role: new Obstacle(),
@@ -119,7 +119,7 @@ function builder(level: number) {
     backWheel.rigidBody.setRevoluteJointMotor(10, 10);
 
     // Connect a front wheel... it'll be all-wheel drive :)
-    let frontWheel = Actor.Make({
+    let frontWheel = new Actor({
       appearance: new ImageSprite({ width: 0.5, height: 0.5, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 2.75, cy: 8.5, radius: 0.25 }, { density: 3, friction: 1 }),
       role: new Obstacle(),
