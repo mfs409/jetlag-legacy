@@ -59,14 +59,14 @@ const tut_src = {
     "timers",
   ],
   md: [
-    "assets_audio_animations.md", "camera_gravity.md", "collisions.md",
-    "endless_runner_game.md", "gestures.md", "getting_started.md",
-    "joints.md", "maze_game.md", "movement_physics.md",
-    "overhead_fight_farm_game.md", "overview.md", "package_desktop.md",
-    "package_mobile.md", "platformer_game.md", "projectiles.md",
-    "roles.md", "score.md", "simulation_conway.md",
-    "stage_transitions.md", "storage.md", "svg.md",
-    "text_hud.md", "timers.md",
+    "assets_audio_animations", "camera_gravity", "collisions",
+    "endless_runner_game", "gestures", "getting_started",
+    "joints", "maze_game", "movement_physics",
+    "overhead_fight_farm_game", "overview", "package_desktop",
+    "package_mobile", "platformer_game", "projectiles",
+    "roles", "score", "simulation_conway",
+    "stage_transitions", "storage", "svg",
+    "text_hud", "timers",
   ],
 };
 

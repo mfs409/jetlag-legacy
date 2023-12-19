@@ -9,13 +9,13 @@ import { GAME_DIST_FOLDER, production_builder } from './common.mjs';
 // *this file*, which is assumed to be in the `scripts/` subfolder of the root).
 const root_folder = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-// Compute the source and destination folders
-const src_folder = path.join(root_folder, "src", target);
-const dest_folder = path.join(root_folder, GAME_DIST_FOLDER);
-
 // Build the code in the `game` folder
 const target = "game";
 console.log(`Building ${target}`);
+
+// Compute the source and destination folders
+const src_folder = path.join(root_folder, "src", target);
+const dest_folder = path.join(root_folder, GAME_DIST_FOLDER);
 
 // Figure out paths to the game's main `ts` file, its `html` file, and its
 // `assets` folder
