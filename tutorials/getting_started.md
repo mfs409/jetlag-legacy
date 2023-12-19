@@ -168,3 +168,62 @@ out, pretty much all that matters is that there is a folder called `src/game`,
 with two files: `game.html` and `game.ts`.  In the next tutorial, we'll look at
 how to start changing the code in these files to make your own game.
 
+
+
+
+*** Getting Started (getting_started.ts; ready; need to verify after deplying v3 to github)
+**** Overview
+In this tutorial, we will discuss how to get started using JetLag.  This
+tutorial doesn't involve much programming.  It only focuses on getting your
+computer set up to start writing games.  When you finish this tutorial, you
+will have a copy of the JetLag code that you are able to run.  You will be
+able to use this as the starting point for learning about games, and also as
+the starting point for making your own game.
+**** Required Software
+- Terminal
+- Git
+- Node.js and NPM
+- Web Browser
+- Editor
+
+? How do you know that everything is good?  `node --version`, `npm
+--version`, `git --version`, `code --version`
+**** Helpful Configuration
+- VSCode: `"editor.formatOnSave": true,`
+- VSCode: `"[typescript]": { "editor.defaultFormatter": "vscode.typescript-language-features" },`
+
+- Git: merge strategy
+- Git: user name
+
+- GitHub: You need an account, and you need to set up your ssh keys
+**** Fork the repo
+**** Clone the repo
+**** Mention https://www.cse.lehigh.edu/~spear/tutorials/viewer.html#cse216_git/tut.md
+**** Running for the first time
+- Do things like type ls to see that the files are there
+- You need to `npm install`, but only the first time
+- You need to do `npm start`
+- There's the "localhost" thing, which you can click to see your game
+**** Opening the code in VSCode
+- Talk about how we open folders, not files
+- Talk about the bar on the side
+- Discuss the folders and main files
+  - `assets` - This is where you should put any images, sounds, or other
+    files that support your game.
+  - `node_modules` - You can ignore this.  It's where `npm` put the things it
+    needs in order for your game to work.
+  - `scripts` - You can ignore this.  It's just has some code for helping
+    `npm to know how to run your code`
+  - `src` - This has two subfolders.  `src/jetlag` is where the JetLag code
+    can be found.  `src/game` is where your game code should go.
+  - `.gitignore` - This file tells `git` that some folders and files, such as
+    `node_modules`, shouldn't get backed up to GitHub.
+  - `package-lock.json` - This file is created by `npm`.  You can ignore it.
+  - `README.md` - A file describing the repository.  For now, it describes
+    the JetLag repository, but you may eventually change it.
+  - `package.json` - This file is used by `npm`.  You probably won't need to work
+    with this until your game gets very advanced.
+  - `tsconfig.json` - Another configuration file that you can ignore for a long
+    time.
+- Remind that all that matters for now is just src/game
+

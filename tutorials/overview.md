@@ -1165,3 +1165,89 @@ page-title = A Tour of JetLag
 img {display: block; margin: auto; max-width: 500px;}
 .red {color: red;}
 ```
+
+*** An Overview of JetLag (getting_started.ts; ready)
+**** Overview
+In this tutorial, we will discuss the key ideas in JetLag.  We'll make small
+changes to the game from the first tutorial, and watch how those changes
+change the behavior of the game.  In doing so, we will learn about the
+physics simulator, graphics engine, actors, and events.
+**** The idea of libraries
+- Other people's code that you don't change, you just use
+- We have two big ones we rely on: Box2D and Pixi.js
+- JetLag is NOT a library
+- Model it: browser at the bottom, box2d+pixi.js next, then
+  Components/Entities/Services/Systems/Stage.  That's the JetLag part.  Then
+  your game.
+- JetLag not a library because we want it to be easy, but we don't want you
+  falling off a cliff of difficulty, so when it stops being easy, you change
+  it so things stay easy.
+**** The default game
+- Look at the HTML file.  HEAD is general appearance of the web page.  META
+  is about mobile browsers.  STYLE makes sure the page fills the screen.
+  TITLE... you can change that.  It's the title bar/tab.  Now on to BODY.
+  The DIV centers a DIV with a name.  The game goes there.  Then the SCRIPT,
+  which is the name of your code.
+- Now look at the ts file.  It's not JS.  It's not the thing the browser
+  uses.  There's a process for building that.  We'll get to it.
+- First, the top part.  That's imports.  The parts of JetLag that your game
+  needs.  VSCode will help us to manage this.
+- Second is the configuration.
+  - Talk about comments
+  - Talk about how the whole extends and all that is just for getting good
+    errors (show it).
+  - Remind that errors are good.  They help you fix problems early!
+  - Third is the code that tells how your game behaves.  We'll do that later.
+  - Fourth is the thing that sets it all up.  Connects the HTML to the config
+    (and hence to the code).
+**** Thinking about a Theater Production
+- Actors moving around on a stage
+  - Yeah, that's a simplification, but for now it works.
+- So then each level is like an act, or at least a scene.  What is code?  It
+  sets up the initial state of the scene, before the curtain opens.  Then as
+  the action plays out, the actors perform their roles.  That's mostly
+  whatever the physics simulator says to do.
+- One key difference.  We can change the action in the middle.  If the crowd
+  isn't laughing, we might change the jokes.  Things that cause us to deviate
+  from the script are "events"
+  - Collisions: when two actors collide, we can run some code
+  - When an amount of time elapses, we can run some code
+  - User input (gestures and keyboard and mouse) can cause code to run.
+- "code to run" == "script" or "callback".
+**** Now Actors
+- Look at our game code.
+- First, notice that F12 does great stuff.  Turn off hitboxes.  That changes
+  things.  Turn off the grid too.  Hmm...
+- Talk about where is 0,0, and which direction is up/down.
+- Now let's make a hero.   Every actor must have an appearance and a body.
+  Other things are optional.  We can see how to find what the other things
+  are.
+- Talk about appearance.  Solid shapes, pictures, animated sequences of
+  pictures.  For now, we'll just do solid shapes.
+- Talk about bodies.  Polygon, circle, rectangle (box).
+- We should play with the numbers a bit, and see what happens.
+- Role: Hero is usually the focus of a game.  There are other roles, like
+  enemy and goodie.  We'll explore them later on.
+- Movement: this is complicated.  We'll get back to that in a minute
+- Now look, two more actors.  Both are Obstacles.  Those are usually walls.
+- We could make the body and appearance different, but that would be
+  confusing.
+- Now let's go back to the movement.  The hero has one.  But it's the most
+  bland one... StandardMovement.  Just lets us control the hero "later on".
+- That leads to the key handlers.  Talk about them.
+- Watch how the game plays out.  Quite bland.  But it does the job for now.
+- Now let's switch the hero to TiltMovement
+- Change the handlers:
+  // Configure tilt: arrow keys will simulate gravitational force, with a
+  // maximum of +- 10 in the X and Y dimensions.
+  stage.tilt.tiltMax.Set(10, 10);
+  // Pressing a key will induce a force, releasing will stop inducing that force
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
+

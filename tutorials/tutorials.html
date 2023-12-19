@@ -18,7 +18,7 @@
   <h1>JetLag Tutorials</h1>
   <p>Below are the current tutorials.</p>
   <dl>
-    <dt><a href="#tut_getting_started.md" target="_blank">How to set up your computer to start writing games with JetLag</a></dt>
+    <dt><a href="#getting_started.md" target="_blank">Getting Started</a></dt>
     <dd>
       In this tutorial, we will discuss how to get started using JetLag.  This
       tutorial doesn't involve much programming.  It only focuses on getting
@@ -27,79 +27,132 @@
       run.  You will be able to use this as the starting point for learning
       about games, and also as the starting point for making your own game.
     </dd>
-    <dt><a href="#tut_jetlag_tour.md" target="_blank">A tour of the JetLag code</a></dt>
+    <dt><a href="#overview.md" target="_blank">An Overview Of JetLag</a></dt>
     <dd>
       This tutorial gives a high-level overview of JetLag.  It briefly describes
       the main concepts that you will want to understand as you learn about game
       development.
     </dd>
-    <dt><a href="#tut_maze_game.md" target="_blank">A maze game</a></dt>
-    <dt><a href="#tut_assets.md" target="_blank">A tour of the JetLag code</a></dt>
-    <dt><a href="#tut_text.md" target="_blank">A tour of the JetLag code</a></dt>
-    <dt>tut_events</dt>
-    <dt>tut_clocked_game</dt>
-    <dt>tut_joints</dt>
-    <dt>tut_platformer</dt>
-    <dt>tut_types_of_stages</dt>
-    <dt>tut_movement</dt>
-    <dt>tut_roles</dt>
-    <dt>tut_game_styles</dt>
-    <dt>tut_audio</dt>
-    <dt>tut_animations</dt>
-    <dt>tut_gestures_hud</dt>
-    <dt>tut_storage</dt>
-    <dt>tut_projectiles</dt>
-    <dt>tut_parallax</dt>
-    <dt>tut_filters</dt>
+    <dt><a href="#camera_gravity.md" target="_blank">The Camera And Gravity</a></dt>
+    <dd>
+     In JetLag, the camera decides what part of a level is visible at any
+     time.  The camera and gravity work together in interesting ways, which
+     we explore in this tutorial.
+    </dd>
+    <dt><a href="#simulation_conway.md" target="_blank">Introduction To
+    Simulation With Conway's Game Of Life</a></dt>
+    <dd>
+     Conway's Game of Life is a famous simulation.  This tutorial implements
+     a version of it in JetLag, as a way to get you thinking about
+     simulation.  This tutorial is also useful if you're thinking about
+     making a game that doesn't rely on physics, but instead on a sort of
+     "game board".
+    </dd>
+    <dt><a href="#roles.md" target="_blank">Roles that Actors Play</a></dt>
+    <dd>
+     In JetLag, actors take on roles, like "hero" or "obstacle".  This
+     tutorial discusses these roles.
+    </dd>
+    <dt><a href="#movement_physics.md" target="_blank">Movement and Physics</a></dt>
+    <dd>
+     This tutorial discusses the physics simulation that underpins all of
+     JetLag.  It also introduces different ways of controlling an actor's
+     movement.
+    </dd>
+    <dt><a href="#text_hud.md" target="_blank">Text And The Heads-Up Display</a></dt>
+    <dd>
+     This tutorial discusses the ways that you can create text that appears
+     in your game.  It also introduces the heads-up display (HUD).
+    </dd>
+    <dt><a href="#assets_audio_animations.md" target="_blank">Assets, Audio,
+    and Animations</a></dt>
+    <dd>
+     This tutorial discusses the different ways that you can control the
+     appearance of an Actor.  It also introduces sound effects.
+    </dd>
+    <dt><a href="#timers.md" target="_blank">Working With Timers</a></dt>
+    <dd>
+     Timers provide a way to make events happen in the future.  This tutorial
+     covers the basics of how to use them.
+    </dd>
+    <dt><a href="#score.md" target="_blank">Keeping Score</a></dt>
+    <dd>
+     JetLag tracks a lot of different statistics, which you can use as part
+     of the "score" in your game.
+    </dd>
+    <dt><a href="#stage_transitions.md" target="_blank">Transitions Among Stages</a></dt>
+    <dd>
+     When you are designing a game, you'll quickly find that putting
+     everything in one file is a bad idea.  This tutorial presents one way of
+     organizing your code, and also discusses how to transition between the
+     different parts of your game.  This tutorial also shows how to do
+     background music.
+    </dd>
+    <dt><a href="#gestures.md" target="_blank">Gesture Input</a></dt>
+    <dd>
+     Mouse and touch inputs are among the most common ways of interacting
+     with a game.  This tutorial explores their use in JetLag.
+    </dd>
+    <dt><a href="#projectiles.md" target="_blank">Projectiles</a></dt>
+    <dd>
+     Projectiles are a special role.  This tutorial helps you to understand
+     how they work.  It also introduces "actor pools", which help your game
+     to run efficiently.
+    </dd>
+    <dt><a href="#storage.md" target="_blank">Storing Information</a></dt>
+    <dd>
+     In this tutorial, you will learn about how JetLag helps you to store
+     information while your game is being played.
+    </dd>
+    <dt><a href="#maze_game.md" target="_blank">A Maze Game</a></dt>
+    <dd>
+     This tutorial will help you get started making a game in the "maze"
+     style.
+    </dd>
+    <dt><a href="#overhead_fight_farm_game.md" target="_blank">An Overhead
+    Fighting And Farming Game</a></dt>
+    <dd>
+     This tutorial will help you get started making a game with an overhead
+     perspective.  It shows features like "farming" and "fighting".
+    </dd>
+    <dt><a href="#platformer_game.md" target="_blank">A Platformer Game</a></dt>
+    <dd>
+     This tutorial will help you get started making a game in the
+     "platformer" style.
+    </dd>
+    <dt><a href="#endless_runner_game.md" target="_blank">An Endless Runner Game</a></dt>
+    <dd>
+     This tutorial will help you get started making a game in the "endless
+     runner" style.
+    </dd>
+    <dt><a href="#collisions.md" target="_blank">Advanced Collisions</a></dt>
+    <dd>
+     This tutorial discusses a few ways of customizing what happens when
+     actors collide.
+    </dd>
+    <dt><a href="#joints.md" target="_blank">Getting Started With Joints</a></dt>
+    <dd>
+     This tutorial introduces the idea of joints.  Box2D provides a powerful
+     joint system, which is accessible from your JetLag-based game.
+    </dd>
+    <dt><a href="#svg.md" target="_blank">Drawing Actors From SVG Files</a></dt>
+    <dd>
+     This tutorial presents a feature of JetLag that lets you use a line
+     drawing (in the SVG format) as a way to quickly make a bunch of Actors.
+    </dd>
+    <dt><a href="#package_desktop.md" target="_blank">Packaging Your Game For Desktop</a></dt>
+    <dd>
+     This tutorial discusses how to use Electron to take your existing
+     web-based game and turn it into a desktop app.
+    </dd>
+    <dt><a href="#package_mobile.md" target="_blank">Packaging Your Game For Mobile</a></dt>
+    <dd>
+     This tutorial discusses how to use Capacitor to take your existing
+     web-based game and turn it into a mobile app.
+    </dd>
   </dl>
   <div class="copy">&copy; 2023 by Michael Spear. All rights reserved.</div>
   <script src="./viewer.js"></script>
 </body>
 
 </html>
-
-<!--
-* Getting Started
-** Installing/Configuring git/vscode/npm/node
-** Getting the software
-** Removing my strings
-** Running for the first time
-
-* How JetLag Games Work
-** Layers of Code
-** Mental Model: Interactive Play + Events
-** The Camera and the HUD
-** Assets
-** Thinking About Code: "Flappy Bird"
-
-* Introducing Actors
-
-* Winning, Losing, and Managing The Stage
-
-* Working With Events
-
-* The Camera
-
-* Assets
-
-* Text
-
-* Gestures
-
-* Projectiles
-
-* The Heads-Up Display
-
-* Pausing
-
-* Example: A Maze Game
-
-* Example: An Infinite Scroller
-
-* Example: A Platform Game
-
-* Example: An RPG
-
-* Example: A Clock-Based Game
-
--->

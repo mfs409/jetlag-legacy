@@ -58,8 +58,17 @@ const tut_src = {
     "storage", "svg", "text_hud",
     "timers",
   ],
-  md: ["getting_started", "overview", "maze_game"],
-}
+  md: [
+    "assets_audio_animations.md", "camera_gravity.md", "collisions.md",
+    "endless_runner_game.md", "gestures.md", "getting_started.md",
+    "joints.md", "maze_game.md", "movement_physics.md",
+    "overhead_fight_farm_game.md", "overview.md", "package_desktop.md",
+    "package_mobile.md", "platformer_game.md", "projectiles.md",
+    "roles.md", "score.md", "simulation_conway.md",
+    "stage_transitions.md", "storage.md", "svg.md",
+    "text_hud.md", "timers.md",
+  ],
+};
 
 // First, copy the .md and subfolder
 for (let t of tut_src.md) {

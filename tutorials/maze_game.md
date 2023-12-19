@@ -733,3 +733,18 @@ img {display: block; margin: auto; max-width: 500px;}
 iframe {display: block; margin: auto; max-width: 75%; aspect-ratio: 16/9;}
 .red {color: red;}
 ```
+
+*** A Maze Game (maze_game.ts; ready)
+**** Overview
+This tutorial builds a game where the player must navigate a maze.  It is the
+first time we use "assets", and it also lets us start to think about how to
+write efficient and maintainable code, by using a declarative approach for
+defining the maze.
+**** Sprites
+- We're cheating, using a spritesheet
+- Otherwise, it would be green_ball, blue_ball, mustard_ball, red_ball.
+- The code is pretty straightforward, walking through the steps of making the
+  game
+- The big thing is using the array.  Be sure to talk about that.
+- Other big thing is the winscene and losescene.  These really go all-in on
+  callbacks.
