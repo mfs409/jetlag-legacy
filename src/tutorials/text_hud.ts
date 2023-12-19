@@ -31,7 +31,6 @@ class Config implements JetLagGameConfig {
  * @param level Which level should be displayed
  */
 function builder(level: number) {
-  level = 8;
   if (level == 1) {
     // Everything is an actor, and text is just the 'appearance' of the actor.
     // This mean1 that the actor's body is the "anchor" for where the text

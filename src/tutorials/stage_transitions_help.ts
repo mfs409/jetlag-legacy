@@ -19,11 +19,11 @@ import { splashBuilder } from "./stage_transitions_splash";
  * @param level Which help screen should be displayed
  */
 export function helpBuilder(level: number) {
-  // Our first scene describes the color coding that we use for the different
-  // entities in the game
   if (level == 1) {
-    // Light blue background
-    stage.backgroundColor = "#19698e";
+    // Our first scene describes the color coding that we use for the different
+    // entities in the game
+
+    stage.backgroundColor = "#19698e"; // Light blue background
 
     // put some information and pictures on the screen
     Actor.Make({
@@ -93,9 +93,11 @@ export function helpBuilder(level: number) {
     });
   }
 
-  // Our second help scene is just here to show that it is possible to have more than one help scene.
   else if (level == 2) {
-    // This is just like the previous screen, but with different text
+    // Our second help scene is just here to show that it is possible to have
+    // more than one help scene. This is just like the previous screen, but with
+    // different text
+
     stage.backgroundColor = "#19698e";
     Actor.Make({
       appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 56 }, "That's All"),

@@ -10,6 +10,7 @@ import { stage } from "../jetlag/Stage";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { TimedEvent } from "../jetlag/Systems/Timer";
 import { b2Vec2 } from "@box2d/core";
+import { boundingBox } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -38,10 +39,10 @@ function builder(level: number) {
   stage.score.onLose = { level, builder };
   stage.score.onWin = { level, builder };
 
-  // Projectiles are something that we can "toss" on the screen.  They are
-  // unique among roles, because it really only makes sense to have a Projectile
-  // role along with Projectile movement.
   if (level == 1) {
+    // Projectiles are something that we can "toss" on the screen.  They are
+    // unique among roles, because it really only makes sense to have a
+    // Projectile role along with Projectile movement.
     boundingBox();
     let hero = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -69,10 +70,10 @@ function builder(level: number) {
     stage.world.setGravity(0, 10);
   }
 
-  // Making all of those projectiles is a bad idea... we'll end up with too
-  // many, and the game will slow down.  We can use a "pool" to hold just
-  // enough to make the game work:
   else if (level == 2) {
+    // Making all of those projectiles is a bad idea... we'll end up with too
+    // many, and the game will slow down.  We can use a "pool" to hold just
+    // enough to make the game work:
     boundingBox();
     let projectiles = new ActorPoolSystem();
     for (let i = 0; i < 10; ++i) {
@@ -102,8 +103,8 @@ function builder(level: number) {
     stage.world.setGravity(0, 10);
   }
 
-  // We ran out of projectiles!  Let's get them back into the pool:
   else if (level == 3) {
+    // We ran out of projectiles!  Let's get them back into the pool:
     boundingBox();
     let projectiles = new ActorPoolSystem();
     for (let i = 0; i < 10; ++i) {
@@ -141,9 +142,9 @@ function builder(level: number) {
     // increase it.
   }
 
-  // Projectiles don't have to be circles.  Here, we make them long, skinny
-  // rectangles, so they look like laser beams
   if (level == 4) {
+    // Projectiles don't have to be circles.  Here, we make them long, skinny
+    // rectangles, so they look like laser beams
     boundingBox();
 
     let h = Actor.Make({
@@ -212,13 +213,13 @@ function builder(level: number) {
     // they are colliding with something.
   }
 
-  // What happens if projectiles go "too far"?  We might want to put them back
-  // in the pool before they collide with something off-screen.  Also, when we
-  // toss a projectile, we could randomly pick its image.
-  //
-  // Also, we didn't really get into *why* one would want projectiles.  Let's
-  // use them to defeat enemies!
   if (level == 5) {
+    // What happens if projectiles go "too far"?  We might want to put them back
+    // in the pool before they collide with something off-screen.  Also, when we
+    // toss a projectile, we could randomly pick its image.
+    //
+    // Also, we didn't really get into *why* one would want projectiles.  Let's
+    // use them to defeat enemies!
     boundingBox();
     stage.world.setGravity(0, 10);
 
@@ -278,10 +279,10 @@ function builder(level: number) {
     }
   }
 
-  // This level is reminiscent of games where you need to keep asteroids from
-  // hitting the ground. Note that now, the velocity of the projectile will
-  // depend on the distance between the hero and the touch point
   else if (level == 6) {
+    // This level is reminiscent of games where you need to keep asteroids from
+    // hitting the ground. Note that now, the velocity of the projectile will
+    // depend on the distance between the hero and the touch point
     stage.world.setGravity(0, 3);
 
     // We won't have a bounding box, just a floor:
@@ -372,9 +373,9 @@ function builder(level: number) {
 
   }
 
-  // We'll wrap up with a level where the hero can jump and toss projectiles.
-  // It needs to get projectiles into the basket to win.
   else if (level == 7) {
+    // We'll wrap up with a level where the hero can jump and toss projectiles.
+    // It needs to get projectiles into the basket to win.
     stage.world.setGravity(0, 10);
     boundingBox();
 
@@ -463,28 +464,3 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}

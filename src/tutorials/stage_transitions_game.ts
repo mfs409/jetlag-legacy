@@ -95,8 +95,8 @@ export function gameBuilder(level: number) {
     stage.score.onWin = { level: 1, builder: splashBuilder };
   }
 
-  // Level 1 will just have a hero and a destination
   if (level == 1) {
+    // Level 1 will just have a hero and a destination
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -113,8 +113,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("Use tilt (or arrows) to reach the destination");
   }
 
-  // Level two adds an enemy
   else if (level == 2) {
+    // Level two adds an enemy
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -138,8 +138,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("Avoid the enemy!");
   }
 
-  // Level three requires one goodie before the destination works
   else if (level == 3) {
+    // Level three requires one goodie before the destination works
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -162,8 +162,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("Use tilt (or arrows) to reach the destination");
   }
 
-  // Now we'll have an enemy and a goodie!
   else if (level == 4) {
+    // Now we'll have an enemy and a goodie!
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -193,8 +193,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("Be careful!");
   }
 
-  // This time, we'll add some obstacles
   else if (level == 5) {
+    // This time, we'll add some obstacles
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -231,8 +231,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("You cannot pass through the purple obstacles");
   }
 
-  // This time we'll add a sensor, which will change the hero's trajectory
   else if (level == 6) {
+    // This time we'll add a sensor, which will change the hero's trajectory
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -261,8 +261,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("The (grey) sensor will change your movement");
   }
 
-  // Now we'll add an enemy
   else if (level == 7) {
+    // Now we'll add an enemy again
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -298,8 +298,8 @@ export function gameBuilder(level: number) {
     welcomeMessage("It's getting harder...");
   }
 
-  // Now we'll add another enemy, so it's harder to get to the goodie
   else if (level == 8) {
+    // Now we'll add another enemy, so it's harder to get to the goodie
     Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -341,9 +341,9 @@ export function gameBuilder(level: number) {
     welcomeMessage("Almost done...");
   }
 
-  // For our last level, we'll throw in a few more enemies.  Note how we can
-  // alter their paths by adding a waypoint
   else if (level == 9) {
+    // For our last level, we'll throw in a few more enemies.  Note how we can
+    // alter their paths by adding a waypoint
     let h = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),

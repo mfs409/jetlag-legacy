@@ -1,13 +1,12 @@
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
 import { TiltMovement } from "../jetlag/Components/Movement";
-import { stage } from "../jetlag/Stage";
 import { FilledBox, ImageSprite } from "../jetlag/Components/Appearance";
 import { Actor } from "../jetlag/Entities/Actor";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { SvgSystem } from "../jetlag/Systems/Svg";
-import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { enableTilt, boundingBox } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -32,85 +31,42 @@ class Config implements JetLagGameConfig {
  *
  * @param level Which level should be displayed
  */
-function builder(_level: number) {
-  // Drawing terrain by hand can be tedious.  In this level, we demonstrate
-  // JetLag's rudimentary support for SVG files.  If you use Inkscape, or
-  // another SVG tool, to make a picture that consists of only one line, then
-  // you can import it into your game as a set of obstacles. Drawing a picture
-  // on top of the obstacle is probably a good idea, though we don't bother in
-  // this level
-  enableTilt(10, 10);
-  boundingBox();
+function builder(level: number) {
+  if (level == 1) {
+    // Drawing terrain by hand can be tedious.  In this level, we demonstrate
+    // JetLag's rudimentary support for SVG files.  If you use Inkscape, or
+    // another SVG tool, to make a picture that consists of only one line, then
+    // you can import it into your game as a set of obstacles. Drawing a picture
+    // on top of the obstacle is probably a good idea, though we don't bother in
+    // this level
+    enableTilt(10, 10);
+    boundingBox();
 
-  let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
-  Actor.Make({
-    appearance: new ImageSprite(cfg),
-    rigidBody: new CircleBody(cfg, { density: 5, friction: 0.6 }),
-    movement: new TiltMovement(),
-    role: new Hero(),
-  });
-
-  // draw an obstacle from SVG.  We are stretching it in the X and Y
-  // dimensions, and also moving it rightward and downward
-  //
-  // Notice that "shape.svg" is not in assets.  It works differently
-  SvgSystem.processFile("shape.svg", 2, 2, 1.5, 1.5, (centerX: number, centerY: number, width: number, rotation: number) => {
-    // Make an obstacle and rotate it
-    let a = Actor.Make({
-      appearance: new FilledBox({ width, height: 0.05, fillColor: "#FF0000" }),
-      rigidBody: new BoxBody({ cx: centerX, cy: centerY, width, height: 0.05 }),
-      role: new Obstacle(),
+    let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
+    Actor.Make({
+      appearance: new ImageSprite(cfg),
+      rigidBody: new CircleBody(cfg, { density: 5, friction: 0.6 }),
+      movement: new TiltMovement(),
+      role: new Hero(),
     });
-    a.rigidBody.setRotation(rotation);
-    a.rigidBody.setPhysics({ density: 1, elasticity: .2, friction: .4 });
-  });
 
+    // draw an obstacle from SVG.  We are stretching it in the X and Y
+    // dimensions, and also moving it rightward and downward
+    //
+    // Notice that "shape.svg" is not in assets.  It gets loaded right here,
+    // when we make the call to processFile.
+    SvgSystem.processFile("shape.svg", 2, 2, 1.5, 1.5, (centerX: number, centerY: number, width: number, rotation: number) => {
+      // Make an obstacle and rotate it
+      let a = Actor.Make({
+        appearance: new FilledBox({ width, height: 0.05, fillColor: "#FF0000" }),
+        rigidBody: new BoxBody({ cx: centerX, cy: centerY, width, height: 0.05 }),
+        role: new Obstacle(),
+      });
+      a.rigidBody.setRotation(rotation);
+      a.rigidBody.setPhysics({ density: 1, elasticity: .2, friction: .4 });
+    });
+  }
 }
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
-
-/**
- * Enable Tilt, and set up arrow keys to simulate it
- *
- * @param xMax  The maximum X force
- * @param yMax  The maximum Y force
- */
-function enableTilt(xMax: number, yMax: number) {
-  stage.tilt.tiltMax.Set(xMax, yMax);
-  if (!stage.accelerometer.tiltSupported) {
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  }
-}
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}

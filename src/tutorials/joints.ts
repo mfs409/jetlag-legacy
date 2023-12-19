@@ -5,9 +5,9 @@ import { TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
-import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { TimedEvent } from "../jetlag/Systems/Timer";
+import { enableTilt, boundingBox } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -131,49 +131,3 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  let l = Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  let r = Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  let t = Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  let b = Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  return { l, r, t, b };
-}
-
-/**
- * Enable Tilt, and set up arrow keys to simulate it
- *
- * @param xMax  The maximum X force
- * @param yMax  The maximum Y force
- */
-function enableTilt(xMax: number, yMax: number) {
-  stage.tilt.tiltMax.Set(xMax, yMax);
-  if (!stage.accelerometer.tiltSupported) {
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  }
-}

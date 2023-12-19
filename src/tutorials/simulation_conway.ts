@@ -12,21 +12,13 @@ import { GridSystem } from "../jetlag/Systems/Grid";
  * the assets (images and sounds) used by this game.
  */
 class Config implements JetLagGameConfig {
-  // It's very unlikely that you'll want to change these next four values.
-  // Hover over them to see what they mean.
   pixelMeterRatio = 20;
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
-
-  // When you deploy your game, you'll want to change all of these
   canVibrate = true;
   forceAccelerometerOff = true;
   storageKey = "--no-key--";
   hitBoxes = false;
-
-  // Here's where we name all the images/sounds/background music files.  Make
-  // sure names don't have spaces or other funny characters, and make sure you
-  // put the corresponding files in the folder identified by `resourcePrefix`.
   resourcePrefix = "./assets/";
   musicNames = [];
   soundNames = [];

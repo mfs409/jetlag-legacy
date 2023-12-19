@@ -10,6 +10,7 @@ import { stage } from "../jetlag/Stage";
 import { DIRECTION } from "../jetlag/Components/StateManager";
 import { ActorPoolSystem } from "../jetlag/Systems/ActorPool";
 import { Scene } from "../jetlag/Entities/Scene";
+import { boundingBox } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -63,26 +64,7 @@ function builder(level: number) {
   let state = stage.storage.getSession("state") as State;
 
   // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
+  boundingBox();
 
   // Make a portal to the other level
   Actor.Make({

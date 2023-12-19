@@ -3,11 +3,12 @@ import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { ProjectileMovement, TiltMovement } from "../jetlag/Components/Movement";
 import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
-import { Destination, Enemy, Goodie, Hero, Obstacle, Projectile } from "../jetlag/Components/Role";
+import { Destination, Enemy, Goodie, Hero, Projectile } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { Scene } from "../jetlag/Entities/Scene";
+import { enableTilt, boundingBox } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -118,18 +119,18 @@ function builder(level: number) {
   enableTilt(10, 10);
   boundingBox();
 
-  // Automatically win in 5 seconds
   if (level == 1) {
+    // Automatically win in 5 seconds
     stage.score.setVictorySurvive(5);
   }
 
-  // Automatically lose in 5 seconds
   else if (level == 2) {
+    // Automatically lose in 5 seconds
     stage.score.setLoseCountdownRemaining(5);
   }
 
-  // Defeat all the enemies via collision
   else if (level == 3) {
+    // Defeat all the enemies via collision
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -149,8 +150,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount();
   }
 
-  // Defeat via invincibility
   else if (level == 4) {
+    // Defeat via invincibility
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -175,8 +176,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount(2);
   }
 
-  // Defeat via crawl
   else if (level == 5) {
+    // Defeat via crawl
     let h = Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -193,8 +194,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount(1);
   }
 
-  // Defeat via jump
   else if (level == 6) {
+    // Defeat via jump
     stage.world.setGravity(0, 10);
     let h = Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
@@ -211,8 +212,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount(1);
   }
 
-  // Defeat via projectile
   else if (level == 7) {
+    // Defeat via projectile
     let h = Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -240,8 +241,9 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount(1);
   }
 
-  // Defeat via code
   else if (level == 8) {
+    // Defeat via code
+
     // Defeating this one doesn't actually count!
     const e = Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
@@ -258,8 +260,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount(1);
   }
 
-  // Win via goodie count
   else if (level == 9) {
+    // Win via goodie count
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -289,8 +291,8 @@ function builder(level: number) {
     stage.score.setVictoryGoodies(1, 1, 1, 1);
   }
 
-  // Win via destination (single destination)
   else if (level == 10) {
+    // Win via destination (single destination)
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -311,8 +313,8 @@ function builder(level: number) {
     stage.score.setVictoryDestination(2);
   }
 
-  // Win via destination (multiple destinations)
   else if (level == 11) {
+    // Win via destination (multiple destinations)
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -338,8 +340,8 @@ function builder(level: number) {
     stage.score.setVictoryDestination(2);
   }
 
-  // Win via code
   else if (level == 12) {
+    // Win via code
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -347,8 +349,8 @@ function builder(level: number) {
     });
   }
 
-  // Lose because all heroes defeated
   else if (level == 13) {
+    // Lose because all heroes defeated
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -369,8 +371,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount();
   }
 
-  // Lose because important hero defeated
   else if (level == 14) {
+    // Lose because important hero defeated
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -391,8 +393,8 @@ function builder(level: number) {
     stage.score.setVictoryEnemyCount();
   }
 
-  // Lose via code
   else if (level == 15) {
+    // Lose via code
     Actor.Make({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: .5, cy: 8.5, radius: .5 }),
@@ -454,49 +456,4 @@ function loseMessage(message: string) {
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     })
   };
-}
-
-/**
- * Enable Tilt, and set up arrow keys to simulate it
- *
- * @param xMax  The maximum X force
- * @param yMax  The maximum Y force
- */
-function enableTilt(xMax: number, yMax: number) {
-  stage.tilt.tiltMax.Set(xMax, yMax);
-  if (!stage.accelerometer.tiltSupported) {
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  }
-}
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
 }

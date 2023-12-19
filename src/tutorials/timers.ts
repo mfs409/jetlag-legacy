@@ -2,12 +2,13 @@ import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
 import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
 import { GravityMovement, TiltMovement } from "../jetlag/Components/Movement";
-import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
-import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
+import { CircleBody } from "../jetlag/Components/RigidBody";
+import { Destination, Enemy, Goodie, Hero } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { TimedEvent } from "../jetlag/Systems/Timer";
+import { boundingBox } from "./common"
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -33,13 +34,10 @@ class Config implements JetLagGameConfig {
  * @param level Which level should be displayed
  */
 function builder(level: number) {
-
-  level = 5;
-
-  // The simplest thing we can do with a timer is ask for something to happen
-  // after some time transpires.  In this case, the destination won't appear
-  // for five seconds.
   if (level == 1) {
+    // The simplest thing we can do with a timer is ask for something to happen
+    // after some time transpires.  In this case, the destination won't appear
+    // for five seconds.
     stage.world.setGravity(0, 10);
     stage.tilt.tiltMax.Set(10, 0);
     if (!stage.accelerometer.tiltSupported) {
@@ -74,10 +72,10 @@ function builder(level: number) {
     stage.score.onWin = { level, builder };
   }
 
-  // There are two kinds of timers in this level.  One is attached to enemies,
-  // and makes them reproduce every second.  The other says that if you can stay
-  // alive for 5 seconds, you win.
-  if (level == 2) {
+  else if (level == 2) {
+    // There are two kinds of timers in this level.  One is attached to enemies,
+    // and makes them reproduce every second.  The other says that if you can
+    // stay alive for 5 seconds, you win.
     stage.world.setGravity(0, 0);
     stage.tilt.tiltMax.Set(10, 10);
     if (!stage.accelerometer.tiltSupported) {
@@ -170,9 +168,9 @@ function builder(level: number) {
     });
   }
 
-  // We can also have timers so that you lose if you don't finish a level within
-  // an amount of time:
   else if (level == 3) {
+    // We can also have timers so that you lose if you don't finish a level
+    // within an amount of time:
     stage.world.setGravity(0, 10);
     stage.tilt.tiltMax.Set(10, 0);
     if (!stage.accelerometer.tiltSupported) {
@@ -211,11 +209,11 @@ function builder(level: number) {
     });
   }
 
-  // There is a lot more that you can do with timers.  One example is to chain
-  // timers together, so that one leads to another.  Another is that you might
-  // find that you need a timer to check if something has happened.  We'll
-  // demonstrate that in this level.
   else if (level == 4) {
+    // There is a lot more that you can do with timers.  One example is to chain
+    // timers together, so that one leads to another.  Another is that you might
+    // find that you need a timer to check if something has happened.  We'll
+    // demonstrate that in this level.
     stage.world.setGravity(0, 0);
     stage.tilt.tiltMax.Set(10, 10);
     if (!stage.accelerometer.tiltSupported) {
@@ -270,10 +268,10 @@ function builder(level: number) {
     });
   }
 
-  // Lastly, notice that you can make a timer "speed up" by having it go *very
-  // fast* and then making it seem to to run so often.  Part of the trick is that we
-  // know that it will never run faster than 1/45 of a second.
-  if (level == 5) {
+  else if (level == 5) {
+    // Lastly, notice that you can make a timer "speed up" by having it go *very
+    // fast* and then making it seem to to run so often.  Part of the trick is
+    // that we know that it will never run faster than 1/45 of a second.
     stage.score.setVictoryEnemyCount(20);
     stage.world.setGravity(0, 3);
 
@@ -303,28 +301,3 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}

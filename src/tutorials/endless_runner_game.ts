@@ -31,7 +31,6 @@ class Config implements JetLagGameConfig {
  * @param level Which level should be displayed
  */
 function builder(level: number) {
-  // _level = 88;
   if (level == 1) {
     stage.score.onWin = { level, builder };
     stage.score.onLose = { level, builder };

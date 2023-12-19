@@ -8,6 +8,7 @@ import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
 import { AdvancedCollisionSystem } from "../jetlag/Systems/Collisions";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { boundingBox, enableTilt } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -37,10 +38,10 @@ function builder(level: number) {
   stage.score.onLose = { level, builder };
   stage.score.onWin = { level, builder };
 
-  // It can be useful to make a hero stick to an obstacle. As an example, if the
-  // hero should stand on a platform that moves along a path, then we will want
-  // the hero to "stick" to it, even as the platform moves downward.
   if (level == 1) {
+    // It can be useful to make a hero stick to an obstacle. As an example, if
+    // the hero should stand on a platform that moves along a path, then we will
+    // want the hero to "stick" to it, even as the platform moves downward.
     stage.world.setGravity(0, 10);
     let hero = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -75,9 +76,9 @@ function builder(level: number) {
     });
   }
 
-  // Another popular feature is walls that can be passed through in one
-  // direction, but not another
   else if (level == 2) {
+    // Another popular feature is walls that can be passed through in one
+    // direction, but not another
     enableTilt(10, 10);
 
     Actor.Make({
@@ -114,8 +115,8 @@ function builder(level: number) {
     });
   }
 
-  // Sometimes, we want to say that certain actors can pass through others
   else if (level == 3) {
+    // Sometimes, we want to say that certain actors can pass through others
     enableTilt(10, 10);
     let h = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -140,11 +141,11 @@ function builder(level: number) {
     });
   }
 
-  // We previously saw that we can have "sticky" actors, and also allow actors
-  // to pass through other actors by making only certain sides rigid.  In this
-  // example, we make sure they work together, by letting the hero jump through
-  // a platform, and then stick to it.
   else if (level == 4) {
+    // We previously saw that we can have "sticky" actors, and also allow actors
+    // to pass through other actors by making only certain sides rigid.  In this
+    // example, we make sure they work together, by letting the hero jump
+    // through a platform, and then stick to it.
     stage.world.setGravity(0, 10);
     let hero = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -175,9 +176,9 @@ function builder(level: number) {
     })
   }
 
-  // Everything we've looked at so far deals with when collisions *start*.
-  // Sometimes, we want to do something when the collision *ends*.
   else if (level == 5) {
+    // Everything we've looked at so far deals with when collisions *start*.
+    // Sometimes, we want to do something when the collision *ends*.
     enableTilt(10, 10);
     let h = Actor.Make({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -210,48 +211,3 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}
-
-/**
- * Enable Tilt, and set up arrow keys to simulate it
- *
- * @param xMax  The maximum X force
- * @param yMax  The maximum Y force
- */
-function enableTilt(xMax: number, yMax: number) {
-  stage.tilt.tiltMax.Set(xMax, yMax);
-  if (!stage.accelerometer.tiltSupported) {
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  }
-}

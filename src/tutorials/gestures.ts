@@ -7,6 +7,7 @@ import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
 import { FilledBox, ImageSprite } from "../jetlag/Components/Appearance";
 import { b2Vec2 } from "@box2d/core";
+import { boundingBox, wideBoundingBox } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -37,8 +38,9 @@ function builder(level: number) {
   stage.score.onLose = { level, builder };
   stage.score.onWin = { level, builder };
 
-  // side scroller, fixed speed, jump by touching anywhere
   if (level == 1) {
+    // side scroller, fixed speed, jump by touching anywhere
+
     // In this level, we're going to cover the screen with a button.  Tapping
     // the button will make the hero jump
     boundingBox();
@@ -75,12 +77,13 @@ function builder(level: number) {
     return;
   }
 
-  // We have a problem though... what if the world is bigger?  Does it really
-  // make sense to cover the whole screen with the button?
   if (level == 2) {
+    // We have a problem though... what if the world is bigger?  Does it really
+    // make sense to cover the whole screen with the button?
+
     // In this level, we're going to cover the screen with a button.  Tapping
     // the button will make the hero jump
-    boundingBox2();
+    wideBoundingBox();
     stage.world.setGravity(0, 10);
     stage.world.camera.setBounds(0, 0, 32, 9);
 
@@ -122,13 +125,14 @@ function builder(level: number) {
     });
   }
 
-  // So far, we've only really looked at the tap gesture.  Now let's look at
-  // panning.
-  //
-  // Panning has three parts: what to do when the pan begins, what to do while
-  // it continues, and what to do when it ends.  We'll demonstrate it with a
-  // joystick.
   else if (level == 3) {
+    // So far, we've only really looked at the tap gesture.  Now let's look at
+    // panning.
+    //
+    // Panning has three parts: what to do when the pan begins, what to do while
+    // it continues, and what to do when it ends.  We'll demonstrate it with a
+    // joystick.
+
     boundingBox();
 
     // A hero with ManualMovement, so that the joystick can control it
@@ -175,13 +179,14 @@ function builder(level: number) {
     // to worry about it for now.
   }
 
-  // We've seen a gesture on the HUD change the behavior of an actor in the
-  // world.  An important concept is that we can translate HUD coordinates to
-  // screen coordinates.  Let's try it out:
   else if (level == 4) {
+    // We've seen a gesture on the HUD change the behavior of an actor in the
+    // world.  An important concept is that we can translate HUD coordinates to
+    // screen coordinates.  Let's try it out:
+
     // In this level, we're going to cover the screen with a button.  Tapping
     // the button will make the hero jump
-    boundingBox2();
+    wideBoundingBox();
     stage.world.setGravity(0, 10);
     stage.world.camera.setBounds(0, 0, 32, 9);
 
@@ -224,9 +229,10 @@ function builder(level: number) {
     });
   }
 
-  // Now that we understand how to translate coordinates, let's try to use it to
-  // implement some dragging of actors using pan events.
   else if (level == 5) {
+    // Now that we understand how to translate coordinates, let's try to use it
+    // to implement some dragging of actors using pan events.
+
     boundingBox();
     stage.world.setGravity(0, 10);
 
@@ -305,8 +311,10 @@ function builder(level: number) {
     // for a car.
   }
 
-  // This level shows that we can use "flick" or "swipe" gestures to move actors
   else if (level == 6) {
+    // This level shows that we can use "flick" or "swipe" gestures to move
+    // actors
+
     boundingBox();
     stage.world.setGravity(0, 10);
 
@@ -365,10 +373,10 @@ function builder(level: number) {
     });
   }
 
-  // In the previous levels, any single kind of gesture only happened in one
-  // place.  What if we want a kind of gestures to be handled on the HUD and in
-  // the world?
   if (level == 7) {
+    // In the previous levels, any single kind of gesture only happened in one
+    // place.  What if we want a kind of gestures to be handled on the HUD and
+    // in the world?
     boundingBox();
 
     // Track the actor most recently tapped
@@ -467,10 +475,10 @@ function builder(level: number) {
     });
   }
 
-  // This level shows that we can set a button's action to happen repeatedly for
-  // as long as it is being depressed, by making use of the touch-down and
-  // touch-up gestures.
   else if (level == 8) {
+    // This level shows that we can set a button's action to happen repeatedly
+    // for as long as it is being depressed, by making use of the touch-down and
+    // touch-up gestures.
     boundingBox();
 
     let h = Actor.Make({
@@ -532,9 +540,9 @@ function builder(level: number) {
 
   }
 
-  // There is a "pseudo-movement" called Hover.  It makes an actor stay at the
-  // same part of the HUD, while behaving like it is in the world.
   else if (level == 9) {
+    // There is a "pseudo-movement" called Hover.  It makes an actor stay at the
+    // same part of the HUD, while behaving like it is in the world.
     stage.world.setGravity(0, 10);
     boundingBox();
 
@@ -598,53 +606,3 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}
-
-/** Draw a bounding box that surrounds an extended world viewport */
-function boundingBox2() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16, cy: -.05, width: 32, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 32, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16, cy: 9.05, width: 32, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 32.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}

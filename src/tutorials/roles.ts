@@ -8,6 +8,7 @@ import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { DIRECTION } from "../jetlag/Components/StateManager";
+import { enableTilt, boundingBox, levelController } from "./common";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -28,78 +29,6 @@ class Config implements JetLagGameConfig {
 }
 
 /**
- * Enable Tilt, and set up arrow keys to simulate it
- *
- * @param xMax  The maximum X force
- * @param yMax  The maximum Y force
- */
-function enableTilt(xMax: number, yMax: number) {
-  stage.tilt.tiltMax.Set(xMax, yMax);
-  if (!stage.accelerometer.tiltSupported) {
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-  }
-}
-
-/** Draw a bounding box that surrounds the default world viewport */
-function boundingBox() {
-  // Draw a box around the world
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: -.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: 16, height: .1, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 8, cy: 9.05, width: 16, height: .1 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: -.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-  Actor.Make({
-    appearance: new FilledBox({ width: .1, height: 9, fillColor: "#ff0000" }),
-    rigidBody: new BoxBody({ cx: 16.05, cy: 4.5, width: .1, height: 9 }),
-    role: new Obstacle(),
-  });
-}
-
-/**
- * Set the +/- keys to move among the levels of the tutorial
- * @param curr  The current level
- * @param max   The largest level
- */
-function levelController(curr: number, max: number) {
-  let next = () => {
-    if (curr == max) stage.switchTo(builder, 1);
-    else stage.switchTo(builder, curr + 1);
-  };
-  let prev = () => {
-    if (curr == 1) stage.switchTo(builder, max);
-    else stage.switchTo(builder, curr - 1);
-  }
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_EQUAL, next);
-  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_MINUS, prev);
-}
-
-/**
- * Report the goodie counts in a pop-up window, as a way of sanity-checking
- * scores
- */
-function alertGoodies() {
-  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SLASH, () =>
-    window.alert(`${stage.score.getGoodieCount(0)}, ${stage.score.getGoodieCount(1)}, ${stage.score.getGoodieCount(2)}, ${stage.score.getGoodieCount(3)}`));
-}
-
-/**
  * Build the levels of the game.
  *
  * @param level Which level should be displayed
@@ -115,7 +44,7 @@ function builder(level: number) {
   boundingBox();
 
   // Set up for quick switching among levels
-  levelController(level, 17);
+  levelController(level, 17, builder);
 
   if (level == 1) {
     // Let's start by looking at Goodies.  Whenever a hero collides with a
@@ -636,3 +565,12 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
+
+/**
+ * Report the goodie counts in a pop-up window, as a way of sanity-checking
+ * scores
+ */
+function alertGoodies() {
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SLASH, () =>
+    window.alert(`${stage.score.getGoodieCount(0)}, ${stage.score.getGoodieCount(1)}, ${stage.score.getGoodieCount(2)}, ${stage.score.getGoodieCount(3)}`));
+}
