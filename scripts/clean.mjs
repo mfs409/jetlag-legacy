@@ -1,6 +1,5 @@
 // clean_tuts.mjs:
-//   Clean up by removing the folder into which we built the tutorial viewer and
-//   tutorials
+//   Clean up by removing all the output folders that aren't tracked in git
 
 import * as fs from 'fs';
 import * as path from 'path';
