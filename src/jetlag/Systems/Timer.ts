@@ -1,11 +1,7 @@
-// Last review: 08-10-2023
-
 /**
  * TimedEvent is an action that needs to happen after some amount of time has
  * passed.
  */
-// TODO: add a way to advance/de-advance a timer, instead of adding a "start
-// delay"
 export class TimedEvent {
   /** The number of milliseconds before we execute this event's action */
   private msUntilNext: number;
@@ -38,22 +34,40 @@ export class TimedEvent {
 
   /**
    * On a clock tick, we check if this event should run, and if so, run the
-   * event.  Note that an event may run more than once, if it loops.
+   * event.  Note that an event may run more than once, if it loops.  However,
+   * if this is a looping event, and elapsedMs is greater tha the period of the
+   * timer, it will not run multiple times.
    *
-   * @param elapsedMS The milliseconds that have transpired
+   * Warning: This should only be called by Stage.  You probably want to call
+   *          `add()` instead.
+   *
+   * @param elapsedMs The milliseconds that have transpired
    *
    * @returns true if this event has not run for the last time yet (either
    *          because it didn't run, or because it did, but it's a repeat event)
    */
-  public advance(elapsedMS: number) {
+  public advance(elapsedMs: number) {
     if (this.cancelled) return false;
-    this.msUntilNext -= elapsedMS;
+    this.msUntilNext -= elapsedMs;
     if (this.msUntilNext > 0) return true;
     this.action();
     if (!this.repeat) return false;
     this.msUntilNext = this.msInterval;
     return true;
   }
+
+  /**
+   * Act as if an additional `elapsedMs` have transpired.
+   *
+   * Adding a large number (more than the internal `msUntilNext`) will not cause
+   * the event to fire twice.  It also will not cause the event to fire
+   * immediately... the event will be run on the next iteration of the render
+   * loop.
+   *
+   * @param seconds How many more seconds have transpired.  Can be negative to
+   *                delay when the next timer event happens.
+   */
+  public add(elapsedMs: number) { this.msUntilNext -= (1000 * elapsedMs); }
 }
 
 /**
@@ -73,9 +87,7 @@ export class TimerSystem {
    *
    * @param event The event to add
    */
-  public addEvent(event: TimedEvent) {
-    this.events.push(event);
-  }
+  public addEvent(event: TimedEvent) { this.events.push(event); }
 
   /**
    * Move time forward, and handle any events whose time is up
@@ -85,23 +97,10 @@ export class TimerSystem {
    */
   public advance(elapsedMs: number) {
     // The events that return true will go into this, so we can do them
-    // again
+    // again.  (Using a separate array avoids invalidating the iterator.)
     let next: TimedEvent[] = [];
     for (let event of this.events)
       if (event.advance(elapsedMs)) next.push(event);
     this.events = next;
-  }
-
-  /** Events that get processed on the next render, then discarded */
-  public readonly oneTimeEvents: (() => void)[] = [];
-
-  /** Events that get processed on every render */
-  public readonly repeatEvents: (() => void)[] = [];
-
-  /** Run any pending events that should happen during a render */
-  public runEvents() {
-    for (let e of this.oneTimeEvents) e();
-    this.oneTimeEvents.length = 0;
-    for (let e of this.repeatEvents) e();
   }
 }

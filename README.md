@@ -26,13 +26,15 @@ for compilation, so every time you make a change, the code will recompile.
 To test your game, open a browser and navigate to <http://localhost:7000>.
 
 To develop a game, we recommend that you start by reading the code in
-`src/game/Levels.ts`, to understand how JetLag works.  Then edit the first
-level of that file to start creating your game.
+`src/game/game.ts`, to understand how JetLag works.  Then edit the first level
+of that file to start creating your game.  An extensive set of tutorials are
+under development.  More information will be available soon.  For now, you will
+want to look at the v3-dev branch for examples.
 
 To add images and sounds to JetLag, follow these steps:
 
 1. Copy the image or sound file into the assets folder
-2. Add the name of the file to the appropriate list in `src/game/GameConfig.ts`
+2. Add the name of the file to the appropriate list in `src/game/game.ts`
 
 That's it.  Once you follow those two steps, you can refer to the asset by its
 filename in your code.

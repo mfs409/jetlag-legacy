@@ -1,7 +1,5 @@
-// Last review: 08-10-2023
-
 import { b2Vec2 } from "@box2d/core";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 
 /**
  * We are probably going to need a way to re-interpret the meaning of
@@ -9,8 +7,10 @@ import { game } from "../Stage";
  * portrait vs. landscape).  Until we have a use case, we'll just anticipate as
  * best we can by having this enum to pass to the constructor.
  *
- * NB:  In 2015, Android accelerometer readings on tablets and phones were
- *      weirdly different, but maybe it's cleaner by now?
+ * TODO:  In 2015, Android accelerometer readings on tablets and phones were
+ *        weirdly different, but maybe it's cleaner by now?  It would be good to
+ *        check, and also to check iphone/ipad.  Then implement PORTRAIT
+ *        support.
  */
 export enum AccelerometerMode { LANDSCAPE, PORTRAIT }
 
@@ -48,13 +48,12 @@ export class AccelerometerService {
 
     // If the service doesn't exist, disable the accelerometer
     if (!("DeviceMotionEvent" in window)) {
-      game.console.urgent("DeviceMotion API not available... unable to use tilt to control entities");
+      stage.console.log("DeviceMotion API not available... unable to use tilt to control entities");
       this.tiltSupported = false;
       return;
     }
     if (mode != AccelerometerMode.LANDSCAPE) {
-      // TODO: start supporting PORTRAIT mode?
-      game.console.urgent("Unsupported device orientation mode");
+      stage.console.log("Unsupported device orientation mode");
       this.tiltSupported = false;
       return;
     }

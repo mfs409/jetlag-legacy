@@ -1,27 +1,50 @@
-// Last review: 08-10-2023
-
 /**
- * The keys that we currently support
- *
- * TODO: consider adding WASD?  Others?
+ * The keys that we currently support.  We represent each with its `ev.code`
+ * value.
  */
-export enum KeyCodes { ESCAPE = 0, UP = 1, DOWN = 2, LEFT = 3, RIGHT = 4, SPACE = 5, COUNT = 6 }
+export enum KeyCodes {
+  KEY_ESCAPE = 'Escape', KEY_HOME = 'Home', KEY_END = 'End',
+  KEY_INSERT = 'Insert', KEY_DELETE = 'Delete', KEY_BACKQUOTE = 'Backquote',
+  KEY_DIGIT1 = 'Digit1', KEY_DIGIT2 = 'Digit2', KEY_DIGIT3 = 'Digit3',
+  KEY_DIGIT4 = 'Digit4', KEY_DIGIT5 = 'Digit5', KEY_DIGIT6 = 'Digit6',
+  KEY_DIGIT7 = 'Digit7', KEY_DIGIT8 = 'Digit8', KEY_DIGIT9 = 'Digit9',
+  KEY_DIGIT0 = 'Digit0', KEY_MINUS = 'Minus', KEY_EQUAL = 'Equal',
+  KEY_BACKSPACE = 'Backspace', KEY_TAB = 'Tab',
+  KEY_Q = 'KeyQ', KEY_W = 'KeyW', KEY_E = 'KeyE', KEY_R = 'KeyR', KEY_T = 'KeyT',
+  KEY_Y = 'KeyY', KEY_U = 'KeyU', KEY_I = 'KeyI', KEY_O = 'KeyO', KEY_P = 'KeyP',
+  KEY_BRACKETLEFT = 'BracketLeft', KEY_BRACKETRIGHT = 'BracketRight',
+  KEY_BACKSLASH = 'Backslash',
+  KEY_A = 'KeyA', KEY_S = 'KeyS', KEY_D = 'KeyD', KEY_F = 'KeyF', KEY_G = 'KeyG',
+  KEY_H = 'KeyH', KEY_J = 'KeyJ', KEY_K = 'KeyK', KEY_L = 'KeyL',
+  KEY_SEMICOLON = 'Semicolon',
+  KEY_QUOTE = 'Quote', KEY_ENTER = 'Enter',
+  KEY_Z = 'KeyZ', KEY_X = 'KeyX', KEY_C = 'KeyC', KEY_V = 'KeyV', KEY_B = 'KeyB',
+  KEY_N = 'KeyN', KEY_M = 'KeyM', KEY_COMMA = 'Comma', KEY_PERIOD = 'Period',
+  KEY_SLASH = 'Slash', KEY_SPACE = 'Space', KEY_PAGEUP = 'PageUp', KEY_PAGEDOWN = 'PageDown',
+  KEY_LEFT = 'ArrowLeft', KEY_UP = 'ArrowUp', KEY_DOWN = 'ArrowDown', KEY_RIGHT = 'ArrowRight',
+};
 
 /**
  * KeyboardService provides an interface for subscribing to keyboard events and
  * running callbacks when those events happen.
+ *
+ * TODO: This should be updated according to
+ * https://medium.com/@dovern42/handling-multiple-key-presses-at-once-in-vanilla-javascript-for-game-controllers-6dcacae931b7
  */
 export class KeyboardService {
-  /** handlers for when keys are pressed down */
-  private downHandlers: (() => void)[] = [];
+  /** 
+   * handlers for when keys are down pressed.  These re-fire while the key is
+   * held 
+   */
+  private downHandlers: Map<string, () => void> = new Map();
 
   /** handlers for when keys are released */
-  private upHandlers: (() => void)[] = [];
+  private upHandlers: Map<string, () => void> = new Map();
 
   /** Create the service by setting up listeners */
   constructor() {
-    document.addEventListener("keydown", (ev: KeyboardEvent) => this.keyDownHandler(ev));
-    document.addEventListener("keyup", (ev: KeyboardEvent) => this.keyUpHandler(ev));
+    document.addEventListener("keydown", (ev: KeyboardEvent) => { this.keyDownHandler(ev) }, true);
+    document.addEventListener("keyup", (ev: KeyboardEvent) => { this.keyUpHandler(ev) });
   }
 
   /**
@@ -30,7 +53,7 @@ export class KeyboardService {
    * @param key     The key to listen for
    * @param handler The code to run
    */
-  public setKeyDownHandler(key: KeyCodes, handler: () => void) { this.downHandlers[key.valueOf() as number] = handler; }
+  public setKeyDownHandler(key: KeyCodes, handler: () => void) { this.downHandlers.set(key.valueOf(), handler); }
 
   /**
    * Set a handler to respond to some keyup event
@@ -38,27 +61,12 @@ export class KeyboardService {
    * @param key     The key to listen for
    * @param handler The code to run
    */
-  public setKeyUpHandler(key: KeyCodes, handler: () => void) { this.upHandlers[key.valueOf() as number] = handler; }
+  public setKeyUpHandler(key: KeyCodes, handler: () => void) { this.upHandlers.set(key.valueOf(), handler); }
 
-  /** Reset the keyboard (i.e., between levels) */
+  /** Reset the keyboard (e.g., between levels) */
   public clearHandlers() {
-    this.downHandlers = [];
-    this.upHandlers = [];
-  }
-
-  /** Convert a key code to the KEYS enum */
-  private toCode(code: number): number {
-    let idx = -1;
-    switch (code) {
-      case 27: idx = KeyCodes.ESCAPE; break;
-      case 38: idx = KeyCodes.UP; break;
-      case 40: idx = KeyCodes.DOWN; break;
-      case 37: idx = KeyCodes.LEFT; break;
-      case 39: idx = KeyCodes.RIGHT; break;
-      case 32: idx = KeyCodes.SPACE; break;
-      default: idx = -1; break;
-    }
-    return idx;
+    this.downHandlers.clear();
+    this.upHandlers.clear();
   }
 
   /**
@@ -67,14 +75,12 @@ export class KeyboardService {
    * @param ev The HTML keyboard Event
    */
   private keyDownHandler(ev: KeyboardEvent) {
-    // TODO:  address deprecated field
-    let idx = this.toCode(ev.keyCode);
-    if (idx != -1) {
-      let h = this.downHandlers[idx];
-      if (h) {
-        h();
-        ev.preventDefault();
-      }
+    let handler = this.downHandlers.get(ev.code);
+    if (handler) {
+      // NB:  `ev.preventDefault()` is necessary, or things like TAB will do their
+      //      default UI interaction (e.g., focus the address bar)
+      ev.preventDefault();
+      handler();
     }
   }
 
@@ -84,14 +90,12 @@ export class KeyboardService {
    * @param ev The HTML keyboard Event
    */
   private keyUpHandler(ev: KeyboardEvent) {
-    // TODO:  address deprecated field
-    let idx = this.toCode(ev.keyCode);
-    if (idx != -1) {
-      let h = this.upHandlers[idx];
-      if (h) {
-        h();
-        ev.preventDefault();
-      }
+    let handler = this.upHandlers.get(ev.code);
+    if (handler) {
+      // NB:  `ev.preventDefault()` is necessary, or things like TAB will do their
+      //      default UI interaction (e.g., focus the address bar)
+      ev.preventDefault();
+      handler();
     }
   }
 }

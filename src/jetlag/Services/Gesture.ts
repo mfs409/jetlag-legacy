@@ -1,12 +1,15 @@
-// Last review: 08-11-2023
-
 import { Scene } from "../Entities/Scene";
 import { Stage } from "../Stage";
 import Hammer from "hammerjs";
 
-/** GestureService routes gesture events (as defined by hammerjs) to a Stage. */
+/*** GestureService routes gesture events (as defined by hammerjs) to a Stage */
 export class GestureService {
-  /** The DOM element that receives gesture events */
+  /**
+   * The DOM element that receives gesture events
+   *
+   * NB:  hammerjs needs this, but since we always have a game with a single div
+   *      that fills the screen, it's kind of trivial.
+   */
   private elt: HTMLElement;
 
   /** Should gestures go to the HUD first, or to the WORLD first? */
@@ -29,78 +32,107 @@ export class GestureService {
       return false;
     } as any;
 
+    let mouseFunc = (ev: MouseEvent) => {
+      let overlay_coords = stage.overlay?.camera.screenToMeters(ev.clientX, ev.clientY);
+      let world_coords = stage.world.camera.screenToMeters(ev.clientX, ev.clientY);
+      let hud_coords = stage.hud.camera.screenToMeters(ev.clientX, ev.clientY);
+      // If we have an overlay scene right now, let it handle the tap
+      if (stage.overlay) {
+        this.mouseHover(stage.overlay, overlay_coords!);
+      }
+      // Handle in hud or world
+      else if (this.gestureHudFirst) {
+        if (this.mouseHover(stage.hud, hud_coords)) return;
+        this.mouseHover(stage.world, world_coords);
+      } else {
+        if (this.mouseHover(stage.world, world_coords)) return;
+        this.mouseHover(stage.hud, hud_coords);
+      }
+    }
+
+    this.elt.onmouseover = (ev: MouseEvent) => { mouseFunc(ev); };
+    this.elt.onmousemove = (ev: MouseEvent) => { mouseFunc(ev); };
+
     // Set up handlers for all the Hammer events
     let hammer = new Hammer(this.elt);
     hammer.on("tap", (ev: HammerInput) => {
       let e = ev.srcEvent as PointerEvent;
+      let overlay_coords = stage.overlay?.camera.screenToMeters(e.offsetX, e.offsetY);
+      let world_coords = stage.world.camera.screenToMeters(e.offsetX, e.offsetY);
+      let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
+      // Log the coordinates, to aid in debugging?
+      if (stage.config.hitBoxes) {
+        stage.console.log("World Touch: (" + world_coords.x + ", " + world_coords.y + ")");
+        stage.console.log("HUD Touch: (" + hud_coords.x + ", " + hud_coords.y + ")");
+      }
       // If we have an overlay scene right now, let it handle the tap
       if (stage.overlay) {
-        this.tap(stage.overlay, e.offsetX, e.offsetY);
-        return;
-      }
-      // Log the event?
-      if (stage.config.hitBoxes) {
-        let world_coords = stage.world.camera.screenToMeters(e.offsetX, e.offsetY);
-        let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
-        stage.console.info("World Touch: (" + world_coords.x + ", " + world_coords.y + ")");
-        stage.console.info("HUD Touch: (" + hud_coords.x + ", " + hud_coords.y + ")");
+        this.tap(stage.overlay, overlay_coords!);
       }
       // Handle in hud or world
-      if (this.gestureHudFirst) {
-        if (this.tap(stage.hud, e.offsetX, e.offsetY)) return;
-        this.tap(stage.world, e.offsetX, e.offsetY);
+      else if (this.gestureHudFirst) {
+        if (this.tap(stage.hud, hud_coords)) return;
+        this.tap(stage.world, world_coords);
       } else {
-        if (this.tap(stage.world, e.offsetX, e.offsetY)) return;
-        this.tap(stage.hud, e.offsetX, e.offsetY);
+        if (this.tap(stage.world, world_coords)) return;
+        this.tap(stage.hud, hud_coords);
       }
     });
 
     hammer.get("pan").set({ direction: Hammer.DIRECTION_ALL });
     hammer.on("panstart", (ev: HammerInput) => {
       let e = ev.srcEvent as PointerEvent;
-      if (stage.overlay) {
-        this.panStart(stage.overlay, e.offsetX, e.offsetY);
-        return;
-      }
-      this.panStart(stage.hud, e.offsetX, e.offsetY);
+      let overlay_coords = stage.overlay?.camera.screenToMeters(e.offsetX, e.offsetY);
+      let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
+      if (stage.overlay) this.panStart(stage.overlay, overlay_coords!);
+      else this.panStart(stage.hud, hud_coords);
     });
     hammer.on("panmove", (ev: HammerInput) => {
       let e = ev.srcEvent as PointerEvent;
-      if (stage.overlay) {
-        this.panMove(stage.overlay, e.offsetX, e.offsetY);
-        return;
-      }
-      this.panMove(stage.hud, e.offsetX, e.offsetY);
+      let overlay_coords = stage.overlay?.camera.screenToMeters(e.offsetX, e.offsetY);
+      let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
+      if (stage.overlay) this.panMove(stage.overlay, overlay_coords!);
+      else this.panMove(stage.hud, hud_coords);
     });
     hammer.on("panend", (ev: HammerInput) => {
       let e = ev.srcEvent as PointerEvent;
-      if (stage.overlay) this.panStop(stage.overlay, e.offsetX, e.offsetY);
-      else this.panStop(stage.hud, e.offsetX, e.offsetY);
+      let overlay_coords = stage.overlay?.camera.screenToMeters(e.offsetX, e.offsetY);
+      let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
+      if (stage.overlay) this.panStop(stage.overlay, overlay_coords!);
+      else this.panStop(stage.hud, hud_coords);
     });
     hammer.on("pancancel", (ev: HammerInput) => {
       let e = ev.srcEvent as PointerEvent;
-      if (stage.overlay) this.panStop(stage.overlay, e.offsetX, e.offsetY);
-      else this.panStop(stage.hud, e.offsetX, e.offsetY);
+      let overlay_coords = stage.overlay?.camera.screenToMeters(e.offsetX, e.offsetY);
+      let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
+      if (stage.overlay) this.panStop(stage.overlay, overlay_coords!);
+      else this.panStop(stage.hud, hud_coords);
     });
 
     // this gets us 'downpress' and 'release'.  See "input events" on
     // http://hammerjs.github.io/api/
     hammer.on("hammer.input", (ev: HammerInput) => {
+      let e = ev.srcEvent as PointerEvent;
+      let overlay_coords = stage.overlay?.camera.screenToMeters(e.offsetX, e.offsetY);
+      let hud_coords = stage.hud.camera.screenToMeters(e.offsetX, e.offsetY);
       if (ev.eventType == 1) {
-        let e = ev.srcEvent as PointerEvent;
-        if (stage.overlay) this.touchDown(stage.overlay, e.offsetX, e.offsetY);
-        else this.touchDown(stage.hud, e.offsetX, e.offsetY);
+        if (stage.overlay) this.touchDown(stage.overlay, overlay_coords!);
+        else this.touchDown(stage.hud, hud_coords);
       } else if (ev.eventType == 4) {
-        let e = ev.srcEvent as PointerEvent;
-        if (stage.overlay) this.touchUp(stage.overlay, e.offsetX, e.offsetY);
-        else this.touchUp(stage.hud, e.offsetX, e.offsetY);
+        if (stage.overlay) this.touchUp(stage.overlay, overlay_coords!);
+        else this.touchUp(stage.hud, hud_coords);
       }
     });
 
-    // NB: swipe also registers pans.
-    // NB: there is also swipeup, swipeleft, swiperight, swipedown
+    // NB:  swipe also registers pans, so you probably don't want swipe and pan
+    //      at the same time.
+    //
+    // NB:  This could be split into swipeup, swipeleft, swiperight, swipedown,
+    //      but that's probably not worth it.
     hammer.on("swipe", (ev: HammerInput) => {
-      this.swipe(stage.hud, ev.center.x - ev.deltaX, ev.center.y - ev.deltaY, ev.center.x, ev.center.y, ev.deltaTime);
+      let start_coord = stage.hud.camera.screenToMeters(ev.center.x - ev.deltaX, ev.center.y - ev.deltaY);
+      let end_coord = stage.hud.camera.screenToMeters(ev.center.x, ev.center.y);
+      this.swipe(stage.hud, start_coord, end_coord, ev.deltaTime);
     });
     hammer.get("swipe").set({ direction: Hammer.DIRECTION_ALL });
   }
@@ -111,100 +143,118 @@ export class GestureService {
   /**
    * Handle a tap action
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX  The X coordinate on the screen
-   * @param screenY  The Y coordinate on the screen
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
    */
-  private tap(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.tap) {
-      actor.gestures.tap(scene.camera.screenToMeters(screenX, screenY));
-      return true;
-    }
+  private tap(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor.gestures?.tap)
+        if (actor.gestures.tap(coords))
+          return true;
+    return false;
+  }
+
+  /**
+   * Handle a mouse over or mouse move action
+   *
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
+   */
+  private mouseHover(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor.gestures?.mouseHover)
+        if (actor.gestures.mouseHover(coords))
+          return true;
     return false;
   }
 
   /**
    * Run this when a pan event starts
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX  The X coordinate on the screen
-   * @param screenY  The Y coordinate on the screen
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
    */
-  private panStart(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.panStart) return actor.gestures.panStart(scene.camera.screenToMeters(screenX, screenY));
+  private panStart(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor?.gestures?.panStart)
+        if (actor.gestures.panStart(coords))
+          return true;
     return false;
   }
 
   /**
    * This runs when a pan produces a "move" event
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX  The X coordinate on the screen
-   * @param screenY  The Y coordinate on the screen
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
    */
-  private panMove(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.panMove) return actor.gestures.panMove(scene.camera.screenToMeters(screenX, screenY));
+  private panMove(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor?.gestures?.panMove)
+        if (actor.gestures.panMove(coords))
+          return true;
     return false;
   }
 
   /**
    * This runs when a pan event stops
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX  The X coordinate on the screen
-   * @param screenY  The Y coordinate on the screen
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
    */
-  private panStop(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.panStop) return actor.gestures.panStop(scene.camera.screenToMeters(screenX, screenY));
+  private panStop(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor?.gestures?.panStop)
+        if (actor.gestures.panStop(coords))
+          return true;
     return false;
   }
 
   /**
    * This runs in response to a down-press
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX  The X coordinate on the screen
-   * @param screenY  The Y coordinate on the screen
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
    */
-  private touchDown(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.touchDown) return actor.gestures.touchDown(scene.camera.screenToMeters(screenX, screenY));
+  private touchDown(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor?.gestures?.touchDown)
+        if (actor.gestures.touchDown(coords))
+          return true;
     return false;
   }
 
   /**
    * This runs when a down-press is released
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX  The X coordinate on the screen
-   * @param screenY  The Y coordinate on the screen
+   * @param scene   The scene that should receive the gesture
+   * @param coords  The coordinates (within the scene) of the gesture
    */
-  private touchUp(scene: Scene, screenX: number, screenY: number) {
-    let actor = scene.physics!.actorAt(scene.camera, screenX, screenY);
-    if (actor?.gestures?.touchUp) return actor.gestures.touchUp(scene.camera.screenToMeters(screenX, screenY));
+  private touchUp(scene: Scene, coords: { x: number, y: number }) {
+    for (let actor of scene.physics!.actorsAt(coords))
+      if (actor?.gestures?.touchUp)
+        if (actor.gestures.touchUp(coords))
+          return true;
     return false;
   }
 
   /**
    * This runs in response to a screen swipe event
    *
-   * @param scene    The scene that should receive the gesture
-   * @param screenX0 The x of the start position of the swipe
-   * @param screenY0 The y of the start position of the swipe
-   * @param screenX1 The x of the end position of the swipe
-   * @param screenY1 The y of the end position of the swipe
-   * @param time     The time it took for the swipe to happen
+   * @param scene         The scene that should receive the gesture
+   * @param start_coords  The coordinates (within the scene) where the swipe
+   *                      began
+   * @param end_coords    The coordinates (within the scene) where the swipe
+   *                      ended
+   * @param time          The time it took for the swipe to happen
    */
-  private swipe(scene: Scene, screenX0: number, screenY0: number, screenX1: number, screenY1: number, time: number) {
-    let sActor = scene.physics!.actorAt(scene.camera, screenX0, screenY0);
-    let eActor = scene.physics!.actorAt(scene.camera, screenX1, screenY1);
-    if (!sActor) return false;
-    if (sActor !== eActor) return false;
-    if (!sActor.gestures?.swipe) return false;
-    return sActor.gestures.swipe(scene.camera.screenToMeters(screenX0, screenY0), scene.camera.screenToMeters(screenX1, screenY1), time);
+  private swipe(scene: Scene, start_coord: { x: number, y: number }, end_coord: { x: number, y: number }, time: number) {
+    for (let sActor of scene.physics!.actorsAt(start_coord))
+      if (sActor.gestures?.swipe)
+        for (let eActor of scene.physics!.actorsAt(end_coord))
+          if (sActor === eActor)
+            if (sActor.gestures.swipe(start_coord, end_coord, time))
+              return true;
+    return false;
   }
 }

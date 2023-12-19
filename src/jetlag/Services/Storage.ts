@@ -1,18 +1,21 @@
-// Last review: 08-10-2023
+// TODO:  Capacitor and Electron will need to use plugins for persistence.
+//        Supporting that will likely introduce a need for some kind of
+//        compile-time switch to pick the right persistence?
 
 /**
  * StorageService provides three key/value stores
  *
  * - Persistent: Things saved here will remain here, even after the player
- *               leaves the page.  This uses the HTML5 persistent storage API.
+ *               leaves the page.  This currently uses the HTML5 persistent
+ *               storage API.
  * - Session:    Things saved here will remain as the player moves among levels,
- *               but will be discarded when the player leaves/refreshes the
+ *               but will be discarded when the player exits/refreshes the
  *               browser.
  * - Level:      Things saved here will remain only until the player moves to
  *               another level.
  *
  * Note that Session and Level can story any data type.  Persistent can only
- * store strings.
+ * store strings, so you'll need JSON serialization for fancy stuff.
  */
 export class StorageService {
   /** The "session" storage */

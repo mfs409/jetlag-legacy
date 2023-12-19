@@ -3,7 +3,7 @@
     "module": "commonjs",
     "target": "esnext",
     "sourceMap": true,
-    "outDir": "./dist/",
+    "outDir": "./check/",
     "noImplicitAny": true,
     "removeComments": true,
     "strict": true,
@@ -22,14 +22,5 @@
   ],
   "include": [
     "src/game/*",
-    "src/index.ts"
-  ],
-  "typedocOptions": {
-    "out": "./docs/",
-    "name": "JetLag Documentation",
-    "excludeExternals": true,
-    "excludePrivate": true,
-    "excludeProtected": true,
-    "hideGenerator": true
-  }
+  ]
 }

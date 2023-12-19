@@ -1,17 +1,15 @@
-// Last review: 08-11-2023
-
 import { b2AABB, b2Contact, b2ContactImpulse, b2ContactListener, b2DistanceJoint, b2DistanceJointDef, b2Fixture, b2Manifold, b2Vec2, b2World, b2WorldManifold } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
-import { CameraSystem } from "../Systems/Camera";
+import { Sides } from "../Config";
 
 /**
  * PointToActorCallback queries the world to find the actor at a given
  * coordinate
  */
 class PointToActorCallback {
-  /** If we found an actor, we'll put it here */
-  foundEntity?: Actor;
+  /** If we found any actors, we'll put them here */
+  foundEntities: Actor[] = [];
 
   /** A helper vector for tracking the location that is being queried */
   private readonly touchVector = new b2Vec2(0, 0);
@@ -36,8 +34,8 @@ class PointToActorCallback {
     let b = fixture.GetBody().GetUserData() as Actor;
     if (!b.enabled) return true;
     // It's active, so save the Entity
-    this.foundEntity = b;
-    return false;
+    this.foundEntities.push(b);
+    return true;
   }
 
   /**
@@ -47,7 +45,7 @@ class PointToActorCallback {
    * @param world The world in which the check is happening
    */
   query(pt: { x: number, y: number }, world: b2World) {
-    this.foundEntity = undefined;
+    this.foundEntities.length = 0;
     this.touchVector.Set(pt.x, pt.y);
     this.aabb.lowerBound.Set(pt.x - this.tolerance, pt.y - this.tolerance);
     this.aabb.upperBound.Set(pt.x + this.tolerance, pt.y + this.tolerance);
@@ -62,25 +60,20 @@ class PointToActorCallback {
  */
 export class BasicCollisionSystem {
   /** The physics world in which all actors interact */
-  public readonly world: b2World;
+  public readonly world = b2World.Create(new b2Vec2(0, 0));
 
   /** For querying the point that was touched */
   protected readonly pointQuerier = new PointToActorCallback();
 
-  /** Create a world with no default gravitational forces */
-  constructor() {
-    this.world = b2World.Create(new b2Vec2(0, 0));
-  }
-
   /**
-   * Query to find the actor at a screen coordinate
+   * Query to find the actors at a screen coordinate
    *
    * @param screenX The X coordinate to look up
    * @param screenY The Y coordinate to look up
    */
-  public actorAt(camera: CameraSystem, screenX: number, screenY: number) {
-    this.pointQuerier.query(camera.screenToMeters(screenX, screenY), this.world);
-    return this.pointQuerier.foundEntity;
+  public actorsAt(coords: { x: number, y: number }) {
+    this.pointQuerier.query(coords, this.world);
+    return this.pointQuerier.foundEntities;
   }
 }
 
@@ -89,10 +82,32 @@ export class BasicCollisionSystem {
  * code in response to collisions.
  */
 export class AdvancedCollisionSystem extends BasicCollisionSystem {
-  /** Create an AdvancedCollisionSystem */
-  constructor(scene: Scene) {
-    super();
+  /**
+   * Callbacks to consider running in response to a contact *ending*.  These are
+   * always one-time callbacks.
+   *
+   * NB:  This could become a performance bottleneck, since we're using an array
+   *      with O(n) search overhead.  The assumption is that the array will be
+   *      small.  If that changes, then this will need to be redesigned.
+   */
+  private endContactHandlers: { actor1: Actor, actor2: Actor, callback: (a: Actor, b: Actor) => void }[] = [];
+
+  /** Provide a scene, so we can route collision events to it */
+  public setScene(scene: Scene) {
     this.configureCollisionHandlers(scene);
+  }
+
+  /**
+   * Register a new endContactHandler to run when a collision ends
+   *
+   * @param actor1    One of the actors of the collision.  This actor should be
+   *                  the first argument to `callback`.
+   * @param actor2    The other actor from the collision / the second argument
+   *                  to `callback`.
+   * @param callback  The code to run when the collision ends
+   */
+  public addEndContactHandler(actor1: Actor, actor2: Actor, callback: (a: Actor, b: Actor) => void) {
+    this.endContactHandlers.push({ actor1, actor2, callback });
   }
 
   /** Configure collision handling for the current level */
@@ -117,7 +132,7 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
 
           // The world is in mid-render, so we can't really change anything, so
           // defer handling the event until after the next render.
-          this.scene.timer.oneTimeEvents.push(() => {
+          this.scene.oneTimeEvents.push(() => {
             // NB: if `a` handles the collision, don't ask `b` to handle it
             if (!a.role?.onCollide(b, contact)) b.role?.onCollide(a, contact);
           });
@@ -129,8 +144,23 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
          *
          * @param contact A description of the contact event
          */
-        public EndContact(_contact: b2Contact) {
-          // NB: For now, we don't do anything here
+        public EndContact(contact: b2Contact) {
+          // Get the bodies, make sure both are actors
+          let a = contact.GetFixtureA().GetBody().GetUserData();
+          let b = contact.GetFixtureB().GetBody().GetUserData();
+          if (!(a instanceof Actor) || !(b instanceof Actor)) return;
+
+          // If this pair is in the array, splice it out and run the array entry
+          for (let ch of this.collisionSystem.endContactHandlers)
+            if ((ch.actor1 == a && ch.actor2 == b) || (ch.actor1 == b && ch.actor2 == a)) {
+              let i = this.collisionSystem.endContactHandlers.indexOf(ch);
+              this.collisionSystem.endContactHandlers.splice(i, 1);
+              // The world is in mid-render, so we can't really change anything, so
+              // defer handling the event until after the next render.
+              this.scene.oneTimeEvents.push(() => {
+                ch.callback(ch.actor1, ch.actor2);
+              });
+            }
         }
 
         /**
@@ -145,46 +175,49 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
           let a = contact.GetFixtureA().GetBody().GetUserData();
           let b = contact.GetFixtureB().GetBody().GetUserData();
           if (!(a instanceof Actor) || !(b instanceof Actor) || !a.rigidBody || !b.rigidBody) return;
-          let ap = a.rigidBody.props, bp = b.rigidBody.props;
+          let ab = a.rigidBody, bb = b.rigidBody;
 
           // is either one-sided?
           let oneSided: Actor | undefined = undefined;
           let other: Actor | undefined = undefined;
-          if (ap.bottomRigidOnly || ap.topRigidOnly || ap.leftRigidOnly || ap.rightRigidOnly) {
+          if (ab.singleRigidSide != undefined) {
             oneSided = a; other = b;
-          } else if (bp.bottomRigidOnly || bp.topRigidOnly || bp.leftRigidOnly || bp.rightRigidOnly) {
+          } else if (bb.singleRigidSide != undefined) {
             oneSided = b; other = a;
           }
           // Should we disable a one-sided collision?
           if (oneSided && other && !oneSided.rigidBody!.distJoint && !other.rigidBody!.distJoint) {
-            let worldManiFold = new b2WorldManifold();
-            contact.GetWorldManifold(worldManiFold);
-            let numPoints = worldManiFold.points.length;
-            for (let i = 0; i < numPoints; i++) {
-              let xy = new b2Vec2(0, 0);
-              other.rigidBody?.body.GetLinearVelocityFromWorldPoint(worldManiFold.points[i], xy);
-              // disable based on the value of isOneSided and the vector between
-              // the entities
-              if (oneSided.rigidBody!.props.topRigidOnly && xy.y < 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.props.leftRigidOnly && xy.y > 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.props.rightRigidOnly && xy.x > 0) contact.SetEnabled(false);
-              else if (oneSided.rigidBody!.props.bottomRigidOnly && xy.x < 0) contact.SetEnabled(false);
+            if (true) {
+              let ot = oneSided.rigidBody.getCenter().y - oneSided.rigidBody.h / 2;
+              let ob = oneSided.rigidBody.getCenter().y + oneSided.rigidBody.h / 2;
+              let ol = oneSided.rigidBody.getCenter().x - oneSided.rigidBody.w / 2;
+              let or = oneSided.rigidBody.getCenter().x + oneSided.rigidBody.w / 2;
+              let ct = other.rigidBody.getCenter().y - other.rigidBody.h / 2;
+              let cb = other.rigidBody.getCenter().y + other.rigidBody.h / 2;
+              let cl = other.rigidBody.getCenter().x - other.rigidBody.w / 2;
+              let cr = other.rigidBody.getCenter().x + other.rigidBody.w / 2;
+              let vx = other.rigidBody.getVelocity().x;
+              let vy = other.rigidBody.getVelocity().y;
+              if (oneSided.rigidBody!.singleRigidSide == Sides.TOP && cb >= ot && vy <= 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.LEFT && cr >= ol && vx <= 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.RIGHT && cl <= or && vx >= 0) contact.SetEnabled(false);
+              else if (oneSided.rigidBody!.singleRigidSide == Sides.BOTTOM && ct <= ob && vy >= 0) contact.SetEnabled(false);
+
             }
-            return;
           }
 
           // If at least one entity is sticky, then see about making them stick
-          if (ap.bottomSticky || ap.topSticky || ap.leftSticky || ap.rightSticky) {
+          if (ab.stickySides.length > 0) {
             this.collisionSystem.handleSticky(a, b, contact);
             return;
-          } else if (bp.bottomSticky || bp.topSticky || bp.leftSticky || bp.rightSticky) {
+          } else if (bb.stickySides.length > 0) {
             this.collisionSystem.handleSticky(b, a, contact);
             return;
           }
 
           // if the entities have the same passthrough ID, and it's not
           // zero, then disable the contact
-          if (ap.passThroughId && ap.passThroughId == bp.passThroughId) {
+          if (ab.passThroughId && ab.passThroughId == bb.passThroughId) {
             contact.SetEnabled(false);
             return;
           }
@@ -194,14 +227,14 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
           let exA = a.role?.collisionRules;
           let exB = b.role?.collisionRules;
           if (exA && exB) {
-            for (let a of exA.ignore)
-              for (let b of exB.role)
+            for (let a of exA.ignores)
+              for (let b of exB.properties)
                 if (a == b) {
                   contact.SetEnabled(false);
                   return;
                 }
-            for (let b of exB.ignore)
-              for (let a of exA.role)
+            for (let b of exB.ignores)
+              for (let a of exA.properties)
                 if (b == a) {
                   contact.SetEnabled(false);
                   return;
@@ -232,22 +265,22 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
     // don't create a joint if we've already got one
     if (other.rigidBody?.distJoint) return;
     // don't create a joint if we're supposed to wait
-    if (window.performance.now() < (other.rigidBody?.props.stickyDelay ?? 0)) return;
+    if (window.performance.now() < (other.rigidBody?.stickyDelay ?? 0)) return;
     // only do something if we're hitting the actor from the correct direction
     let sBody = sticky.rigidBody!;
     let oBody = other.rigidBody!;
-    let oy = oBody.getCenter().y, ox = oBody.getCenter().x, ow = oBody.props.w, oh = oBody.props.h;
-    let sy = sBody.getCenter().y, sx = sBody.getCenter().x, sw = sBody.props.w, sh = sBody.props.h;
-    if ((sBody.props.topSticky && ((oy + oh / 2) <= (sy - sh / 2))) ||
-      (sBody.props.bottomSticky && ((oy - oh / 2) >= (sy + sh / 2))) ||
-      (sBody.props.rightSticky && ((ox - ow / 2) >= (sx + sw / 2))) ||
-      (sBody.props.leftSticky && ((ox + ow / 2) <= (sx - sw / 2)))) {
+    let oy = oBody.getCenter().y, ox = oBody.getCenter().x, ow = oBody.w, oh = oBody.h;
+    let sy = sBody.getCenter().y, sx = sBody.getCenter().x, sw = sBody.w, sh = sBody.h;
+    if ((sBody.stickySides.indexOf(Sides.TOP) > -1 && ((oy + oh / 2) <= (sy - sh / 2))) ||
+      (sBody.stickySides.indexOf(Sides.BOTTOM) > -1 && ((oy - oh / 2) >= (sy + sh / 2))) ||
+      (sBody.stickySides.indexOf(Sides.RIGHT) > -1 && ((ox - ow / 2) >= (sx + sw / 2))) ||
+      (sBody.stickySides.indexOf(Sides.LEFT) > -1 && ((ox + ow / 2) <= (sx - sw / 2)))) {
       // create a distance joint. Note that we need to make the joint in a
       // callback that runs later
       let m = new b2WorldManifold();
       contact.GetWorldManifold(m);
       let v = m.points[0];
-      sticky.scene.timer.oneTimeEvents.push(() => {
+      sticky.scene.oneTimeEvents.push(() => {
         let sb = sticky.rigidBody?.body;
         let ob = other.rigidBody?.body;
         if (!sb || !ob) return;

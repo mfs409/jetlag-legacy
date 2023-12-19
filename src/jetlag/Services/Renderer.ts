@@ -1,21 +1,25 @@
-// Last review: 08-10-2023
-
-import { Application, Container, Graphics, BlurFilter, ColorMatrixFilter, NoiseFilter } from "pixi.js";
+import { Application, Container, Graphics, BlurFilter, NoiseFilter, SCALE_MODES, Sprite as PixiSprite } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
-import { game } from "../Stage";
-import { AppearanceComponent, } from "../Components/Appearance";
-import { RigidBodyComponent, PolygonCfg } from "../Components/RigidBody";
+import { stage } from "../Stage";
+import { AppearanceComponent, FilledBox, FilledCircle, FilledPolygon } from "../Components/Appearance";
+import { RigidBodyComponent, BoxBody, CircleBody, PolygonBody } from "../Components/RigidBody";
 import { CameraSystem } from "../Systems/Camera";
-import { Sprite, Text } from "./ImageService";
+import { Sprite, Text } from "./ImageLibrary";
 import { b2Vec2 } from "@box2d/core";
 
 /**
  * RenderService is a wrapper around the PIXI Application object.  It
  * initializes the render loop, which fires at a regular interval to tell the
- * game to advance the simulation by some number of milliseconds.  Doing this 45
- * times per second is what makes our game work :)
+ * game to advance the simulation by some number of milliseconds.  Doing this
+ * many times per second is what makes our game work :)
+ *
+ * <!--
+ * As of December 2023, PIXI.js v 7.3.2's '.d.ts' file isn't always exactly
+ * correct.  There are a few `as any` casts in this file for dealing with the
+ * issues.  Re-check these casts as PIXI.js updates.
+ *  -->
  */
-export class RenderService {
+export class RendererService {
   /** The pixi application object is responsible for drawing onto a canvas */
   private pixi: Application;
 
@@ -32,10 +36,22 @@ export class RenderService {
   private debug?: Container;
 
   /** The "time" in milliseconds, where 0 is when the game started */
-  private _elapsed = 0;
+  private elapsed = 0;
 
   /** The "time" in milliseconds, where 0 is when the game started */
-  public get now() { return this._elapsed; }
+  public get now() { return this.elapsed; }
+
+  /**
+   * When in debug mode, this lets us still disable hitboxes.  It's useful for
+   * tutorials, otherwise not.
+   */
+  public suppressHitBoxes = false;
+
+  /** The most recently-taken screenshot */
+  public mostRecentScreenShot?: PixiSprite;
+
+  /** Is someone requesting that a new screenshot be taken? */
+  public screenshotRequested = false;
 
   /**
    * Initialize the renderer.
@@ -47,11 +63,7 @@ export class RenderService {
    */
   constructor(screenWidth: number, screenHeight: number, domId: string, debugMode: boolean) {
     // Create a rendering context and attach it to the the DOM
-    //
-    // TODO:  `as any` avoids a warning that seems to stem from the typings
-    //        being stale for PIXI 7.  Monitor for changes that will reconcile
-    //        this.
-    this.pixi = new Application({ width: screenWidth, height: screenHeight, antialias: true });
+    this.pixi = new Application({ width: screenWidth, height: screenHeight, antialias: false });
     document.getElementById(domId)!.appendChild(this.pixi.view as any);
 
     // Set up the containers we will use when rendering
@@ -70,16 +82,27 @@ export class RenderService {
       this.main.removeChildren();
       this.debug?.removeChildren();
 
-      // Tell the game to advance by a step
+      // Tell the game to advance by a step.  This will populate the main
+      // container
       let x = this.pixi.ticker.elapsedMS;
-      this._elapsed += x;
-      game.render(x);
+      this.elapsed += x;
+      stage.render(x);
 
-      // Add the containers to the renderer, so they'll show on screen
-      if (this.debug) this.main.addChild(this.debug);
+      // Add the debug container
+      if (this.debug && !this.suppressHitBoxes) this.main.addChild(this.debug);
+
+      // Add the container to the renderer, so it will show on screen
       this.pixi.stage.addChild(this.main);
+
+      // Grab a screenshot if we don't have one yet
+      // TODO:  This screenshot includes the HUD.  I don't think we want that.
+      if (this.screenshotRequested) {
+        this.screenshotRequested = false;
+        this.mostRecentScreenShot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
+      }
     });
   }
+
 
   /**
    * Set the background color of the next frame to a HTML hex value (e.g.,
@@ -147,7 +170,7 @@ export class RenderService {
   private drawDebugPoly(x: number, y: number, rot: number, s: number, verts: b2Vec2[], poly: Graphics) {
     // For polygons, we need to translate the points (they are 0-relative in
     // Box2d, we need them to be relative to (x,y))
-    poly.clear;
+    poly.clear();
     poly.lineStyle(1, 0xff00ff);
     let pts: number[] = [];
     for (let pt of verts) {
@@ -166,21 +189,61 @@ export class RenderService {
   }
 
   /**
-   * Helper method to add a sprite to the main container
+   * Add a filled sprite (a Pixi Graphic) to the main container
    *
-   * @param sprite  The sprite to add
-   * @param x       The center X coordinate
-   * @param y       The center Y coordinate
-   * @param w       The sprite width
-   * @param h       The sprite height
-   * @param r       The rotation of the sprite
+   * @param appearance  The filled sprite to draw
+   * @param body        The rigid body that accompanies the filled sprite
+   * @param graphic     The graphic context
+   * @param camera      The camera (and by extension, the world)
    */
-  private addSprite(sprite: Sprite, x: number, y: number, w: number, h: number, r: number) {
-    sprite.setAnchoredPosition(0.5, 0.5, x, y); // (.5, .5) == anchor at center
-    sprite.setWidth(w);
-    sprite.setHeight(h);
-    sprite.setRotation(r);
-    this.main.addChild(sprite.sprite);
+  public addFilledSpriteToFrame(appearance: FilledBox | FilledCircle | FilledPolygon, body: RigidBodyComponent, graphic: Graphics, camera: CameraSystem) {
+    graphic.clear();
+    // If the actor isn't on screen, skip it
+    if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
+    // Common fields and common appearance configuration:
+    let s = camera.getScale();
+    let x = s * (body.getCenter().x - camera.getLeft());
+    let y = s * (body.getCenter().y - camera.getTop());
+    if (appearance.lineWidth && appearance.lineColor)
+      graphic.lineStyle(appearance.lineWidth, appearance.lineColor);
+    if (appearance.fillColor)
+      graphic.beginFill(appearance.fillColor);
+    if (appearance instanceof FilledBox) {
+      let w = s * appearance.width;
+      let h = s * appearance.height;
+      graphic.drawRect(x, y, w, h);
+      graphic.position.set(x, y);
+      graphic.pivot.set(x + w / 2, y + h / 2);
+      graphic.rotation = body.getRotation();
+    }
+    else if (appearance instanceof FilledCircle) {
+      let radius = s * appearance.radius;
+      graphic.drawCircle(x, y, radius);
+    }
+    else if (appearance instanceof FilledPolygon) {
+      // For polygons, we need to translate the points (they are 0-relative in
+      // Box2d, we need them to be relative to (x,y))
+      let pts: number[] = [];
+      for (let pt of appearance.vertices) {
+        pts.push(s * pt.x + x);
+        pts.push(s * pt.y + y);
+      }
+      // NB: must repeat start point of polygon in PIXI
+      pts.push(pts[0]);
+      pts.push(pts[1]);
+      graphic.drawPolygon(pts);
+      graphic.position.set(x, y);
+      graphic.pivot.set(x, y);
+      graphic.rotation = body.getRotation();
+    }
+    else {
+      throw "Error: unrecognized FilledSprite?"
+    }
+    this.main.addChild(graphic);
+
+    // Debug render?
+    if (this.debug != undefined)
+      this.debugDraw(body, camera);
   }
 
   /**
@@ -192,116 +255,150 @@ export class RenderService {
    * @param camera      The camera that determines which actors to show, and
    *                    where
    */
-  public addBodyToFrame(appearance: AppearanceComponent, body: RigidBodyComponent, sprite: Sprite | undefined, camera: CameraSystem) {
+  public addBodyToFrame(appearance: AppearanceComponent, body: RigidBodyComponent, sprite: Sprite, camera: CameraSystem) {
     // If the actor isn't on screen, skip it
     if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
 
     // Compute the dimensions of the actor, in pixels
     let s = camera.getScale();
-    let x = s * (body.getCenter().x - camera.getOffsetX());
-    let y = s * (body.getCenter().y - camera.getOffsetY());
-    let w = s * appearance.props.w;
-    let h = s * appearance.props.h;
-    let r = body.getRotation();
+    let x = s * (body.getCenter().x - camera.getLeft());
+    let y = s * (body.getCenter().y - camera.getTop());
 
     // Add the sprite
-    if (sprite) this.addSprite(sprite, x, y, w, h, r);
+    sprite.setAnchoredPosition(0.5, 0.5, x, y); // (.5, .5) == anchor at center
+    sprite.sprite.width = s * appearance.width;
+    sprite.sprite.height = s * appearance.height;
+    sprite.sprite.rotation = body.getRotation();
+    this.main.addChild(sprite.sprite);
 
-    // Debug rendering: switch to the body's width/height
-    w = s * body.props.w;
-    h = s * body.props.h;
-    if (!this.debug) return;
-    if (body.isBox())
-      this.drawDebugBox(x, y, w, h, r, body.debug.shape, 0x00ff00);
-    else if (body.isCircle())
-      this.drawDebugCircle(x, y, body.radius * s, r, body.debug.shape, body.debug.line, 0x0000ff);
-    else if (body.isPolygon())
-      this.drawDebugPoly(x, y, r, s, (body.props as PolygonCfg).vertArray, body.debug.shape);
+    // Debug render?
+    if (this.debug != undefined)
+      this.debugDraw(body, camera);
   }
 
   /**
-   * Add a Picture to the next frame
+   * Draw an outline for a rigid body
+   * 
+   * @param body    The rigid body whose outline we'll draw
+   * @param camera  The camera related to where we're drawing
+   */
+  private debugDraw(body: RigidBodyComponent, camera: CameraSystem) {
+    let s = camera.getScale();
+    let r = body.getRotation();
+    let x = s * (body.getCenter().x - camera.getLeft());
+    let y = s * (body.getCenter().y - camera.getTop());
+    let w = s * body.w;
+    let h = s * body.h;
+    if (!this.debug || !body.debug) return;
+    if (body instanceof BoxBody)
+      this.drawDebugBox(x, y, w, h, r, body.debug.shape, 0x00ff00);
+    else if (body instanceof CircleBody)
+      this.drawDebugCircle(x, y, body.radius * s, r, body.debug.shape, body.debug.line, 0x0000ff);
+    else if (body instanceof PolygonBody)
+      this.drawDebugPoly(x, y, r, s, body.vertArray, body.debug.shape);
+  }
+
+  /**
+   * Add a Picture to the next frame.  Note that pictures are never rotated,
+   * because we only use this for Parallax pictures (which have no rigid body,
+   * and hence no rotation).
    *
    * @param appearance  The AppearanceComponent for the actor
    * @param sprite      The sprite, from `appearance`
    * @param camera      The camera that determines which actors to show, and
    *                    where
    */
-  public addPictureToFrame(appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem) {
+  public addPictureToFrame(anchor: { cx: number, cy: number }, appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem) {
     // If the picture isn't on screen, skip it
-    let radius = Math.sqrt(Math.pow(appearance.props.w / 2, 2) + Math.pow(appearance.props.h / 2, 2))
-    if (!camera.inBounds(appearance.props.cx, appearance.props.cy, radius)) return;
+    let radius = Math.sqrt(Math.pow(appearance.width / 2, 2) + Math.pow(appearance.height / 2, 2))
+    if (!camera.inBounds(anchor.cx, anchor.cy, radius)) return;
 
     // Convert from meters to pixels
     let s = camera.getScale();
-    let x = s * (appearance.props.cx - camera.getOffsetX());
-    let y = s * (appearance.props.cy - camera.getOffsetY());
-    let w = s * appearance.props.w;
-    let h = s * appearance.props.h;
+    let x = s * (anchor.cx - camera.getLeft());
+    let y = s * (anchor.cy - camera.getTop());
+    let w = s * appearance.width;
+    let h = s * appearance.height;
 
     // Put it on screen
-    this.addSprite(sprite, x, y, w, h, appearance.props.rot);
+    sprite.setAnchoredPosition(0.5, 0.5, x, y); // (.5, .5) == anchor at center
+    sprite.sprite.width = w;
+    sprite.sprite.height = h;
+    sprite.sprite.rotation = 0;
+    this.main.addChild(sprite.sprite);
 
     // Debug rendering: draw a box around the image
     if (this.debug)
-      this.drawDebugBox(x, y, w, h, appearance.props.rot, sprite.debug, 0xff0000);
+      this.drawDebugBox(x, y, w, h, appearance.actor?.rigidBody.getRotation() ?? 0, sprite.debug, 0xff0000);
   }
 
   /**
    * Add text to the next frame
    *
    * @param text    The text object to display
+   * @param body    The rigidBody of the actor
    * @param camera  The camera that determines which text to show, and where
    * @param center  Should we center the text at its x/y coordinate?
    */
-  public addTextToFrame(text: Text, camera: CameraSystem, center: boolean) {
-    // TODO: we currently don't support rotating text?
+  public addTextToFrame(text: Text, body: RigidBodyComponent, camera: CameraSystem, center: boolean) {
+    if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
+
+    // Compute screen coords of center
     let s = camera.getScale();
-    let x = s * (text.getXPosition() - camera.getOffsetX());
-    let y = s * (text.getYPosition() - camera.getOffsetY());
+    let x = s * (body.getCenter().x - camera.getLeft());
+    let y = s * (body.getCenter().y - camera.getTop());
 
-    if (center) {
-      let bounds = text.getBounds();
-      x -= bounds.x / 2;
-      y -= bounds.y / 2;
+    // NB:  Changing the text's anchor handles top-left vs center
+    text.text.anchor.set(.5, .5);
+    if (!center)
+      text.text.anchor.set(0, 0);
+
+    text.text.position.x = x;
+    text.text.position.y = y;
+    text.text.rotation = body.getRotation();
+    this.main.addChild(text.text);
+
+    // Draw a debug box around the text?
+    if (this.debug != undefined) {
+      // bounds tells us the bounding box in world coords.  For rotated text,
+      // it'll be too big, so we use local bounds to get the bounding box dims.
+      let bounds = text.text.getBounds();
+      let lBounds = text.text.getLocalBounds();
+      this.drawDebugBox(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, lBounds.width, lBounds.height, text.text.rotation, text.debug, 0xFF00FF);
     }
 
-    text.setPosition(x, y);
-    this.main.addChild(text.getRenderObject());
-    if (this.debug) {
-      let bounds = text.getBounds();
-      let w = bounds.x;
-      let h = bounds.y;
-      this.drawDebugBox(x + w / 2, y + h / 2, w, h, 0, new Graphics(), 0xf0f000)
-    }
+    // Debug render?
+    if (this.debug != undefined)
+      this.debugDraw(body, camera);
   }
 
   /**
-   * Return the current Frames-Per-Second of the renderer.  This is useful
+   * Return the current Frames-Per-Second of the renderer.  This can be useful
    * when debugging
    */
   public getFPS() { return this.pixi.ticker.FPS; }
 
-  /** in-progress support for an ASCII filter */
+  /** TODO: in-progress support for an ASCII filter */
   private ascii_filter = new AsciiFilter(8);
 
-  /** in-progress support for a blur filter */
+  /** TODO: in-progress support for a blur filter */
   private blur_filter = new BlurFilter(.5);
 
-  /** in-progress support for an old sepia TV filter.  Part 1: noise. */
+  /** TODO: in-progress support for an old sepia TV filter.  Part 1: noise. */
   private noise_filter = new NoiseFilter();
 
-  /** in-progress support for an old sepia TV filter.  Part 2: lens effect. */
+  /** TODO: in-progress support for an old sepia TV filter.  Part 2: lens effect. */
   private godray_filter = new GodrayFilter();
 
-  /** in-progress support for an old sepia TV filter.  Part 3: sepia. */
-  private oldfilm_filter = new OldFilmFilter();
+  /** TODO: in-progress support for an old sepia TV filter.  Part 3: sepia. */
+  private old_film_filter = new OldFilmFilter();
 
   /**
    * Apply one of our pre-made filters to the world.  All filter stuff is
    * in-progress
    *
-   * TODO: finish adding filter support
+   * TODO:  Finish adding filter support.  We probably want to do it one Z at a
+   *        time?
    *
    * @param use_blur      Use the blur filter?
    * @param use_ascii     Use the ASCII filter?
@@ -312,24 +409,20 @@ export class RenderService {
       this.main.filters = [this.blur_filter];
     }
     else if (use_ascii) {
-      this.main.filters = [this.ascii_filter];
+      this.main.filters = [this.ascii_filter as any];
     }
     else if (use_sepia_tv) {
-      // TODO:  Is there a way to avoid re-making the ColorMatrixFilter every
-      //        time?
-      let f = new ColorMatrixFilter();
-      f.sepia(true);
       this.noise_filter.seed = Math.random();
-      this.oldfilm_filter.sepia = .3;
-      this.oldfilm_filter.noise = .3;
-      this.oldfilm_filter.noiseSize = 1;
-      this.oldfilm_filter.scratch = .5;
-      this.oldfilm_filter.scratchDensity = .3;
-      this.oldfilm_filter.scratchWidth = 1;
-      this.oldfilm_filter.vignetting = .3;
-      this.oldfilm_filter.vignettingAlpha = 1;
-      this.oldfilm_filter.vignettingBlur = .3;
-      this.main.filters = [f, this.noise_filter, this.godray_filter, this.oldfilm_filter];
+      this.old_film_filter.sepia = .3;
+      this.old_film_filter.noise = .3;
+      this.old_film_filter.noiseSize = 1;
+      this.old_film_filter.scratch = .5;
+      this.old_film_filter.scratchDensity = .3;
+      this.old_film_filter.scratchWidth = 1;
+      this.old_film_filter.vignetting = .3;
+      this.old_film_filter.vignettingAlpha = 1;
+      this.old_film_filter.vignettingBlur = .3;
+      this.main.filters = [this.noise_filter, this.godray_filter as any, this.old_film_filter as any];
     }
   }
 }

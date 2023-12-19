@@ -1,19 +1,44 @@
-// Last review: 08-10-2023
+import { stage } from "../Stage";
+import { ISound } from "../Services/AudioLibrary";
 
-import { game } from "../Stage";
-import { ISound } from "../Services/AudioService";
-
-/** All audio-related aspects of an actor get stored here */
+/**
+ * SoundEffect provides a set of sounds associated with events that can happen
+ * to an actor.  This lets us easily know which sound to play without having to
+ * rely on a callback.  Note that this component has the full set of possible
+ * sounds, even though not all are appropriate for any single actor.
+ */
 export class SoundEffectComponent {
   /** Sound to play when the actor disappears */
-  public disappearSound: ISound;
+  public disappear: ISound | undefined;
+
+  /** Sound to play when the actor tosses a projectile */
+  public toss: ISound | undefined;
+
+  /** Sound to play upon an arrival at a destination */
+  public arrive: ISound | undefined;
+
+  /** Sound to play when an actor is defeated */
+  public defeat: ISound | undefined;
+
+  /** Sound to play when an actor jumps */
+  public jump: ISound | undefined;
+
+  /** Sound to play when there a collision with this actor */
+  public collide: ISound | undefined;
 
   /**
-   * Request that a sound plays whenever this actor disappears
+   * Construct a SoundEffectComponent from the file names of the sounds to play
+   * on events.
    *
-   * @param soundName The name of the sound file to play
+   * @param config  An object with the names of the sounds for events for which
+   *                a sound should play
    */
-  constructor(soundName: string) {
-    this.disappearSound = game.musicLibrary.getSound(soundName);
+  constructor(config: { disappear?: string, toss?: string, arrive?: string, defeat?: string, jump?: string, collide?: string }) {
+    if (config.disappear) this.disappear = stage.musicLibrary.getSound(config.disappear);
+    if (config.toss) this.toss = stage.musicLibrary.getSound(config.toss);
+    if (config.arrive) this.arrive = stage.musicLibrary.getSound(config.arrive);
+    if (config.defeat) this.defeat = stage.musicLibrary.getSound(config.defeat);
+    if (config.jump) this.jump = stage.musicLibrary.getSound(config.jump);
+    if (config.collide) this.collide = stage.musicLibrary.getSound(config.collide);
   }
 }

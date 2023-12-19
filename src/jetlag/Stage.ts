@@ -1,21 +1,20 @@
-// Last review: 08-11-2023
-
 import { Scene } from "./Entities/Scene";
 import { ParallaxSystem } from "./Systems/Parallax";
 import { GestureService } from "./Services/Gesture";
-import { AudioService } from "./Services/AudioService";
+import { AudioLibraryService } from "./Services/AudioLibrary";
 import { MusicComponent } from "./Components/Music";
 import { ScoreSystem } from "./Systems/Score";
-import { GameCfg } from "./Config";
+import { JetLagGameConfig } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
-import { RenderService } from "./Services/Renderer";
+import { RendererService } from "./Services/Renderer";
 
 import { AccelerometerMode, AccelerometerService } from "./Services/Accelerometer";
 import { StorageService } from "./Services/Storage";
 import { TiltSystem } from "./Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "./Systems/Collisions";
-import { ImageService } from "./Services/ImageService";
+import { ImageLibraryService } from "./Services/ImageLibrary";
+import { ImageSprite } from "./Components/Appearance";
 
 /**
  * Stage is the container for all of the functionality for the playable portion
@@ -32,91 +31,94 @@ import { ImageService } from "./Services/ImageService";
  * in the game, we don't make a new Stage object... instead we clear out the
  * existing one and reuse it.
  *
- * Stage does not manage transitions between stages on its own. Instead, it has
+ * Stage does not manage transitions between scenes on its own. Instead, it has
  * mechanisms (onScreenChange and endLevel) for resetting itself at the
  * beginning of a stage, and cleaning itself up at the end of a stage.
- *
- * TODO:  It would be nice to have transparency to the (paused) underlying
- *        world, maybe even with effects, when an overlay is showing.
  */
 export class Stage {
   /** The physics world in which all actors exist */
   public world!: Scene;
-
   /** A heads-up display */
   public hud!: Scene;
-
+  /** The tilt system for the stage */
+  public readonly tilt: TiltSystem;
   /** Any pause, win, or lose scene that supersedes the world and hud */
   public overlay?: Scene;
-
   /** Background color for the stage being drawn.  Defaults to white */
-  public backgroundColor = 0xffffff;
-
+  public backgroundColor = "#ffffff";
   /** The background layers */
   public background!: ParallaxSystem;
-
   /** The foreground layers */
   public foreground!: ParallaxSystem;
-
-  /** Everything related to music */
-  readonly stageMusic = new MusicComponent();
-
+  /** Everything related to music that is controlled on one level at a time */
+  public levelMusic: MusicComponent | undefined;
   /** The Score, suitable for use throughout JetLag */
   readonly score = new ScoreSystem();
-
   /** A console device, for debug messages */
   readonly console: ConsoleService;
-
   /** touch controller, providing gesture inputs */
-  readonly gestures: GestureService;
-
+  public gestures!: GestureService;
   /** keyboard controller, providing key event inputs */
   readonly keyboard: KeyboardService;
-
   /** access to the the device's accelerometer */
   readonly accelerometer: AccelerometerService;
-
   /** rendering support, for drawing to the screen */
-  readonly renderer: RenderService;
-
+  readonly renderer: RendererService;
   /** A library of sound and music files */
-  readonly musicLibrary: AudioService;
-
+  readonly musicLibrary: AudioLibraryService;
   /** A library of images */
-  readonly imageLibrary: ImageService;
-
-  /**
-   * storage interfaces with the device's persistent storage, and also
-   * provides volatile storage for levels and sessions
-   */
+  readonly imageLibrary: ImageLibraryService;
+  /** Background music that doesn't stop when the level changes */
+  public gameMusic: MusicComponent | undefined;
+  /** Persistent storage + volatile storage for a game session and a level */
   readonly storage: StorageService;
-
-  /**
-   * Amount by which fonts need to be scaled to make everything fit on the
-   * screen.
-   */
+  /** Amount to scale fonts so everything fits on the screen. */
   fontScaling = 1;
-
   /** The real screen width */
   screenWidth: number;
-
   /** The real screen height */
   screenHeight: number;
-
   /** The real pixel-meter ratio */
   pixelMeterRatio: number;
+  /** Code to run at the end of the next render step */
+  private afterRender?: () => void;
 
   /**
-   * Put an overlay on top of the game.  This is *not* the HUD.  It's something
-   * that goes on top of everything else, and prevents the game from playing,
-   * such as a pause scene, a win/lose scene, or a welcome scene.
+   * Request that an overlay be put on top of the game.  This is *not* the HUD.
+   * It's something that goes on top of everything else, and prevents the game
+   * from playing, such as a pause scene, a win/lose scene, or a welcome scene.
    *
-   * @param builder Code for creating the overlay
+   * @param builder           Code for creating the overlay
+   * @param requestScreenshot Should the overlay delay for a cycle or two, so a
+   *                          screenshot can be taken first?
    */
-  public installOverlay(builder: (overlay: Scene) => void) {
-    this.overlay = new Scene(this.screenWidth, this.screenHeight, this.pixelMeterRatio);
-    this.overlay.physics = new BasicCollisionSystem();
-    builder(this.overlay);
+  public requestOverlay(builder: (overlay: Scene, screenshot?: ImageSprite) => void, requestScreenshot: boolean) {
+    if (!requestScreenshot) {
+      this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
+      builder(this.overlay, undefined);
+      return;
+    }
+
+    // clear the last screenshot, request a new one
+    if (this.renderer.mostRecentScreenShot) {
+      this.renderer.mostRecentScreenShot.destroy(true);
+      this.renderer.mostRecentScreenShot = undefined;
+    }
+    this.renderer.screenshotRequested = true;
+
+    let action = () => {
+      if (this.renderer.mostRecentScreenShot) {
+        let screenshot = new ImageSprite({ width: 16, height: 9, img: "", z: -2 });
+        screenshot.overrideImage(this.renderer.mostRecentScreenShot);
+        this.overlay = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
+        builder(this.overlay, screenshot);
+        this.afterRender = undefined;
+      }
+      else {
+        this.afterRender = action;
+      }
+    }
+    this.afterRender = action;
   }
 
   /** Remove the current overlay scene, if any */
@@ -133,30 +135,31 @@ export class Stage {
     if (this.overlay) {
       this.overlay.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
       this.overlay.timer.advance(elapsedMs);
-      // Note that the timer might cancel the overlay, so we can't assume it's still valid...
+      this.overlay.runRendertimeEvents();
+      // NB:  The timer might cancel the overlay, so we can't assume it's still
+      //      valid...
       this.overlay?.camera.render(elapsedMs);
       return;
     }
 
     // Only set the color and play music if we don't have an overlay showing
-    this.renderer.setFrameColor(this.backgroundColor);
-    this.stageMusic.playMusic();
+    this.renderer.setFrameColor(this.backgroundColor as any);
+    this.levelMusic?.play();
 
-    // Update the win/lose countdown timers and the stopwatch
-    let t = this.score.onClockTick(elapsedMs);
-    if (t == -1) this.score.endLevel(false);
-    if (t == 1) this.score.endLevel(true);
+    // Update the win/lose countdown timers and the stopwatch.  This might end
+    // the level.
+    this.score.onClockTick(elapsedMs);
 
     // handle accelerometer stuff... note that accelerometer is effectively
-    // disabled during a popup... we could change that by moving this to the
+    // disabled during an overlay... we could change that by moving this to the
     // top, but that's probably not going to produce logical behavior
-    this.world.tilt?.handleTilt();
+    this.tilt.handleTilt();
 
     // Advance the physics world
     this.world.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 })
 
-    // Run any pending events, and clear one-time events
-    this.world.timer.runEvents();
+    // Run any pending world events, and clear one-time events
+    this.world.runRendertimeEvents();
 
     // Determine the center of the camera's focus
     this.world.camera.adjustCamera();
@@ -168,9 +171,14 @@ export class Stage {
     this.world.camera.render(elapsedMs);
     this.renderer.applyFilter(false, false, false);
     this.foreground.render(this.world.camera, elapsedMs);
+
     this.hud.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
+    this.hud.runRendertimeEvents();
     this.hud.timer.advance(elapsedMs);
     this.hud.camera.render(elapsedMs);
+
+    if (this.afterRender)
+      this.afterRender();
   }
 
   /**
@@ -179,30 +187,27 @@ export class Stage {
    */
   public switchTo(builder: (index: number, stage: Stage) => void, index: number) {
     // reset music
-    this.stageMusic.stopMusic();
-    this.stageMusic.clear();
+    this.levelMusic?.stop();
+    this.levelMusic = undefined;
 
-    // reset score
+    // reset score and storage
     this.score.reset();
     this.storage.clearLevelStorage();
 
-    // reset keyboard handlers, since they aren't part of the world
+    // reset keyboard and gesture handlers, since they aren't part of the world
     this.keyboard.clearHandlers();
-
-    // Reset the touch screen, too
     this.gestures.reset();
 
     // reset other fields to default values
-    this.backgroundColor = 0xffffff;
+    this.backgroundColor = "#ffffff";
 
-    // Just re-make the scenes, instead of clearing the old ones
-    this.world = new Scene(this.screenWidth, this.screenHeight, this.pixelMeterRatio);
-    this.world.physics = new AdvancedCollisionSystem(this.world);
-    this.world.tilt = new TiltSystem();
-    this.hud = new Scene(this.screenWidth, this.screenHeight, this.pixelMeterRatio);
-    this.hud.physics = new BasicCollisionSystem();
+    // Just re-make the scenes and systems, instead of clearing the old ones
+    this.world = new Scene(this.pixelMeterRatio, new AdvancedCollisionSystem());
+    (this.world.physics as AdvancedCollisionSystem).setScene(this.world);
+    this.hud = new Scene(this.pixelMeterRatio, new BasicCollisionSystem());
     this.background = new ParallaxSystem();
     this.foreground = new ParallaxSystem();
+    this.tilt.reset();
 
     // Now run the level
     builder(index, this);
@@ -213,44 +218,57 @@ export class Stage {
    *
    * @param config  The game-wide configuration object
    * @param domId   The Id of the DOM element where the game exists
+   * @param builder A function for building the first visible level of the game
    */
-  constructor(readonly config: GameCfg, domId: string) {
+  constructor(readonly config: JetLagGameConfig, domId: string, builder: (level: number) => void) {
     this.console = new ConsoleService(config);
 
     this.pixelMeterRatio = config.pixelMeterRatio;
-    this.screenWidth = config.defaultScreenWidth;
-    this.screenHeight = config.defaultScreenHeight;
+    this.screenWidth = config.screenDimensions.width;
+    this.screenHeight = config.screenDimensions.height;
 
     // Check if the config needs to be adapted, then check for errors
-    if (config.pixelMeterRatio <= 0) this.console.urgent("Invalid `pixelMeterRatio` in game config object");
+    if (config.pixelMeterRatio <= 0) this.console.log("Invalid `pixelMeterRatio` in game config object");
     if (config.adaptToScreenSize) this.adjustScreenDimensions();
-    if (this.screenWidth <= 0) this.console.urgent("`width` must be greater than zero in game config object");
-    if (this.screenHeight <= 0) this.console.urgent("`height` must be greater than zero in game config object");
+    if (this.screenWidth <= 0) this.console.log("`width` must be greater than zero in game config object");
+    if (this.screenHeight <= 0) this.console.log("`height` must be greater than zero in game config object");
 
     // Configure the services
     this.storage = new StorageService();
-    this.musicLibrary = new AudioService(config);
-    this.gestures = new GestureService(domId, this);
+    this.musicLibrary = new AudioLibraryService(config);
     this.keyboard = new KeyboardService();
     this.accelerometer = new AccelerometerService(AccelerometerMode.LANDSCAPE, config.forceAccelerometerOff);
-    this.renderer = new RenderService(this.screenWidth, this.screenHeight, domId, this.config.hitBoxes);
-    this.imageLibrary = new ImageService(config);
+    this.renderer = new RendererService(this.screenWidth, this.screenHeight, domId, this.config.hitBoxes);
+    this.imageLibrary = new ImageLibraryService(config);
 
     // make sure the volume is reset to its old value
     this.musicLibrary.resetMusicVolume(parseInt(this.storage.getPersistent("volume") ?? "1"));
 
+    // Configure any systems that should be running
+    this.tilt = new TiltSystem;
+
+    // For the sake of tutorials, we can do a little bit of querystring parsing
+    // to override the default level
+    let level = 1;
+    let url = window.location.href;
+    let qs_level = url.split("?")[1]; // Level from query string
+    if (qs_level) {
+      level = parseInt(qs_level);
+      if (isNaN(level)) level = 1;
+    }
+
     // Load the images asynchronously, then start rendering
     this.imageLibrary.loadAssets(() => {
-      this.switchTo(config.splashBuilder, 1);
+      this.gestures = new GestureService(domId, this);
+      this.switchTo(builder, level);
       this.renderer.startRenderLoop();
     });
+
   }
 
   /**
    * If the game is supposed to fill the screen, this code will change the
    * config object to maximize the div in which the game is drawn
-   *
-   * @param config The JetLagConfig object
    */
   private adjustScreenDimensions() {
     // as we compute the new screen width, height, and pixel ratio, we need
@@ -273,8 +291,15 @@ export class Stage {
     this.fontScaling = this.screenWidth / old.x;
   }
 
-  /** Close the window to exit the game */
-  public exit() { window.close(); }
+  /**
+   * Close the window to exit the game
+   *
+   * TODO: This probably needs special versions for Capacitor and Electron
+   */
+  public exit() {
+    this.levelMusic?.stop();
+    window.close();
+  }
 
   /**
    * Cause the device to vibrate for a fixed number of milliseconds, or print
@@ -283,22 +308,21 @@ export class Stage {
    * @param ms The number of milliseconds for which to vibrate
    */
   vibrate(ms: number) {
-    if (!!navigator.vibrate)
-      navigator.vibrate(ms);
-    else
-      this.console.info("Simulating " + ms + "ms of vibrate");
+    if (!!navigator.vibrate) navigator.vibrate(ms);
+    else this.console.log("Simulating " + ms + "ms of vibrate");
   }
 }
 
 /**
  * Start a game
  *
- * @param domId  The name of the DIV into which the game should be placed
- * @param config The game configuration object
+ * @param domId   The name of the DIV into which the game should be placed
+ * @param config  The game configuration object
+ * @param builder A function for building the first visible level of the game
  */
-export function initializeAndLaunch(domId: string, config: GameCfg) {
-  game = new Stage(config, domId);
+export function initializeAndLaunch(domId: string, config: JetLagGameConfig, builder: (level: number) => void) {
+  stage = new Stage(config, domId, builder);
 }
 
 /** A global reference to the Stage, suitable for use throughout JetLag */
-export let game: Stage;
+export let stage: Stage;

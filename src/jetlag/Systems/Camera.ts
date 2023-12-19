@@ -1,13 +1,11 @@
-// Last review: 08-11-2023
-
 import { b2Vec2 } from "@box2d/core";
 import { Actor } from "../Entities/Actor";
-import { game } from "../Stage";
+import { stage } from "../Stage";
 
 /**
- * The Camera is used to determine /how much/ of a world to render.  The Camera
- * has a minimum X and Y coordinate, and a maximum X and Y coordinate.  It also
- * has a zoom factor, and a current center point.
+ * The Camera is used to determine /how much/ of a world to render, and /which
+ * part/.  The Camera can have a minimum X and Y coordinate, and a maximum X and
+ * Y coordinate.  It also has a zoom factor, and a current center point.
  *
  * The zoom factor and center point give a rectangular region.  The min and max
  * coordinates give another rectangular region.  If the first region is not
@@ -19,13 +17,19 @@ import { game } from "../Stage";
  */
 export class CameraSystem {
   /** Anything in the world that can be rendered (5 planes [-2, -1, 0, 1, 2]) */
-  protected readonly renderables: Actor[][] = [[], [], [], [], []];
+  protected readonly actors: Actor[][] = [[], [], [], [], []];
 
-  /** The minimum x/y coordinates that can be shown (top left corner) */
-  private readonly min = new b2Vec2(0, 0);
+  /** The minimum x coordinate that can be shown (left) */
+  private minX: number | undefined;
 
-  /** The maximum x/y coordinates that can be shown (bottom right corner) */
-  private readonly max = new b2Vec2(0, 0);
+  /** The minimum y coordinate that can be shown (top) */
+  private minY: number | undefined;
+
+  /** The maximum x coordinate that can be shown (right) */
+  private maxX: number | undefined;
+
+  /** The maximum y coordinate that can be shown (bottom) */
+  private maxY: number | undefined;
 
   /** The current center point of the camera */
   private readonly center = new b2Vec2(0, 0);
@@ -39,8 +43,8 @@ export class CameraSystem {
   /** The visible dimensions of the screen, in meters */
   private readonly scaledVisibleRegionDims = new b2Vec2(0, 0);
 
-  /** The Entity that the camera chases, if any */
-  private cameraChaseActor?: Actor;
+  /** The Entity that the camera follows, if any */
+  private cameraFollowActor?: Actor;
 
   /**
    * When the camera follows the entity without centering on it, this gives us
@@ -56,13 +60,13 @@ export class CameraSystem {
    * @param x     Amount of x distance to add to actor center
    * @param y     Amount of y distance to add to actor center
    */
-  public setCameraChase(actor: Actor | undefined, x: number = 0, y: number = 0) {
-    this.cameraChaseActor = actor;
+  public setCameraFocus(actor: Actor | undefined, x: number = 0, y: number = 0) {
+    this.cameraFollowActor = actor;
     this.cameraOffset.Set(x, y);
   }
 
   /**
-   * If the world's camera is supposed to follow an entity, this code will
+   * If the world's camera is supposed to follow an Actor, this code will
    * figure out the point on which the camera should center, and will request
    * that the camera center on that point.
    *
@@ -70,12 +74,12 @@ export class CameraSystem {
    *     and camera bounds.
    */
   public adjustCamera() {
-    if (!this.cameraChaseActor) return;
+    if (!this.cameraFollowActor) return;
 
     // figure out the entity's position + the offset
-    let a = this.cameraChaseActor;
-    let x = (a.rigidBody?.body.GetWorldCenter().x ?? 0) + this.cameraOffset.x;
-    let y = (a.rigidBody?.body.GetWorldCenter().y ?? 0) + this.cameraOffset.y;
+    let a = this.cameraFollowActor;
+    let x = a.rigidBody.body.GetWorldCenter().x + this.cameraOffset.x;
+    let y = a.rigidBody.body.GetWorldCenter().y + this.cameraOffset.y;
 
     // request that the camera center on that point
     this.setCenter(x, y);
@@ -84,21 +88,22 @@ export class CameraSystem {
   /**
    * Create a Camera by setting its bounds and its current pixel/meter ratio
    *
-   * @param maxX The maximum X value (in meters)
-   * @param maxY The maximum Y value (in meters)
    * @param ratio The initial pixel/meter ratio
    */
-  constructor(maxX: number, maxY: number, ratio: number) {
-    this.max.Set(maxX, maxY)
-    this.center.Set((this.max.x - this.min.x) / 2, (this.max.y - this.min.y) / 2);
-    this.screenDims.Set(game.screenWidth, game.screenHeight);
+  constructor(ratio: number) {
+    // set up the game camera, with (0, 0) in the top left
+    let w = stage.screenWidth / ratio;
+    let h = stage.screenHeight / ratio;
+
+    this.center.Set(w / 2, h / 2);
+    this.screenDims.Set(stage.screenWidth, stage.screenHeight);
     this.ratio = ratio;
     this.setScale(this.ratio);
 
     // set up the containers for holding anything we can render
-    this.renderables = new Array<Array<Actor>>(5);
+    this.actors = new Array<Array<Actor>>(5);
     for (let i = 0; i < 5; ++i)
-      this.renderables[i] = new Array<Actor>();
+      this.actors[i] = new Array<Actor>();
   }
 
   /**
@@ -125,13 +130,14 @@ export class CameraSystem {
   /**
    * Update a camera's bounds by providing a new maximum (X, Y) coordinate
    *
-   * TODO: We should have support for a truly "infinite" level
-   *
    * @param maxX The new maximum X value (in meters)
    * @param maxY The new maximum Y value (in meters)
    */
-  public setBounds(maxX: number, maxY: number) {
-    this.max.Set(maxX, maxY);
+  public setBounds(minX: number | undefined, minY: number | undefined, maxX: number | undefined, maxY: number | undefined) {
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
     // Warn if the new bounds are too small to fill the screen
     this.checkDims();
   }
@@ -155,10 +161,14 @@ export class CameraSystem {
 
     this.center.Set(centerX, centerY);
 
-    if (bottom > this.max.y) this.center.y = this.max.y - this.scaledVisibleRegionDims.y / 2;
-    if (top < this.min.y) this.center.y = this.min.y + this.scaledVisibleRegionDims.y / 2;
-    if (right > this.max.x) this.center.x = this.max.x - this.scaledVisibleRegionDims.x / 2;
-    if (left < this.min.x) this.center.x = this.min.x + this.scaledVisibleRegionDims.x / 2;
+    if (this.maxY != undefined && bottom > this.maxY)
+      this.center.y = this.maxY - this.scaledVisibleRegionDims.y / 2;
+    if (this.minY != undefined && top < this.minY)
+      this.center.y = this.minY + this.scaledVisibleRegionDims.y / 2;
+    if (this.maxX != undefined && right > this.maxX)
+      this.center.x = this.maxX - this.scaledVisibleRegionDims.x / 2;
+    if (this.minX != undefined && left < this.minX)
+      this.center.x = this.minX + this.scaledVisibleRegionDims.x / 2;
   }
 
   /**
@@ -178,10 +188,10 @@ export class CameraSystem {
   }
 
   /** Return the X coordinate of the left of the camera viewport */
-  public getOffsetX() { return this.center.x - this.scaledVisibleRegionDims.x / 2; }
+  public getLeft() { return this.center.x - this.scaledVisibleRegionDims.x / 2; }
 
   /** Return the Y coordinate of the top of the camera viewport */
-  public getOffsetY() { return this.center.y - this.scaledVisibleRegionDims.y / 2; }
+  public getTop() { return this.center.y - this.scaledVisibleRegionDims.y / 2; }
 
   /**
    * Given screen coordinates, convert them to meter coordinates in the world
@@ -190,7 +200,7 @@ export class CameraSystem {
    * @param screenY The Y coordinate, in pixels
    */
   public screenToMeters(screenX: number, screenY: number) {
-    return { x: screenX / this.ratio + this.getOffsetX(), y: screenY / this.ratio + this.getOffsetY() };
+    return { x: screenX / this.ratio + this.getLeft(), y: screenY / this.ratio + this.getTop() };
   }
 
   /**
@@ -200,7 +210,7 @@ export class CameraSystem {
    * @param worldY  The Y coordinate, in meters
    */
   public metersToScreen(worldX: number, worldY: number) {
-    return { x: (worldX - this.getOffsetX()) * this.ratio, y: (worldY - this.getOffsetY()) * this.ratio };
+    return { x: (worldX - this.getLeft()) * this.ratio, y: (worldY - this.getTop()) * this.ratio };
   }
 
   /**
@@ -209,10 +219,15 @@ export class CameraSystem {
    */
   private checkDims() {
     // w and h are the visible world's width and height in pixels
-    let w = this.ratio * (this.max.x - this.min.x);
-    let h = this.ratio * (this.max.y - this.min.y);
-    if (w < this.screenDims.x) game.console.urgent("Warning, the visible game area is less than the screen width");
-    if (h < this.screenDims.y) game.console.urgent("Warning, the visible game area is less than the screen height");
+    if (this.maxX != undefined && this.minX != undefined) {
+      let w = this.ratio * (this.maxX - this.minX);
+      if (w < this.screenDims.x) stage.console.log("Warning, the visible game area is less than the screen width");
+    }
+
+    if (this.maxY != undefined && this.minY != undefined) {
+      let h = this.ratio * (this.maxY - this.minY);
+      if (h < this.screenDims.y) stage.console.log("Warning, the visible game area is less than the screen height");
+    }
   }
 
   /**
@@ -221,8 +236,7 @@ export class CameraSystem {
    * @param actor The actor to add
    */
   addEntity(actor: Actor) {
-    if (actor.appearance)
-      this.renderables[actor.appearance.props.z + 2].push(actor);
+    this.actors[actor.appearance.z + 2].push(actor);
   }
 
   /**
@@ -231,22 +245,16 @@ export class CameraSystem {
    * @param actor The actor to remove
    */
   removeEntity(actor: Actor) {
-    if (!actor.appearance) return;
-    let z = actor.appearance.props.z
-    let i = this.renderables[z + 2].indexOf(actor);
-    this.renderables[z + 2].splice(i, 1);
+    let z = actor.appearance.z
+    let i = this.actors[z + 2].indexOf(actor);
+    this.actors[z + 2].splice(i, 1);
   }
 
-  /**
-   * Render this scene
-   *
-   * @return True if the scene was rendered, false if it was not
-   */
+  /** Render the actors associated with this camera */
   render(elapsedMs: number) {
     // Draw everything
-    for (let zPlane of this.renderables)
+    for (let zPlane of this.actors)
       for (let renderable of zPlane)
         if (renderable.prerender(elapsedMs)) renderable.appearance?.render(this, elapsedMs);
-    return true;
   }
 }

@@ -3,26 +3,27 @@
     "version": "1.0.0",
     "description": "A 2D Game Framework for web and mobile, using PIXI.js and Box2D",
     "scripts": {
-        "start": "node scripts/dev.js -w",
-        "build": "node scripts/build.js",
-        "clean": "node scripts/clean.js",
+        "start": "node scripts/serve_game.mjs -w",
+        "build-game": "node scripts/deploy_game.mjs",
         "check": "tsc",
-        "test": "echo \"no tests yet\" && exit 1"
+        "clean": "node scripts/clean.mjs",
+        "help": "node scripts/help.mjs"
     },
-    "author": "Micah Carlisle, Maximilian Hasselbusch, and Michael Spear",
+    "owner": "Michael Spear",
     "license": "MIT",
     "type": "module",
     "dependencies": {
         "@box2d/core": "^0.10.0",
         "hammerjs": "^2.0.8",
-        "howler": "^2.2.3",
+        "howler": "^2.2.4",
         "pixi-filters": "^5.2.1",
-        "pixi.js": "^7.2.4"
+        "pixi.js": "^7.3.2"
     },
     "devDependencies": {
-        "@types/hammerjs": "^2.0.41",
-        "@types/howler": "^2.2.7",
-        "esbuild": "^0.18.15",
+        "@types/hammerjs": "^2.0.44",
+        "@types/howler": "^2.2.11",
+        "chokidar": "^3.5.3",
+        "cross-env": "^7.0.3",
         "esbuild-serve": "^1.0.1",
         "typescript": "^5.1.6"
     }

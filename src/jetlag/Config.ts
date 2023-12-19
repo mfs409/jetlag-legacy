@@ -1,151 +1,34 @@
-// Last review: 08-10-2023
-
-import { Sprite } from "./Services/ImageService";
-import { ErrorVerbosity } from "./Services/Console";
-import { game } from "./Stage";
+import { Scene } from "./Entities/Scene";
+import { Sprite } from "./Services/ImageLibrary";
+import { stage } from "./Stage";
 
 /**
- * ImgConfigOpts expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation is a single image.
+ * The different ActorState combinations for which we might have an animation
+ *
+ * NB:  JetLag supports a broad set of possible states.  In many games, most of
+ *      these won't be useful.
  */
-export interface ImgConfigOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Z index of the image: Must be in the range [-2, 2] */
-  z?: number;
-  /** Amount of rotation */
-  rotation?: number;
-  /** Width of the image */
-  width: number;
-  /** Height of the image */
-  height: number;
-  /** The name of the image to use for this actor. */
-  img: string;
-}
-
-/**
- * TxtConfigOpts expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation is some text.
- */
-export interface TxtConfigOpts {
-  /** X coordinate of the top left corner */
-  cx: number;
-  /** Y coordinate of the top left corner */
-  cy: number;
-  /** Z index of the image: Must be in the range [-2, 2] */
-  z?: number;
-  /** Amount of rotation */
-  rotation?: number;
-  /** Should the text be centered at (cx,cy) (true) or is (cx,cy) top-left (false) */
-  center: boolean;
-  /** Font to use */
-  face: string;
-  /** Color for the text */
-  color: string;
-  /** Font size */
-  size: number;
-}
-
-/**
- * AniCfgOpts expresses the required and optional fields that a programmer
- * should provide to JetLag in order to create an entity whose visual
- * representation uses flipbook-style animation.
- */
-export interface AniCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Z index of the image: Must be in the range [-2, 2] */
-  z?: number;
-  /** Amount of rotation */
-  rotation?: number;
-  /** Width of the animation */
-  width: number;
-  /** Height of the animation */
-  height: number;
-  /** The default animation */
-  idle_right: AnimationSequence;
-  /* The flipped default */
-  idle_left?: AnimationSequence;
-  /** The default moving animation */
-  move_right?: AnimationSequence;
-  /** The flipped moving animation */
-  move_left?: AnimationSequence;
-  /** The default jumping animation */
-  jump_right?: AnimationSequence;
-  /** The flipped jumping animation */
-  jump_left?: AnimationSequence;
-  /** The default crawling animation */
-  crawl_right?: AnimationSequence;
-  /** The flipped crawling animation */
-  crawl_left?: AnimationSequence;
-  /** The default throwing animation */
-  throw_right?: AnimationSequence;
-  /** The flipped throwing animation */
-  throw_left?: AnimationSequence;
-  /** The default invincible animation */
-  invincible_right?: AnimationSequence;
-  /** The flipped invincible animation */
-  invincible_left?: AnimationSequence;
-  /** The disappearance animation */
-  disappear?: AnimationSequence;
-  /** Dimensions for the disappearance animation */
-  disappearDims?: { x: number, y: number };
-  /** Offset of the disappearance animation relative to the actor */
-  disappearOffset?: { x: number, y: number };
-}
-
-/**
- * BoxCfgOpts expresses the required fields that a programmer should provide to
- * JetLag in order to create an entity with a rigid Box body.
- */
-export interface BoxCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Width of the box */
-  width: number;
-  /** Height of the box */
-  height: number;
-}
-
-/**
- * CircleCfgOpts expresses the required fields that a programmer should provide
- * to JetLag in order to create an entity with a rigid Circle body.
- */
-export interface CircleCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Radius of the circle */
-  radius: number;
-}
-
-/**
- * PolygonCfgOpts expresses the required fields that a programmer should provide
- * to JetLag in order to create an entity with a rigid Polygon body.
- */
-export interface PolygonCfgOpts {
-  /** X coordinate of the center */
-  cx: number;
-  /** Y coordinate of the center */
-  cy: number;
-  /** Width of the box */
-  width: number;
-  /** Height of the box */
-  height: number;
-  /**
-   * Vertices of the body, as a stream of alternating x and y values that are
-   * offsets relative to (cx, cy)
-   */
-  vertices: number[];
+export const enum AnimationState {
+  // Stationary
+  IDLE_N, IDLE_NE, IDLE_E, IDLE_SE, IDLE_S, IDLE_SW, IDLE_W, IDLE_NW,
+  // Moving
+  WALK_N, WALK_NE, WALK_E, WALK_SE, WALK_S, WALK_SW, WALK_W, WALK_NW,
+  // Stationary + Tossing
+  TOSS_IDLE_N, TOSS_IDLE_NE, TOSS_IDLE_E, TOSS_IDLE_SE, TOSS_IDLE_S, TOSS_IDLE_SW, TOSS_IDLE_W, TOSS_IDLE_NW,
+  // Moving + Tossing
+  TOSS_N, TOSS_NE, TOSS_E, TOSS_SE, TOSS_S, TOSS_SW, TOSS_W, TOSS_NW,
+  // Stationary + Invincible
+  INV_IDLE_N, INV_IDLE_NE, INV_IDLE_E, INV_IDLE_SE, INV_IDLE_S, INV_IDLE_SW, INV_IDLE_W, INV_IDLE_NW,
+  // Moving + Invincible
+  INV_N, INV_NE, INV_E, INV_SE, INV_S, INV_SW, INV_W, INV_NW,
+  // Stationary + Jumping
+  JUMP_IDLE_N, JUMP_IDLE_NE, JUMP_IDLE_E, JUMP_IDLE_SE, JUMP_IDLE_S, JUMP_IDLE_SW, JUMP_IDLE_W, JUMP_IDLE_NW,
+  // Moving + Jumping
+  JUMP_N, JUMP_NE, JUMP_E, JUMP_SE, JUMP_S, JUMP_SW, JUMP_W, JUMP_NW,
+  // Stationary + Crawling
+  CRAWL_IDLE_N, CRAWL_IDLE_NE, CRAWL_IDLE_E, CRAWL_IDLE_SE, CRAWL_IDLE_S, CRAWL_IDLE_SW, CRAWL_IDLE_W, CRAWL_IDLE_NW,
+  // Moving + Crawling
+  CRAWL_N, CRAWL_NE, CRAWL_E, CRAWL_SE, CRAWL_S, CRAWL_SW, CRAWL_W, CRAWL_NW,
 }
 
 /**
@@ -166,8 +49,7 @@ export class AnimationSequence {
    *
    * @param loop  Should the animation repeat?
    */
-  constructor(readonly loop: boolean) {
-  }
+  constructor(readonly loop: boolean) { }
 
   /** Return the duration of the entire animation sequence */
   getDuration(): number {
@@ -181,7 +63,7 @@ export class AnimationSequence {
     let a = new AnimationSequence(this.loop);
     for (let s of this.steps)
       a.steps.push({
-        cell: game.imageLibrary.getSprite(s.cell.imgName),
+        cell: stage.imageLibrary.getSprite(s.cell.imgName),
         duration: s.duration
       });
     return a;
@@ -196,8 +78,25 @@ export class AnimationSequence {
    * @return         The Animation, so that we can chain calls to "to()"
    */
   public to(imgName: string, duration: number): AnimationSequence {
-    this.steps.push({ cell: game.imageLibrary.getSprite(imgName), duration });
+    this.steps.push({ cell: stage.imageLibrary.getSprite(imgName), duration });
     return this;
+  }
+
+  /**
+   * Create a "simple" animation (i.e., one that shows each of a set of images
+   * for the same amount of time)
+   *
+   * @param timePerFrame  The time to show each image
+   * @param repeat        True if the animation should repeat when it reaches
+   *                      the end
+   * @param imgNames      The names of the images that comprise the animation
+   *
+   * @return The animation
+   */
+  static makeSimple(cfg: { timePerFrame: number, repeat: boolean, images: string[] }) {
+    let a = new AnimationSequence(cfg.repeat);
+    cfg.images.forEach((i) => a.to(i, cfg.timePerFrame));
+    return a;
   }
 }
 
@@ -206,140 +105,94 @@ export class AnimationSequence {
  * code to run in response to each of the gestures that JetLag supports.
  */
 export class GestureHandlers {
-  /**
-   * Construct a set of GestureHandlers
-   *
-   * @param tap       code to run when this actor is tapped
-   * @param panStart  code to run on a pan start event
-   * @param panMove   code to run on a pan move event
-   * @param panStop   code to run on a pan stop event
-   * @param touchDown code to run on a downpress event
-   * @param touchUp   code to run on a release event
-   * @param swipe     code to run on a swipe event
-   */
-  constructor(
-    public tap?: (worldCoords: { x: number, y: number }) => boolean,
-    public panStart?: (worldCoords: { x: number, y: number }) => boolean,
-    public panMove?: (worldCoords: { x: number, y: number }) => boolean,
-    public panStop?: (worldCoords: { x: number, y: number }) => boolean,
-    public touchDown?: (worldCoords: { x: number, y: number }) => boolean,
-    public touchUp?: (worldCoords: { x: number, y: number }) => boolean,
-    public swipe?: (point1: { x: number, y: number }, point2: { x: number, y: number }, time: number) => boolean
-  ) { }
+  /** code to run when this actor is tapped */
+  public tap?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a pan start event */
+  public panStart?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a pan move event */
+  public panMove?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a pan stop event */
+  public panStop?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a down press event */
+  public touchDown?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a release event */
+  public touchUp?: (worldCoords: { x: number, y: number }) => boolean;
+  /** code to run on a swipe event */
+  public swipe?: (point1: { x: number, y: number }, point2: { x: number, y: number }, time: number) => boolean;
+  /** code to run when the mouse hovers over the actor */
+  public mouseHover?: (worldCoords: { x: number, y: number }) => boolean;
 }
 
 /**
- * AdvancedRigidBodyCfgOpts describes advanced, optional configuration
- * properties for any rigid body
+ * For the purpose of stickiness and pass-through surfaces, we treat things as
+ * having four sides, as defined by this enum.
  */
-export interface AdvancedRigidBodyCfgOpts {
+export const enum Sides { TOP, RIGHT, BOTTOM, LEFT }
+
+/**
+ * PhysicsCfg describes provides advanced, but optional, ways of altering the
+ * physical behavior of rigid bodies when they are being constructed.
+ *
+ * <!--
+ * JetLag Developer Note: We replicate the documentation for PhysicsCfg in many
+ * places. Please take care when adding to PhysicsCfg, so that the documentation
+ * does not become stale.
+ * -->
+ */
+export interface PhysicsCfg {
+  /** The scene where this body should be made (defaults to stage.world) */
+  scene?: Scene;
   /** The density of the body */
   density?: number;
   /** The elasticity of the body */
   elasticity?: number;
   /** The friction of the body */
   friction?: number;
-
   /** Should rotation be disabled? */
   disableRotation?: boolean;
-
   /** Do collisions happen, or do other bodies glide through this? */
   collisionsEnabled?: boolean;
-
-  /** When entities touch the top of this, do they stick? */
-  topSticky?: boolean;
-  /** When entities touch the bottom of this, do they stick? */
-  bottomSticky?: boolean;
-  /** When entities touch the left side of this, do they stick? */
-  leftSticky?: boolean;
-  /** When entities touch the right side of this, do they stick? */
-  rightSticky?: boolean;
-  /** 
-   * When an entity *stops* sticking to this, how long before it can stick
-   * again? 
-   */
+  /** Which sides of the body are sticky, if any? */
+  stickySides?: Sides[];
+  /** Delay after something stops sticking, before it can stick again */
   stickyDelay?: number;
-
-  /** Is the top the only hard surface of this body */
-  topRigidOnly?: boolean;
-  /** Is the bottom the only hard surface of this body */
-  bottomRigidOnly?: boolean;
-  /** Is the left side the only hard surface of this body */
-  leftRigidOnly?: boolean;
-  /** Is the right side the only hard surface of this body */
-  rightRigidOnly?: boolean;
-
+  /** Are collisions only valid from one direction? */
+  singleRigidSide?: Sides;
   /** Entities with a matching nonzero Id don't collide with each other */
   passThroughId?: number;
-
   /** The speed at which to rotate, in rotations per second */
   rotationSpeed?: number;
-
   /** Should the body be forced to be dynamic? */
   dynamic?: boolean;
+  /** Should the body be forced to be kinematic? */
+  kinematic?: boolean;
 }
 
 /**
- * GameCfg stores game-specific configuration values.  The programmer makes one
- * of these to tell JetLag how to run their game.
+ * JetLagGameConfig stores game-specific configuration values.  The programmer
+ * makes one of these to tell JetLag how to run their game.
  */
-export interface GameCfg {
+export interface JetLagGameConfig {
   /** How many pixels are equivalent to a meter in the game? */
   readonly pixelMeterRatio: number;
-
   /** The default game screen width, in pixels */
-  readonly defaultScreenWidth: number;
-
-  /** The default game screen height, in pixels */
-  readonly defaultScreenHeight: number;
-
+  readonly screenDimensions: { width: number, height: number };
   /** Should we adapt the game size based on the size of the browser window? */
   readonly adaptToScreenSize: boolean;
-
   /** Should the phone vibrate on certain events? */
   readonly canVibrate: boolean;
-
-  /** How verbose should we be with printing to the console? */
-  readonly verbosity: ErrorVerbosity;
-
   /** Should JetLag print an outline around each actor in the game? */
   readonly hitBoxes: boolean;
-
   /** Key for accessing persistent storage */
   readonly storageKey: string;
-
   /** The list of image files that can be used by the game */
   readonly imageNames: string[];
-
   /** The list of audio files that can be used as sound effects by the game */
   readonly soundNames: string[];
-
   /** The list of audio files that can be used as (looping) background music */
   readonly musicNames: string[];
-
   /** The prefix for all resources */
   readonly resourcePrefix: string;
-
-  /**
-   * Should we force the accelerometer to be off? 
-   *
-   * This is useful when developing on a laptop that actually *has* an
-   * accelerometer, because you probably don't want it in that case.
-   */
+  /** Should we force the accelerometer to be off (e.g., some laptops)?  */
   readonly forceAccelerometerOff: boolean;
-
-  /** The code that draws the main levels of the game */
-  readonly levelBuilder: (index: number) => void;
-
-  /** The code that draws the level chooser */
-  readonly chooserBuilder: (index: number) => void;
-
-  /** The code that draws the help screens */
-  readonly helpBuilder: (index: number) => void;
-
-  /** The code that draws the opening "splash" screen */
-  readonly splashBuilder: (index: number) => void;
-
-  /** The code that draws the store screens */
-  readonly storeBuilder: (index: number) => void;
 }
