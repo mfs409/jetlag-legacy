@@ -41,7 +41,7 @@ export class Stage {
   /** A heads-up display */
   public hud!: Scene;
   /** The tilt system for the stage */
-  public readonly tilt: TiltSystem;
+  readonly tilt: TiltSystem;
   /** Any pause, win, or lose scene that supersedes the world and hud */
   public overlay?: Scene;
   /** Background color for the stage being drawn.  Defaults to white */
@@ -263,7 +263,6 @@ export class Stage {
       this.switchTo(builder, level);
       this.renderer.startRenderLoop();
     });
-
   }
 
   /**

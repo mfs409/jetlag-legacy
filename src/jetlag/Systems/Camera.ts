@@ -130,8 +130,10 @@ export class CameraSystem {
   /**
    * Update a camera's bounds by providing a new maximum (X, Y) coordinate
    *
-   * @param maxX The new maximum X value (in meters)
-   * @param maxY The new maximum Y value (in meters)
+   * @param minX  The new minimum X value (in meters)
+   * @param minY  The new minimum Y value (in meters)
+   * @param maxX  The new maximum X value (in meters)
+   * @param maxY  The new maximum Y value (in meters)
    */
   public setBounds(minX: number | undefined, minY: number | undefined, maxX: number | undefined, maxY: number | undefined) {
     this.minX = minX;

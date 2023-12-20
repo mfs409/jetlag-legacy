@@ -57,3 +57,22 @@ JetLag is supposed to be a library that its users will hack for their own
 purposes.  Consequently, we prefer that programmers preserve the structure we
 have in the repository, where both `jetlag` and `game` are sub-folders of the
 `src` folder.
+
+## Contributors
+
+The following people have contributed to JetLag and its predecessors, LibLOL and
+ALE.  If you contributed, and we missed your name, please send a note reminding
+us to give you credit!
+
+- Mike Spear
+- Dan Spear
+- Greyson Parrelli
+- Jennifer Bayzick
+- Rachel Santangelo
+- Micah Carlisle
+- Maximilian Hasselbusch
+- Jimmy Johnson
+- Marc Soda
+- Égide Ntwari
+- Nana Nyanor
+- Sebastian Chavarro

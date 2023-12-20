@@ -28,7 +28,7 @@ export enum KeyCodes {
  * KeyboardService provides an interface for subscribing to keyboard events and
  * running callbacks when those events happen.
  *
- * TODO: This should be updated according to
+ * TODO: This may need to be updated according to
  * https://medium.com/@dovern42/handling-multiple-key-presses-at-once-in-vanilla-javascript-for-game-controllers-6dcacae931b7
  */
 export class KeyboardService {
