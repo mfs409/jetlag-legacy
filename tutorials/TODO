@@ -1,3 +1,5 @@
+# Unused tutorial text
+
 ## The Game Loop
 
 If you have taken an introductory computer science class, you've probably
@@ -31,7 +33,6 @@ corresponding event happens).
 
 ## Putting It All Together: Our First "Game"
 
-
 In LibLOL, the coordinate system starts in the bottom left corner.  So (0, 0) is bottom left, and as we move up and to the right, the y and x values get larger, respectively.
 
 The last important aspect here is the relationship between the units of the world and the units of the camera.  We're going to measure our world in meters, and our camera in pixels.  In LibLOL, there are 20 pixels per meter.  We're also going to assume that the camera is 960 pixels wide by 640 pixels high.  LibGDX will stretch our game to look nice on any phone, but starting with a 960x640 camera (which shows 48x32 meters) gives good resolution and a good width-to-height ratio for most phones.
@@ -45,15 +46,12 @@ The first step in learning to use liblol is understanding how the files are laid
 
 Let's start by taking a quick look at the way Android Studio should look when you get started:
 
-
-
-
 A World, and a Camera
 
 A Very Simple Level
 Now that we've gone over those details, we can start writing the levels of a game.  Remember that the game levels that you get when you check out the LibLOL code are meant to demonstrate how to use the code, and that you're encouraged to change them as you learn, and then replace them as you create your own game.  Let's take a look at level 1 of the demos:
 
-
+```java
         /*
          * In this level, all we have is a hero (the green ball) who needs to
          * make it to the destination (a mustard colored ball). The game is
@@ -90,6 +88,7 @@ Now that we've gone over those details, we can start writing the levels of a gam
             Destination.makeAsCircle(29, 26, 2, 2, "mustardball.png");
             Score.setVictoryDestination(1);
         }
+```
 
 There are only seven lines of code.  Let's work through them, one at a time.
 
@@ -103,8 +102,6 @@ Destination.makeAsCircle(29, 26, 2, 2, "mustardball.png") -- This draws the dest
 Score.setVictoryDestination(1) -- There are many ways to win a level... surviving for long enough, defeating enough enemies, collecting enough goodies, etc.  In this case, we are saying that once one hero reaches the destination, the level should end.
 You should feel free to modify these lines of code and see what happens.  Change numbers.  Delete lines.  In some cases, your game will still work.  In others, Android Studio will inform you that your code is no longer valid.  Once you get comfortable with level 1, move on to subsequent levels and start exploring.  Hopefully you'll find that LibLOL makes it easy to get very advanced effects using only a small number of lines of code.
 
-
-
 The Heads-Up Display
 There are times when we want to draw things on the camera, instead of in the world.  A great example of this is in Mario-style games.  No matter where the hero is, we want the time, number of lives, and coin count in the top-left corner.  Putting text in the world wouldn't work: as Mario moves, the text would scroll off the screen.  In a phone game, where touching the screen is a way of controlling the action, we might also want to draw buttons on the camera instead of the world.  
 
@@ -113,12 +110,13 @@ It is confusing to think of "drawing on the camera", so games use the term "head
 Callbacks
 Recall that a game is a simulation.  Part of what that means is that we can change the state of the simulation in response to special events, like screen touches.  But that also means we need to be able to provide code that doesn't run until the event happens.  Callbacks are a way of providing this functionality.  Consider the following code:
 
-
+```java
         Control.addCallbackControl(96, 186, 160, 80, "", new LolCallback() {
             public void onEvent() {
                 Lol.doHelp(1);
             }
         });
+```
 
 This code says "draw a button on the screen, and when the player presses it, run the code I'm providing".
 
@@ -129,8 +127,6 @@ Let's look at this code in more detail.  We are drawing a control with a bottom 
 What is important is the last part of the code: "new LolCallback() { ... });"  This is a lot of text, and in the end, it's just to say "run Lol.doHelp(1) when the control is pressed".  Java 1.8 provides a cleaner way of writing this code, but Android Studio doesn't support Java 1.8 yet.  When it does, this code will get a lot cleaner.
 
 If callbacks don't make complete sense right now, it's OK.  Most Computer Science programs don't teach callbacks (technically "anonymous classes") until students have a few semesters of experience.
-
-
 
 We turn on music with one line of code.
 Then we draw three invisible buttons over the "Help", "Play", and "Quit" text, with callbacks for switching to the help screens, switching to the chooser, or quitting the game.
@@ -145,8 +141,6 @@ This means you can see where the buttons are.  But is it necessary to guess abou
 In the screenshot above, I enabled the "Run" view in the bottom left corner.  Then I started the desktop version of the game, and I clicked once on an area of the game window.  As you can see, the log shows the screen coordinates (in pixels), corresponding to where on the "camera" I touched, and it also projects these to the world coordinates (in meters) where my touch would have happened in the physics world.
 
 Note, too, that there are a few error messages about LibLOL not finding image files.  These messages can be really helpful if you mistype a file name.  So for as annoying as it can be to have those boxes showing when you are developing your game, it's a good idea to keep them enabled until you're ready to put your game on the market.  Once you get used to them, they can save you a ton of time!
-
-
 
 ## All About Actors
 
@@ -171,21 +165,17 @@ Enemies can take all sorts of forms and shapes.  An invisible enemy at the botto
 
 There are a few ways to defeat an enemy.  As described above, you can defeat an enemy by colliding it with a hero, as long as the hero has more strength than the enemy has damage.  Enemies can also be marked so that they are defeated by colliding with a hero who is crawling or jumping (in which case the hero strength does not change).  By default, an invincible hero will defeat any enemy it touches (but you can disable this for certain enemies).  It's also possible to defeat an enemy by throwing projectiles at it, or by colliding it with an obstacle that has a collide callback.  Naturally, you can find examples of all these behaviors in the levels of the sample game.
 
-
 Obstacles
 
 This might sound trite, but when in doubt, consider using an obstacle.  Obstacles in LibLOL have grown from being static objects like walls and floors into being the primary mechanism for handling callbacks.  By using the "toggleCollisionEffect", you can make it so that your obstacle doesn't impede the movement of other actors, while still causing a callback to run.  There are many pre-defined callbacks (such as for boosting a hero's velocity when it collides with the obstacle).  When you can't find the behavior you need, your next best bet is to use a collision callback.  You can use these to defeat enemies (by calling remove() on the enemy), to win or lose the game, to change the score, etc.
 
 In another post, I'll talk about how to make "infinite" games by using collisions with obstacles as a way to know when to draw the next part of the level.
 
-
 Goodies
 
 Goodies are things that the hero collects.  As a hero collects goodies, they disappear, and they get added to one of four score counters.  It's possible to use these score counters as a way to activate destinations, or even to win the game ("win by collecting two apples, a banana, and six celery"). Goodies can be configured to increase the hero's strength, or to cause the hero to become invincible.
 
 When the level ends, the goodie counts get reset.  If you need to keep the counts for longer, you'll need to look at using a callback at the end of the level to add the scores to a session Fact or a game Fact.
-
-
 
 Projectiles
 
@@ -205,13 +195,11 @@ SVG Lines
 
 Depending on when you read this document, there might be an actor type for SVG lines.  If so, ignore it.  It's going away soon.
 
-
 All Actors
 
 There are behaviors and properties that are common to all actors, like animation, route-based movement, and collision callbacks.  Be sure to look at the LibLOL JavaDocs for more information.
 
-
-
+```typescript
   // Configure tilt: arrow keys will simulate gravitational force, with a
   // maximum of +- 10 in the X and Y dimensions.
   stage.tilt.tiltMax.Set(10, 10);
@@ -224,7 +212,7 @@ There are behaviors and properties that are common to all actors, like animation
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
   stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-
+``````
 
 *** Thinking about the Camera and Gravity (overview.ts; ready)
 **** Overview
@@ -233,6 +221,7 @@ simulator.  This will let us think about how we can use Box2D and Pixi.js to
 make games that seem like they are happening "in front of us" or where we're
 watching from above.
 **** An overhead game
+
 - The default is no physical forces
 - In this game, we won't have any movement in the x/y, but we will rotate
 - New things
@@ -261,8 +250,6 @@ watching from above.
 - Pass-through
 - Vertical parallax
 - Actual jumping
-
-
 
 ### Rigid Body
 
@@ -325,7 +312,6 @@ complex game, in which case you can always change them, or add more.
 - Passive: This role is for things that aren't supposed to be interactive, such
   as backgrounds and user interface text.
 
-
 An important concept is that you can put actors onto the *camera* instead of
 into the *world*.  This can be useful for informational text, user interface
 buttons, and other things that aren't part of the world, and that need to be
@@ -337,4 +323,3 @@ What are the files and paths that need to be changed right away?
 
 - Stuff in GameConfig.ts
 - Stuff in index.html
-
