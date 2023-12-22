@@ -105,7 +105,7 @@ export class ImageLibraryService {
   constructor(private config: JetLagGameConfig) {
     // Set the names of the graphics assets, but don't load them yet.
     for (let imgName of config.imageNames!)
-      Assets.add(imgName, config.resourcePrefix + imgName);
+      Assets.add({ alias: imgName, src: config.resourcePrefix + imgName });
   }
 
   /**
