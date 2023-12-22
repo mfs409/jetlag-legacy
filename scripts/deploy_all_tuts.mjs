@@ -15,6 +15,8 @@ const root_folder = path.join(path.dirname(fileURLToPath(import.meta.url)), ".."
 
 // Compute the destination folder where everything goes
 const dest_folder = path.join(root_folder, TUT_DIST_FOLDER);
+// We also need a font subfolder
+const font_folder = path.join(dest_folder, "fonts");
 
 // Compute source folder for the webapp
 const webapp_src_folder = path.join(root_folder, "src", "viewer");
@@ -25,10 +27,16 @@ const webapp_src = {
   folder: webapp_src_folder,
   ts: path.join(webapp_src_folder, "viewer.ts"),
   static_files: [
-    ["node_modules/katex/dist/", "katex.min.css"],
-    ["node_modules/highlight.js/styles/", "arta.min.css"],
-    ["tutorials/", "tutorials.html"],
-    ["tutorials/", "tutorials.css"],
+    ["node_modules/katex/dist/", "katex.min.css", ""],
+    ["node_modules/katex/dist/", "fonts/", "KaTeX_Main-Regular.ttf"],
+    ["node_modules/katex/dist/", "fonts/", "KaTeX_Main-Regular.woff"],
+    ["node_modules/katex/dist/", "fonts/", "KaTeX_Main-Regular.woff2"],
+    ["node_modules/katex/dist/", "fonts/", "KaTeX_Math-Italic.ttf"],
+    ["node_modules/katex/dist/", "fonts/", "KaTeX_Math-Italic.woff"],
+    ["node_modules/katex/dist/", "fonts/", "KaTeX_Math-Italic.woff2"],
+    ["node_modules/highlight.js/styles/", "arta.min.css", ""],
+    ["tutorials/", "tutorials.html", ""],
+    ["tutorials/", "tutorials.css", ""],
   ],
 }
 
@@ -41,6 +49,7 @@ const webapp_dest = {
 // Erase and re-build the output folder
 fs.rmSync(dest_folder, { recursive: true, force: true });
 fs.mkdirSync(dest_folder);
+fs.mkdirSync(font_folder);
 
 // Build the web app
 build_web_app(root_folder, webapp_src, webapp_dest);
@@ -120,7 +129,7 @@ function build_tutorial_game(target) {
 function build_web_app(root, src, dest) {
   // Copy the static files to the destination folder
   src.static_files.forEach(name => {
-    fs.copyFileSync(path.join(root, name[0], name[1]), path.join(dest.folder, name[1]))
+    fs.copyFileSync(path.join(root, name[0], name[1], name[2]), path.join(dest.folder, name[1], name[2]))
   });
 
   // Compile the web app into the destination folder
