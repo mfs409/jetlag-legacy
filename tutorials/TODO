@@ -1,0 +1,340 @@
+## The Game Loop
+
+If you have taken an introductory computer science class, you've probably
+learned to think about programming in a very specific way, where you write code,
+and that tells the computer what to do.  When you think about a game, this
+probably leads you to imagine code that would look like this:
+
+```typescript
+configure_world();
+while (!user_requested_to_exit_game()) {
+    handle_events();
+    update_screen();
+}
+```
+
+This is often referred to as an "event handling loop", "event processing loop",
+or just "event loop".
+
+Let's break it down a bit.  First, we set up the initial state of the game. Then
+there is a loop that runs over and over again, until
+`user_requested_to_exit_game` returns `true`.  Each time the loop runs, it
+checks for events, and uses them to update the stage (`handle_events()`).  Then
+it draws the game to the screen (`update_screen()`).
+
+JetLag is responsible for handling this loop.  But it's good to have this loop
+in mind, because it helps you to see how your code fits into the big picture.
+You'll write code that corresponds to `configure_world()`, and in it, you'll set
+up some scripts to run in response to certain events.  Then the game will start.
+`handle_events()` will use those scripts when appropriate (i.e., when the
+corresponding event happens).
+
+## Putting It All Together: Our First "Game"
+
+
+In LibLOL, the coordinate system starts in the bottom left corner.  So (0, 0) is bottom left, and as we move up and to the right, the y and x values get larger, respectively.
+
+The last important aspect here is the relationship between the units of the world and the units of the camera.  We're going to measure our world in meters, and our camera in pixels.  In LibLOL, there are 20 pixels per meter.  We're also going to assume that the camera is 960 pixels wide by 640 pixels high.  LibGDX will stretch our game to look nice on any phone, but starting with a 960x640 camera (which shows 48x32 meters) gives good resolution and a good width-to-height ratio for most phones.
+
+## Events
+
+## Out of date stuff
+
+Making Games in Liblol: Part 1: The Important Files
+The first step in learning to use liblol is understanding how the files are laid out, and what each file is expected to do.  In this tutorial, I'll cover the basics of what goes where, and how everything fits together.
+
+Let's start by taking a quick look at the way Android Studio should look when you get started:
+
+
+
+
+A World, and a Camera
+
+A Very Simple Level
+Now that we've gone over those details, we can start writing the levels of a game.  Remember that the game levels that you get when you check out the LibLOL code are meant to demonstrate how to use the code, and that you're encouraged to change them as you learn, and then replace them as you create your own game.  Let's take a look at level 1 of the demos:
+
+
+        /*
+         * In this level, all we have is a hero (the green ball) who needs to
+         * make it to the destination (a mustard colored ball). The game is
+         * configured to use tilt to control the hero.
+         */
+        if (whichLevel == 1) {
+            // set the screen to 48 meters wide by 32 meters high... this is
+            // important, because Config.java says the screen is 480x320, and
+            // LOL likes a 20:1 pixel to meter ratio. If we went smaller than
+            // 48x32, things would get really weird. And, of course, if you make
+            // your screen resolution higher in Config.java, these numbers would
+            // need to get bigger.
+            //
+            // Level.configure MUST BE THE FIRST LINE WHEN DRAWING A LEVEL!!!
+            Level.configure(48, 32);
+            // there is no default gravitational force
+            Physics.configure(0, 0);
+
+            // in this level, we'll use tilt to move some things around. The
+            // maximum force that tilt can exert on anything is +/- 10 in the X
+            // dimension, and +/- 10 in the Y dimension
+            Tilt.enable(10, 10);
+
+            // now let's create a hero, and indicate that the hero can move by
+            // tilting the phone. "greenball.png" must be registered in
+            // the registerMedia() method, which is also in this file. It must
+            // also be in your android game's assets folder.
+            Hero h = Hero.makeAsCircle(4, 17, 3, 3, "greenball.png");
+            h.setMoveByTilting();
+
+            // draw a circular destination, and indicate that the level is won
+            // when the hero reaches the destination. "mustardball.png" must be
+            // registered in registerMedia()
+            Destination.makeAsCircle(29, 26, 2, 2, "mustardball.png");
+            Score.setVictoryDestination(1);
+        }
+
+There are only seven lines of code.  Let's work through them, one at a time.
+
+Level.configure() -- This line should always be the first line of code when drawing a level.  It is responsible for saying how big the physical world is for this game.  We've made it 48 meters x 32 meters, which is as small as a level can be, given the size of our camera and our pixel-to-meter ratio.  In general, if you're making a non-scrolling game, these dimensions are good.  When this line of code finishes, there is a physical world into which we can place actors.
+Physics.configure(0, 0) -- This line indicates that there are no default forces acting on actors in the level.  This makes sense for a game where the player is supposed to be looking down at the action.  For a Mario-style game, where the view is from the side, (0, -10) is a common setting.
+Tilt.enable(10, 10) -- This level is going to use the tilt of the phone (note: when running on the desktop, use the arrows to simulate tilt).  The numbers passed to this function set thresholds for how much force you can produce via tilting.  In this case, no matter how steep the angle, we'll say that the phone produces no more than 10 units of force.
+Hero.makeAsCircle(4, 17, 3, 3, "greenball.png") -- This line creates an actor who is a "hero".  The hero will be drawn such that it is 3 meters wide by 3 meters high, and its bottom left corner will be at the coordinate (4, 17).  If that didn't make sense, take a look at the following image, which would correspond to Hero.makeAsCircle(7, 10, 3, 3, "greenball.png")
+
+h.setMoveByTilting() -- This indicates that the hero we just made is going to be controlled by the tilt of the phone.
+Destination.makeAsCircle(29, 26, 2, 2, "mustardball.png") -- This draws the destination (the place the hero must reach).
+Score.setVictoryDestination(1) -- There are many ways to win a level... surviving for long enough, defeating enough enemies, collecting enough goodies, etc.  In this case, we are saying that once one hero reaches the destination, the level should end.
+You should feel free to modify these lines of code and see what happens.  Change numbers.  Delete lines.  In some cases, your game will still work.  In others, Android Studio will inform you that your code is no longer valid.  Once you get comfortable with level 1, move on to subsequent levels and start exploring.  Hopefully you'll find that LibLOL makes it easy to get very advanced effects using only a small number of lines of code.
+
+
+
+The Heads-Up Display
+There are times when we want to draw things on the camera, instead of in the world.  A great example of this is in Mario-style games.  No matter where the hero is, we want the time, number of lives, and coin count in the top-left corner.  Putting text in the world wouldn't work: as Mario moves, the text would scroll off the screen.  In a phone game, where touching the screen is a way of controlling the action, we might also want to draw buttons on the camera instead of the world.  
+
+It is confusing to think of "drawing on the camera", so games use the term "heads-up display", or HUD, to refer to anything drawn on the camera.  In LibLOL, we can put information (images and text) onto the HUD through the "Display" feature, and we can put buttons onto the HUD through the "Control" feature.
+
+Callbacks
+Recall that a game is a simulation.  Part of what that means is that we can change the state of the simulation in response to special events, like screen touches.  But that also means we need to be able to provide code that doesn't run until the event happens.  Callbacks are a way of providing this functionality.  Consider the following code:
+
+
+        Control.addCallbackControl(96, 186, 160, 80, "", new LolCallback() {
+            public void onEvent() {
+                Lol.doHelp(1);
+            }
+        });
+
+This code says "draw a button on the screen, and when the player presses it, run the code I'm providing".
+
+In truth, most of the code for making controls in LibLOL is much simpler than this, because I provide the code to run when the button is pressed.  You don't need to write your own callbacks for jumping, running, ducking, throwing projectiles, and so on.  Callback controls are really only for custom behaviors.  But since they're there, I wanted to demo them, and what better place than the splash screen?
+
+Let's look at this code in more detail.  We are drawing a control with a bottom left coordinate of (96, 186), a width of 160, and a height of 80.  We are not providing an image for the control (""), and hence it is invisible.  We could give an image, which would be drawn on top of the world.  We could give a partially-transparent image, too, so that the world would be visible through the image of the control.  But that's not important right now.
+
+What is important is the last part of the code: "new LolCallback() { ... });"  This is a lot of text, and in the end, it's just to say "run Lol.doHelp(1) when the control is pressed".  Java 1.8 provides a cleaner way of writing this code, but Android Studio doesn't support Java 1.8 yet.  When it does, this code will get a lot cleaner.
+
+If callbacks don't make complete sense right now, it's OK.  Most Computer Science programs don't teach callbacks (technically "anonymous classes") until students have a few semesters of experience.
+
+
+
+We turn on music with one line of code.
+Then we draw three invisible buttons over the "Help", "Play", and "Quit" text, with callbacks for switching to the help screens, switching to the chooser, or quitting the game.
+We draw a mute button as an obstacle.  We put a callback on the obstacle to toggle the state of the speakers (muted or unmuted).  The callback also changes the obstacle's image to correspond to the speaker state.
+The mute button is definitely the trickiest part.  If it doesn't make sense, don't worry about it.  If you have a mute button, you'll probably only be concerned about where to put it, its size, and what images to use.  You should be able to figure out how to change those aspects of the code pretty easily.
+
+Taking Advantage of Debug Support
+One of the most common questions students ask is "How do I know what values to use for the coordinates of my buttons?  There's a nice trick here.  In MyGame.java, the configure() function can set "mShowDebugBoxes" to true or false.  When it's true, and I play the game, every control in the game will be outlined, as will every actor.  In the splash screen, it looks like this:
+
+This means you can see where the buttons are.  But is it necessary to guess about button placement?  Not really.  When the debug boxes are enabled, then LibLOL also prints diagnostic information on every click.  Let's take a look:
+
+In the screenshot above, I enabled the "Run" view in the bottom left corner.  Then I started the desktop version of the game, and I clicked once on an area of the game window.  As you can see, the log shows the screen coordinates (in pixels), corresponding to where on the "camera" I touched, and it also projects these to the world coordinates (in meters) where my touch would have happened in the physics world.
+
+Note, too, that there are a few error messages about LibLOL not finding image files.  These messages can be really helpful if you mistype a file name.  So for as annoying as it can be to have those boxes showing when you are developing your game, it's a good idea to keep them enabled until you're ready to put your game on the market.  Once you get used to them, they can save you a ton of time!
+
+
+
+## All About Actors
+
+All About Actors
+Within a level of your game, just about everything of interest involves an actor.  The idea behind an actor is that it encapsulates a visible thing in the game world, and that it can be involved in collisions.
+
+There are different types of actors in a game.  In LibLOL, there are some pre-defined kinds of actors, and they have certain behaviors and properties attached to them, as described below:
+
+Heroes
+
+The hero is usually, but not always, the focal point of the game.  Whenever a hero collides with something, it's probably important: it could be an enemy that causes harm to the hero, an obstacle that re-enables the hero's ability to jump, a goodie to collect, etc.
+
+Every hero in the game has a certain amount of strength (initially set to 1), and when a hero's strength drops to 0, that hero is removed from the game.  If all the heroes are gone, then the level ends in defeat.  You can also specify that once a certain number of heroes are gone, the level ends in defeat, to capture the idea that you need to keep 3 of 5 heroes from being defeated.
+
+Heroes are usually the focal point for controlling the movement of the game.  In tilt games, the hero usually moves with the tilt of the phone, and otherwise there are usually buttons for making the hero move, jump, and duck.  But that's not always the case.  For example, sometimes it's useful to have an invisible enemy at the bottom of the screen, with enemies falling from the sky.
+
+Enemies
+
+These are the "bad guys" in a game.  They have an amount of damage assigned to them, so that whenever the hero collides with the enemy, it loses strength.  Strictly speaking, when a hero collides with an enemy, we check if the hero strength is greater than the enemy's damage value.  If it is, the hero's strength decreases and the enemy disappears.  Otherwise, the enemy's damage decreases and the hero disappears.
+
+Enemies can take all sorts of forms and shapes.  An invisible enemy at the bottom of a pit is a good way to detect when the hero fails to make a tricky jump.  Every fireball shooting from the dragon's mouth is probably an enemy.  Spikes and fires are probably enemies.  And actors who move around and get in the way of the hero are often enemies.
+
+There are a few ways to defeat an enemy.  As described above, you can defeat an enemy by colliding it with a hero, as long as the hero has more strength than the enemy has damage.  Enemies can also be marked so that they are defeated by colliding with a hero who is crawling or jumping (in which case the hero strength does not change).  By default, an invincible hero will defeat any enemy it touches (but you can disable this for certain enemies).  It's also possible to defeat an enemy by throwing projectiles at it, or by colliding it with an obstacle that has a collide callback.  Naturally, you can find examples of all these behaviors in the levels of the sample game.
+
+
+Obstacles
+
+This might sound trite, but when in doubt, consider using an obstacle.  Obstacles in LibLOL have grown from being static objects like walls and floors into being the primary mechanism for handling callbacks.  By using the "toggleCollisionEffect", you can make it so that your obstacle doesn't impede the movement of other actors, while still causing a callback to run.  There are many pre-defined callbacks (such as for boosting a hero's velocity when it collides with the obstacle).  When you can't find the behavior you need, your next best bet is to use a collision callback.  You can use these to defeat enemies (by calling remove() on the enemy), to win or lose the game, to change the score, etc.
+
+In another post, I'll talk about how to make "infinite" games by using collisions with obstacles as a way to know when to draw the next part of the level.
+
+
+Goodies
+
+Goodies are things that the hero collects.  As a hero collects goodies, they disappear, and they get added to one of four score counters.  It's possible to use these score counters as a way to activate destinations, or even to win the game ("win by collecting two apples, a banana, and six celery"). Goodies can be configured to increase the hero's strength, or to cause the hero to become invincible.
+
+When the level ends, the goodie counts get reset.  If you need to keep the counts for longer, you'll need to look at using a callback at the end of the level to add the scores to a session Fact or a game Fact.
+
+
+
+Projectiles
+
+Projectiles are things the hero throws.  Normally, the idea is that the hero throws projectiles at the enemy, to defeat it.  But don't let that get in the way of being creative... perhaps the projectile is a basketball, and the enemy is an invisible spot in the middle of the basketball hoop, so that each successful basket gets counted via the mechanism for defeating enemies.
+
+If we made a projectile every time a projectile needed to be thrown, we could end up making thousands of projectiles.  That would be inefficient.  Instead, LibLOL has a projectile pool.  Once you've configured the pool, any attempt to throw a projectile begins by choosing one from the pool.  This is more efficient when your game is running, but it saves you code, too, since you can configure a pool once, and then avoid configuring each projectile that is thrown.
+
+Projectiles always are thrown by a hero, and they depart from some point on the hero's body.  The offset parameters to the pool specify where the projectile should start.
+
+When throwing a projectile, there are two techniques: you can either throw at a fixed velocity, or you can throw at an angle.  This latter technique is very nice: when you press the screen, the hero will throw toward the point that you pressed.  By altering the projectile gravity, and by modifying how it behaves upon collision with obstacles, you can achieve projectiles that behave like bullets, grenades, and basketballs, to name a few.
+
+Destinations
+
+Some games, especially mazes, require a hero to reach a destination.  In LibLOL, there is a special actor for this.  Destinations are pretty simple: they can hold as many heroes as you allow them to hold, and they can be configured so that they don't hold any heroes until a certain score is achieved (a certain number of goodies are collected).
+
+SVG Lines
+
+Depending on when you read this document, there might be an actor type for SVG lines.  If so, ignore it.  It's going away soon.
+
+
+All Actors
+
+There are behaviors and properties that are common to all actors, like animation, route-based movement, and collision callbacks.  Be sure to look at the LibLOL JavaDocs for more information.
+
+
+
+  // Configure tilt: arrow keys will simulate gravitational force, with a
+  // maximum of +- 10 in the X and Y dimensions.
+  stage.tilt.tiltMax.Set(10, 10);
+  // Pressing a key will induce a force, releasing will stop inducing that force
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
+  stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
+  stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
+
+
+*** Thinking about the Camera and Gravity (overview.ts; ready)
+**** Overview
+In this tutorial, we will explore ideas related to the camera and the physics
+simulator.  This will let us think about how we can use Box2D and Pixi.js to
+make games that seem like they are happening "in front of us" or where we're
+watching from above.
+**** An overhead game
+- The default is no physical forces
+- In this game, we won't have any movement in the x/y, but we will rotate
+- New things
+  - Timer for the enemies (an event)!
+  - New role: projectiles!
+  - Emphasize that this is a *bad* way to do projectiles (no limit, no
+    range), but for this tutorial, it's good enough.
+  - Winning and losing, win on enemy count
+  - New role: enemies
+  - PathMovement, ProjectileMovement
+- Talk about default strength for heroes and enemies
+**** Another overhead game, with a bigger map
+- Just to show that we can do it
+- Adds some zooming, but talks about how it's a tad janky
+**** A Side Scroller
+- Camera follows the hero
+- Gravity
+- Border Obstacles
+- Jumping isn't really jumping, we'll get to that later on
+- Tap gesture on the hero
+- Destination win condition
+- Time limit
+- Putting stuff on the HUD
+**** A Vertical Scroller
+- Elasticity
+- Pass-through
+- Vertical parallax
+- Actual jumping
+
+
+
+### Rigid Body
+
+The *Rigid Body* of an actor is the shape that represents it within the physics
+simulation.  *Every actor* has a rigid body.  The rigid body can be a circle, a
+rectangle ("box"), or a convex polygon.
+
+### Appearance
+
+The *Appearance* of an actor describes how to display it.  The simplest
+appearance is to show a single picture.  Since pictures are always rectangular,
+it's usually a good idea to use `.png` images when making the images for your
+game, because `.png` images can have transparency.  This lets your image match
+the shape defined by the actor's rigid body.
+
+There are two other options for an actor's appearance.  We can flip between a
+series of images, to create an animation, or we can use text as the appearance.
+We'll study these more in a later tutorial.
+
+### Movement
+
+Actors can move around in the game.  The way we move them can depend on quite a
+few factors.  The *Movement* component of an actor specifies the rules for how a
+certain actor moves.  JetLag provides several pre-made movement profiles, or you
+can add your own:
+
+- Path: This lets an actor move along a fixed path
+- Tilt: This is for actors who move in response to phone tilt events
+- Drag: This is for actors who move in response to drag gestures
+- Chase: This causes an actor to chase another actor
+- ChaseFixed: This causes an actor to chase another actor, with a fixed velocity
+- Flick: This leads an actor to move in response to flick gestures
+- Hover: This will cause the actor to hover in one place on the screen, even as
+  the camera moves.
+- HoverFlick: If you want an actor to hover, immune to gravity, until it is
+  flicked, you can use this.
+- Projectile: This is a special movement policy just for projectiles.
+- Gravity: This lets an actor move in response to gravity.
+- Explicit: This is for when you will be manually altering the actor's movement.
+  It is most frequently used with keyboard or tap controls.
+- Inert: This is for when your actor never moves.
+
+### Role
+
+In the early stages of your game design, it can be useful to have pre-defined
+roles for the actors in your game.  The *Role* component provides several
+pre-made roles.  You might find that these roles are too restrictive in a
+complex game, in which case you can always change them, or add more.
+
+- Hero: The focal point of the game.  Usually the camera follows the hero, and
+  the hero must not run out of strength.
+- Enemy: Things that reduce the hero's strength
+- Goodie: Things the hero can collect to get points
+- Destination: A place the hero must reach in order to win a level
+- Obstacle: Obstacles include things like walls, but tend to be used for much
+  more.
+- Sensor: Sensors detect when a hero collides with them, and run a script in
+  response to the collision.
+- Projectile: This role should only be used by the Projectile system
+- Passive: This role is for things that aren't supposed to be interactive, such
+  as backgrounds and user interface text.
+
+
+An important concept is that you can put actors onto the *camera* instead of
+into the *world*.  This can be useful for informational text, user interface
+buttons, and other things that aren't part of the world, and that need to be
+visible all the time.
+
+## Making It Yours
+
+What are the files and paths that need to be changed right away?
+
+- Stuff in GameConfig.ts
+- Stuff in index.html
+

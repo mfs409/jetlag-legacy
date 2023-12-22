@@ -64,7 +64,7 @@ function builder(level: number) {
       let rigidBody = new CircleBody({ radius: 0.125, cx: -100, cy: -100 });
       rigidBody.setCollisionsEnabled(true);
       let appearance = new FilledCircle({ radius: .125, fillColor: "#bbbbbb", z: 0 });
-      let role = new Projectile({ damage: 1, disappearOnCollide: true });
+      let role = new Projectile();
       new Actor({ appearance, rigidBody, movement: new ProjectileMovement(), role });
       role.tossAt(x, y, x + scale * dx, y + scale * dy, h, 0, 0);
     });
@@ -317,7 +317,9 @@ function builder(level: number) {
       rigidBody: new BoxBody({ cx: 17, cy: -9, width: .1, height: 36 }),
       role: new Enemy(),
     });
-
+    stage.score.onLose = { level: level, builder: builder }
+    // Note that there's an intentional bug in this code: these enemies don't go
+    // as high as they should.  Can you tell why?
 
     let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -325,18 +327,16 @@ function builder(level: number) {
       movement: new TiltMovement(),
       role: new Hero(),
     });
-
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => (h.role as Hero).jump(0, -10));
-
     stage.world.camera.setCameraFocus(h, 0, -2);
+    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => (h.role as Hero).jump(0, -10));
 
     new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "mustard_ball.png" }),
       rigidBody: new CircleBody({ cx: 15, cy: -26, radius: 0.5 }),
       role: new Destination(),
     });
-
     stage.score.setVictoryDestination(1);
+    stage.score.onWin = { level: level, builder: builder }
 
     // create a platform that we can jump through from below
     function platform(cx: number, cy: number) {
@@ -358,13 +358,10 @@ function builder(level: number) {
     platform(5, -21.5);
     platform(6, -24.5);
 
-    stage.score.onWin = { level: level, builder: builder }
-    stage.score.onLose = { level: level, builder: builder }
-    stage.score.setVictoryDestination(1);
-
+    // Set up a nice background
     let animations = new Map();
     animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 550, repeat: true, images: ["night_0.png", "night_1.png"] }))
-    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5 }, imageMaker: () => new AnimatedSprite({ width: 16, height: 9, animations }), speed: 0, isHorizontal: false, isAuto: false });
+    stage.background.addLayer({ anchor: { cx: 8, cy: 4.5 }, imageMaker: () => new AnimatedSprite({ width: 16, height: 9, animations }), speed: 0.3, isHorizontal: false, isAuto: false });
   }
 }
 
