@@ -795,10 +795,10 @@ export class Projectile extends Role {
    * direction
    *
    * @param actor     The actor who is performing the toss
-   * @param offsetX   The x distance between the top left of the projectile and
-   *                  the top left of the actor tossing the projectile
-   * @param offsetY   The y distance between the top left of the projectile and
-   *                  the top left of the actor tossing the projectile
+   * @param offsetX   The x distance between the center of the projectile and
+   *                  the center of the actor tossing the projectile
+   * @param offsetY   The y distance between the center of the projectile and
+   *                  the center of the actor tossing the projectile
    * @param velocityX The X velocity of the projectile when it is tossed
    * @param velocityY The Y velocity of the projectile when it is tossed
    */
@@ -827,10 +827,10 @@ export class Projectile extends Role {
    * @param toX     X coordinate of the point at which to toss
    * @param toY     Y coordinate of the point at which to toss
    * @param actor   The actor who is performing the toss
-   * @param offsetX The x distance between the top left of the projectile and
-   *                the top left of the actor tossing the projectile
-   * @param offsetY The y distance between the top left of the projectile and
-   *                the top left of the actor tossing the projectile
+   * @param offsetX The x distance between the center of the projectile and
+   *                the center of the actor tossing the projectile
+   * @param offsetY The y distance between the center of the projectile and
+   *                the center of the actor tossing the projectile
    */
   public tossAt(fromX: number, fromY: number, toX: number, toY: number, actor: Actor, offsetX: number, offsetY: number) {
     // Get the actor, set its appearance, enable it
