@@ -51,12 +51,14 @@ function builder(level: number) {
     // We will use tilt to control the hero, with arrow keys simulating
     // tilt on devices that lack an accelerometer
     enableTilt(10, 10);
+    boundingBox();
 
     // The actor who can move
     new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
       movement: new TiltMovement(), // This makes it dynamic
+      role: new Hero(),
     });
 
     new Actor({
@@ -84,6 +86,16 @@ function builder(level: number) {
 
     // Let's have a bounding box
     boundingBox();
+
+    enableTilt(10, 10);
+
+    // The actor who can move
+    new Actor({
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
+      movement: new TiltMovement(), // This makes it dynamic
+      role: new Hero(),
+    });
 
     let s = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "purple_ball.png" }),
@@ -288,7 +300,9 @@ function builder(level: number) {
       role: new Obstacle(),
     });
 
-    boundingBox();
+    let walls = boundingBox();
+    walls.b.rigidBody.setPhysics({ friction: .4 });
+    walls.l.rigidBody.setPhysics({ elasticity: .2 });
     // Be sure to play around with the arrow keys to make things collide
   }
 
@@ -339,129 +353,116 @@ function builder(level: number) {
     });
 
     // A circle.  Tap it to make it shrink a little bit
-    let shrinkCircle = new Actor({
+    new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#FF0000" }),
       rigidBody: new CircleBody({ cx: 2, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkCircle.extra.radius *= .8; shrinkCircle.resize(2, 2, 2 * shrinkCircle.extra.radius, 2 * shrinkCircle.extra.radius); return true; } },
+      gestures: { tap: (shrinkCircle) => { shrinkCircle.resize(.8); return true; } },
       role: new Obstacle(),
       extra: { radius: .5 }
     });
 
     // A box.  Tap it to make it shrink a little bit
-    let shrinkBox = new Actor({
+    new Actor({
       appearance: new FilledBox({ width: 1, height: 2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 4, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkBox.extra.w *= .8; shrinkBox.extra.h *= .8; shrinkBox.resize(4, 2, shrinkBox.extra.w, shrinkBox.extra.h); return true; } },
+      gestures: { tap: (shrinkBox) => { shrinkBox.resize(.8); return true; } },
       role: new Obstacle(),
-      extra: { w: 1, h: 2 }
     });
 
     // A circle.  Tap it to make it grow a little bit
-    let growCircle = new Actor({
+    new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#0000FF" }),
       rigidBody: new CircleBody({ cx: 2, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growCircle.extra.radius *= 1.2; growCircle.resize(2, 5, 2 * growCircle.extra.radius, 2 * growCircle.extra.radius); return true; } },
+      gestures: { tap: (growCircle) => { growCircle.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { radius: .5 }
     });
 
     // A box.  Tap it to make it grow a little bit
-    let growBox = new Actor({
+    new Actor({
       appearance: new FilledBox({ width: 1, height: 2, fillColor: "#0000FF" }),
       rigidBody: new BoxBody({ cx: 4, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growBox.extra.w *= 1.2; growBox.extra.h *= 1.2; growBox.resize(4, 5, growBox.extra.w, growBox.extra.h); return true; } },
+      gestures: { tap: (growBox) => { growBox.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { w: 1, h: 2 }
     });
 
     // A circle with an image.  Tap it to make it shrink a little bit
-    let shrinkCircleImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkCircleImage.extra.radius *= .8; shrinkCircleImage.resize(6, 2, 2 * shrinkCircleImage.extra.radius, 2 * shrinkCircleImage.extra.radius); return true; } },
+      gestures: { tap: (shrinkCircleImage) => { shrinkCircleImage.resize(.8); return true; } },
       role: new Obstacle(),
-      extra: { radius: .5 }
     });
 
     // A box with an image.  Tap it to make it shrink a little bit
-    let shrinkBoxImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "red_ball.png" }),
       rigidBody: new BoxBody({ cx: 8, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkBoxImage.extra.w *= .8; shrinkBoxImage.extra.h *= .8; shrinkBoxImage.resize(8, 2, shrinkBoxImage.extra.w, shrinkBoxImage.extra.h); return true; } },
+      gestures: { tap: (shrinkBoxImage) => { shrinkBoxImage.resize(.8); return true; } },
       role: new Obstacle(),
-      extra: { w: 1, h: 2 }
     });
 
     // A circle with an image.  Tap it to make it grow a little bit
-    let growCircleImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growCircleImage.extra.radius *= 1.2; growCircleImage.resize(6, 5, 2 * growCircleImage.extra.radius, 2 * growCircleImage.extra.radius); return true; } },
+      gestures: { tap: (growCircleImage) => { growCircleImage.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { radius: .5 }
     });
 
     // A box with an image.  Tap it to make it grow a little bit
-    let growBoxImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "blue_ball.png" }),
       rigidBody: new BoxBody({ cx: 8, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growBoxImage.extra.w *= 1.2; growBoxImage.extra.h *= 1.2; growBoxImage.resize(8, 5, growBoxImage.extra.w, growBoxImage.extra.h); return true; } },
+      gestures: { tap: (growBoxImage) => { growBoxImage.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { w: 1, h: 2 }
     });
 
     // A circle with text.  Tap it to make it shrink a little bit
-    let shrinkCircleText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#FF0000" }, "hello"),
       rigidBody: new CircleBody({ cx: 10, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkCircleText.extra.radius *= .8; shrinkCircleText.resize(10, 2, 2 * shrinkCircleText.extra.radius, 10 * shrinkCircleText.extra.radius); return true; } },
+      gestures: { tap: (shrinkCircleText) => { shrinkCircleText.resize(.8); return true; } },
       role: new Obstacle(),
-      extra: { radius: .5 }
     });
 
     // A box with text.  Tap it to make it shrink a little bit
-    let shrinkBoxText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#FF0000" }, "hello"),
       rigidBody: new BoxBody({ cx: 12, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkBoxText.extra.w *= .8; shrinkBoxText.extra.h *= .8; shrinkBoxText.resize(12, 2, shrinkBoxText.extra.w, shrinkBoxText.extra.h); return true; } },
+      gestures: { tap: (shrinkBoxText) => { shrinkBoxText.resize(.8); return true; } },
       role: new Obstacle(),
-      extra: { w: 1, h: 2 }
     });
 
     // A circle with text.  Tap it to make it grow a little bit
-    let growCircleText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#0000FF" }, "hello"),
       rigidBody: new CircleBody({ cx: 10, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growCircleText.extra.radius *= 1.2; growCircleText.resize(10, 5, 2 * growCircleText.extra.radius, 2 * growCircleText.extra.radius); return true; } },
+      gestures: { tap: (growCircleText) => { growCircleText.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { radius: .5 }
     });
 
     // A box with text.  Tap it to make it grow a little bit
-    let growBoxText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#0000FF" }, "hello"),
       rigidBody: new BoxBody({ cx: 12, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growBoxText.extra.w *= 1.2; growBoxText.extra.h *= 1.2; growBoxText.resize(12, 5, growBoxText.extra.w, growBoxText.extra.h); return true; } },
+      gestures: { tap: (growBoxText) => { growBoxText.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { w: 1, h: 2 }
     });
 
     // A polygon.  Tap it to make it shrink a little bit
-    let shrinkPoly = new Actor({
+    new Actor({
       appearance: new FilledPolygon({ vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#FF0000" }),
       rigidBody: new PolygonBody({ cx: 14, cy: 2, vertices: [-1, -1, 0, 1, -1, 1] }),
-      gestures: { tap: () => { shrinkPoly.extra.w *= .8; shrinkPoly.extra.h *= .8; shrinkPoly.resize(14, 2, shrinkPoly.extra.w, shrinkPoly.extra.h); return true; } },
+      gestures: { tap: (shrinkPoly) => { shrinkPoly.resize(.8); return true; } },
       role: new Obstacle(),
-      extra: { w: 2, h: 2 }
     });
 
     // A polygon.  Tap it to make it grow a little bit
-    let growPoly = new Actor({
+    new Actor({
       appearance: new FilledPolygon({ vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#0000FF" }),
       rigidBody: new PolygonBody({ cx: 14, cy: 5, vertices: [-1, -1, 0, 1, -1, 1] }),
-      gestures: { tap: () => { growPoly.extra.w *= 1.2; growPoly.extra.h *= 1.2; growPoly.resize(14, 5, growPoly.extra.w, growPoly.extra.h); return true; } },
+      gestures: { tap: (growPoly) => { growPoly.resize(1.2); return true; } },
       role: new Obstacle(),
-      extra: { w: 2, h: 2 }
     });
   }
 

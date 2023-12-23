@@ -70,7 +70,7 @@ const tut_src = {
   md: [
     "assets_audio_animations", "camera_gravity", "collisions",
     "endless_runner_game", "gestures", "getting_started",
-    "joints", "maze_game", "movement_physics",
+    "joints", "maze_game", "movement_physics_1", "movement_physics_2",
     "overhead_fight_farm_game", "overview", "package_desktop",
     "package_mobile", "platformer_game", "projectiles",
     "roles", "score", "simulation_conway",

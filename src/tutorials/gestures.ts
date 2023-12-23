@@ -156,7 +156,7 @@ function builder(level: number) {
     let scale = 2;
     // here's code for moving the hero, based on how hard we're pushing the
     // joystick and where the touch is relative to the joystick center
-    function doMove(hudCoords: { x: number; y: number }) {
+    function doMove(_actor: Actor, hudCoords: { x: number; y: number }) {
       (hero.movement as ManualMovement).setAbsoluteVelocity(scale * (hudCoords.x - jcx), scale * (hudCoords.y - jcy));
       return true;
     }
@@ -211,7 +211,7 @@ function builder(level: number) {
       appearance: new FilledBox({ width: 0.1, height: 0.1, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 2.25, width: 16, height: 4.5 }, { scene: stage.hud }), // put it on the HUD
       gestures: {
-        tap: (hudMeters: { x: number, y: number }) => {
+        tap: (_actor: Actor, hudMeters: { x: number, y: number }) => {
           // We need to translate the coordinates from the HUD to the world.  We
           // do that by turning them into screen coordinates, then turning them
           // back.
@@ -266,7 +266,7 @@ function builder(level: number) {
     // use this local variable (but we *could* use "level" storage)
     let foundActor: Actor | undefined;
     // pan start updates foundActor if there is an actor where the touch began
-    let panStart = (hudCoords: { x: number; y: number }) => {
+    let panStart = (_actor: Actor, hudCoords: { x: number; y: number }) => {
       // Turn HUD coordinates to world coordinates
       let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
       let world_coords = stage.world.camera.screenToMeters(pixels.x, pixels.y);
@@ -281,7 +281,7 @@ function builder(level: number) {
     };
 
     // pan move changes the actor's position
-    let panMove = (hudCoords: { x: number; y: number }) => {
+    let panMove = (_actor: Actor, hudCoords: { x: number; y: number }) => {
       // If we have an Actor, move it using the translated coordinates
       if (!foundActor) return false;
       let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
@@ -342,7 +342,7 @@ function builder(level: number) {
 
     // A swipe gesture consists of starting coordinates and ending coordinates,
     // as well as the amount of time the swipe took
-    let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
+    let swipe = (_actor: Actor, hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
       // Convert starting coordinates from hud to world
       let screenCoord1 = stage.hud.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
       let worldCoord1 = stage.world.camera.screenToMeters(screenCoord1.x, screenCoord1.y);
@@ -416,7 +416,7 @@ function builder(level: number) {
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: stage.hud }),
       gestures: {
-        tap: (hudCoords: { x: number; y: number }) => {
+        tap: (_actor: Actor, hudCoords: { x: number; y: number }) => {
           if (!lastTapActor) return false;
           let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
           let meters = stage.world.camera.screenToMeters(pixels.x, pixels.y);
@@ -497,7 +497,7 @@ function builder(level: number) {
     function addToggleButton(actor: Actor, whileDownAction: () => void, onUpAction: (coords: { x: number; y: number }) => void) {
       let active = false; // will be captured by lambdas below
       let touchDown = () => { active = true; return true; };
-      let touchUp = (hudCoords: { x: number; y: number }) => {
+      let touchUp = (_actor: Actor, hudCoords: { x: number; y: number }) => {
         if (!active) return false;
         active = false;
         onUpAction(hudCoords);
@@ -572,7 +572,7 @@ function builder(level: number) {
     });
 
     // Set up a "swipe" zone on the HUD, for swiping that hero
-    let swipe = (hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
+    let swipe = (_actor: Actor, hudCoord1: { x: number; y: number }, hudCoord2: { x: number; y: number }, time: number) => {
       // Convert starting coordinates from hud to world
       let screenCoord1 = stage.hud.camera.metersToScreen(hudCoord1.x, hudCoord1.y);
       let worldCoord1 = stage.world.camera.screenToMeters(screenCoord1.x, screenCoord1.y);

@@ -176,7 +176,7 @@ function builder(level: number) {
     let v = new b2Vec2(0, 0);
     let isHolding = false;
     // On the initial touch, figure out where in the world it's happening
-    let touchDown = (hudCoords: { x: number; y: number }) => {
+    let touchDown = (_actor: Actor, hudCoords: { x: number; y: number }) => {
       isHolding = true;
       let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
       let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
@@ -331,7 +331,7 @@ function builder(level: number) {
 
     let v = new b2Vec2(0, 0);
     let isHolding = false;
-    let touchDown = (hudCoords: { x: number; y: number }) => {
+    let touchDown = (_actor: Actor, hudCoords: { x: number; y: number }) => {
       isHolding = true;
       let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
       let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
@@ -440,7 +440,7 @@ function builder(level: number) {
       appearance: new FilledBox({ width: 15, height: 9, fillColor: "#00000000" }),
       rigidBody: new BoxBody({ cx: 8.5, cy: 4.5, width: 15, height: 9 }, { scene: stage.hud }),
       gestures: {
-        tap: (hudCoords: { x: number; y: number }) => {
+        tap: (_actor: Actor, hudCoords: { x: number; y: number }) => {
           let pixels = stage.hud.camera.metersToScreen(hudCoords.x, hudCoords.y);
           let world = stage.world.camera.screenToMeters(pixels.x, pixels.y);
           let p = projectiles.get(); if (!p) return true;
