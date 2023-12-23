@@ -387,37 +387,31 @@ export class CircleBody extends RigidBodyBase {
   }
 
   /**
-   * Resize and re-center a CircleBody
+   * Resize a CircleBody
    *
-   * @param cx      The new X position
-   * @param cy      The new Y position
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  public resize(cx: number, cy: number, width: number, height: number) {
+  public resize(scale: number) {
     // Get the current fixture, so we can preserve sensor state,
     // density/elasticity/friction, and vertices when we make a new fixture
     let oldFix = this.body.GetFixtureList()!;
-    // Compute the transform
-    let transform = new b2Transform();
-    transform.SetPositionAngle({ x: cx, y: cy }, this.body.GetAngle());
+
+    // Update dimensions
+    this.radius *= scale;
+    this.w *= scale;
+    this.h *= scale;
 
     // make a new circle body
-    this.radius = width > height ? width / 2 : height / 2;
     let shape = new b2CircleShape();
     shape.m_radius = this.radius;
     this.body.CreateFixture({ shape });
-
-    // Update dimensions
-    this.w = 2 * this.radius;
-    this.h = 2 * this.radius;
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
     this.setPhysics({ density: oldFix.GetDensity(), elasticity: oldFix.GetRestitution(), friction: oldFix.GetFriction() });
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix)
-    this.body.SetTransform(transform);
   }
 };
 
@@ -482,37 +476,31 @@ export class BoxBody extends RigidBodyBase {
   }
 
   /**
-   * Resize and re-center a BoxBody
+   * Resize a BoxBody
    *
-   * @param cx      The new X position
-   * @param cy      The new Y position
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  public resize(cx: number, cy: number, width: number, height: number) {
+  public resize(scale: number) {
     // Get the current fixture, so we can preserve sensor state,
     // density/elasticity/friction, and vertices when we make a new fixture
     let oldFix = this.body.GetFixtureList()!;
-    // Compute the transform
-    let transform = new b2Transform();
-    transform.SetPositionAngle({ x: cx, y: cy }, this.body.GetAngle());
-
-    // make a new box body
-    this.radius = Math.sqrt(Math.pow(height / 2, 2) + Math.pow(width / 2, 2));
-    let shape = new b2PolygonShape();
-    shape.SetAsBox(width / 2, height / 2);
-    this.body.CreateFixture({ shape });
 
     // Update dimensions
-    this.w = width;
-    this.h = height;
+    this.radius *= scale;
+    this.w *= scale;
+    this.h *= scale;
+
+    // make a new box body
+    let shape = new b2PolygonShape();
+    shape.SetAsBox(this.w / 2, this.h / 2);
+    this.body.CreateFixture({ shape });
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
     this.setPhysics({ density: oldFix.GetDensity(), elasticity: oldFix.GetRestitution(), friction: oldFix.GetFriction() });
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix)
-    this.body.SetTransform(transform);
   }
 };
 
@@ -597,54 +585,44 @@ export class PolygonBody extends RigidBodyBase {
   }
 
   /**
-   * Resize and re-center a PolygonBody
+   * Resize a PolygonBody
    *
-   * @param cx      The new X position
-   * @param cy      The new Y position
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  public resize(cx: number, cy: number, width: number, height: number) {
+  public resize(scale: number) {
     // Get the current fixture, so we can preserve sensor state,
     // density/elasticity/friction, and vertices when we make a new fixture
     let oldFix = this.body.GetFixtureList()!;
-    // Compute the transform
-    let transform = new b2Transform();
-    transform.SetPositionAngle({ x: cx, y: cy }, this.body.GetAngle());
 
     // we need to manually scale all the vertices, based on the old verts
-    let xScale = height / this.h;
-    let yScale = width / this.w;
     let ps = oldFix.GetShape() as b2PolygonShape;
     let vertices: number[] = [];
     for (let i = 0; i < ps.m_vertices.length; ++i) {
       let mTempVector = ps.m_vertices[i];
-      vertices.push(mTempVector.x * xScale);
-      vertices.push(mTempVector.y * yScale);
+      vertices.push(mTempVector.x * scale);
+      vertices.push(mTempVector.y * scale);
     }
     let vertArray: b2Vec2[] = [];
     for (let i = 0; i < vertices.length; i += 2)
       vertArray[i / 2] = new b2Vec2(vertices[i], vertices[i + 1]);
     this.vertArray = vertArray;
-    // Also re-compute the bounding radius
-    let r = 0;
-    for (let i = 0; i < vertices.length; i += 2)
-      r = Math.max(r, Math.pow(vertices[i], 2), + Math.pow(vertices[i + 1], 2));
-    this.radius = r;
+
+    // Update dimensions
+    this.radius *= scale;
+    this.w *= scale;
+    this.h *= scale;
+
+    // Make a new polygon body
     let shape = new b2PolygonShape();
     shape.Set(vertArray);
     this.body.CreateFixture({ shape });
-
-    // Update new dimensions
-    this.w = width;
-    this.h = height;
 
     // Copy the old fixture's DEF and collision status to the new fixture before
     // destroying it
     this.setPhysics({ density: oldFix.GetDensity(), elasticity: oldFix.GetRestitution(), friction: oldFix.GetFriction() });
     if (oldFix.IsSensor()) this?.setCollisionsEnabled(false);
     this.body.DestroyFixture(oldFix);
-    this.body.SetTransform(transform);
   }
 };
 

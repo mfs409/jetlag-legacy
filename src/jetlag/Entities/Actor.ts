@@ -113,16 +113,17 @@ export class Actor {
   }
 
   /**
-   * Change the size of an Actor, and/or change its position
+   * Change the size of an Actor, keeping its center unchanged
    *
-   * @param x      The new X coordinate of its center
-   * @param y      The new Y coordinate of its center
-   * @param width  The new width of the Actor
-   * @param height The new height of the Actor
+   * @param scale The factor by which to scale the actor's dimensions.  Must be
+   *              >0.  1 means no change, a fraction means shrink, and a number
+   *              >1 means grow.
    */
-  public resize(x: number, y: number, width: number, height: number) {
+  public resize(scale: number) {
+    if (scale <= 0)
+      throw "Error: resize requires a positive, non-zero value";
     // set new height and width of the Render context
-    this.appearance.resize(width, height);
-    this.rigidBody.resize(x, y, width, height);
+    this.appearance.resize(scale);
+    this.rigidBody.resize(scale);
   }
 }
