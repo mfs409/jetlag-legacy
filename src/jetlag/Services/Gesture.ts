@@ -149,7 +149,7 @@ export class GestureService {
   private tap(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor.gestures?.tap)
-        if (actor.gestures.tap(coords))
+        if (actor.gestures.tap(actor, coords))
           return true;
     return false;
   }
@@ -163,7 +163,7 @@ export class GestureService {
   private mouseHover(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor.gestures?.mouseHover)
-        if (actor.gestures.mouseHover(coords))
+        if (actor.gestures.mouseHover(actor, coords))
           return true;
     return false;
   }
@@ -177,7 +177,7 @@ export class GestureService {
   private panStart(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor?.gestures?.panStart)
-        if (actor.gestures.panStart(coords))
+        if (actor.gestures.panStart(actor, coords))
           return true;
     return false;
   }
@@ -191,7 +191,7 @@ export class GestureService {
   private panMove(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor?.gestures?.panMove)
-        if (actor.gestures.panMove(coords))
+        if (actor.gestures.panMove(actor, coords))
           return true;
     return false;
   }
@@ -205,7 +205,7 @@ export class GestureService {
   private panStop(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor?.gestures?.panStop)
-        if (actor.gestures.panStop(coords))
+        if (actor.gestures.panStop(actor, coords))
           return true;
     return false;
   }
@@ -219,7 +219,7 @@ export class GestureService {
   private touchDown(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor?.gestures?.touchDown)
-        if (actor.gestures.touchDown(coords))
+        if (actor.gestures.touchDown(actor, coords))
           return true;
     return false;
   }
@@ -233,7 +233,7 @@ export class GestureService {
   private touchUp(scene: Scene, coords: { x: number, y: number }) {
     for (let actor of scene.physics!.actorsAt(coords))
       if (actor?.gestures?.touchUp)
-        if (actor.gestures.touchUp(coords))
+        if (actor.gestures.touchUp(actor, coords))
           return true;
     return false;
   }
@@ -253,7 +253,7 @@ export class GestureService {
       if (sActor.gestures?.swipe)
         for (let eActor of scene.physics!.actorsAt(end_coord))
           if (sActor === eActor)
-            if (sActor.gestures.swipe(start_coord, end_coord, time))
+            if (sActor.gestures.swipe(sActor, start_coord, end_coord, time))
               return true;
     return false;
   }

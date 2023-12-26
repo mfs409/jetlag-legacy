@@ -138,16 +138,14 @@ export class TextSprite {
    * Change the size of the text.  You shouldn't call this directly.  It gets
    * called by Actor.resize().
    *
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  resize(width: number, height: number) {
-    let xScale = width * stage.fontScaling / this.width;
-    let yScale = height * stage.fontScaling / this.height;
-    this.size *= xScale;
+  resize(scale: number) {
+    this.size *= scale;
     // (this.text.text.style.fontSize as number) *= xScale;
-    this.text.text.width = width * xScale;
-    this.text.text.height = height * yScale;
+    this.text.text.width *= scale;
+    this.text.text.height *= scale;
     this.width = this.text.text.width;
     this.height = this.text.text.height;
   }
@@ -228,12 +226,12 @@ export class ImageSprite {
    * Change the size of the image.  You shouldn't call this directly.  It gets
    * called by Actor.resize().
    *
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  resize(width: number, height: number) {
-    this.width = width;
-    this.height = height;
+  resize(scale: number) {
+    this.width *= scale;
+    this.height *= scale;
   }
 
   /**
@@ -660,12 +658,12 @@ export class AnimatedSprite implements IStateObserver {
    * Change the size of the animation.  You shouldn't call this directly.  It
    * gets called by Actor.resize().
    *
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  resize(width: number, height: number) {
-    this.width = width;
-    this.height = height;
+  resize(scale: number) {
+    this.width *= scale;
+    this.height *= scale;
   }
 }
 
@@ -728,12 +726,12 @@ export class FilledBox {
    * Change the size of the box.  You shouldn't call this directly.  It gets
    * called by Actor.resize().
    *
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  resize(width: number, height: number) {
-    this.width = width;
-    this.height = height;
+  resize(scale: number) {
+    this.width *= scale;
+    this.height *= scale;
   }
 }
 
@@ -798,11 +796,11 @@ export class FilledCircle {
    * Change the size of the circle.  You shouldn't call this directly.  It gets
    * called by Actor.resize().
    *
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  resize(width: number, height: number) {
-    this.radius = width > height ? width / 2 : height / 2;
+  resize(scale: number) {
+    this.radius *= scale;
     this.width = 2 * this.radius;
     this.height = 2 * this.radius;
   }
@@ -883,21 +881,17 @@ export class FilledPolygon {
    * Change the size of the polygon.  You shouldn't call this directly.  It gets
    * called by Actor.resize().
    *
-   * @param width   The new width
-   * @param height  The new height
+   * @param scale The amount to scale the size by.  1 means "no change", >1
+   *              means "grow", fraction means "shrink".
    */
-  resize(width: number, height: number) {
+  resize(scale: number) {
     // we need to manually scale all the vertices, based on the old verts
-    let xScale = width / this.width;
-    let yScale = height / this.height;
     let vertArray: b2Vec2[] = [];
-    for (let i = 0; i < this.vertices.length; ++i) {
-      let point = this.vertices[i];
-      vertArray.push(new b2Vec2(point.x * xScale, point.y * yScale));
-    }
+    for (let point of this.vertices)
+      vertArray.push(new b2Vec2(point.x * scale, point.y * scale));
     this.vertices = vertArray;
-    this.width = width;
-    this.height = height;
+    this.width *= scale;
+    this.height *= scale;
   }
 }
 

@@ -1,6 +1,7 @@
 import { Scene } from "./Entities/Scene";
 import { Sprite } from "./Services/ImageLibrary";
 import { stage } from "./Stage";
+import { Actor } from "./Entities/Actor";
 
 /**
  * The different ActorState combinations for which we might have an animation
@@ -108,21 +109,21 @@ export class AnimationSequence {
  */
 export class GestureHandlers {
   /** code to run when this actor is tapped */
-  public tap?: (worldCoords: { x: number, y: number }) => boolean;
+  public tap?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
   /** code to run on a pan start event */
-  public panStart?: (worldCoords: { x: number, y: number }) => boolean;
+  public panStart?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
   /** code to run on a pan move event */
-  public panMove?: (worldCoords: { x: number, y: number }) => boolean;
+  public panMove?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
   /** code to run on a pan stop event */
-  public panStop?: (worldCoords: { x: number, y: number }) => boolean;
+  public panStop?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
   /** code to run on a down press event */
-  public touchDown?: (worldCoords: { x: number, y: number }) => boolean;
+  public touchDown?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
   /** code to run on a release event */
-  public touchUp?: (worldCoords: { x: number, y: number }) => boolean;
+  public touchUp?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
   /** code to run on a swipe event */
-  public swipe?: (point1: { x: number, y: number }, point2: { x: number, y: number }, time: number) => boolean;
+  public swipe?: (actor: Actor, point1: { x: number, y: number }, point2: { x: number, y: number }, time: number) => boolean;
   /** code to run when the mouse hovers over the actor */
-  public mouseHover?: (worldCoords: { x: number, y: number }) => boolean;
+  public mouseHover?: (actor: Actor, worldCoords: { x: number, y: number }) => boolean;
 }
 
 /**

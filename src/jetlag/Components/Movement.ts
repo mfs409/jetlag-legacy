@@ -416,10 +416,10 @@ export class ProjectileMovement {
    * @param fromY   Y coordinate of the center of the actor doing the toss
    * @param toX     X coordinate of the point at which to toss
    * @param toY     Y coordinate of the point at which to toss
-   * @param offsetX The x distance between the top left of the projectile and
-   *                the top left of the actor tossing the projectile
-   * @param offsetY The y distance between the top left of the projectile and
-   *                the top left of the actor tossing the projectile
+   * @param offsetX The x distance between the center of the projectile and
+   *                the center of the actor tossing the projectile
+   * @param offsetY The y distance between the center of the projectile and
+   *                the center of the actor tossing the projectile
    */
   public tossAt(from: b2Vec2, fromX: number, fromY: number, toX: number, toY: number, offsetX: number, offsetY: number) {
     let transform = new b2Transform();
