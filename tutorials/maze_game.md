@@ -8,7 +8,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?1"
+    "src": "tut_maze_game.html?1"
 }
 ```
 
@@ -18,7 +18,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?2"
+    "src": "tut_maze_game.html?2"
 }
 ```
 
@@ -28,7 +28,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?3"
+    "src": "tut_maze_game.html?3"
 }
 ```
 
@@ -38,7 +38,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?4"
+    "src": "tut_maze_game.html?4"
 }
 ```
 
@@ -48,7 +48,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?5"
+    "src": "tut_maze_game.html?5"
 }
 ```
 
@@ -58,7 +58,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?6"
+    "src": "tut_maze_game.html?6"
 }
 ```
 
@@ -68,7 +68,7 @@
 {
     "width": 800,
     "height": 450,
-    "src": "/tut_maze_game.html?7"
+    "src": "tut_maze_game.html?7"
 }
 ```
 

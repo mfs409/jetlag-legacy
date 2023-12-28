@@ -44,42 +44,53 @@
      time.  The camera and gravity work together in interesting ways, which
      we explore in this tutorial.
     </dd>
-    <dt><a href="#movement_physics_1.md" target="_blank">Movement and Physics (1/2)</a></dt>
+    <dt><a href="#rigidbody.md" target="_blank">Rigid Bodies and Physics</a></dt>
     <dd>
       This tutorial discusses important issues related to rigid body types,
       physics properties, gravity, shapes, and tilt.
     </dd>
-    <dt><a href="#movement_physics_2.md" target="_blank">Movement and Physics (1/2)</a></dt>
+    <dt><a href="#movement.md" target="_blank">Styles of Movement</a></dt>
     <dd>
       This tutorial relates the discussion of physics to the Movement field in
       the constructor for Actors.
     </dd>
-<!--
-    <dt><a href="#simulation_conway.md" target="_blank">Introduction To
-    Simulation With Conway's Game Of Life</a></dt>
+    <dt><a href="#roles_goodies_destinations_sensors.md" target="_blank">Roles that Actors Play (1/2)</a></dt>
     <dd>
-     Conway's Game of Life is a famous simulation.  This tutorial implements
-     a version of it in JetLag, as a way to get you thinking about
-     simulation.  This tutorial is also useful if you're thinking about
-     making a game that doesn't rely on physics, but instead on a sort of
-     "game board".
+     In JetLag, actors take on roles, like "Hero" or "Obstacle".  This
+     tutorial discusses the "Goodie", "Destination", and "Sensor" roles.
     </dd>
-    <dt><a href="#roles.md" target="_blank">Roles that Actors Play</a></dt>
+    <dt><a href="#roles_obstacles_enemies.md" target="_blank">Roles that Actors Play (2/2)</a></dt>
     <dd>
-     In JetLag, actors take on roles, like "hero" or "obstacle".  This
-     tutorial discusses these roles.
+     This tutorial focuses on the "Obstacle" and "Enemy" roles.
     </dd>
     <dt><a href="#text_hud.md" target="_blank">Text And The Heads-Up Display</a></dt>
     <dd>
-     This tutorial discusses the ways that you can create text that appears
-     in your game.  It also introduces the heads-up display (HUD).
+      This tutorial discusses the ways that you can create text that appears
+      in your game.  It also introduces the heads-up display (HUD).
     </dd>
-    <dt><a href="#assets_audio_animations.md" target="_blank">Assets, Audio,
-    and Animations</a></dt>
+    <dt><a href="#graphic_assets.md" target="_blank">Graphical Assets</a></dt>
     <dd>
-     This tutorial discusses the different ways that you can control the
-     appearance of an Actor.  It also introduces sound effects.
+      This tutorial begins a discussion about the different ways that you can
+      control the appearance of an Actor.
     </dd>
+    <dt><a href="#animations.md" target="_blank">Animations</a></dt>
+    <dd>
+      This tutorial discusses animations.
+    </dd>
+    <dt><a href="#audio.md" target="_blank">Sound Effects</a></dt>
+    <dd>
+      This tutorial introduces sound effects.
+    </dd>
+    <dt><a href="#stage_transitions.md" target="_blank">Transitions Among Stages</a></dt>
+    <dd>
+     When you are designing a game, you'll quickly find that putting
+     everything in one file is a bad idea.  This tutorial presents one way of
+     organizing your code, and also discusses how to transition between the
+     different parts of your game.  This tutorial also shows how to do
+     background music.
+    </dd>
+
+<!--
     <dt><a href="#timers.md" target="_blank">Working With Timers</a></dt>
     <dd>
      Timers provide a way to make events happen in the future.  This tutorial
@@ -89,14 +100,6 @@
     <dd>
      JetLag tracks a lot of different statistics, which you can use as part
      of the "score" in your game.
-    </dd>
-    <dt><a href="#stage_transitions.md" target="_blank">Transitions Among Stages</a></dt>
-    <dd>
-     When you are designing a game, you'll quickly find that putting
-     everything in one file is a bad idea.  This tutorial presents one way of
-     organizing your code, and also discusses how to transition between the
-     different parts of your game.  This tutorial also shows how to do
-     background music.
     </dd>
     <dt><a href="#gestures.md" target="_blank">Gesture Input</a></dt>
     <dd>
@@ -113,6 +116,21 @@
     <dd>
      In this tutorial, you will learn about how JetLag helps you to store
      information while your game is being played.
+    </dd>
+    <dt><a href="#collisions.md" target="_blank">Advanced Collisions</a></dt>
+    <dd>
+     This tutorial discusses a few ways of customizing what happens when
+     actors collide.
+    </dd>
+
+    <dt><a href="#simulation_conway.md" target="_blank">Introduction To
+    Simulation With Conway's Game Of Life</a></dt>
+    <dd>
+     Conway's Game of Life is a famous simulation.  This tutorial implements
+     a version of it in JetLag, as a way to get you thinking about
+     simulation.  This tutorial is also useful if you're thinking about
+     making a game that doesn't rely on physics, but instead on a sort of
+     "game board".
     </dd>
     <dt><a href="#maze_game.md" target="_blank">A Maze Game</a></dt>
     <dd>
@@ -135,11 +153,7 @@
      This tutorial will help you get started making a game in the "endless
      runner" style.
     </dd>
-    <dt><a href="#collisions.md" target="_blank">Advanced Collisions</a></dt>
-    <dd>
-     This tutorial discusses a few ways of customizing what happens when
-     actors collide.
-    </dd>
+
     <dt><a href="#joints.md" target="_blank">Getting Started With Joints</a></dt>
     <dd>
      This tutorial introduces the idea of joints.  Box2D provides a powerful
@@ -150,6 +164,7 @@
      This tutorial presents a feature of JetLag that lets you use a line
      drawing (in the SVG format) as a way to quickly make a bunch of Actors.
     </dd>
+
     <dt><a href="#package_desktop.md" target="_blank">Packaging Your Game For Desktop</a></dt>
     <dd>
      This tutorial discusses how to use Electron to take your existing

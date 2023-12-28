@@ -67,7 +67,8 @@ function builder(level: number) {
     new Actor({
       rigidBody: new BoxBody({ cx: 1, cy: 1, width: .5, height: .5 }),
       appearance: new TextSprite({ center: true, face: "Arial", size: 64, color: "#FF0000aa", strokeColor: "#0000FF", strokeWidth: 2 }, "Tap Me"),
-      movement: new PathMovement(new Path().to(1, 1).to(15, 1).to(15, 8).to(1, 8).to(1, 1), 4, true)
+      movement: new PathMovement(new Path().to(1, 1).to(15, 1).to(15, 8).to(1, 8).to(1, 1), 4, true),
+      gestures: { tap: () => { console.log("Tapped"); return true; } }
     });
   }
 

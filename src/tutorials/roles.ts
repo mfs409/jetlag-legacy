@@ -95,6 +95,8 @@ function builder(level: number) {
       }),
     });
 
+    let resized = false;
+
     new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 3, radius: 0.4 }),
@@ -105,8 +107,11 @@ function builder(level: number) {
         // goodie wasn't collected yet.
         onCollect: (g: Actor, h: Actor) => {
           if (stage.score.getGoodieCount(0) == 0) {
-            g.resize(12, 3, 1, 1);
-            h.resize(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, .4, .4);
+            if (!resized) {
+              g.resize(1.2);
+              h.resize(.75);
+              resized = true;
+            }
             return false;
           }
           stage.score.setGoodieCount(0, 10);
@@ -200,6 +205,7 @@ function builder(level: number) {
   }
 
   else if (level == 6) {
+    // Activating Destinations
     new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.4 }),
@@ -344,7 +350,7 @@ function builder(level: number) {
       role: new Obstacle({
         heroCollision: (_o: Actor, h: Actor) => {
           if (h.extra.regular) {
-            h.resize(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, .5, .5);
+            h.resize(.5);
             h.extra.regular = false;
           }
         }
@@ -391,8 +397,9 @@ function builder(level: number) {
       rigidBody: new CircleBody({ cx: 2, cy: 3, radius: 0.2 }, { density: 2 }),
       movement: new TiltMovement(),
       role: new Hero({
-        onStrengthChange: (h) =>
-          h.resize(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, (h.role as Hero).strength * .4, (h.role as Hero).strength * .4)
+        onStrengthChange: (h) => {
+          if ((h.role as Hero).strength == 4) h.resize(2); else h.resize(.5);
+        }
       }),
     });
 
@@ -509,7 +516,7 @@ function builder(level: number) {
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 12, cy: 8.6, radius: 0.4 }),
       role: new Enemy({
-        damage: 8, onDefeatHero: (e: Actor) => e.resize(12, 8.5, 1, 1), onDefeated: (e: Actor) =>
+        damage: 8, onDefeatHero: (e: Actor) => e.resize(1.2), onDefeated: (e: Actor) =>
           new Actor({
             appearance: new ImageSprite({ width: .5, height: .5, img: "blue_ball.png" }),
             rigidBody: new CircleBody({ radius: .25, cx: e.rigidBody.getCenter().x, cy: 2 }),

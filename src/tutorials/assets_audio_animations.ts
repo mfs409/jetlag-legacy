@@ -469,10 +469,9 @@ function builder(level: number) {
     let remap = new Map();
     remap.set(AnimationState.JUMP_W, AnimationState.JUMP_E);
 
-    let h_cfg = { cx: 0.25, cy: 7, width: 0.8, height: 0.8, radius: 0.4, animations, remap };
     let h = new Actor({
-      appearance: new AnimatedSprite(h_cfg),
-      rigidBody: new CircleBody(h_cfg, { density: 5, friction: 0.6, disableRotation: true }),
+      appearance: new AnimatedSprite({ width: 0.8, height: 0.8, animations, remap }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 7, radius: 0.4 }, { density: 5, friction: 0.6, disableRotation: true }),
       movement: new TiltMovement(),
       role: new Hero(),
     });

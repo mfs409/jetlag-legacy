@@ -1,4 +1,4 @@
-# Movement Styles and Physics (1/2)
+# Rigid Bodies and Physics
 
 This tutorial discusses important issues related to rigid body types,
 physics properties, gravity, shapes, and tilt.
@@ -50,13 +50,13 @@ initializeAndLaunch("game-player", new Config(), builder);
 Next, let's set up the assets that we'll use throughout these tutorials.
 Download these files to your `assets` folder:
 
-- [green_ball.png](movement_physics/green_ball.png)
-- [purple_ball.png](movement_physics/purple_ball.png)
-- [blue_ball.png](movement_physics/blue_ball.png)
-- [red_ball.png](movement_physics/red_ball.png)
-- [grey_ball.png](movement_physics/grey_ball.png)
-- [mustard_ball.png](movement_physics/mustard_ball.png)
-- [mid.png](movement_physics/mid.png)
+- [green_ball.png](rigidbody/green_ball.png)
+- [purple_ball.png](rigidbody/purple_ball.png)
+- [blue_ball.png](rigidbody/blue_ball.png)
+- [red_ball.png](rigidbody/red_ball.png)
+- [grey_ball.png](rigidbody/grey_ball.png)
+- [mustard_ball.png](rigidbody/mustard_ball.png)
+- [mid.png](rigidbody/mid.png)
 
 Then update your 'Config' object:
 
@@ -135,7 +135,7 @@ We're going start our exploration of this idea through the following game:
 {
     "width": 800,
     "height": 450,
-    "src": "/movement_physics.html?1"
+    "src": "rigidbody.html?1"
 }
 ```
 
@@ -240,7 +240,7 @@ Here's the complete game:
 {
     "width": 800,
     "height": 450,
-    "src": "/movement_physics.html?2"
+    "src": "rigidbody.html?2"
 }
 ```
 
@@ -270,11 +270,11 @@ that we had just added.)
 {
     "width": 800,
     "height": 450,
-    "src": "/movement_physics.html?3"
+    "src": "rigidbody.html?3"
 }
 ```
 
-## Rigid Body Shapes [start here!]
+## Rigid Body Shapes
 
 In a previous tutorial, we saw that each rigidBody can have one of three shapes:
 a box (rectangle), a circle, or a convex polygon.  Let's make a game that shows
@@ -284,7 +284,7 @@ all of these options.
 {
     "width": 800,
     "height": 450,
-    "src": "/movement_physics.html?4"
+    "src": "rigidbody.html?4"
 }
 ```
 
@@ -377,7 +377,7 @@ Before moving on, there are two things worth trying:
     stage.tilt.tiltVelocityOverride = true;
 ```
 
-## Next
+## Density, Elasticity, and Friction
 
 In the last level, it may have seemed odd that the green ball doesn't roll along
 the ground, and doesn't start spinning when it interacts with the spinning
@@ -389,7 +389,7 @@ Here's a very brief demonstration:
 {
     "width": 800,
     "height": 450,
-    "src": "/movement_physics.html?6"
+    "src": "rigidbody.html?6"
 }
 ```
 
@@ -450,22 +450,16 @@ It's important to resize both the appearance and rigidBody, so JetLag has a
 rigidBody being resized.  This works for all kinds of rigidBody shapes, and all
 kinds of appearances, so in the following example, we make lots of different
 combinations of shape and appearance.  Tapping red things will make them shrink.
-Tapping blue things will make them grow.  You'll notice that resizing text and
-polygons is kind of tricky to get right...
+Tapping blue things will make them grow.  You'll notice that resizing text is a
+bit weird.  The `Text` tutorial will help clear this up.
 
 ```iframe
 {
     "width": 800,
     "height": 450,
-    "src": "/movement_physics.html?8"
+    "src": "rigidbody.html?8"
 }
 ```
-
-@@red Should I fix JetLag before publishing this?@@
-
-@@red I should fix this part of the API@@
-When you tap an actor in JetLag, the gesture code does not keep track of which
-actor was tapped.
 
 The code below suffers from a lot of copy-and-paste.  While I usually think it
 is a good idea to read every line, and to re-type code from these tutorials into
@@ -485,121 +479,126 @@ understand one or two actors, and then copy it and try it out.
     });
 
     // A circle.  Tap it to make it shrink a little bit
-    let shrinkCircle = new Actor({
+    new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#FF0000" }),
       rigidBody: new CircleBody({ cx: 2, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkCircle.rigidBody.radius *= .8; shrinkCircle.resize(2, 2, 2 * shrinkCircle.rigidBody.radius, 2 * shrinkCircle.rigidBody.radius); return true; } },
+      gestures: { tap: (shrinkCircle) => { shrinkCircle.resize(.8); return true; } },
       role: new Obstacle(),
       extra: { radius: .5 }
     });
 
     // A box.  Tap it to make it shrink a little bit
-    let shrinkBox = new Actor({
+    new Actor({
       appearance: new FilledBox({ width: 1, height: 2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 4, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkBox.rigidBody.w *= .8; shrinkBox.rigidBody.h *= .8; shrinkBox.resize(4, 2, shrinkBox.rigidBody.w, shrinkBox.rigidBody.h); return true; } },
+      gestures: { tap: (shrinkBox) => { shrinkBox.resize(.8); return true; } },
       role: new Obstacle(),
     });
 
     // A circle.  Tap it to make it grow a little bit
-    let growCircle = new Actor({
+    new Actor({
       appearance: new FilledCircle({ radius: .5, fillColor: "#0000FF" }),
       rigidBody: new CircleBody({ cx: 2, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growCircle.rigidBody.radius *= 1.2; growCircle.resize(2, 5, 2 * growCircle.rigidBody.radius, 2 * growCircle.rigidBody.radius); return true; } },
+      gestures: { tap: (growCircle) => { growCircle.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 
     // A box.  Tap it to make it grow a little bit
-    let growBox = new Actor({
+    new Actor({
       appearance: new FilledBox({ width: 1, height: 2, fillColor: "#0000FF" }),
       rigidBody: new BoxBody({ cx: 4, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growBox.rigidBody.w *= 1.2; growBox.rigidBody.h *= 1.2; growBox.resize(4, 5, growBox.rigidBody.w, growBox.rigidBody.h); return true; } },
+      gestures: { tap: (growBox) => { growBox.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 
     // A circle with an image.  Tap it to make it shrink a little bit
-    let shrinkCircleImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "red_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkCircleImage.rigidBody.radius *= .8; shrinkCircleImage.resize(6, 2, 2 * shrinkCircleImage.rigidBody.radius, 2 * shrinkCircleImage.rigidBody.radius); return true; } },
+      gestures: { tap: (shrinkCircleImage) => { shrinkCircleImage.resize(.8); return true; } },
       role: new Obstacle(),
     });
 
     // A box with an image.  Tap it to make it shrink a little bit
-    let shrinkBoxImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "red_ball.png" }),
       rigidBody: new BoxBody({ cx: 8, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkBoxImage.rigidBody.w *= .8; shrinkBoxImage.rigidBody.h *= .8; shrinkBoxImage.resize(8, 2, shrinkBoxImage.rigidBody.w, shrinkBoxImage.rigidBody.h); return true; } },
+      gestures: { tap: (shrinkBoxImage) => { shrinkBoxImage.resize(.8); return true; } },
       role: new Obstacle(),
     });
 
     // A circle with an image.  Tap it to make it grow a little bit
-    let growCircleImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 1, img: "blue_ball.png" }),
       rigidBody: new CircleBody({ cx: 6, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growCircleImage.rigidBody.radius *= 1.2; growCircleImage.resize(6, 5, 2 * growCircleImage.rigidBody.radius, 2 * growCircleImage.rigidBody.radius); return true; } },
+      gestures: { tap: (growCircleImage) => { growCircleImage.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 
     // A box with an image.  Tap it to make it grow a little bit
-    let growBoxImage = new Actor({
+    new Actor({
       appearance: new ImageSprite({ width: 1, height: 2, img: "blue_ball.png" }),
       rigidBody: new BoxBody({ cx: 8, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growBoxImage.rigidBody.w *= 1.2; growBoxImage.rigidBody.h *= 1.2; growBoxImage.resize(8, 5, growBoxImage.rigidBody.w, growBoxImage.rigidBody.h); return true; } },
+      gestures: { tap: (growBoxImage) => { growBoxImage.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 
     // A circle with text.  Tap it to make it shrink a little bit
-    let shrinkCircleText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#FF0000" }, "hello"),
       rigidBody: new CircleBody({ cx: 10, cy: 2, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkCircleText.rigidBody.radius *= .8; shrinkCircleText.resize(10, 2, 2 * shrinkCircleText.rigidBody.radius, 10 * shrinkCircleText.rigidBody.radius); return true; } },
+      gestures: { tap: (shrinkCircleText) => { shrinkCircleText.resize(.8); return true; } },
       role: new Obstacle(),
     });
 
     // A box with text.  Tap it to make it shrink a little bit
-    let shrinkBoxText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#FF0000" }, "hello"),
       rigidBody: new BoxBody({ cx: 12, cy: 2, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { shrinkBoxText.rigidBody.w *= .8; shrinkBoxText.rigidBody.h *= .8; shrinkBoxText.resize(12, 2, shrinkBoxText.rigidBody.w, shrinkBoxText.rigidBody.h); return true; } },
+      gestures: { tap: (shrinkBoxText) => { shrinkBoxText.resize(.8); return true; } },
       role: new Obstacle(),
     });
 
     // A circle with text.  Tap it to make it grow a little bit
-    let growCircleText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#0000FF" }, "hello"),
       rigidBody: new CircleBody({ cx: 10, cy: 5, radius: .5 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growCircleText.rigidBody.radius *= 1.2; growCircleText.resize(10, 5, 2 * growCircleText.rigidBody.radius, 2 * growCircleText.rigidBody.radius); return true; } },
+      gestures: { tap: (growCircleText) => { growCircleText.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 
     // A box with text.  Tap it to make it grow a little bit
-    let growBoxText = new Actor({
+    new Actor({
       appearance: new TextSprite({ center: true, face: "Arial", size: 24, color: "#0000FF" }, "hello"),
       rigidBody: new BoxBody({ cx: 12, cy: 5, width: 1, height: 2 }, { density: 5, friction: 0.6 }),
-      gestures: { tap: () => { growBoxText.rigidBody.w *= 1.2; growBoxText.rigidBody.h *= 1.2; growBoxText.resize(12, 5, growBoxText.rigidBody.w, growBoxText.rigidBody.h); return true; } },
+      gestures: { tap: (growBoxText) => { growBoxText.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 
     // A polygon.  Tap it to make it shrink a little bit
-    let shrinkPoly = new Actor({
+    new Actor({
       appearance: new FilledPolygon({ vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#FF0000" }),
       rigidBody: new PolygonBody({ cx: 14, cy: 2, vertices: [-1, -1, 0, 1, -1, 1] }),
-      gestures: { tap: () => { shrinkPoly.rigidBody.w *= .8; shrinkPoly.rigidBody.h *= .8; shrinkPoly.resize(14, 2, shrinkPoly.rigidBody.w, shrinkPoly.rigidBody.h); return true; } },
+      gestures: { tap: (shrinkPoly) => { shrinkPoly.resize(.8); return true; } },
       role: new Obstacle(),
     });
 
     // A polygon.  Tap it to make it grow a little bit
-    let growPoly = new Actor({
+    new Actor({
       appearance: new FilledPolygon({ vertices: [-1, -1, 0, 1, -1, 1], fillColor: "#0000FF" }),
       rigidBody: new PolygonBody({ cx: 14, cy: 5, vertices: [-1, -1, 0, 1, -1, 1] }),
-      gestures: { tap: () => { growPoly.rigidBody.w *= 1.2; growPoly.rigidBody.h *= 1.2; growPoly.resize(14, 5, growPoly.rigidBody.w, growPoly.rigidBody.h); return true; } },
+      gestures: { tap: (growPoly) => { growPoly.resize(1.2); return true; } },
       role: new Obstacle(),
     });
 ```
 
+## Wrapping Up
+
+This tutorial delved into many aspects of how rigid bodies can be configured. In
+the next tutorial, we'll continue with this theme, by focusing on movement.
+
 ```md-config
-page-title = Movement Styles and Physics (1/2)
+page-title = Rigid Bodies and Physics
 
 img {display: block; margin: auto; max-width: 500px;}
 .red {color: red;}

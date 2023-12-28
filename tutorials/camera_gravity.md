@@ -21,9 +21,15 @@ change the hero's movement to `TiltMovement`:
     movement: new TiltMovement(), // was `new ManualMovement(),`
 ```
 
-When you do this, VSCode should help you to update your `imports`, because we
-need to import `TiltMovement`.  If VSCode didn't do it for you, update the
-import at the top of the file to look like this:
+You can put this line anywhere *inside* the `builder()` function.  A good thing
+to think is "`builder` runs before my game starts, so the order in which I
+configure the different parts of the game shouldn't matter".  Later on, we'll
+find that the order matters in some specific cases, but nothing we need to worry
+about yet.
+
+When you add this code to `builder`, VSCode should help you to update your
+`imports`, because we need to import `TiltMovement`.  If VSCode didn't do it for
+you, update the import at the top of the file to look like this:
 
 ```typescript
 import { ManualMovement, TiltMovement } from "../jetlag/Components/Movement";
@@ -117,7 +123,7 @@ point, we'll make a game that looks like this:
 {
     "width": 800,
     "height": 450,
-    "src": "/overview.html?1"
+    "src": "overview.html?1"
 }
 ```
 
@@ -437,7 +443,7 @@ convince yourself that it's a problem:
 {
     "width": 800,
     "height": 450,
-    "src": "/getting_started.html"
+    "src": "getting_started.html"
 }
 ```
 
@@ -460,7 +466,7 @@ the hero needs to reach in order to win.
 {
     "width": 800,
     "height": 450,
-    "src": "/overview.html?2"
+    "src": "overview.html?2"
 }
 ```
 
@@ -882,7 +888,7 @@ game, like Super Mario Bros, or in an endless runner game like Jetpack Joyride.
 {
     "width": 800,
     "height": 450,
-    "src": "/overview.html?3"
+    "src": "overview.html?3"
 }
 ```
 
@@ -1195,7 +1201,7 @@ space bar to jump.
 {
     "width": 800,
     "height": 450,
-    "src": "/overview.html?4"
+    "src": "overview.html?4"
 }
 ```
 

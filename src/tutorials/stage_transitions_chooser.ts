@@ -82,7 +82,7 @@ export function chooserBuilder(level: number) {
 }
 
 /**
- * Drawing a button for that jumps to a level when tapped
+ * Draw a button for that jumps to a level when tapped
  *
  * @param cx    X coordinate of the center of the button
  * @param cy    Y coordinate of the center of the button

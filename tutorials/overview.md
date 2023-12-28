@@ -498,7 +498,7 @@ console as you play, to see messages as you click the screen.
 {
     "width": 800,
     "height": 450,
-    "src": "/getting_started.html"
+    "src": "getting_started.html"
 }
 ```
 
