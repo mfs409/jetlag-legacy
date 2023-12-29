@@ -228,7 +228,7 @@ import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appeara
 import { stage } from "../jetlag/Stage";
 import { BoxBody } from "../jetlag/Components/RigidBody";
 import { splashBuilder } from "./splash";
-import { gameBuilder } from "./game";
+import { gameBuilder } from "./play";
 import { MusicComponent } from "../jetlag/Components/Music";
 
 /**
@@ -463,9 +463,9 @@ noting that all of these builders are really making playable levels.  That means
 that you could have animations, interactivity, "training experiences",
 interactive stores, and so forth, if you wanted to.
 
-## The Hard Part: `game.ts`
+## The Hard Part: `play.ts`
 
-`game.ts` is going to be quite a bit more difficult than everything else we've
+`play.ts` is going to be quite a bit more difficult than everything else we've
 done so far.  One thing is that we'll need to have nine different levels,
 because of how we set up our chooser.  But it's also time to think about how to
 make the transitions more pleasant.
