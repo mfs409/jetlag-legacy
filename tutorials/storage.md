@@ -289,3 +289,10 @@ function builder(level: number) {
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
 ```
+
+```md-config
+page-title = Gesture-Based Input
+img {display: block; margin: auto; max-width: 75%;}
+.max500 img {max-width: 500px}
+.red {color: red}
+```

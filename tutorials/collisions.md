@@ -1,75 +1,43 @@
-*** Collision Events (collisions; ready)
-**** Overview
-This tutorial discusses collision events, and how they are handled in JetLag.
-**** What Goes In here?
-- Not in it: Most things are when the collision starts
-  - Automatic things: the code for when a hero and enemy collide.  But even
-    these are customizable
-    - Goodie: "OnCollect"
-    - Destination: "OnAttemptArrival"
-    - Enemy: OnDefeatHero, OnDefeated
-    - Hero: OnStrengthChange, defaults for enemy, destination, goodie
-    - Obstacle: heroCollision, enemyCollision, projectileCollision
-    - Sensor: heroCollision
-- Disabling collisions: onesided, passthrough
-- addEndContactHandler (world method) is at the end of a collision
-- Sticky
+# Advanced Collisions
 
-5 levels
+JetLag, via Box2D, provides many ways of customizing or even overriding the way that collisions are handled.  This tutorial shows a few more advanced collision options.
+
+## Getting Started
+
+This tutorial uses the `boundingBox()` and `enableTilt()` functions, as well as
+the `sprites.json` and `sprites.png` files.  Be sure to copy them over from
+previous tutorials before continuing.
+
+Also, since the examples are likely to involve winning and losing, you'll
+probably want these three lines at the top of `builder()`:
+
+```typescript
+  boundingBox();
+  stage.score.onLose = { level, builder };
+  stage.score.onWin = { level, builder };
+```
+
+## Sticky Actors
+
+It can be useful to make a hero stick to an actor.  As an example, if the hero
+should stand on a platform that moves along a path, then physics says that the
+hero will slide on the platform as it moves left/right (unless there is a lot of
+friction), and the hero will "bounce" when the platform goes from moving upward
+to moving downward.  In the following example, you should move the hero onto
+each platform, and watch how its behavior changes.
 
 ```iframe
 {
     "width": 800,
     "height": 450,
-    "src": "text_hud.html?1"
+    "src": "collisions.html?1"
 }
 ```
 
+To make this example, we'll start by setting up some gravity and a hero.  The
+hero can move left/right via the arrow keys, and can jump via the space bar:
+
 ```typescript
-import { initializeAndLaunch } from "../jetlag/Stage";
-import { JetLagGameConfig, Sides } from "../jetlag/Config";
-import { FilledBox, ImageSprite, TextSprite } from "../jetlag/Components/Appearance";
-import { ChaseMovement, ManualMovement, Path, PathMovement, TiltMovement } from "../jetlag/Components/Movement";
-import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
-import { Enemy, Hero, Obstacle } from "../jetlag/Components/Role";
-import { Actor } from "../jetlag/Entities/Actor";
-import { stage } from "../jetlag/Stage";
-import { AdvancedCollisionSystem } from "../jetlag/Systems/Collisions";
-import { KeyCodes } from "../jetlag/Services/Keyboard";
-import { boundingBox, enableTilt } from "./common";
-
-/**
- * Screen dimensions and other game configuration, such as the names of all
- * the assets (images and sounds) used by this game.
- */
-class Config implements JetLagGameConfig {
-  pixelMeterRatio = 100;
-  screenDimensions = { width: 1600, height: 900 };
-  adaptToScreenSize = true;
-  canVibrate = true;
-  forceAccelerometerOff = true;
-  storageKey = "--no-key--";
-  hitBoxes = true;
-  resourcePrefix = "./assets/";
-  musicNames = [];
-  soundNames = [];
-  imageNames = ["sprites.json"];
-}
-
-/**
- * Build the levels of the game.
- *
- * @param level Which level should be displayed
- */
-function builder(level: number) {
-  boundingBox();
-  stage.score.onLose = { level, builder };
-  stage.score.onWin = { level, builder };
-
-  if (level == 1) {
-    // It can be useful to make a hero stick to an obstacle. As an example, if
-    // the hero should stand on a platform that moves along a path, then we will
-    // want the hero to "stick" to it, even as the platform moves downward.
     stage.world.setGravity(0, 10);
     let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -82,31 +50,58 @@ function builder(level: number) {
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
+```
 
-    // This platform is sticky on top... Jump onto it and watch what happens
+Now we'll make a platform that moves in a diamond shape.  This platform is
+sticky on top, via the `stickySides` argument to its rigid body
+
+```typescript
     new Actor({
       appearance: new FilledBox({ width: 2, height: 0.25, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 2, cy: 6, width: 2, height: 0.25 }, { stickySides: [Sides.TOP], density: 100, friction: 0.1 }),
       movement: new PathMovement(new Path().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true),
       role: new Obstacle(),
     });
-    // Be sure to try out bottomSticky, leftSticky, and rightSticky
+```
 
-    // This obstacle is not sticky... The hero can slip around on it
-    //
-    // It's tempting to think "I'll use some friction here", but that still
-    // wouldn't help with when the platform reaches the top of its path
+Now we'll make another platform, without stickiness.  You should try to use
+friction (on the hero and platform) to avoid the sliding and bouncing behaviors.
+You'll probably find that it's too hard to get it to work nicely while still
+having the rest of the hero movement the way you want it.
+
+```typescript
     new Actor({
       appearance: new FilledBox({ width: 2, height: 0.25, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 11, cy: 6, width: 2, height: 0.25 }, { density: 100, friction: 1 }),
       movement: new PathMovement(new Path().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true),
       role: new Obstacle(),
     });
-  }
+```
 
-  else if (level == 2) {
-    // Another popular feature is walls that can be passed through in one
-    // direction, but not another
+You can make several a different side sticky, by using `Sides.BOTTOM`,
+`Sides.RIGHT`, or `Sides.LEFT`.  You can also put several sides into the
+`stickySides` array, by separating each with a comma.
+
+## Disabling Collisions From One Side
+
+In some games, we want one kind of actor to be able to "pass through" another.
+For example, in this level, each of the red walls can be passed through from
+three sides.  This means the hero can go through the wall in one direction, and
+not the other.
+
+```iframe
+{
+    "width": 800,
+    "height": 450,
+    "src": "collisions.html?2"
+}
+```
+
+In the code for this level, each of the red walls uses `singleRigidSide` to pick
+just one side that stays rigid.  The result is a sort of "box" on the screen
+that is easy to get inside, and harder to get out of.
+
+```typescript
     enableTilt(10, 10);
 
     new Actor({
@@ -116,8 +111,6 @@ function builder(level: number) {
       role: new Hero(),
     });
 
-    // create a box that is easy to fall into, but hard to get out of,
-    // by making its sides each "one-sided"
     new Actor({
       appearance: new FilledBox({ width: 3, height: 0.2, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 4.5, cy: 3.1, width: 3, height: 0.2 }, { singleRigidSide: Sides.BOTTOM }),
@@ -141,10 +134,28 @@ function builder(level: number) {
       rigidBody: new BoxBody({ cx: 4.5, cy: 7.5, width: 3, height: 0.2 }, { singleRigidSide: Sides.TOP }),
       role: new Obstacle(),
     });
-  }
+```
 
-  else if (level == 3) {
-    // Sometimes, we want to say that certain actors can pass through others
+There are many possibilities for this sort of wall.  For example, you might want
+a trap door, or a platform that can be "jumped through".
+
+## Disabling Collisions For Teams Of Actors
+
+Another way we can change the behavior of collisions is by indicating that
+certain combinations of actors simply do not collide with each other.  In this
+example, the hero is able to move through the red wall, but the enemy cannot:
+
+```iframe
+{
+    "width": 800,
+    "height": 450,
+    "src": "collisions.html?3"
+}
+```
+
+JetLag achieves this behavior via an extra field, called `passThroughId`
+
+```typescript
     enableTilt(10, 10);
     let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -167,7 +178,19 @@ function builder(level: number) {
       rigidBody: new BoxBody({ cx: 12, cy: 1, width: 0.1, height: 7 }, { passThroughId: 7 }),
       role: new Obstacle(),
     });
-  }
+```
+
+## X 
+
+```iframe
+{
+    "width": 800,
+    "height": 450,
+    "src": "collisions.html?4"
+}
+```
+
+```typescript
 
   else if (level == 4) {
     // We previously saw that we can have "sticky" actors, and also allow actors
@@ -203,6 +226,19 @@ function builder(level: number) {
       role: new Obstacle(),
     })
   }
+```
+
+## X 
+
+```iframe
+{
+    "width": 800,
+    "height": 450,
+    "src": "collisions.html?5"
+}
+```
+
+```typescript
 
   else if (level == 5) {
     // Everything we've looked at so far deals with when collisions *start*.
@@ -239,4 +275,11 @@ function builder(level: number) {
 
 // call the function that kicks off the game
 initializeAndLaunch("game-player", new Config(), builder);
+```
+
+```md-config
+page-title = Advanced Collisions
+img {display: block; margin: auto; max-width: 75%;}
+.max500 img {max-width: 500px}
+.red {color: red}
 ```

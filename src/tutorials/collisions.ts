@@ -120,7 +120,7 @@ function builder(level: number) {
     enableTilt(10, 10);
     let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
-      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { passThroughId: 7 }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { passThroughId: [7] }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
@@ -136,7 +136,7 @@ function builder(level: number) {
 
     new Actor({
       appearance: new FilledBox({ width: 0.1, height: 7, fillColor: "#FF0000" }),
-      rigidBody: new BoxBody({ cx: 12, cy: 1, width: 0.1, height: 7 }, { passThroughId: 7 }),
+      rigidBody: new BoxBody({ cx: 12, cy: 1, width: 0.1, height: 7 }, { passThroughId: [7] }),
       role: new Obstacle(),
     });
   }

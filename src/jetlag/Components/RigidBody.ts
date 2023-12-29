@@ -22,7 +22,7 @@ abstract class RigidBodyBase {
   /** Which sides of the body are sticky, if any? */
   stickySides: Sides[] = [];
   /** Entities with a matching Id don't collide with each other */
-  passThroughId?: number;
+  passThroughId?: number[];
   /** Are collisions only valid from one direction? */
   singleRigidSide?: Sides;
   /** A joint for fusing entities together when one is "sticky" */

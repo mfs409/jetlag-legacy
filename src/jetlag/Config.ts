@@ -162,7 +162,7 @@ export interface PhysicsCfg {
   /** Are collisions only valid from one direction? */
   singleRigidSide?: Sides;
   /** Entities with a matching nonzero Id don't collide with each other */
-  passThroughId?: number;
+  passThroughId?: number[];
   /** The speed at which to rotate, in rotations per second */
   rotationSpeed?: number;
   /** Should the body be forced to be dynamic? */

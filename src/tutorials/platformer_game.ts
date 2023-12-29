@@ -84,7 +84,7 @@ function builder(level: number) {
 
     let h = new Actor({
       appearance: new AnimatedSprite({ width: 2, height: 2, animations, remap }),
-      rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true, passThroughId: 8 }),
+      rigidBody: new PolygonBody({ cx: 0.5, cy: 8.1, vertices: [-.5, .9, .5, .9, .5, -.5, -.5, -.5] }, { density: 1, disableRotation: true, passThroughId: [8] }),
       movement: new ManualMovement(),
       role: new Hero()
     });
@@ -120,7 +120,7 @@ function builder(level: number) {
     // set up the pool of projectiles
     for (let i = 0; i < 100; ++i) {
       let appearance = new FilledCircle({ radius: 0.125, fillColor: "#777777", z: 0 });
-      let rigidBody = new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, { density: 0.01, elasticity: 1, passThroughId: 8 });
+      let rigidBody = new CircleBody({ radius: 0.125, cx: -100, cy: -100 }, { density: 0.01, elasticity: 1, passThroughId: [8] });
       rigidBody.body.SetGravityScale(1);
       rigidBody.setCollisionsEnabled(true);
       let reclaimer = (actor: Actor) => { projectiles.put(actor); }
