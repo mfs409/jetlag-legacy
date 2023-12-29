@@ -5,6 +5,19 @@ aspects of JetLag.  You might need to read through this tutorial more than once
 before it all makes sense.  You should also be sure to do the Graphical Assets
 tutorial, since the ideas in it relate to how Animations work.
 
+## A Warning About Imports
+
+In this tutorial, we will use the `AnimatedSprite` type.  Unfortunately, both
+JetLag and Pixi.js have something that they call an `AnimatedSprite`.  If you
+are using a plug-in to manage your imports, or if you are letting VSCode
+automatically create import statements for you, make sure it imports the correct
+import: `import { AnimatedSprite } from "../jetlag/Components/Appearance";`.
+
+(Note: the statement might include other things in the import, so if you see
+something like `import { AnimatedSprite, FilledBox, FilledCircle, FilledPolygon,
+ImageSprite } from "../jetlag/Components/Appearance";`, that's fine too.  The
+thing you don't want is this: ~~`import { AnimatedSprite } from "pixi.js";`~~
+
 ## State Machines
 
 Before we try to animate anything, it's important to have some familiarity with
@@ -168,7 +181,6 @@ animation.
       });
       (coin.appearance as AnimatedSprite).skipTo(Math.trunc(i / 2), (i % 2) * .25);
     }
-  }
 ```
 
 ## Animations With Varying Time
@@ -396,10 +408,9 @@ You probably guessed that we'll want to do some re-mapping:
 But in truth, there's a lot more remapping that it seems like we need.
 Fortunately, there is another way.  JetLag understands that there are two
 dominant views (overhead and side), and that there are different (but still
-reasonable) default remappings for each.  Let's make our hero:
+reasonable) default re-mappings for each.  Let's make our hero:
 
 ```typescript
-    let h_cfg = ;
     let h = new Actor({
       appearance: new AnimatedSprite({ width: 0.8, height: 0.8, animations, remap }),
       rigidBody: new CircleBody({ cx: 0.25, cy: 7, radius: 0.4 }, { density: 5, friction: 0.6, disableRotation: true }),
