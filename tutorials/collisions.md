@@ -1,6 +1,8 @@
 # Advanced Collisions
 
-JetLag, via Box2D, provides many ways of customizing or even overriding the way that collisions are handled.  This tutorial shows a few more advanced collision options.
+JetLag, via Box2D, provides many ways of customizing or even overriding the way
+that collisions are handled.  This tutorial shows a few more advanced collision
+options.
 
 ## Getting Started
 
@@ -153,13 +155,15 @@ example, the hero is able to move through the red wall, but the enemy cannot:
 }
 ```
 
-JetLag achieves this behavior via an extra field, called `passThroughId`
+JetLag achieves this behavior via an extra field, called `passThroughId`.  It is
+an array of numbers.  If two actors have any number in common between their two
+arrays, then JetLag will turn off collisions between those two actors.
 
 ```typescript
     enableTilt(10, 10);
     let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
-      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { passThroughId: 7 }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { passThroughId: [7] }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
@@ -175,12 +179,22 @@ JetLag achieves this behavior via an extra field, called `passThroughId`
 
     new Actor({
       appearance: new FilledBox({ width: 0.1, height: 7, fillColor: "#FF0000" }),
-      rigidBody: new BoxBody({ cx: 12, cy: 1, width: 0.1, height: 7 }, { passThroughId: 7 }),
+      rigidBody: new BoxBody({ cx: 12, cy: 1, width: 0.1, height: 7 }, { passThroughId: [7] }),
       role: new Obstacle(),
     });
 ```
 
-## X 
+A nice aspect of this design is that you can use many different numbers to
+represent many different rules.  For example, maybe enemies should pass through
+obstacles, obstacles through heroes, heroes through goodies, and goodies through
+destinations.  Using a different number for each rule, and two numbers per
+actor, would let you express these behaviors.
+
+## Combining Stickiness With Rigid Sides
+
+In this next example, we do a quick test to make sure that the ideas we've seen
+so far *compose*.  It should be possible to jump through the bottom of the
+leftmost platform, and then stick to its top:
 
 ```iframe
 {
@@ -190,45 +204,20 @@ JetLag achieves this behavior via an extra field, called `passThroughId`
 }
 ```
 
+Compared to before, the only difference from before is when we make the rigid
+body for the platform on the left:
+
 ```typescript
-
-  else if (level == 4) {
-    // We previously saw that we can have "sticky" actors, and also allow actors
-    // to pass through other actors by making only certain sides rigid.  In this
-    // example, we make sure they work together, by letting the hero jump
-    // through a platform, and then stick to it.
-    stage.world.setGravity(0, 10);
-    let hero = new Actor({
-      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
-      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 2, disableRotation: true }),
-      movement: new ManualMovement(),
-      role: new Hero(),
-    });
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => { (hero.role as Hero).jump(0, -7.5); });
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(-5, hero.rigidBody.getVelocity().y); });
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
-    stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
-    stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
-
-    // This obstacle is sticky on top, and only rigid on its top
-    new Actor({
-      appearance: new FilledBox({ width: 2, height: 0.25, fillColor: "#FF0000" }),
       rigidBody: new BoxBody({ cx: 2, cy: 6, width: 2, height: 0.25, }, { stickySides: [Sides.TOP], singleRigidSide: Sides.TOP, density: 100, friction: 0.1 }),
-      movement: new PathMovement(new Path().to(2, 6).to(4, 8).to(6, 6).to(4, 4).to(2, 6), 1, true),
-      role: new Obstacle(),
-    });
-
-    // This obstacle is not sticky, and it is rigid on all sides
-    new Actor({
-      appearance: new FilledBox({ width: 2, height: 0.25, fillColor: "#FF0000" }),
-      rigidBody: new BoxBody({ cx: 11, cy: 6, width: 2, height: 0.25, }, { density: 100, friction: 1 }),
-      movement: new PathMovement(new Path().to(10, 6).to(12, 8).to(14, 6).to(12, 4).to(10, 6), 1, true),
-      role: new Obstacle(),
-    })
-  }
 ```
 
-## X 
+## Responding To The End Of A Collision
+
+Everything we've looked at so far deals with when collisions *start*. Sometimes,
+we want to do something when the collision *ends*.  In this example, each time
+the hero collides with the obstacle, it puts a different message on the screen.
+You can think of this as the start of the kind of interaction you might have in
+an RPG style of game.
 
 ```iframe
 {
@@ -238,11 +227,9 @@ JetLag achieves this behavior via an extra field, called `passThroughId`
 }
 ```
 
-```typescript
+The first part of this code just sets up the hero:
 
-  else if (level == 5) {
-    // Everything we've looked at so far deals with when collisions *start*.
-    // Sometimes, we want to do something when the collision *ends*.
+```typescript
     enableTilt(10, 10);
     let h = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
@@ -250,7 +237,31 @@ JetLag achieves this behavior via an extra field, called `passThroughId`
       movement: new TiltMovement(),
       role: new Hero(),
     });
+```
 
+There are two things to understand about the rest of the code.  The first is
+that we're going to make an ad hoc state machine.  We'll accomplish it using a
+number and an array of messages:
+
+```mermaid
+graph TD
+  A[collisions=0] -->|collide| B[show first message]
+  B -->|end collision| C[collisions=1]
+  C -->|collide| D[show second message]
+  D -->|end collision| E[collisions=2]
+  E -->|collide| F[show third message]
+  F -->|end collision| G[win the game]
+```
+
+Next, let's think about how to get the behavior we want.  When the hero collides
+with the obstacle, we'll set up an "end contact" handler.  This code will run
+when the hero and obstacle stop being in a collided state.  If they collide
+again, we'll need to add a new "end contact" handler, but fortunately, the code
+is the same (it's just the value of `collisions` that will change).
+
+Putting it all together, the rest of the example looks like this:
+
+```typescript
     let collisions = 0;
     let messages = ["Please leave me alone", "Why do you bother me so?", "Fine, you win."]
     let o = new Actor({
@@ -270,12 +281,15 @@ JetLag achieves this behavior via an extra field, called `passThroughId`
         }
       }),
     });
-  }
-}
-
-// call the function that kicks off the game
-initializeAndLaunch("game-player", new Config(), builder);
 ```
+
+## Wrapping Up
+
+In this tutorial, we saw ways of either *not* using a collision, or using a
+collision differently than what was possible in the previous tutorials.  Perhaps
+the most important point is that none of these features was part of my original
+design for JetLag... they all came later, in response to needs that students
+raised.  If you think you need a new feature in JetLag, please contact me!
 
 ```md-config
 page-title = Advanced Collisions
