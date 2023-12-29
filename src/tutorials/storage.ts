@@ -173,8 +173,6 @@ function builder(level: number) {
     }
 
     for (let cx = 1.5; cx < 16.5; cx += 2) {
-      let animations = new Map();
-      animations.set(AnimationState.IDLE_E, AnimationSequence.makeSimple({ timePerFrame: 75, repeat: true, images: ["coin0.png", "coin1.png", "coin2.png", "coin3.png", "coin4.png", "coin5.png", "coin6.png", "coin7.png"] }))
       new Actor({
         appearance: new ImageSprite({ width: 0.4, height: 0.4, img: "red_ball.png" }),
         rigidBody: new CircleBody({ cx, cy: 5, radius: 0.2 }),
