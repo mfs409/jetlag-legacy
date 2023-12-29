@@ -70,9 +70,9 @@ const tut_src = {
     "endless_runner_game", "gestures", "getting_started", "joints", "maze_game",
     "movement", "rigidbody", "overhead_fight_farm_game", "overview",
     "package_desktop", "package_mobile", "platformer_game", "projectiles",
-    "roles_goodies_destinations_sensors", "roles_obstacles_enemies", "score",
-    "simulation_conway", "stage_transitions", "storage", "svg", "text_hud",
-    "timers",
+    "roles_goodies_destinations_sensors", "roles_obstacles_enemies", "score_1",
+    "score_2", "simulation_conway", "stage_transitions", "storage", "svg",
+    "text_hud", "timers",
   ],
 };
 
