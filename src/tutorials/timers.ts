@@ -8,7 +8,7 @@ import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { TimedEvent } from "../jetlag/Systems/Timer";
-import { boundingBox } from "./common"
+import { boundingBox, enableTilt } from "./common"
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -39,13 +39,7 @@ function builder(level: number) {
     // after some time transpires.  In this case, the destination won't appear
     // for five seconds.
     stage.world.setGravity(0, 10);
-    stage.tilt.tiltMax.Set(10, 0);
-    if (!stage.accelerometer.tiltSupported) {
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-    }
+    enableTilt(10, 0);
     boundingBox();
 
     stage.world.timer.addEvent(new TimedEvent(5, false, () => {
@@ -77,17 +71,7 @@ function builder(level: number) {
     // and makes them reproduce every second.  The other says that if you can
     // stay alive for 5 seconds, you win.
     stage.world.setGravity(0, 0);
-    stage.tilt.tiltMax.Set(10, 10);
-    if (!stage.accelerometer.tiltSupported) {
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-    }
+    enableTilt(10, 10);
     boundingBox();
 
     new Actor({
@@ -172,13 +156,7 @@ function builder(level: number) {
     // We can also have timers so that you lose if you don't finish a level
     // within an amount of time:
     stage.world.setGravity(0, 10);
-    stage.tilt.tiltMax.Set(10, 0);
-    if (!stage.accelerometer.tiltSupported) {
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-    }
+    enableTilt(10, 0);
     boundingBox();
 
     // Make a destination
@@ -215,17 +193,7 @@ function builder(level: number) {
     // find that you need a timer to check if something has happened.  We'll
     // demonstrate that in this level.
     stage.world.setGravity(0, 0);
-    stage.tilt.tiltMax.Set(10, 10);
-    if (!stage.accelerometer.tiltSupported) {
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 0));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_UP, () => (stage.accelerometer.accel.y = -5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_DOWN, () => (stage.accelerometer.accel.y = 5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_LEFT, () => (stage.accelerometer.accel.x = -5));
-      stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => (stage.accelerometer.accel.x = 5));
-    }
+    enableTilt(10, 10);
     boundingBox();
 
     // Make an invisible destination
