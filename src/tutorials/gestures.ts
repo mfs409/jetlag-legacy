@@ -74,7 +74,6 @@ function builder(level: number) {
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }),
       gestures: { tap: () => { (hero.role as Hero).jump(0, -7.5); return true; } }
     });
-    return;
   }
 
   if (level == 2) {
@@ -138,7 +137,7 @@ function builder(level: number) {
     // A hero with ManualMovement, so that the joystick can control it
     let hero = new Actor({
       appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
-      rigidBody: new CircleBody({ cx: 1, cy: 8.5, radius: 0.4 }),
+      rigidBody: new CircleBody({ cx: 1, cy: 1.5, radius: 0.4 }),
       movement: new ManualMovement(),
       role: new Hero(),
     });
