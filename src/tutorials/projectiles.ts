@@ -162,7 +162,6 @@ function builder(level: number) {
       let appearance = new FilledBox({ width: 0.02, height: 1, fillColor: "#FF0000" });
       let rigidBody = new BoxBody({ width: 0.02, height: .5, cx: -100, cy: -100 }, { collisionsEnabled: false });
       // let's not let gravity affect these projectiles
-      rigidBody.setCollisionsEnabled(false);
       let reclaimer = (actor: Actor) => { projectiles.put(actor); }
       let role = new Projectile({ disappearOnCollide: true, reclaimer });
       let p = new Actor({ appearance, rigidBody, movement: new ProjectileMovement({ fixedVectorVelocity: 10, rotateVectorToss: true }), role });
@@ -189,19 +188,19 @@ function builder(level: number) {
     // Move will be the same as touchDown
     let panMove = touchDown;
 
-    // Set up a timer to run on every render
-    let mLastToss = 0;
-    stage.world.repeatEvents.push(() => {
+    // Set up a timer to run at high frequency
+    let lastToss = 0;
+    stage.world.timer.addEvent(new TimedEvent(.01, true, () => {
       if (isHolding) {
-        let now = new Date().getTime();
+        let now = stage.renderer.now;
         // Only throw once per 100 ms
-        if (mLastToss + 100 < now) {
-          mLastToss = now;
+        if (lastToss + 100 < now) {
+          lastToss = now;
           // We can use "tossAt" to throw toward a specific point
-          (projectiles.get()?.role as Projectile | undefined)?.tossAt(h.rigidBody?.getCenter().x ?? 0, h.rigidBody?.getCenter().y ?? 0, v.x, v.y, h, 0, 0);
+          (projectiles.get()?.role as Projectile | undefined)?.tossAt(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, v.x, v.y, h, 0, 0);
         }
       }
-    });
+    }));
 
     new Actor({
       appearance: new FilledBox({ width: 16, height: 9, fillColor: "#00000000" }),
@@ -233,7 +232,6 @@ function builder(level: number) {
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_LEFT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(5, hero.rigidBody.getVelocity().y); });
     stage.keyboard.setKeyUpHandler(KeyCodes.KEY_RIGHT, () => { (hero.movement as ManualMovement).setAbsoluteVelocity(0, hero.rigidBody.getVelocity().y); });
-    stage.world.setGravity(0, 10);
 
     // set up the pool of projectiles
     let projectiles = new ActorPoolSystem();
@@ -292,10 +290,9 @@ function builder(level: number) {
       role: new Obstacle(),
     });
 
-    let cfg = { cx: 8.5, cy: 0.5, width: 1, height: 1, radius: 0.5, img: "green_ball.png" };
     let h = new Actor({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg),
+      appearance: new ImageSprite({ width: 1, height: 1, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 8.5, cy: 0.5, radius: 0.5 }),
       role: new Hero(),
     });
 
@@ -347,17 +344,17 @@ function builder(level: number) {
       gestures: { touchDown, touchUp, panMove },
     });
 
-    let mLastToss = 0;
-    stage.world.repeatEvents.push(() => {
+    let lastToss = 0;
+    stage.world.timer.addEvent(new TimedEvent(.01, true, () => {
       if (isHolding) {
-        let now = new Date().getTime();
-        if (mLastToss + 50 < now) {
-          mLastToss = now;
+        let now = stage.renderer.now;
+        if (lastToss + 50 < now) {
+          lastToss = now;
           let p = projectiles.get();
           if (p) (p.role as Projectile).tossAt(h.rigidBody.getCenter().x, h.rigidBody.getCenter().y, v.x, v.y, h, 0, -.5);
         }
       }
-    });
+    }));
 
     // We'll set up a timer, so that enemies keep falling from the sky
     stage.world.timer.addEvent(new TimedEvent(1, true, () => {
