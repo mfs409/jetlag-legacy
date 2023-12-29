@@ -283,7 +283,7 @@ much every device, so it's an easy choice.  However, you might want to use other
 fonts, so let's look at two ways of doing so.
 
 The first option is to let your game fetch a font from the web when it starts.
-If you visit the [Google Fonts](https://fonts.googleapis.com) website, you'll
+If you visit the [Google Fonts](https://fonts.google.com/) website, you'll
 find lots of nice fonts that you can use (be sure to read the licensing rules).
 Once you've found one, you can edit your `game.html` file to put a `<link>` into
 the `<head>`.  This will cause your game to load that font:
