@@ -42,10 +42,9 @@ function builder(level: number) {
     enableTilt(10, 10);
     boundingBox();
 
-    let cfg = { cx: 0.25, cy: 5.25, width: 0.8, height: 0.8, radius: 0.4, img: "green_ball.png" };
     new Actor({
-      appearance: new ImageSprite(cfg),
-      rigidBody: new CircleBody(cfg, { density: 5, friction: 0.6 }),
+      appearance: new ImageSprite({ width: 0.8, height: 0.8, img: "green_ball.png" }),
+      rigidBody: new CircleBody({ cx: 0.25, cy: 5.25, radius: 0.4 }, { density: 5, friction: 0.6 }),
       movement: new TiltMovement(),
       role: new Hero(),
     });
