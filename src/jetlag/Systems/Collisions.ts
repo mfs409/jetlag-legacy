@@ -215,11 +215,18 @@ export class AdvancedCollisionSystem extends BasicCollisionSystem {
             return;
           }
 
-          // if the entities have the same passthrough ID, and it's not
-          // zero, then disable the contact
-          if (ab.passThroughId && ab.passThroughId == bb.passThroughId) {
-            contact.SetEnabled(false);
-            return;
+          // if the entities have a matching passthrough ID
+          //
+          // TODO: is there a more efficient option than this n^2 code?
+          if (ab.passThroughId && bb.passThroughId) {
+            for (let i1 of ab.passThroughId) {
+              for (let i2 of bb.passThroughId) {
+                if (i1 == i2) {
+                  contact.SetEnabled(false);
+                  return;
+                }
+              }
+            }
           }
 
           // if the entities have a special exemption to keep them from

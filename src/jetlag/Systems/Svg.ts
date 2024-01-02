@@ -265,10 +265,10 @@ export class SvgSystem {
     y2 -= this.top_left!.y;
 
     // convert the coordinates to meters
-    x1 /= stage.pixelMeterRatio;
-    y1 /= stage.pixelMeterRatio;
-    x2 /= stage.pixelMeterRatio;
-    y2 /= stage.pixelMeterRatio;
+    x1 /= stage.config.pixelMeterRatio;
+    y1 /= stage.config.pixelMeterRatio;
+    x2 /= stage.config.pixelMeterRatio;
+    y2 /= stage.config.pixelMeterRatio;
 
     // add in the user transform in meters and draw it
     x1 += this.translate.x;
