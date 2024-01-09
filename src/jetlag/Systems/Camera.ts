@@ -17,7 +17,7 @@ import { stage } from "../Stage";
  */
 export class CameraSystem {
   /** Anything in the world that can be rendered (5 planes [-2, -1, 0, 1, 2]) */
-  protected readonly actors: Actor[][] = [[], [], [], [], []];
+  protected readonly actors: Actor[] = [];
 
   /** The minimum x coordinate that can be shown (left) */
   private minX: number | undefined;
@@ -101,9 +101,7 @@ export class CameraSystem {
     this.setScale(this.ratio);
 
     // set up the containers for holding anything we can render
-    this.actors = new Array<Array<Actor>>(5);
-    for (let i = 0; i < 5; ++i)
-      this.actors[i] = new Array<Actor>();
+    this.actors = [];
   }
 
   /**
@@ -238,25 +236,13 @@ export class CameraSystem {
    * @param actor The actor to add
    */
   addEntity(actor: Actor) {
-    this.actors[actor.appearance.z + 2].push(actor);
-  }
-
-  /**
-   * Remove an actor from its z plane
-   *
-   * @param actor The actor to remove
-   */
-  removeEntity(actor: Actor) {
-    let z = actor.appearance.z
-    let i = this.actors[z + 2].indexOf(actor);
-    this.actors[z + 2].splice(i, 1);
+    this.actors.push(actor);
   }
 
   /** Render the actors associated with this camera */
   render(elapsedMs: number) {
     // Draw everything
-    for (let zPlane of this.actors)
-      for (let renderable of zPlane)
-        if (renderable.prerender(elapsedMs)) renderable.appearance?.render(this, elapsedMs);
+    for (let renderable of this.actors)
+      if (renderable.prerender(elapsedMs)) renderable.appearance?.render(this, elapsedMs);
   }
 }

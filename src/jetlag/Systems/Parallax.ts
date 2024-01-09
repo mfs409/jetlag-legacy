@@ -1,7 +1,7 @@
 import { b2Vec2 } from "@box2d/core";
 import { stage } from "../Stage";
 import { CameraSystem } from "../Systems/Camera";
-import { AnimatedSprite, ImageSprite } from "../Components/Appearance";
+import { AnimatedSprite, ImageSprite, ZIndex } from "../Components/Appearance";
 
 /**
  * A ParallaxLayer is a layer that seems to scroll and repeat.  Layering
@@ -53,25 +53,27 @@ class ParallaxLayer {
    *
    * @param camera    The camera for the world that these layers accompany
    * @param elapsedMs The time since the last render
+   * @param z         The z index at which to render the layer
    */
-  public render(camera: CameraSystem, elapsedMs: number) {
+  public render(camera: CameraSystem, elapsedMs: number, z: ZIndex) {
     for (let i of this.images)
       i.prerender(elapsedMs);
-    if (this.isAuto) this.renderAuto(camera, elapsedMs);
-    else this.renderRelative(camera, elapsedMs);
+    if (this.isAuto) this.renderAuto(camera, elapsedMs, z);
+    else this.renderRelative(camera, elapsedMs, z);
   }
 
   /**
    * Draw a layer that moves in a fixed velocity in the X dimension
    *
-   * @param camera  The camera for the world that these layers accompany
-   * @param elapsed The elapsed time since we last drew this layer
+   * @param camera    The camera for the world that these layers accompany
+   * @param elapsedMs The elapsed time since we last drew this layer
+   * @param z         The z index at which to render the layer
    */
-  private renderAuto(camera: CameraSystem, elapsedMs: number) {
+  private renderAuto(camera: CameraSystem, elapsedMs: number, z: ZIndex) {
     // Determine the position of a reference tile of the image
     if (this.isHorizontal) this.last.x += this.speed * elapsedMs;
     else this.last.y += this.speed * elapsedMs;
-    this.normalizeAndRender(camera, elapsedMs);
+    this.normalizeAndRender(camera, elapsedMs, z);
   }
 
   /**
@@ -80,9 +82,11 @@ class ParallaxLayer {
    * NB: the efficiency of this code derives from the assumption that the
    *     camera does not move suddenly
    *
-   * @param camera  The camera for the world that these layers accompany
+   * @param camera    The camera for the world that these layers accompany
+   * @param elapsedMs The elapsed time since we last drew this layer
+   * @param z         The z index at which to render the layer
    */
-  private renderRelative(camera: CameraSystem, elapsedMs: number) {
+  private renderRelative(camera: CameraSystem, elapsedMs: number, z: ZIndex) {
     // Determine the change in camera
     let x = camera.getLeft(); // left of viewport
     let y = camera.getTop(); // top of viewport
@@ -91,15 +95,16 @@ class ParallaxLayer {
     // Determine the relative change to the reference tile
     if (this.isHorizontal) this.last.x = this.last.x + dx * this.speed;
     else this.last.y = this.last.y + dy * this.speed;
-    this.normalizeAndRender(camera, elapsedMs);
+    this.normalizeAndRender(camera, elapsedMs, z);
   }
 
   /**
    * This is how we actually figure out where to draw the background
    *
    * @param camera  The camera for the world that these layers accompany
+   * @param z       The z index at which to render the layer
    */
-  private normalizeAndRender(camera: CameraSystem, elapsedMs: number) {
+  private normalizeAndRender(camera: CameraSystem, elapsedMs: number, z: ZIndex) {
     let x = camera.getLeft(); // left of viewport
     let y = camera.getTop(); // top of viewport
     let camW = stage.screenWidth / stage.pixelMeterRatio;
@@ -120,16 +125,18 @@ class ParallaxLayer {
     // save camera for next render
     this.lastCam.x = x;
     this.lastCam.y = y;
-    this.renderVisibleTiles(camera, elapsedMs);
+    this.renderVisibleTiles(camera, elapsedMs, z);
   }
 
   /**
    * Given the x,y coordinates of a reference tile, render the tiles of a
    * layer that are visible
    *
-   * @param camera  The camera for the world that these layers accompany
+   * @param camera    The camera for the world that these layers accompany
+   * @param elapsedMs The elapsed time since we last drew this layer
+   * @param z         The z index at which to render the layer
    */
-  private renderVisibleTiles(camera: CameraSystem, elapsedMs: number) {
+  private renderVisibleTiles(camera: CameraSystem, elapsedMs: number, z: ZIndex) {
     let x = camera.getLeft(); // left of viewport
     let y = camera.getTop(); // top of viewport
     let camW = stage.screenWidth / stage.pixelMeterRatio;
@@ -140,7 +147,7 @@ class ParallaxLayer {
       while (plx < x + camW) {
         let cx = plx + this.images[i].width / 2;
         let cy = this.last.y + this.images[i].height / 2;
-        this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs);
+        this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs, z);
         plx += this.images[i].width;
         i++;
       }
@@ -151,7 +158,7 @@ class ParallaxLayer {
       while (ply < y + camH) {
         let cx = this.last.x + this.images[i].width / 2;
         let cy = ply + this.images[i].height / 2;;
-        this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs);
+        this.images[i].renderWithoutBody({ cx, cy }, camera, elapsedMs, z);
         ply += this.images[i].height;
         i++;
       }
@@ -193,9 +200,10 @@ export class ParallaxSystem {
    *
    * @param camera    The camera for the world that these layers accompany
    * @param elapsedMs The time since the last render
+   * @param z         The z index at which to render the layer
    */
-  public render(camera: CameraSystem, elapsedMs: number) {
+  public render(camera: CameraSystem, elapsedMs: number, z: ZIndex) {
     for (let pl of this.layers)
-      pl.render(camera, elapsedMs);
+      pl.render(camera, elapsedMs, z);
   }
 }

@@ -80,7 +80,7 @@ export class Stage {
   screenHeight: number;
   /** The real pixel-meter ratio */
   pixelMeterRatio: number;
-  /** Code to run at the end of the next render step */
+  /** Code to run at the end of the next render step (used for screenshots) */
   private afterRender?: () => void;
 
   /**
@@ -125,12 +125,12 @@ export class Stage {
   public clearOverlay() { this.overlay = undefined; }
 
   /**
-   * This code is called dozens of times per second to update the game state and
-   * re-draw the screen
+   * This code is called dozens of times per second to update the game's world's
+   * state and re-draw the world
    *
    * @param elapsedMs The time in milliseconds since the previous render
    */
-  public render(elapsedMs: number) {
+  public renderWorld(elapsedMs: number) {
     // If we've got an overlay, show it and do nothing more
     if (this.overlay) {
       this.overlay.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
@@ -164,21 +164,35 @@ export class Stage {
     // Determine the center of the camera's focus
     this.world.camera.adjustCamera();
 
-    // The world is now static for this time step... we can display it!
-    // Order is background, world, foreground, hud
-    this.background.render(this.world.camera, elapsedMs);
+    // The world is now static for this time step... we can display it! Order is
+    // background, world, foreground.  We force the Z values on the background
+    // and foreground to achieve this behavior.
+    this.background.render(this.world.camera, elapsedMs, -2);
     this.world.timer.advance(elapsedMs);
     this.world.camera.render(elapsedMs);
     this.renderer.applyFilter(false, false, false);
-    this.foreground.render(this.world.camera, elapsedMs);
+    this.foreground.render(this.world.camera, elapsedMs, 2);
+
+    if (this.afterRender)
+      this.afterRender();
+  }
+
+  /**
+   * This code is called dozens of times per second to update the game's hud's
+   * state and re-draw the hud
+   *
+   * @param elapsedMs The time in milliseconds since the previous render
+   */
+  public renderHud(elapsedMs: number) {
+    // If we've got an overlay, don't draw the HUD
+    if (this.overlay) {
+      return;
+    }
 
     this.hud.physics!.world.Step(elapsedMs / 1000, { velocityIterations: 8, positionIterations: 3 });
     this.hud.runRendertimeEvents();
     this.hud.timer.advance(elapsedMs);
     this.hud.camera.render(elapsedMs);
-
-    if (this.afterRender)
-      this.afterRender();
   }
 
   /**

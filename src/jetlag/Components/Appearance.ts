@@ -8,6 +8,12 @@ import { stage } from "../Stage";
 import { Graphics, Sprite as PixiSprite } from "pixi.js";
 
 /**
+ * ZIndex is a convenience type to enforce that there are five Z indices in
+ * JetLag, numbered -2, -1, 0, 1, and 2
+ */
+export type ZIndex = -2 | -1 | 0 | 1 | 2;
+
+/**
  * Validate a filled Box/Circle/Polygon's line/fill information
  *
  * @param cfg     The object being validated
@@ -21,15 +27,6 @@ function validateFilledConfig(cfg: FilledBox | FilledCircle | FilledPolygon, cfg
   // Validate: if there's a line color, there needs to be a line width
   else if (cfg.lineColor !== undefined && cfg.lineWidth === undefined)
     stage.console.log(`Error: ${cfgName} with lineColor must have lineWidth`);
-}
-
-/** Coerce a z value into the range -2...2 */
-function coerceZ(z: number | undefined): (-2 | -1 | 0 | 1 | 2) {
-  if (z == -2) return -2;
-  if (z == -1) return -1;
-  if (z == 1) return 1;
-  if (z == 2) return 2;
-  return 0;
 }
 
 /**
@@ -47,7 +44,7 @@ export class TextSprite {
   /** Height of the text (computed) */
   height = 0;
   /** Z index of the image */
-  z: -2 | -1 | 0 | 1 | 2;
+  z: ZIndex;
   /** Should the text be centered at X,Y (true) or is (X,Y) top-left (false) */
   center: boolean;
   /** Font to use */
@@ -77,12 +74,12 @@ export class TextSprite {
    * @param producer          A function that creates the text to display, or a
    *                          String
    */
-  constructor(opts: { center: boolean, face: string, color: string, size: number, z?: number, strokeWidth?: number, strokeColor?: string }, public producer: string | (() => string)) {
+  constructor(opts: { center: boolean, face: string, color: string, size: number, z?: ZIndex, strokeWidth?: number, strokeColor?: string }, public producer: string | (() => string)) {
     this.center = opts.center;
     this.face = opts.face;
     this.color = opts.color;
     this.size = opts.size;
-    this.z = coerceZ(opts.z);
+    this.z = opts.z ? opts.z : 0;
     this.strokeWidth = opts.strokeWidth;
     this.strokeColor = opts.strokeColor;
     let sample_text = (typeof this.producer == "string") ? this.producer : this.producer();
@@ -109,7 +106,7 @@ export class TextSprite {
       this.text.text.text = (typeof this.producer == "string") ? this.producer : this.producer();
       this.width = this.text.text.width;
       this.height = this.text.text.height;
-      stage.renderer.addTextToFrame(this.text, this.actor.rigidBody, camera, this.center);
+      stage.renderer.addTextToFrame(this.text, this.actor.rigidBody, camera, this.center, this.z);
     }
   }
 
@@ -167,7 +164,7 @@ export class ImageSprite {
   /** Height of the image */
   height: number;
   /** Z index of the image */
-  z: -2 | -1 | 0 | 1 | 2;
+  z: ZIndex;
   /** The name of the image file */
   img: string;
 
@@ -179,10 +176,10 @@ export class ImageSprite {
    * @param opts.img    The name of the file to use as the image
    * @param opts.z      An optional z index in the range [-2,2]
    */
-  constructor(opts: { width: number, height: number, img: string, z?: number }) {
+  constructor(opts: { width: number, height: number, img: string, z?: ZIndex }) {
     this.width = opts.width;
     this.height = opts.height;
-    this.z = coerceZ(opts.z);
+    this.z = opts.z ? opts.z : 0;
     this.img = opts.img;
     this.image = stage.imageLibrary.getSprite(this.img);
   }
@@ -195,7 +192,7 @@ export class ImageSprite {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor)
-      stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera);
+      stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.image, camera, this.z);
   }
 
   /**
@@ -205,9 +202,10 @@ export class ImageSprite {
    * @param anchor    The center x/y at which to draw the image
    * @param camera    The camera for the current stage
    * @param elapsedMs The time since the last render
+   * @param z         A z index (overrides the image's z)
    */
-  renderWithoutBody(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
-    stage.renderer.addPictureToFrame(anchor, this, this.image, camera);
+  renderWithoutBody(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number, z: ZIndex) {
+    stage.renderer.addPictureToFrame(anchor, this, this.image, camera, z);
   }
 
   /**
@@ -279,7 +277,7 @@ export class AnimatedSprite implements IStateObserver {
   /** Height of the animation */
   height: number;
   /** Z index of the image */
-  z: -2 | -1 | 0 | 1 | 2;
+  z: ZIndex;
   /**
    * The animation sequences to use (they correspond to different
    * AnimationStates) 
@@ -320,10 +318,10 @@ export class AnimatedSprite implements IStateObserver {
    * @param opts.remap      A map that indicates when an animation for one state
    *                        should be re-used for another state.
    */
-  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, z?: number, remap?: Map<AnimationState, AnimationState> }) {
+  constructor(opts: { width: number, height: number, animations: Map<AnimationState, AnimationSequence>, z?: ZIndex, remap?: Map<AnimationState, AnimationState> }) {
     this.width = opts.width;
     this.height = opts.height;
-    this.z = coerceZ(opts.z);
+    this.z = opts.z ? opts.z : 0;
 
     if (!opts.animations.has(AnimationState.IDLE_E) && !opts.remap?.has(AnimationState.IDLE_E))
       stage.console.log("Error: you must always provide an IDLE_E animation");
@@ -617,7 +615,7 @@ export class AnimatedSprite implements IStateObserver {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor)
-      stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.getCurrent(), camera);
+      stage.renderer.addBodyToFrame(this, this.actor.rigidBody, this.getCurrent(), camera, this.z);
   }
 
   /**
@@ -627,9 +625,10 @@ export class AnimatedSprite implements IStateObserver {
    * @param anchor    The center x/y at which to draw the image
    * @param camera    The camera for the current stage
    * @param elapsedMs The time since the last render
+   * @param z         A z index (overrides the image's z)
    */
-  renderWithoutBody(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number) {
-    stage.renderer.addPictureToFrame(anchor, this, this.getCurrent(), camera);
+  renderWithoutBody(anchor: { cx: number, cy: number }, camera: CameraSystem, _elapsedMs: number, z: ZIndex) {
+    stage.renderer.addPictureToFrame(anchor, this, this.getCurrent(), camera, z);
   }
 
   /**
@@ -680,7 +679,7 @@ export class FilledBox {
   /** Height of the box */
   height: number;
   /** Z index of the box */
-  z: -2 | -1 | 0 | 1 | 2;
+  z: ZIndex;
   /** Line width */
   lineWidth?: number;
   /** Line color */
@@ -698,10 +697,10 @@ export class FilledBox {
    * @param opts.fillColor  Color to fill the box
    * @param opts.z          An optional z index in the range [-2,2]
    */
-  public constructor(opts: { width: number, height: number, lineWidth?: number, lineColor?: string, fillColor: string, z?: number }) {
+  public constructor(opts: { width: number, height: number, lineWidth?: number, lineColor?: string, fillColor: string, z?: ZIndex }) {
     this.width = opts.width;
     this.height = opts.height;
-    this.z = coerceZ(opts.z);
+    this.z = opts.z ? opts.z : 0;
     this.lineWidth = opts.lineWidth;
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
@@ -716,7 +715,7 @@ export class FilledBox {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor)
-      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
+      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera, this.z);
   }
 
   /** Perform any custom updates to the box before displaying it */
@@ -751,7 +750,7 @@ export class FilledCircle {
   /** Height, to simplify some other code */
   height: number;
   /** Z index of the circle: Must be in the range [-2, 2] */
-  z: number;
+  z: ZIndex;
   /** Line width */
   lineWidth?: number;
   /** Line color */
@@ -768,10 +767,10 @@ export class FilledCircle {
    * @param opts.fillColor  Color to fill the circle
    * @param opts.z          An optional z index in the range [-2,2]
    */
-  public constructor(opts: { radius: number, lineWidth?: number, lineColor?: string, fillColor?: string, z?: number }) {
+  public constructor(opts: { radius: number, lineWidth?: number, lineColor?: string, fillColor?: string, z?: ZIndex }) {
     this.radius = opts.radius;
     this.width = this.height = 2 * this.radius;
-    this.z = coerceZ(opts.z);
+    this.z = opts.z ? opts.z : 0;
     this.lineWidth = opts.lineWidth;
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
@@ -786,7 +785,7 @@ export class FilledCircle {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor)
-      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
+      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera, this.z);
   }
 
   /** Perform any custom updates to the circle before displaying it */
@@ -816,7 +815,7 @@ export class FilledPolygon {
   /** The low-level graphics object that we pass to the Renderer */
   readonly graphics = new Graphics();
   /** Z index of the polygon: Must be in the range [-2, 2] */
-  z: number;
+  z: ZIndex;
   /** Width, to simplify some other code */
   width: number;
   /** Height, to simplify some other code */
@@ -841,7 +840,7 @@ export class FilledPolygon {
    * @param opts.fillColor  Color to fill the box
    * @param opts.z          An optional z index in the range [-2,2]
    */
-  constructor(opts: { vertices: number[], lineWidth?: number, lineColor?: string, fillColor?: string, z?: number }) {
+  constructor(opts: { vertices: number[], lineWidth?: number, lineColor?: string, fillColor?: string, z?: ZIndex }) {
     for (let i = 0; i < opts.vertices.length; i += 2)
       this.vertices.push({ x: opts.vertices[i], y: opts.vertices[i + 1] });
     let minX = this.vertices[0].x;
@@ -856,7 +855,7 @@ export class FilledPolygon {
     }
     this.width = (Math.abs(maxX) > Math.abs(minX)) ? 2 * maxX : 2 * minX;
     this.height = (Math.abs(maxY) > Math.abs(minY)) ? 2 * maxY : 2 * minY;
-    this.z = opts.z ?? 0;
+    this.z = opts.z ? opts.z : 0;
     this.lineWidth = opts.lineWidth;
     this.lineColor = opts.lineColor;
     this.fillColor = opts.fillColor;
@@ -871,7 +870,7 @@ export class FilledPolygon {
    */
   render(camera: CameraSystem, _elapsedMs: number) {
     if (this.actor)
-      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera);
+      stage.renderer.addFilledSpriteToFrame(this, this.actor.rigidBody, this.graphics, camera, this.z);
   }
 
   /** Perform any custom updates to the polygon before displaying it */

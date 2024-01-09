@@ -1,7 +1,7 @@
 import { Application, Container, Graphics, BlurFilter, NoiseFilter, SCALE_MODES, Sprite as PixiSprite } from "pixi.js";
 import { GodrayFilter, AsciiFilter, OldFilmFilter } from "pixi-filters";
 import { stage } from "../Stage";
-import { AppearanceComponent, FilledBox, FilledCircle, FilledPolygon } from "../Components/Appearance";
+import { AppearanceComponent, FilledBox, FilledCircle, FilledPolygon, ZIndex } from "../Components/Appearance";
 import { RigidBodyComponent, BoxBody, CircleBody, PolygonBody } from "../Components/RigidBody";
 import { CameraSystem } from "../Systems/Camera";
 import { Sprite, Text } from "./ImageLibrary";
@@ -24,10 +24,10 @@ export class RendererService {
   private pixi: Application;
 
   /**
-   * mainContainer holds all of the sprites that will be rendered as part of
-   * the currently in-progress render.
+   * All of the sprites that will be rendered as part of the currently
+   * in-progress render, ordered by Z.
    */
-  private main: Container;
+  private worldPlaneContainers: [Container, Container, Container, Container, Container];
 
   /**
    * debugContainer holds outlines for sprites that will be rendered during
@@ -67,7 +67,7 @@ export class RendererService {
     document.getElementById(domId)!.appendChild(this.pixi.view as any);
 
     // Set up the containers we will use when rendering
-    this.main = new Container();
+    this.worldPlaneContainers = [new Container(), new Container(), new Container(), new Container(), new Container()];
     if (debugMode) this.debug = new Container();
   }
 
@@ -79,27 +79,30 @@ export class RendererService {
     this.pixi.ticker.add(() => {
       // Remove all state from the renderer
       this.pixi.stage.removeChildren();
-      this.main.removeChildren();
+      for (let c of this.worldPlaneContainers) c.removeChildren();
       this.debug?.removeChildren();
 
       // Tell the game to advance by a step.  This will populate the main
       // container
       let x = this.pixi.ticker.elapsedMS;
       this.elapsed += x;
-      stage.render(x);
+      stage.renderWorld(x);
 
-      // Add the debug container
-      if (this.debug && !this.suppressHitBoxes) this.main.addChild(this.debug);
+      // Put the main container into the renderer, so it will be drawn
+      for (let c of this.worldPlaneContainers)
+        this.pixi.stage.addChild(c);
 
-      // Add the container to the renderer, so it will show on screen
-      this.pixi.stage.addChild(this.main);
+      // Add the debug container?
+      if (this.debug && !this.suppressHitBoxes) this.pixi.stage.addChild(this.debug);
 
       // Grab a screenshot if we don't have one yet
-      // TODO:  This screenshot includes the HUD.  I don't think we want that.
       if (this.screenshotRequested) {
         this.screenshotRequested = false;
         this.mostRecentScreenShot = new PixiSprite(this.pixi.renderer.generateTexture(this.pixi.stage, { scaleMode: SCALE_MODES.LINEAR, resolution: 1, region: this.pixi.renderer.screen }));
       }
+
+      // Now add the HUD to the renderer
+      stage.renderHud(x);
     });
   }
 
@@ -195,8 +198,9 @@ export class RendererService {
    * @param body        The rigid body that accompanies the filled sprite
    * @param graphic     The graphic context
    * @param camera      The camera (and by extension, the world)
+   * @param z           The Z index of the sprite
    */
-  public addFilledSpriteToFrame(appearance: FilledBox | FilledCircle | FilledPolygon, body: RigidBodyComponent, graphic: Graphics, camera: CameraSystem) {
+  public addFilledSpriteToFrame(appearance: FilledBox | FilledCircle | FilledPolygon, body: RigidBodyComponent, graphic: Graphics, camera: CameraSystem, z: ZIndex) {
     graphic.clear();
     // If the actor isn't on screen, skip it
     if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
@@ -239,7 +243,7 @@ export class RendererService {
     else {
       throw "Error: unrecognized FilledSprite?"
     }
-    this.main.addChild(graphic);
+    this.worldPlaneContainers[z + 2].addChild(graphic);
 
     // Debug render?
     if (this.debug != undefined)
@@ -254,8 +258,9 @@ export class RendererService {
    * @param sprite      The sprite, from `appearance`
    * @param camera      The camera that determines which actors to show, and
    *                    where
+   * @param z           The Z index of the sprite
    */
-  public addBodyToFrame(appearance: AppearanceComponent, body: RigidBodyComponent, sprite: Sprite, camera: CameraSystem) {
+  public addBodyToFrame(appearance: AppearanceComponent, body: RigidBodyComponent, sprite: Sprite, camera: CameraSystem, z: ZIndex) {
     // If the actor isn't on screen, skip it
     if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
 
@@ -269,7 +274,7 @@ export class RendererService {
     sprite.sprite.width = s * appearance.width;
     sprite.sprite.height = s * appearance.height;
     sprite.sprite.rotation = body.getRotation();
-    this.main.addChild(sprite.sprite);
+    this.worldPlaneContainers[z + 2].addChild(sprite.sprite);
 
     // Debug render?
     if (this.debug != undefined)
@@ -307,8 +312,9 @@ export class RendererService {
    * @param sprite      The sprite, from `appearance`
    * @param camera      The camera that determines which actors to show, and
    *                    where
+   * @param z           The Z index of the sprite
    */
-  public addPictureToFrame(anchor: { cx: number, cy: number }, appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem) {
+  public addPictureToFrame(anchor: { cx: number, cy: number }, appearance: AppearanceComponent, sprite: Sprite, camera: CameraSystem, z: ZIndex) {
     // If the picture isn't on screen, skip it
     let radius = Math.sqrt(Math.pow(appearance.width / 2, 2) + Math.pow(appearance.height / 2, 2))
     if (!camera.inBounds(anchor.cx, anchor.cy, radius)) return;
@@ -325,7 +331,7 @@ export class RendererService {
     sprite.sprite.width = w;
     sprite.sprite.height = h;
     sprite.sprite.rotation = 0;
-    this.main.addChild(sprite.sprite);
+    this.worldPlaneContainers[z + 2].addChild(sprite.sprite);
 
     // Debug rendering: draw a box around the image
     if (this.debug)
@@ -339,8 +345,9 @@ export class RendererService {
    * @param body    The rigidBody of the actor
    * @param camera  The camera that determines which text to show, and where
    * @param center  Should we center the text at its x/y coordinate?
+   * @param z           The Z index of the sprite
    */
-  public addTextToFrame(text: Text, body: RigidBodyComponent, camera: CameraSystem, center: boolean) {
+  public addTextToFrame(text: Text, body: RigidBodyComponent, camera: CameraSystem, center: boolean, z: ZIndex) {
     if (!camera.inBounds(body.getCenter().x, body.getCenter().y, body.radius)) return;
 
     // Compute screen coords of center
@@ -356,7 +363,7 @@ export class RendererService {
     text.text.position.x = x;
     text.text.position.y = y;
     text.text.rotation = body.getRotation();
-    this.main.addChild(text.text);
+    this.worldPlaneContainers[z + 2].addChild(text.text);
 
     // Draw a debug box around the text?
     if (this.debug != undefined) {
@@ -400,16 +407,19 @@ export class RendererService {
    * TODO:  Finish adding filter support.  We probably want to do it one Z at a
    *        time?
    *
+   * TODO:  Right now, we're putting the filter on Z=4.  Is that what we really
+   *        want to be doing here?
+   *
    * @param use_blur      Use the blur filter?
    * @param use_ascii     Use the ASCII filter?
    * @param use_sepia_tv  Use the "old TV" filter?
    */
   public applyFilter(use_blur: boolean = false, use_ascii: boolean = false, use_sepia_tv: boolean = false) {
     if (use_blur) {
-      this.main.filters = [this.blur_filter];
+      this.worldPlaneContainers[4].filters = [this.blur_filter];
     }
     else if (use_ascii) {
-      this.main.filters = [this.ascii_filter as any];
+      this.worldPlaneContainers[4].filters = [this.ascii_filter as any];
     }
     else if (use_sepia_tv) {
       this.noise_filter.seed = Math.random();
@@ -422,7 +432,7 @@ export class RendererService {
       this.old_film_filter.vignetting = .3;
       this.old_film_filter.vignettingAlpha = 1;
       this.old_film_filter.vignettingBlur = .3;
-      this.main.filters = [this.noise_filter, this.godray_filter as any, this.old_film_filter as any];
+      this.worldPlaneContainers[4].filters = [this.noise_filter, this.godray_filter as any, this.old_film_filter as any];
     }
   }
 }

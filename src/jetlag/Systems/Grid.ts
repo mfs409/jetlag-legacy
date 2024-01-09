@@ -1,4 +1,4 @@
-import { FilledBox } from "../Components/Appearance";
+import { FilledBox, ZIndex } from "../Components/Appearance";
 import { BoxBody } from "../Components/RigidBody";
 import { Actor } from "../Entities/Actor";
 import { Scene } from "../Entities/Scene";
@@ -20,7 +20,7 @@ export class GridSystem {
    * @param z             The Z index of the grid
    * @param halves        True to print half-meter lines
    */
-  public static makeGrid(scene: Scene, top_left: { x: number, y: number }, bottom_right: { x: number, y: number }, z?: -2 | -1 | 0 | 1 | 2, halves: boolean = true) {
+  public static makeGrid(scene: Scene, top_left: { x: number, y: number }, bottom_right: { x: number, y: number }, z?: ZIndex, halves: boolean = true) {
     let width = bottom_right.x - top_left.x;
     let height = bottom_right.y - top_left.y;
     if (z === undefined) z = -2;
