@@ -32,7 +32,7 @@ export class Actor {
   /** The behavioral role that this Actor plays within the game */
   readonly role: RoleComponent;
   /** The visual representation of this Actor within the game */
-  readonly appearance: AppearanceComponent;
+  readonly appearance: AppearanceComponent[];
   /** Extra data that the game designer can attach to the Actor */
   readonly extra: any = {};
   /** The current state of this Actor */
@@ -54,12 +54,24 @@ export class Actor {
    * @param config.onDisappear  Code to run when the actor disappears
    * @param config.extra        An untyped object to store extra information
    */
-  public constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent, movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
+  public constructor(config: { rigidBody: RigidBodyComponent, appearance: AppearanceComponent | AppearanceComponent[], movement?: MovementComponent, role?: RoleComponent, gestures?: GestureHandlers, sounds?: SoundEffectComponent, onDisappear?: (a: Actor) => void, extra?: any }) {
     this.scene = config.rigidBody.scene;
 
-    this.appearance = config.appearance;
+    let appearance = [] as AppearanceComponent[];
+    if (Array.isArray(config.appearance)) {
+      for (let a of config.appearance)
+        appearance.push(a);
+    }
+    else {
+      appearance.push(config.appearance)
+    }
+    if (appearance.length == 0)
+      throw "Error: config.appearance cannot be an empty array";
+
+    this.appearance = appearance;
     this.scene.camera.addEntity(this);
-    this.appearance.actor = this;
+    for (let a of this.appearance)
+      a.actor = this;
 
     this.rigidBody = config.rigidBody;
     this.rigidBody.body.SetUserData(this);
@@ -91,7 +103,8 @@ export class Actor {
     this.movement?.prerender(elapsedMs, this.scene.camera);
     this.rigidBody?.prerender(elapsedMs, this);
     this.role?.prerender(elapsedMs);
-    this.appearance.prerender(elapsedMs);
+    for (let a of this.appearance)
+      a.prerender(elapsedMs);
     return true;
   }
 
@@ -123,7 +136,8 @@ export class Actor {
     if (scale <= 0)
       throw "Error: resize requires a positive, non-zero value";
     // set new height and width of the Render context
-    this.appearance.resize(scale);
+    for (let a of this.appearance)
+      a.resize(scale);
     this.rigidBody.resize(scale);
   }
 }

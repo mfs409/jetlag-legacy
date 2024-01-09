@@ -243,6 +243,8 @@ export class CameraSystem {
   render(elapsedMs: number) {
     // Draw everything
     for (let renderable of this.actors)
-      if (renderable.prerender(elapsedMs)) renderable.appearance?.render(this, elapsedMs);
+      if (renderable.prerender(elapsedMs))
+        for (let a of renderable.appearance)
+          a.render(this, elapsedMs);
   }
 }
