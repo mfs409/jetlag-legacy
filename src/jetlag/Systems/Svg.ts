@@ -81,9 +81,6 @@ export class SvgSystem {
   public static processFile(file: string, x: number, y: number, stretchX: number, stretchY: number, actorMaker: (cx: number, cy: number, width: number, rotation: number) => void) {
     let svg = new SvgSystem(new b2Vec2(x, y), new b2Vec2(stretchX, stretchY), actorMaker);
     // send the request.  On completion, we'll be in onFileLoaded
-    //
-    // TODO:  Capacitor and Electron might require a different way of getting
-    //        the SVG file...
     let xhr = new XMLHttpRequest();
     xhr.addEventListener("load", (aa: ProgressEvent) => svg.onFileLoaded(aa));
     xhr.open("GET", stage.config.resourcePrefix + file, true);
@@ -100,7 +97,6 @@ export class SvgSystem {
   private onFileLoaded(event: ProgressEvent) {
     let file_contents = (event.currentTarget as XMLHttpRequest).response;
     let dp = new DOMParser();
-    // TODO: consider "image/svg+xml" to get an SVGDocument instead
     let doc = dp.parseFromString(file_contents, "text/xml");
     let gs = doc.getElementsByTagName("g");
     for (let i = 0; i < gs.length; ++i) {
