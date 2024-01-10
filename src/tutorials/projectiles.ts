@@ -262,7 +262,7 @@ function builder(level: number) {
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
       let p = projectiles.get();
       if (!p) return;
-      (p.appearance as ImageSprite).setImage(images[Math.trunc(Math.random() * 4)]);
+      (p.appearance[0] as ImageSprite).setImage(images[Math.trunc(Math.random() * 4)]);
       (p.role as Projectile).tossFrom(hero, .2, 0, 5, 0);
       p.rigidBody.body.SetAngularVelocity(4);
     });

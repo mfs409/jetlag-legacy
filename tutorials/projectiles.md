@@ -460,15 +460,15 @@ vary, so that it will take different numbers of projectiles to defeat them:
 
 We'll use the space bar to toss projectiles, using the `tossFrom()` technique.
 To make the game feel a bit more fun, we'll randomly change the projectile image
-when we throw it.  (@@red Note: this only works because we'll make sure all of
-our projectiles have an `ImageSprite` appearance!@@)
+when we throw it.  (@@red Note: this only works because we'll make sure each of
+our projectiles has exactly one `AppearanceComponent`, and that each of those is an `ImageSprite`!@@)
 
 ```typescript
     let images = ["color_star_1.png", "color_star_2.png", "color_star_3.png", "color_star_4.png"];
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => {
       let p = projectiles.get();
       if (!p) return;
-      (p.appearance as ImageSprite).setImage(images[Math.trunc(Math.random() * 4)]);
+      (p.appearance[0] as ImageSprite).setImage(images[Math.trunc(Math.random() * 4)]);
       (p.role as Projectile).tossFrom(hero, .2, 0, 5, 0);
       p.rigidBody.body.SetAngularVelocity(4);
     });

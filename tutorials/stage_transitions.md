@@ -105,7 +105,7 @@ export function drawMuteButton(cfg: { cx: number, cy: number, width: number, hei
   });
   // If the game is not muted, switch the image
   if (getVolume())
-    (mute.appearance as ImageSprite).setImage("audio_on.png");
+    (mute.appearance[0] as ImageSprite).setImage("audio_on.png");
   // when the obstacle is touched, switch the mute state and update the picture
   mute.gestures = {
     tap: () => {
@@ -115,8 +115,8 @@ export function drawMuteButton(cfg: { cx: number, cy: number, width: number, hei
       // update all music
       stage.musicLibrary.resetMusicVolume(volume);
 
-      if (getVolume()) (mute.appearance as ImageSprite).setImage("audio_on.png");
-      else (mute.appearance as ImageSprite).setImage("audio_off.png");
+      if (getVolume()) (mute.appearance[0] as ImageSprite).setImage("audio_on.png");
+      else (mute.appearance[0] as ImageSprite).setImage("audio_off.png");
       return true;
     }
   };
@@ -479,7 +479,10 @@ immediately pause, that overlay will be drawn, and it will stay until you call
 `stage.clearOverlay()`.  Here's an example: this code will ask for an overlay,
 which pauses the game.  When it gets an overlay, it will put a black background
 on it, then write some text in the middle.  Clicking the background will clear
-the overlay, resuming the game:
+the overlay, resuming the game.  This also shows something very cool that we
+haven't seen before: an `Actor` can have several `appearance` components.  In
+this case, we make a `FilledBox` *and* a `TextSprite`, both centred on the
+`rigidBody`:
 
 ```typescript
 /**
@@ -494,7 +497,10 @@ function welcomeMessage(message: string) {
   stage.requestOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
     new Actor({
-      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message)
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
@@ -502,11 +508,6 @@ function welcomeMessage(message: string) {
           return true;
         }
       },
-    });
-    // The text goes in the middle
-    new Actor({
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
     });
   }, false);
 }
@@ -542,13 +543,12 @@ function pauseGame(level: number) {
 
     // Pressing anywhere on the text box will make the overlay go away
     new Actor({
-      appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); return true; } },
-    });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
 
     // It's not a bad idea to have a mute button...
@@ -584,13 +584,12 @@ function specialPauseGame(level: number, h: Actor) {
 
     // Pressing anywhere on the text box will make the overlay go away
     new Actor({
-      appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused")
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); return true; } },
-    });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
 
     // It's not a bad idea to have a mute button...
@@ -661,7 +660,10 @@ that the player has won or lost.
 function winMessage(message: string) {
   stage.score.winSceneBuilder = (overlay: Scene) => {
     new Actor({
-      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
@@ -670,10 +672,6 @@ function winMessage(message: string) {
           return true;
         }
       },
-    });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
   };
 }
@@ -687,7 +685,10 @@ function winMessage(message: string) {
 function loseMessage(message: string) {
   stage.score.loseSceneBuilder = (overlay: Scene) => {
     new Actor({
-      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
@@ -697,10 +698,6 @@ function loseMessage(message: string) {
         }
       },
     });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
-    })
   };
 }
 ```

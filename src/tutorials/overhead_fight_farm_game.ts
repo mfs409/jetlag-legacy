@@ -219,19 +219,19 @@ function builder(level: number) {
             if (state.seeds > 0 && state.dirt_states[thisActor.extra.id] == 0) {
               state.seeds -= 1;
               state.dirt_states[thisActor.extra.id] = 1;
-              (thisActor.appearance as FilledCircle).fillColor = state.colors[1];
+              (thisActor.appearance[0] as FilledCircle).fillColor = state.colors[1];
             }
             else if (state.dirt_states[thisActor.extra.id] == 3) {
               state.plants += 1;
               state.dirt_states[thisActor.extra.id] = 0;
-              (thisActor.appearance as FilledCircle).fillColor = state.colors[0];
+              (thisActor.appearance[0] as FilledCircle).fillColor = state.colors[0];
             }
           },
           // Watering is via a projectile
           projectileCollision: (thisActor: Actor) => {
             if (state.dirt_states[thisActor.extra.id] == 1) {
               state.dirt_states[thisActor.extra.id] = 2;
-              (thisActor.appearance as FilledCircle).fillColor = state.colors[2];
+              (thisActor.appearance[0] as FilledCircle).fillColor = state.colors[2];
             }
             return false;
           }

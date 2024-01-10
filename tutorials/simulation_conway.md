@@ -155,7 +155,7 @@ function builder(level: number) {
 
   function toggle(cell: Actor) {
     cell.extra.live = !cell.extra.live;
-    (cell.appearance as FilledBox).fillColor = cell.extra.live ? "#757575" : "#FFFFFF";
+    (cell.appearance[0] as FilledBox).fillColor = cell.extra.live ? "#757575" : "#FFFFFF";
   }
 
   // Create the initial grid
@@ -236,7 +236,7 @@ function builder(level: number) {
     for (let row = 0; row < ROWS; ++row) {
       for (let col = 0; col < COLS; ++col) {
         cells[row][col].extra.live = cells[row][col].extra.next;
-        (cells[row][col].appearance as FilledBox).fillColor =
+        (cells[row][col].appearance[0] as FilledBox).fillColor =
           (cells[row][col].extra.live) ?
             "#757575" : "#FFFFFF";
       }

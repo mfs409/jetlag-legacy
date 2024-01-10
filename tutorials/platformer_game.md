@@ -130,7 +130,7 @@ function builder(level: number) {
       movement: new ManualMovement(),
       role: new Hero()
     });
-    (h.appearance as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
+    (h.appearance[0] as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
     // center the camera a little ahead of the hero, so we can see more of the
     // world during gameplay
     stage.world.camera.setCameraFocus(h, 6, 0);

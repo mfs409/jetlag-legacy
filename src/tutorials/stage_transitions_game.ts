@@ -429,7 +429,10 @@ function welcomeMessage(message: string) {
   stage.requestOverlay((overlay: Scene) => {
     // Pressing anywhere on the black background will make the overlay go away
     new Actor({
-      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message)
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
@@ -437,11 +440,6 @@ function welcomeMessage(message: string) {
           return true;
         }
       },
-    });
-    // The text goes in the middle
-    new Actor({
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message),
     });
   }, false);
 }
@@ -468,13 +466,12 @@ function pauseGame(level: number) {
 
     // Pressing anywhere on the text box will make the overlay go away
     new Actor({
-      appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); return true; } },
-    });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
 
     // It's not a bad idea to have a mute button...
@@ -505,13 +502,12 @@ function specialPauseGame(level: number, h: Actor) {
 
     // Pressing anywhere on the text box will make the overlay go away
     new Actor({
-      appearance: new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 2, height: 1, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused")
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 2, height: 1 }, { scene: overlay }),
       gestures: { tap: () => { stage.clearOverlay(); return true; } },
-    });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, "Paused"),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
 
     // It's not a bad idea to have a mute button...
@@ -574,7 +570,10 @@ function specialPauseGame(level: number, h: Actor) {
 function winMessage(message: string) {
   stage.score.winSceneBuilder = (overlay: Scene) => {
     new Actor({
-      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
@@ -583,10 +582,6 @@ function winMessage(message: string) {
           return true;
         }
       },
-    });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
     });
   };
 }
@@ -600,7 +595,10 @@ function winMessage(message: string) {
 function loseMessage(message: string) {
   stage.score.loseSceneBuilder = (overlay: Scene) => {
     new Actor({
-      appearance: new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+      appearance: [
+        new FilledBox({ width: 16, height: 9, fillColor: "#000000" }),
+        new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
+      ],
       rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: 16, height: 9 }, { scene: overlay }),
       gestures: {
         tap: () => {
@@ -610,9 +608,5 @@ function loseMessage(message: string) {
         }
       },
     });
-    new Actor({
-      appearance: new TextSprite({ center: true, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, message),
-      rigidBody: new BoxBody({ cx: 8, cy: 4.5, width: .1, height: .1 }, { scene: overlay }),
-    })
   };
 }
