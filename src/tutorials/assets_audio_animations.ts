@@ -158,7 +158,7 @@ function builder(level: number) {
     });
     let onCollect = (_g: Actor, h: Actor) => {
       let s = ++(h.role as Hero).strength;
-      (h.appearance as ImageSprite).setImage("color_star_" + s + ".png");
+      (h.appearance[0] as ImageSprite).setImage("color_star_" + s + ".png");
       return true;
     }
     new Actor({
@@ -251,7 +251,7 @@ function builder(level: number) {
         appearance: new AnimatedSprite({ width: .5, height: .5, animations: animation_map }),
         rigidBody: new CircleBody({ cx: i + .5, cy: 2, radius: .25 }),
       });
-      (coin.appearance as AnimatedSprite).skipTo(Math.trunc(i / 2), (i % 2) * .25);
+      (coin.appearance[0] as AnimatedSprite).skipTo(Math.trunc(i / 2), (i % 2) * .25);
     }
   }
 
@@ -479,7 +479,7 @@ function builder(level: number) {
     // Instead of remapping JUMP_NE, JUMP_SE, JUMP_NW, JUMP_SW, we can tell the
     // AnimatedSprite that this is a side-scroll game, and it will do the work
     // for us.
-    (h.appearance as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
+    (h.appearance[0] as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
 
     stage.keyboard.setKeyDownHandler(KeyCodes.KEY_SPACE, () => { (h.role as Hero).jump(0, -5); });
 
@@ -597,7 +597,7 @@ function drawMuteButton(cfg: { cx: number, cy: number, width: number, height: nu
   });
   // If the game is not muted, switch the image
   if (getVolume())
-    (mute.appearance as ImageSprite).setImage("audio_on.png");
+    (mute.appearance[0] as ImageSprite).setImage("audio_on.png");
   // when the obstacle is touched, switch the mute state and update the picture
   mute.gestures = {
     tap: () => {
@@ -607,8 +607,8 @@ function drawMuteButton(cfg: { cx: number, cy: number, width: number, height: nu
       // update all music
       stage.musicLibrary.resetMusicVolume(volume);
 
-      if (getVolume()) (mute.appearance as ImageSprite).setImage("audio_on.png");
-      else (mute.appearance as ImageSprite).setImage("audio_off.png");
+      if (getVolume()) (mute.appearance[0] as ImageSprite).setImage("audio_on.png");
+      else (mute.appearance[0] as ImageSprite).setImage("audio_off.png");
       return true;
     }
   };

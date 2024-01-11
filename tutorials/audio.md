@@ -63,7 +63,7 @@ function drawMuteButton(cfg: { cx: number, cy: number, width: number, height: nu
   });
   // If the game is not muted, switch the image
   if (getVolume())
-    (mute.appearance as ImageSprite).setImage("audio_on.png");
+    (mute.appearance[0] as ImageSprite).setImage("audio_on.png");
   // when the obstacle is touched, switch the mute state and update the picture
   mute.gestures = {
     tap: () => {
@@ -73,8 +73,8 @@ function drawMuteButton(cfg: { cx: number, cy: number, width: number, height: nu
       // update all music
       stage.musicLibrary.resetMusicVolume(volume);
 
-      if (getVolume()) (mute.appearance as ImageSprite).setImage("audio_on.png");
-      else (mute.appearance as ImageSprite).setImage("audio_off.png");
+      if (getVolume()) (mute.appearance[0] as ImageSprite).setImage("audio_on.png");
+      else (mute.appearance[0] as ImageSprite).setImage("audio_off.png");
       return true;
     }
   };

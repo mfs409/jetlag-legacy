@@ -179,7 +179,7 @@ animation.
         appearance: new AnimatedSprite({ width: .5, height: .5, animations: animation_map }),
         rigidBody: new CircleBody({ cx: i + .5, cy: 2, radius: .25 }),
       });
-      (coin.appearance as AnimatedSprite).skipTo(Math.trunc(i / 2), (i % 2) * .25);
+      (coin.appearance[0] as AnimatedSprite).skipTo(Math.trunc(i / 2), (i % 2) * .25);
     }
 ```
 
@@ -424,7 +424,7 @@ Instead of remapping JUMP_NE, JUMP_SE, JUMP_NW, JUMP_SW, we can tell the
 AnimatedSprite that this is a side-view game, and it will do the work for us.
 
 ```typescript
-    (h.appearance as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
+    (h.appearance[0] as AnimatedSprite).stateSelector = AnimatedSprite.sideViewAnimationTransitions;
 ```
 
 Note that you can make your own transition maps and assign them to the
