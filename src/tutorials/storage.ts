@@ -9,6 +9,7 @@ import { AnimatedSprite, FilledBox, FilledPolygon, ImageSprite, TextSprite } fro
 import { TiltMovement } from "../jetlag/Components/Movement";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { boundingBox } from "./common";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -19,7 +20,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "com.github.mfs409.jetlag.tut_storage";
   hitBoxes = true;
   resourcePrefix = "./assets/";

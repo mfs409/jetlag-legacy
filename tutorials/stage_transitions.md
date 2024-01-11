@@ -40,6 +40,7 @@ time.  The easiest is `game.ts`:
 import { JetLagGameConfig } from "../jetlag/Config";
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { splashBuilder } from "./splash";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -50,7 +51,7 @@ class Config implements JetLagGameConfig {
     screenDimensions = { width: 1600, height: 900 };
     adaptToScreenSize = true;
     canVibrate = true;
-    forceAccelerometerOff = true;
+    accelerometerMode = AccelerometerMode.DISABLED;
     storageKey = "--no-key--";
     hitBoxes = true;
     resourcePrefix = "./assets/";

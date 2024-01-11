@@ -143,6 +143,7 @@ To begin, erase most of your `game.ts` file, so that it looks like this:
 ```typescript
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { JetLagGameConfig } from "../jetlag/Config";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -153,7 +154,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";
@@ -345,6 +346,7 @@ import { Actor } from "../jetlag/Entities/Actor";
 import { GridSystem } from "../jetlag/Systems/Grid";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { TimedEvent } from "../jetlag/Systems/Timer";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -355,7 +357,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";
@@ -731,6 +733,7 @@ import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Destination, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -741,7 +744,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";
@@ -1080,6 +1083,7 @@ import { Destination, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { GridSystem } from "../jetlag/Systems/Grid";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -1090,7 +1094,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";
@@ -1399,6 +1403,7 @@ import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Destination, Enemy, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Actor } from "../jetlag/Entities/Actor";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -1409,7 +1414,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";

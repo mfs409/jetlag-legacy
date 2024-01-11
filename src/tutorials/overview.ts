@@ -9,6 +9,7 @@ import { Destination, Enemy, Hero, Obstacle, Projectile } from "../jetlag/Compon
 import { stage } from "../jetlag/Stage";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { TimedEvent } from "../jetlag/Systems/Timer";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -19,7 +20,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = false;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";

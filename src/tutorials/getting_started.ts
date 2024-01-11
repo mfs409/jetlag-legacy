@@ -8,6 +8,7 @@ import { KeyCodes } from "../jetlag/Services/Keyboard";
 import { stage } from "../jetlag/Stage";
 import { GridSystem } from "../jetlag/Systems/Grid";
 import { FilledBox, FilledCircle, FilledPolygon } from "../jetlag/Components/Appearance";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -23,7 +24,7 @@ class Config implements JetLagGameConfig {
   adaptToScreenSize = true;
 
   canVibrate = true;            // Turn off except for some mobile games
-  forceAccelerometerOff = true; // Turn on except for some mobile games
+  accelerometerMode = AccelerometerMode.DISABLED; // Turn on in some mobile games
   storageKey = "--no-key--";    // This needs to be globally unique to your game
   hitBoxes = true;              // Turn off before deploying!
 

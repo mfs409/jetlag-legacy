@@ -7,6 +7,7 @@ import { BoxBody, CircleBody } from "../jetlag/Components/RigidBody";
 import { Hero, Obstacle } from "../jetlag/Components/Role";
 import { SvgSystem } from "../jetlag/Systems/Svg";
 import { enableTilt, boundingBox } from "./common";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -17,7 +18,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";

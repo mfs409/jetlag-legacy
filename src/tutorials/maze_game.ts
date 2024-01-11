@@ -8,6 +8,7 @@ import { ManualMovement, Path, PathMovement } from "../jetlag/Components/Movemen
 import { Destination, Enemy, Goodie, Hero, Obstacle } from "../jetlag/Components/Role";
 import { Scene } from "../jetlag/Entities/Scene";
 import { KeyCodes } from "../jetlag/Services/Keyboard";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -18,7 +19,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true; // Resize to fill the screen
   canVibrate = false;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = true;
   resourcePrefix = "./assets/";

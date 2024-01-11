@@ -1,4 +1,5 @@
 import { JetLagGameConfig } from "../jetlag/Config";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 import { initializeAndLaunch } from "../jetlag/Stage";
 import { splashBuilder } from "./stage_transitions_splash";
 
@@ -11,7 +12,7 @@ class Config implements JetLagGameConfig {
     screenDimensions = { width: 1600, height: 900 };
     adaptToScreenSize = true;
     canVibrate = true;
-    forceAccelerometerOff = true;
+    accelerometerMode = AccelerometerMode.DISABLED;
     storageKey = "--no-key--";
     hitBoxes = true;
     resourcePrefix = "./assets/";

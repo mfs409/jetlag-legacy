@@ -2,6 +2,7 @@ import { Scene } from "./Entities/Scene";
 import { Sprite } from "./Services/ImageLibrary";
 import { stage } from "./Stage";
 import { Actor } from "./Entities/Actor";
+import { AccelerometerMode } from "./Services/Accelerometer";
 
 /**
  * The different ActorState combinations for which we might have an animation
@@ -196,6 +197,6 @@ export interface JetLagGameConfig {
   readonly musicNames: string[];
   /** The prefix for all resources */
   readonly resourcePrefix: string;
-  /** Should we force the accelerometer to be off (e.g., some laptops)?  */
-  readonly forceAccelerometerOff: boolean;
+  /** Accelerometer mode (customize for each device target and orientation) */
+  readonly accelerometerMode: AccelerometerMode;
 }

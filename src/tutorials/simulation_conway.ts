@@ -6,6 +6,7 @@ import { Actor } from "../jetlag/Entities/Actor";
 import { stage } from "../jetlag/Stage";
 import { TimedEvent } from "../jetlag/Systems/Timer";
 import { GridSystem } from "../jetlag/Systems/Grid";
+import { AccelerometerMode } from "../jetlag/Services/Accelerometer";
 
 /**
  * Screen dimensions and other game configuration, such as the names of all
@@ -16,7 +17,7 @@ class Config implements JetLagGameConfig {
   screenDimensions = { width: 1600, height: 900 };
   adaptToScreenSize = true;
   canVibrate = true;
-  forceAccelerometerOff = true;
+  accelerometerMode = AccelerometerMode.DISABLED;
   storageKey = "--no-key--";
   hitBoxes = false;
   resourcePrefix = "./assets/";

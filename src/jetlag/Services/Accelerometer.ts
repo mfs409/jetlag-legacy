@@ -7,12 +7,11 @@ import { stage } from "../Stage";
  * portrait vs. landscape).  Until we have a use case, we'll just anticipate as
  * best we can by having this enum to pass to the constructor.
  *
- * TODO:  In 2015, Android accelerometer readings on tablets and phones were
- *        weirdly different, but maybe it's cleaner by now?  It would be good to
- *        check, and also to check iphone/ipad.  Then implement PORTRAIT
- *        support.
+ * TODO: This is only tested on Android phones, not tablets.  iOS is not tested.
  */
-export enum AccelerometerMode { LANDSCAPE, PORTRAIT }
+export enum AccelerometerMode {
+  ANDROID_LANDSCAPE, ANDROID_PORTRAIT, IOS_LANDSCAPE, IOS_PORTRAIT, DISABLED
+}
 
 /**
  * AccelerometerService provides access to device orientation and motion events
@@ -37,11 +36,10 @@ export class AccelerometerService {
    *
    * @param mode      portrait vs. landscape information, so we can interpret
    *                  x/y/z correctly
-   * @param disable   To force the accelerometer to be off
    */
-  constructor(mode: AccelerometerMode, disable: boolean) {
+  constructor(mode: AccelerometerMode) {
     // If there's a request to disable, don't use the accelerometer
-    if (disable) {
+    if (mode == AccelerometerMode.DISABLED) {
       this.tiltSupported = false;
       return;
     }
@@ -52,7 +50,8 @@ export class AccelerometerService {
       this.tiltSupported = false;
       return;
     }
-    if (mode != AccelerometerMode.LANDSCAPE) {
+
+    if (mode == AccelerometerMode.IOS_LANDSCAPE || mode == AccelerometerMode.IOS_PORTRAIT) {
       stage.console.log("Unsupported device orientation mode");
       this.tiltSupported = false;
       return;
@@ -64,8 +63,14 @@ export class AccelerometerService {
     window.addEventListener("devicemotion",
       (ev: DeviceMotionEvent) => {
         if (ev.accelerationIncludingGravity) {
-          this.accel.x = -ev.accelerationIncludingGravity.x!;
-          this.accel.y = ev.accelerationIncludingGravity.y!;
+          if (mode == AccelerometerMode.ANDROID_PORTRAIT) {
+            this.accel.x = -ev.accelerationIncludingGravity.x!;
+            this.accel.y = ev.accelerationIncludingGravity.y!;
+          }
+          else if (mode == AccelerometerMode.ANDROID_LANDSCAPE) {
+            this.accel.x = ev.accelerationIncludingGravity.y!;
+            this.accel.y = ev.accelerationIncludingGravity.x!;
+          }
         }
       },
       false

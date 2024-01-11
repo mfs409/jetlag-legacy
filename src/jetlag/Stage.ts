@@ -8,8 +8,7 @@ import { JetLagGameConfig } from "./Config";
 import { ConsoleService } from "./Services/Console";
 import { KeyboardService } from "./Services/Keyboard";
 import { RendererService } from "./Services/Renderer";
-
-import { AccelerometerMode, AccelerometerService } from "./Services/Accelerometer";
+import { AccelerometerService } from "./Services/Accelerometer";
 import { StorageService } from "./Services/Storage";
 import { TiltSystem } from "./Systems/Tilt";
 import { AdvancedCollisionSystem, BasicCollisionSystem } from "./Systems/Collisions";
@@ -233,8 +232,11 @@ export class Stage {
    * @param config  The game-wide configuration object
    * @param domId   The Id of the DOM element where the game exists
    * @param builder A function for building the first visible level of the game
+   * @param quitter The function for quitting the game
+   * @param vibrate A function that causes the device to vibrate for a fixed
+   *                number of milliseconds.
    */
-  constructor(readonly config: JetLagGameConfig, domId: string, builder: (level: number) => void) {
+  constructor(readonly config: JetLagGameConfig, domId: string, builder: (level: number) => void, private quitter: () => void, readonly vibrate: (ms: number) => void) {
     this.console = new ConsoleService(config);
 
     this.pixelMeterRatio = config.pixelMeterRatio;
@@ -251,7 +253,7 @@ export class Stage {
     this.storage = new StorageService();
     this.musicLibrary = new AudioLibraryService(config);
     this.keyboard = new KeyboardService();
-    this.accelerometer = new AccelerometerService(AccelerometerMode.LANDSCAPE, config.forceAccelerometerOff);
+    this.accelerometer = new AccelerometerService(config.accelerometerMode);
     this.renderer = new RendererService(this.screenWidth, this.screenHeight, domId, this.config.hitBoxes);
     this.imageLibrary = new ImageLibraryService(config);
 
@@ -304,25 +306,11 @@ export class Stage {
     this.fontScaling = this.screenWidth / old.x;
   }
 
-  /**
-   * Close the window to exit the game
-   *
-   * TODO: This probably needs special versions for Capacitor and Electron
-   */
+  /** Close the window to exit the game */
   public exit() {
     this.levelMusic?.stop();
-    window.close();
-  }
-
-  /**
-   * Cause the device to vibrate for a fixed number of milliseconds, or print
-   * a message if the device does not support vibration
-   *
-   * @param ms The number of milliseconds for which to vibrate
-   */
-  vibrate(ms: number) {
-    if (!!navigator.vibrate) navigator.vibrate(ms);
-    else this.console.log("Simulating " + ms + "ms of vibrate");
+    this.gameMusic?.stop();
+    this.quitter();
   }
 }
 
@@ -332,9 +320,21 @@ export class Stage {
  * @param domId   The name of the DIV into which the game should be placed
  * @param config  The game configuration object
  * @param builder A function for building the first visible level of the game
+ * @param quitter A function for quitting the app.  This defaults to a standard
+ *                html5 `window.close` call, but can be overridden (e.g., for
+ *                Capacitor).
+ * @param vibrate A function for vibrating.  This defaults to html5, but can be
+ *                overridden (e.g., for Capacitor).
  */
-export function initializeAndLaunch(domId: string, config: JetLagGameConfig, builder: (level: number) => void) {
-  stage = new Stage(config, domId, builder);
+export function initializeAndLaunch(domId: string, config: JetLagGameConfig, builder: (level: number) => void, quitter?: () => void, vibrate?: (ms: number) => void) {
+  if (!quitter)
+    quitter = () => window.close();
+  if (!vibrate)
+    vibrate = (ms: number) => {
+      if (!!navigator.vibrate) navigator.vibrate(ms);
+      else stage.console.log("Simulating " + ms + "ms of vibrate");
+    }
+  stage = new Stage(config, domId, builder, quitter, vibrate);
 }
 
 /** A global reference to the Stage, suitable for use throughout JetLag */
